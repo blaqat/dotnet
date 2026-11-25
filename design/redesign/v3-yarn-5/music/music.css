@@ -1,0 +1,354 @@
+/* ============================================================
+   music/music.css · Music page + item page (iteration 4, music agent)
+   Projects' layouts (projects/LAYOUT.md), with Music's own parts: the folder (kit Yarn.folder) as a grid
+   card, a timeline row and a phone row; track rows; the tab tip, context menu and toast (add to queue).
+   Kit parts (.ytl .ygroups .yyear .ydetail .ypanel .yfolder .ysearch .yfilter .btn) are only laid out here.
+   ============================================================ */
+.mu-top:empty { display: none; } /* .ytools when it holds the search line + filter row */
+.mu-body { position: relative; outline: none; }
+.mu-empty { display: grid; justify-items: center; gap: 12px; padding: 40px 20px; text-align: center; color: var(--ink-2); }
+.mu-empty p { margin: 0; }
+
+/* ============================================================
+   TOOLS: search + filters on ONE line on desktop (same rules as Projects: the hint, then the chip icons and
+   Browse's word give way below 1280px; past that the chip strip scrolls; it never wraps)
+   ============================================================ */
+@media (min-width: 960px) {
+  .mu-top.ytools { display: flex; align-items: center; gap: 16px; }
+  .mu-top > .ysearch { flex: 1 1 240px; min-width: 220px; }
+  .mu-top > .yfilter { flex: 0 1 auto; min-width: 0; }
+}
+@media (min-width: 960px) and (max-width: 1279px) {
+  /* KIT-CANDIDATE (site · filter row): same compact row as Projects */
+  .mu-top .yfilter__scroll .ychip > :is(i, img, .ychip__ic) { display: none; }
+  .mu-top .yfilter__browse > span:not(.ychip__n) { display: none; }
+  .mu-top .yfilter__browse { padding-inline: .85em; }
+}
+
+/* ============================================================
+   THE FOLDER, everywhere on this page
+   ============================================================ */
+/* the tab tip replaces the kit's CSS hint here (owner, Music 3: the hint went under the sticky filter row) */
+.mu .yfolder__tab::after { content: none; }
+.mu .yfolder__tab.is-tip { transform: translateY(-8px); z-index: 5; color: var(--ink); background-color: var(--white); }
+/* a tab whose track matches the search stands up a little, in the in-card match look */
+.mu .yfolder__tab.is-match:not(.is-now, .is-tip, .is-out, :hover) { transform: translateY(-4px); z-index: 3; color: var(--y-fg); background: var(--tex-knit), var(--white); box-shadow: inset 0 -2px 0 var(--y-chip), 0 -2px 6px rgba(31,30,30,.1); }
+.mu .yfolder__tab.is-match .yfolder__tt { text-decoration: underline 2px rgba(31,30,30,.28); text-underline-offset: 3px; }
+/* the foot: links (small) · … · + (small) · play (the one primary, 44px) */
+.mu .yfolder__foot { gap: 8px; }
+.mu .yfolder__links { gap: 6px; align-items: center; }
+.mu .yfolder__foot .mu-q { margin-left: auto; }
+
+/* == i5 · music · M3: the playing bars live inside the play button, in the icon's own slot ==
+   (Thoughts' playlist rows do the same). Playing: white bars; hover / focus: ⏸ (what a press does). The slot
+   never changes size, so nothing beside the button moves when play starts or stops. Idle bars don't animate. */
+.mu-play__ic { position: relative; display: inline-grid; place-items: center; width: 1.15em; height: 1.15em; flex: none; }
+.mu-play__ic > * { grid-area: 1 / 1; transition: opacity 140ms var(--ease-out); }
+.mu-eq { display: flex; align-items: flex-end; justify-content: center; gap: 2px; width: 14px; height: 13px; opacity: 0; }
+.mu-eq b { width: 3px; height: 100%; border-radius: 1.5px; background: #fff; transform-origin: 50% 100%; scale: 1 .4;
+  animation: mu-eq 820ms ease-in-out infinite alternate; animation-play-state: paused; }
+.mu-eq b:nth-child(2) { animation-duration: 640ms; animation-delay: -320ms; }
+.mu-eq b:nth-child(3) { animation-duration: 1040ms; animation-delay: -560ms; }
+@keyframes mu-eq { 0% { scale: 1 .28; } 55% { scale: 1 1; } 100% { scale: 1 .5; } }
+.mu-play.is-on .mu-eq { opacity: 1; }
+.mu-play.is-on .mu-eq b { animation-play-state: running; }
+.mu-play.is-on .mu-play__ic > i { opacity: 0; }
+@media (hover: hover) { .mu-play.is-on:hover .mu-eq { opacity: 0; } .mu-play.is-on:hover .mu-play__ic > i { opacity: 1; } }
+.mu-play.is-on:focus-visible .mu-eq { opacity: 0; }
+.mu-play.is-on:focus-visible .mu-play__ic > i { opacity: 1; }
+.mu-play--big .mu-play__ic { margin-right: .1em; }
+html.y-reduced .mu-eq b { animation: none; scale: 1 .7; }
+@media (prefers-reduced-motion: reduce) { .mu-eq b { animation: none; scale: 1 .7; } }
+
+/* == i5 · music · M8: a collection down to one tab is that song's single card: "Collection — Song" == */
+.mu-solo__c { font-weight: 600; color: var(--y-fg-2); }
+.mu-tl .ytl__item:has(> .yfolder--coll.is-solo) { --ytl-knot: 37px; }
+
+/* == i5 r2 · song notes · M6 (corrected): read a song's notes without the expanded player (?songnotes=face|rows|sheet) ==
+   rows   the opened collection: a row's caret unrolls its notes under it (row 2 of the row's grid, from the name's
+          edge to the row's end); the one-line start of the notes gives way at the same time. CSS transitions on
+          grid rows, so a second press turns back from where it is. Only the row grows; nothing else moves.
+   face   rows + a grid card's text box is a face, fixed at 3 lines: the collection's notes, or the song under the
+          pointer / focus / playing ("02 libterrene  the wind blows…  more"). Two layers in one cell, cross-faded.
+   sheet  .mu-notes: a popover beside its button (desktop) · a sheet from the bottom edge (phones), notes scroll inside */
+.mu-face { position: relative; display: grid; height: calc(1.45em * 3); font-size: .93rem; line-height: 1.45; }
+.mu-face > * { grid-area: 1 / 1; min-width: 0; }
+.mu-face .mu-face__c { font-size: inherit; -webkit-line-clamp: 3; line-clamp: 3; transition: opacity 180ms var(--ease-out), visibility 0s linear 0s; }
+.mu-face__s { position: relative; opacity: 0; visibility: hidden; transition: opacity 180ms var(--ease-out), visibility 0s linear 180ms; }
+.mu-face.is-song .mu-face__c { opacity: 0; visibility: hidden; transition: opacity 180ms var(--ease-out), visibility 0s linear 180ms; }
+.mu-face.is-song .mu-face__s { opacity: 1; visibility: visible; transition: opacity 180ms var(--ease-out), visibility 0s linear 0s; }
+/* the tab whose song the face shows stays up a little once the pointer has moved on into the card (like a match) */
+.mu .yfolder__tab.is-face:not(.is-now, .is-out, :hover, :focus-visible) { transform: translateY(-5px); z-index: 4; color: var(--ink); background-color: var(--white); }
+.mu-face__x { margin: 0; color: var(--y-fg-2); overflow: hidden; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 3; line-clamp: 3; overflow-wrap: anywhere; }
+.mu-face__h { font: 800 1em/1 var(--font-display); color: var(--y-fg); margin-right: .2em; }
+.mu-face__n { font: 600 .76em/1 var(--font-mono); color: var(--y-fg-3); margin-right: .15em; }
+.mu-face__none { font: 500 .8em/1 var(--font-mono); font-style: italic; color: var(--y-fg-3); }
+/* "more": over the end of the third line, on the card's own cloth (a short fade hides the cut word) */
+.mu-face__more {
+  position: absolute; right: 0; bottom: 0; padding: 0 0 0 26px; line-height: 1.45;
+  background: linear-gradient(to right, transparent, var(--white) 22px); color: var(--red-deep);
+  font: 800 .84rem/1.45 var(--font-display); text-decoration: underline; text-underline-offset: 3px;
+  transition: translate 200ms var(--ease-crit);
+}
+.mu-face__more[hidden] { display: none; }
+@media (hover: hover) { .mu-face__more:hover { translate: 0 -1px; } }
+.mu-face__more:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; border-radius: 4px; }
+@media (max-width: 959px) { .mu-face { font-size: .9rem; } }
+html.y-reduced .mu-face > * { transition: none; }
+@media (prefers-reduced-motion: reduce) { .mu-face > * { transition: none; } }
+
+/* the notes button (rows · sheet; a grid card's foot in sheet): the small round family of "+" and the link openers.
+   rows: a caret that turns over while the notes are out; pressed = the in-card chip look (like "In queue") */
+.mu-nb i { transition: rotate 260ms var(--ease-crit); }
+.mu-nb[data-notes][aria-expanded="true"] i { rotate: 180deg; }
+.mu-nb[aria-expanded="true"] { color: var(--red-deep); background: var(--tex-knit), var(--cotton-2); box-shadow: inset 0 0 0 1.5px rgba(31,30,30,.16); }
+.mu-nb-slot, .mu-q-slot { flex: none; width: 32px; }
+
+/* the popover / sheet */
+.mu-notes {
+  position: fixed; left: 0; top: 0; z-index: var(--z-pop); display: flex; flex-direction: column; width: min(420px, calc(100vw - 16px)); max-height: 560px;
+  border-radius: 18px; background: var(--tex-knit), var(--white); color: var(--ink); box-shadow: 0 0 0 1px rgba(31,30,30,.12), var(--shadow-pop);
+  opacity: 0; visibility: hidden; translate: 0 -6px;
+  transition: opacity 160ms var(--ease-out), translate 320ms var(--ease-crit), visibility 0s linear 320ms;
+}
+.mu-notes.is-up { translate: 0 6px; }
+.mu-notes.is-open { opacity: 1; visibility: visible; translate: none; transition: opacity 160ms var(--ease-out), translate 320ms var(--ease-crit), visibility 0s linear 0s; }
+.mu-notes.is-sizing { overflow: hidden; } /* only while ‹ › glide its height (buttons' lift shadows are never cut otherwise) */
+.mu-notes__head { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 12px; padding: 14px 12px 10px 14px; }
+.mu-notes__sw { line-height: 0; }
+.mu-notes__sw > * { border-radius: 11px; box-shadow: 0 1px 0 rgba(31,30,30,.1), 0 2px 6px rgba(31,30,30,.12); }
+.mu-notes__t { margin: 0; font: 850 1.06rem/1.2 var(--font-display); letter-spacing: -.01em; overflow-wrap: anywhere; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; line-clamp: 2; overflow: hidden; }
+.mu-notes__t:focus { outline: none; }
+.mu-notes__s { margin: 3px 0 0; font: 500 .74rem/1.3 var(--font-mono); color: var(--ink-3); overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.mu-notes__nav { display: flex; gap: 6px; align-self: start; }
+.mu-notes__nav [hidden] { display: none; }
+.mu-notes__acts { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 2px 14px 12px; }
+.mu-notes__acts .mu-q { margin-right: 2px; }
+.mu-notes__links { display: flex; gap: 6px; margin-left: auto; }
+.mu-notes__links:empty { display: none; }
+.mu-notes__body {
+  flex: 0 1 auto; min-height: 0; overflow: auto; overscroll-behavior: contain; scrollbar-width: thin;
+  margin: 0; padding: 14px 18px 18px 14px; border-top: 1.5px dashed rgba(31,30,30,.16);
+  font-size: .95rem; line-height: 1.6; color: var(--ink-2); overflow-wrap: anywhere;
+}
+.mu-notes__body p { margin: 0 0 .75em; }
+.mu-notes__body p:last-child { margin-bottom: 0; }
+.mu-notes__body:focus-visible { outline: 3px solid var(--focus); outline-offset: -3px; border-radius: 0 0 18px 18px; }
+.mu-notes-scrim { position: fixed; inset: 0; z-index: var(--z-scrim); background: rgba(31,30,30,.34); touch-action: none; opacity: 0; visibility: hidden; transition: opacity 200ms var(--ease-out), visibility 0s linear 200ms; }
+.mu-notes-scrim.is-open { opacity: 1; visibility: visible; transition: opacity 200ms var(--ease-out), visibility 0s linear 0s; }
+@media (max-width: 639px) {
+  .mu-notes {
+    z-index: var(--z-sheet); left: 8px !important; right: 8px; top: auto !important; bottom: calc(8px + env(safe-area-inset-bottom)) !important;
+    width: auto; max-height: min(80dvh, 640px) !important; border-radius: 22px; translate: 0 calc(100% + 24px);
+  }
+  .mu-notes.is-up { translate: 0 calc(100% + 24px); }
+  .mu-notes.is-open { translate: none; }
+  .mu-notes::before { content: ""; position: absolute; top: 7px; left: 50%; width: 36px; height: 4px; margin-left: -18px; border-radius: 2px; background: rgba(31,30,30,.16); } /* a sheet */
+  .mu-notes__head { padding-top: 20px; }
+  .mu-notes__s { white-space: normal; }
+  .mu-notes__body { font-size: 1rem; padding-bottom: 22px; }
+}
+html.y-reduced :is(.mu-notes, .mu-notes-scrim) { transition: none; }
+@media (prefers-reduced-motion: reduce) { :is(.mu-notes, .mu-notes-scrim) { transition: none; } }
+
+/* match marks (kit .is-match) on a status / instrument badge: the badge itself never changes */
+.mu-mk { display: inline-flex; align-items: center; padding: 3px 4px; margin: -3px -4px; border-radius: 999px; transition: background-color 160ms var(--ease-out); }
+@media (pointer: coarse) { .mu .yfolder, .mu .mu-trk { -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; } }
+
+/* the quiet "+": a round small button like the link openers; in the queue = a check on the in-card chip look
+   (not the red toggle fill: on a card the play button stays the only red thing) */
+.mu-q[aria-pressed="true"] { color: var(--red-deep); background: var(--tex-knit), var(--cotton-2); box-shadow: inset 0 0 0 1.5px rgba(31,30,30,.16); }
+.mu-q:disabled { opacity: .38; cursor: default; pointer-events: none; }
+.mu-q--big { min-width: 10.4em; }
+.mu-q--big[aria-pressed="true"] { outline-color: rgba(31,30,30,.3); }
+.mu-q--big[aria-pressed="true"] i { color: var(--red-deep); }
+
+/* the detail's play: the label keeps the button's width while it's the current one (only the icon shows then) */
+.mu-play--big { min-width: 8.4em; }
+.mu-play--big.is-cur .mu-play__l { display: none; }
+
+/* ============================================================
+   DESKTOP TIMELINE: ruled year pills, yarn ball on the selected release + the stage (Projects' columns)
+   ============================================================ */
+.mu-list { display: grid; grid-template-columns: minmax(340px, 2fr) minmax(0, 3fr); gap: clamp(24px, 3vw, 44px); align-items: start; }
+.mu-tl .ytl { --ytl-knot: 37px; --ytl-gap: 14px; }
+.mu-tl .ytl__item:has(> .yfolder--coll) { --ytl-knot: 59px; } /* the knot sits on the card's middle, under the tabs */
+.mu-tl .ytl__group { padding-bottom: 26px; }
+.mu-tl .ytl__group > .yyear { margin-bottom: 16px; }
+/* a row: the folder, its card laid out in one line (swatch · name + meta · + · play) */
+.mu-tl .yfolder__card, .mu-mlist .yfolder__card { flex-direction: row; align-items: center; gap: 12px; padding: 10px 12px 10px 10px; }
+.mu-tl .yfolder__head, .mu-mlist .yfolder__head { flex: 1; min-width: 0; gap: 12px; }
+.mu-tl .yfolder__name, .mu-mlist .yfolder__name { margin-bottom: 5px; font-size: 1.04rem; }
+.mu-tl .yfolder__foot, .mu-mlist .yfolder__foot { flex: none; margin: 0; padding: 0; min-height: 0; }
+.mu-tl .yfolder__links, .mu-mlist .yfolder__links { display: none; }
+/* 960–1279: the timeline column is narrow; the row's "+" gives way (the stage beside it has Add to queue) */
+@media (max-width: 1279px) { .mu-tl .yfolder__foot .mu-q { display: none; } }
+
+/* the stage: the opened release on the white card material (kit .ypanel); its own scroll, sized by CSS only */
+.mu-stagewrap { position: sticky; top: 18px; --mu-ui: var(--bottom-ui); }
+.mu-stage {
+  --bottom-ui: 0px; --ypanel-pad: 30px;
+  max-height: calc(100dvh - 36px - var(--mu-ui, 0px)); overflow: auto; overscroll-behavior: contain; scrollbar-width: thin; outline: none;
+}
+.mu-stage .ydetail__top { padding-top: 14px; }
+.mu-stage__none { padding: 40px 0; }
+
+/* ============================================================
+   DESKTOP GRID: year groups (ruled pills = clear separators) of folder cards.
+   4 columns from 1320px, else 2: either way the columns sit on Projects' grid lines (same gap, 2 = 1 + 1).
+   ============================================================ */
+.mu-grid .ygroups { --ygroup-gap: 34px; --ygroup-row: 20px; --ygroup-col: 20px; --ygroup-cols: 2; --yfolder-top: 22px; } /* singles line up with collections' tabs */
+@media (min-width: 1320px) { .mu-grid--cauto .ygroups { --ygroup-cols: 4; } }
+.mu-grid--c2 .yfolder__desc { -webkit-line-clamp: 3; } /* ?gcols=2: wide cards show more of the notes */
+.mu-grid .yfolder__card { min-height: 100%; }
+/* the opened card (Yarn.openInPlace): the detail on the white card material, its text column centred (900px) */
+.mu-grid .ygroup__item.is-open { container-type: inline-size; }
+.mu-panel { --ypanel-pad: max(28px, calc((100cqw - 900px) / 2)); }
+/* while an opened item's bar is stuck at the top, it stands in for its year's pill (they'd overlap) */
+.mu .ygroup > .yyear { transition: opacity 160ms var(--ease-out); }
+.ygroup:has(.mu-panel .ydetail__top:is(.is-stuck, .is-lifted)) > .yyear { opacity: 0; pointer-events: none; } /* i5 · layout: .is-lifted = the bar that lies over the head has its material */
+
+/* ============================================================
+   THE DETAIL (stage · opened card · item page): art · title · meta · play / queue / links · tracks · notes
+   ============================================================ */
+.mu .ydetail__kicker { margin-bottom: 12px; }
+.mu-art { display: block; line-height: 0; }
+.mu-art .yswatch, .mu-art > * { box-shadow: 0 1px 0 rgba(31,30,30,.1), 0 2px 8px rgba(31,30,30,.14); border-radius: 14px; }
+.mu-dmeta { padding-left: 2px; }
+.mu-dlinks { display: inline-flex; flex-wrap: wrap; gap: 8px; } /* the link openers wrap as one group */
+.mu-trks-h { margin: 0 0 10px; }
+.mu-trks { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+/* i5 r2 (M6): n · swatch · name / one line · [links · notes · + · length] in one right-hand group, so the "+" and the
+   notes button line up down the list (a list with notes keeps the button's place on every row); row 2 = the notes */
+.mu-trk { display: grid; grid-template-columns: 24px auto minmax(0, 1fr) auto; align-items: center; column-gap: 12px; row-gap: 0; min-height: 58px; padding: 8px 12px 8px 10px; }
+.mu-trk__acts { display: flex; align-items: center; gap: 10px; }
+.mu-trk__btn { position: absolute; inset: 0; z-index: 1; border: 0; padding: 0; background: none; border-radius: inherit; cursor: pointer; }
+.mu-trk__btn:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; border-radius: 14px; }
+.mu-trk > :not(.mu-trk__btn) { position: relative; z-index: 2; pointer-events: none; }
+.mu-trk :is(a, button):not(.mu-trk__btn) { pointer-events: auto; }
+.mu-trk__n { display: grid; place-items: center; font: 600 .74rem/1 var(--font-mono); color: var(--ink-3); }
+.mu-trk__n > * { grid-area: 1 / 1; }
+.mu-trk__n i, .mu-trk__n .yeq { opacity: 0; }
+.mu-trk__n i { color: var(--red-deep); font-size: 15px; }
+@media (hover: hover) { .mu-trk:not(.is-off):hover .mu-trk__n > span:first-child { opacity: 0; } .mu-trk:not(.is-off):hover .mu-trk__n i { opacity: 1; } }
+.mu-trk[aria-current="true"] .mu-trk__n > span:first-child, .mu-trk[aria-current="true"] .mu-trk__n i { opacity: 0 !important; }
+.mu-trk[aria-current="true"] .mu-trk__n .yeq { opacity: 1; }
+.mu-trk__t { display: grid; gap: 2px; min-width: 0; }
+.mu-trk__t b { width: fit-content; max-width: 100%; font: 800 .95rem/1.2 var(--font-display); overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.mu-trk__t b.is-match { padding: 1px 6px; margin: -1px -6px; border-radius: 7px; }
+.mu-trk__t small { font-size: .8rem; color: var(--ink-3); overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.mu-trk__links { display: flex; gap: 4px; }
+.mu-trk__links:empty { display: none; }
+.mu-trk__d { flex: none; width: 2.9rem; text-align: right; }
+/* M6 rows / face: the notes unroll under the row; the one-line start of them folds away at the same time */
+.mu-trk__t:has(> .is-np) { grid-template-rows: auto 1fr; transition: grid-template-rows 340ms var(--ease-crit); }
+.mu-trk.is-notes .mu-trk__t:has(> .is-np) { grid-template-rows: auto 0fr; }
+.mu-trk__t > .is-np { min-height: 0; transition: opacity 160ms var(--ease-out); }
+.mu-trk.is-notes .mu-trk__t > .is-np { opacity: 0; }
+.mu-trk > .mu-trk__notes {
+  grid-column: 3 / -1; grid-row: 2; display: grid; grid-template-rows: 0fr; pointer-events: auto; cursor: auto;
+  -webkit-user-select: text; user-select: text; -webkit-touch-callout: default;
+  transition: grid-template-rows 360ms var(--ease-crit);
+}
+.mu-trk.is-notes > .mu-trk__notes { grid-template-rows: 1fr; }
+.mu-trk__nin { min-height: 0; overflow: hidden; }
+.mu-trk__nx {
+  max-width: 66ch; padding: 4px 4px 4px 0; font-size: .9rem; line-height: 1.6; color: var(--y-fg-2); overflow-wrap: anywhere;
+  opacity: 0; translate: 0 -4px; transition: opacity 200ms var(--ease-out), translate 300ms var(--ease-crit);
+}
+.mu-trk.is-notes .mu-trk__nx { opacity: 1; translate: none; }
+.mu-trk__nx p { margin: 0 0 .65em; }
+.mu-trk__nx p:last-child { margin-bottom: 0; }
+.mu-trk__nx a { color: var(--red-deep); text-underline-offset: 3px; }
+/* "> " lines (a poem in the notes): one quote with the red twill edge, lighter than a prose quote (the row is the patch) */
+:is(.mu-trk__nx, .mu-notes__body) blockquote { position: relative; margin: .1em 0 .75em; padding: 1px 0 1px 15px; font-style: italic; color: var(--ink-2); }
+:is(.mu-trk__nx, .mu-notes__body) blockquote::before { content: ""; position: absolute; left: 0; top: .2em; bottom: .2em; width: 4px; border-radius: 2px; background: var(--tex-twill), var(--red); }
+:is(.mu-trk__nx, .mu-notes__body) blockquote:last-child { margin-bottom: 0; }
+:is(.mu-trk__nx, .mu-notes__body) blockquote p { margin: 0; }
+.mu-trk.is-instant, .mu-trk.is-instant * { transition: none !important; }
+html.y-reduced .mu-trk :is(.mu-trk__t, .mu-trk__notes, .mu-trk__nx, .is-np) { transition: none; }
+@media (prefers-reduced-motion: reduce) { .mu-trk :is(.mu-trk__t, .mu-trk__notes, .mu-trk__nx, .is-np) { transition: none; } }
+/* the row's "+": quiet until the row is under the pointer (always there on touch, and when it's in the queue) */
+@media (hover: hover) and (pointer: fine) {
+  .mu-trk .mu-q:not([aria-pressed="true"]) { opacity: .5; transition: opacity 160ms var(--ease-out), transform 240ms var(--ease-crit), box-shadow 240ms var(--ease-crit); }
+  .mu-trk:is(:hover, :focus-within) .mu-q { opacity: 1; }
+}
+.mu-trk.is-off { cursor: default; }
+.mu-trk.is-off .mu-trk__t b { color: var(--ink-2); }
+
+/* ============================================================
+   TAB TIP · CONTEXT MENU · TOAST (add to queue; fixed, on the page's top layer)
+   ============================================================ */
+/* i5 · M5: just the name (no "+": the queue lives in the opened collection); the pointer passes through it */
+.mu-tip {
+  position: fixed; left: 0; top: 0; z-index: var(--z-pop); display: flex; align-items: center; max-width: 300px; pointer-events: none; /* kit Z-INDEX SCALE */
+  padding: 5px 10px; border-radius: 9px; background: var(--ink); color: #fff; box-shadow: 0 6px 16px -6px rgba(31,30,30,.5);
+  font: 700 .76rem/1.25 var(--font-display);
+}
+.mu-tip[hidden] { display: none; }
+.mu-tip__t { min-width: 0; }
+
+.mu-menu {
+  position: fixed; left: 0; top: 0; z-index: var(--z-pop); min-width: 210px; max-width: 300px; padding: 6px; border-radius: 16px;
+  background: var(--tex-knit), var(--white); color: var(--ink); box-shadow: 0 0 0 1px rgba(31,30,30,.12), var(--shadow-pop);
+  transform-origin: 0 0;
+}
+.mu-menu[hidden] { display: none; }
+.mu-menu__h { margin: 0; padding: 8px 10px 8px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; font: 850 .86rem/1.2 var(--font-display); color: var(--ink-2); border-bottom: 1.5px dashed rgba(31,30,30,.14); margin-bottom: 4px; }
+.mu-menu [role="menuitem"] {
+  display: flex; align-items: center; gap: 10px; width: 100%; min-height: 40px; padding: 0 12px; border: 0; border-radius: 10px;
+  background: none; color: inherit; font: 750 .9rem/1 var(--font-display); text-align: left; cursor: pointer;
+}
+.mu-menu [role="menuitem"] i { font-size: 1.1rem; color: var(--ink-3); }
+.mu-menu:focus { outline: none; }
+.mu-menu [role="menuitem"]:is(:hover, :focus-visible) { background: var(--cotton-2); outline: none; }
+.mu-menu [role="menuitem"]:focus-visible { box-shadow: inset 0 0 0 2px var(--focus); }
+.mu-menu [role="menuitem"]:disabled { opacity: .45; cursor: default; }
+@media (pointer: coarse) { .mu-menu [role="menuitem"] { min-height: 46px; } }
+
+/* KIT-CANDIDATE (toast): the same cloth as Studio's .st-toast */
+.mu-toast {
+  position: fixed; z-index: var(--z-toast); left: 50%; bottom: calc(var(--bottom-ui, 0px) + var(--frame, 14px) + 18px + env(safe-area-inset-bottom)); translate: -50% 0; /* kit Z-INDEX SCALE (was 48: under the nav + player) */
+  display: flex; align-items: center; gap: 12px; width: max-content; max-width: min(460px, calc(100vw - 32px)); padding: 8px 8px 8px 16px; border-radius: 20px;
+  background: var(--tex-twill), var(--ink); color: #fff; box-shadow: var(--shadow-pop); outline: 1.5px dashed rgba(255,255,255,.3); outline-offset: -5px;
+  font: 600 .9rem/1.3 var(--font-body, inherit);
+}
+.mu-toast[hidden] { display: none; }
+.mu-toast > i { flex: none; font-size: 1.2rem; color: var(--red-hi); }
+.mu-toast__t { min-width: 0; overflow: hidden; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; line-clamp: 2; } /* i5 review: two lines before it cuts the name */
+.mu-toast__t b { font-family: var(--font-display); font-weight: 850; }
+.mu-toast__undo { color: #fff; outline-color: rgba(255,255,255,.4); }
+.mu-toast:not(:has(.mu-toast__undo)) { padding-right: 16px; }
+
+/* ============================================================
+   PHONES: one list of folder rows grouped by year (ruled pills); a tap opens the release's page
+   ============================================================ */
+@media (max-width: 959px) {
+  /* contents: a sticky filter row (msearch=bar) then sticks for the whole list, not just inside this wrapper */
+  .mu-top { display: contents; }
+  .mu-top > * { margin-bottom: 12px; }
+  .mu-top > .yfilter--sticky { margin-bottom: 14px; }
+  .mu-mlist .ygroups { --ygroup-gap: 22px; --ygroup-row: 10px; }
+  .mu-mlist .yfolder__card { padding: 9px 10px 9px 9px; gap: 10px; }
+  .mu-mlist .yfolder__name { font-size: 1.02rem; }
+  .mu-mlist .yfolder__n { display: block; margin-top: 2px; }
+  .mu-mlist .ymeta { gap: 5px 6px; }
+  /* the play button leads the row: the search FAB and the player's disc rest on the right edge above the nav */
+  .mu-mlist .yfolder__foot { order: -1; }
+  .mu-go { order: 1; flex: none; font-size: 1.05rem; color: var(--y-fg-3); } /* as Projects' phone rows: a tap opens its page */
+  .mu-stage, .mu-panel { --ypanel-pad: 16px; }
+  .mu-trk { grid-template-columns: 20px auto minmax(0, 1fr) auto; column-gap: 10px; padding: 8px 10px 8px 8px; }
+  .mu-trk > .mu-trk__notes { grid-column: 2 / -1; } /* M6: on a phone the notes take the swatch's edge too (≈300px at 390) */
+  .mu-trk__links { display: none; }
+  .mu-trk.is-off .mu-trk__links { display: flex; } /* no audio: "listen on the links", so they show */
+  .mu-trk__d { display: none; }
+  .mu-tip { display: none; }
+}
+/* 640–959: two columns of rows (as Projects) */
+@media (min-width: 640px) and (max-width: 959px) {
+  .mu-mlist .ygroup__list { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px 12px; --yfolder-top: 22px; }
+}
+
+/* ============================================================
+   ITEM PAGE (item.html?id=<key>): the kit's Yarn.detailPage on the sheet (normal page background)
+   ============================================================ */

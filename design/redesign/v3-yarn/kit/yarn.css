@@ -1,0 +1,350 @@
+/* ============================================================
+   blaqat.net · round 3 · "yarn" kit
+   Black, red and white base. Section color only on the frame.
+   Every surface is a material: knit, diamond knit, rolled cord,
+   twill ribbon, felt. Mock-only; not production CSS.
+   ============================================================ */
+
+@import url("https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,500..900;1,600..800&family=JetBrains+Mono:wght@400;600&display=swap");
+
+@property --sweep {
+  syntax: "<angle>";
+  inherits: false;
+  initial-value: 0deg;
+}
+
+:root {
+  /* ---- base trio ---- */
+  --ink: #1f1e1e;          /* logo black, "black thread" */
+  --ink-2: #4a4646;        /* secondary text (7.9:1 on cotton) */
+  --ink-3: #6e6868;        /* tertiary text, meta (5.0:1 on cotton) */
+  --cotton: #fbf8f3;       /* warm white sheet */
+  --cotton-2: #f3eee6;     /* recessed white */
+  --white: #ffffff;
+  --red: #d62f38;          /* yarn red: fills, ribbons, rope (white text 4.9:1) */
+  --red-deep: #b4202b;     /* red text / links on white (5.9:1) */
+  --red-soft: #f7d9d6;     /* tint for selections */
+
+  /* ---- sections (frame color only; accents stay red) ---- */
+  --blue: #3a74cf;  --blue-deep: #24518f;  --blue-soft: #dbe7f8;
+  --purple: #8a4fc6; --purple-deep: #5f2f93; --purple-soft: #ece0f8;
+  --gold: #d9a21b;  --gold-deep: #8a5f0c;  --gold-soft: #f8ecc8;
+  --brown: #7a4e2d; --brown-deep: #4e301a; --brown-soft: #c9a07a;
+
+  --sec: var(--red); --sec-deep: var(--red-deep); --sec-soft: var(--red-soft);
+
+  /* ---- type ---- */
+  --font-display: "Nunito", ui-rounded, system-ui, sans-serif;
+  --font-body: system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, monospace;
+
+  /* ---- geometry ---- */
+  --frame: 14px;           /* rolled-cord border around the page */
+  --radius-sheet: 22px;
+  --radius-card: 16px;
+  --radius-pill: 999px;
+  --stitch: 2px;           /* stitch thickness */
+  --stitch-inset: 6px;     /* how far stitches sit inside an edge */
+
+  /* ---- motion (Apple-style: critically damped by default) ---- */
+  --ease-out: cubic-bezier(.2, .8, .2, 1);
+  --ease-spring: linear(0, .009, .035 2.1%, .141 4.4%, .723 12.9%, .938 16.7%, 1.017 20.6%, 1.043 24.6%, 1.035 28.7%, 1.007 37.5%, .996 45.4%, 1);
+  --press: 100ms;
+
+  /* ---- shadows: fabric sits on fabric, so soft & low ---- */
+  --shadow-patch: 0 1px 0 rgba(31, 30, 30, .08), 0 2px 6px rgba(31, 30, 30, .08);
+  --shadow-lift: 0 2px 0 rgba(31, 30, 30, .06), 0 10px 24px rgba(31, 30, 30, .12);
+
+  /* ======================================================
+     TEXTURES (data-URI SVG tiles; static, cheap to paint)
+     ====================================================== */
+
+  /* stockinette knit: rows of little V stitches. White-on-white. */
+  --tex-knit: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='16' viewBox='0 0 14 16'%3E%3Cg fill='%23000' fill-opacity='.026'%3E%3Cellipse cx='4' cy='8' rx='2.6' ry='6' transform='rotate(-28 4 8)'/%3E%3Cellipse cx='10' cy='8' rx='2.6' ry='6' transform='rotate(28 10 8)'/%3E%3C/g%3E%3Cg fill='none' stroke='%23fff' stroke-opacity='.55' stroke-width='.8'%3E%3Cpath d='M2.6 3.6 Q3.4 7 5.2 11'/%3E%3Cpath d='M8.8 11 Q10.6 7 11.4 3.6'/%3E%3C/g%3E%3C/svg%3E");
+
+  /* diamond knit: stitched lattice for the inner white sheet */
+  --tex-diamond: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='36' height='36' viewBox='0 0 36 36'%3E%3Cg fill='none' stroke='%231f1e1e' stroke-opacity='.065' stroke-width='1' stroke-dasharray='3 2.4' stroke-linecap='round'%3E%3Cpath d='M0 18 L18 0 L36 18 L18 36 Z'/%3E%3C/g%3E%3Ccircle cx='18' cy='18' r='1' fill='%231f1e1e' fill-opacity='.06'/%3E%3C/svg%3E");
+
+  /* felt: soft fibrous noise, used at low opacity over color */
+  --tex-felt: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 .55 0'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E");
+
+  /* cork speckle */
+  --tex-cork: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='c'%3E%3CfeTurbulence type='turbulence' baseFrequency='.35' numOctaves='2' seed='4' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .2  0 0 0 0 .12  0 0 0 0 .05  0 0 0 -2.2 1.35'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23c)'/%3E%3C/svg%3E");
+
+  /* twill weave: fine diagonals like the red ribbon */
+  --tex-twill:
+    repeating-linear-gradient(45deg, rgba(255,255,255,.10) 0 1px, transparent 1px 4px),
+    repeating-linear-gradient(-45deg, rgba(0,0,0,.07) 0 1px, transparent 1px 5px);
+
+  /* rolled cord: stacked twisted ropes (the page frame) */
+  --tex-cord:
+    repeating-linear-gradient(180deg, rgba(255,255,255,.22) 0 1.5px, transparent 1.5px 7px, rgba(0,0,0,.20) 10px 12px),
+    repeating-linear-gradient(-58deg, transparent 0 4px, rgba(0,0,0,.16) 4px 5.5px, rgba(255,255,255,.14) 5.5px 6.5px, transparent 6.5px 9px);
+
+  /* corduroy wales (vertical ribs) */
+  --tex-corduroy:
+    repeating-linear-gradient(90deg, rgba(0,0,0,.26) 0 1px, transparent 1px 2.5px, rgba(255,255,255,.12) 2.5px 4.5px, transparent 4.5px 6px);
+
+  /* burlap: coarse open weave */
+  --tex-burlap:
+    repeating-linear-gradient(0deg, rgba(0,0,0,.18) 0 1.5px, transparent 1.5px 5px),
+    repeating-linear-gradient(90deg, rgba(255,255,255,.14) 0 2px, transparent 2px 5px);
+}
+
+/* section scoping: put data-section on <html> or any wrapper */
+[data-section="home"]     { --sec: var(--red);    --sec-deep: var(--red-deep);    --sec-soft: var(--red-soft); }
+[data-section="projects"] { --sec: var(--blue);   --sec-deep: var(--blue-deep);   --sec-soft: var(--blue-soft); }
+[data-section="music"]    { --sec: var(--purple); --sec-deep: var(--purple-deep); --sec-soft: var(--purple-soft); }
+[data-section="thoughts"] { --sec: var(--gold);   --sec-deep: var(--gold-deep);   --sec-soft: var(--gold-soft); }
+
+/* ============================================================
+   BASE
+   ============================================================ */
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0;
+  color: var(--ink);
+  background: var(--cotton);
+  font: 100%/1.5 var(--font-body);
+  -webkit-font-smoothing: antialiased;
+}
+img, video, svg { display: block; max-width: 100%; }
+button { font: inherit; color: inherit; }
+:focus-visible { outline: 3px solid var(--red); outline-offset: 3px; border-radius: 8px; }
+
+.display {
+  font-family: var(--font-display);
+  font-weight: 850;
+  letter-spacing: -0.025em;
+  line-height: 1.02;
+}
+.h1 { font: 850 clamp(2rem, 4.5vw, 3.25rem)/1.02 var(--font-display); letter-spacing: -0.03em; margin: 0; }
+.h2 { font: 800 clamp(1.4rem, 2.6vw, 1.85rem)/1.1 var(--font-display); letter-spacing: -0.02em; margin: 0; }
+.h3 { font: 800 1.125rem/1.2 var(--font-display); letter-spacing: -0.01em; margin: 0; }
+.meta { font: 500 .75rem/1.3 var(--font-mono); letter-spacing: .01em; color: var(--ink-3); }
+.eyebrow { font: 800 .72rem/1 var(--font-display); letter-spacing: .12em; text-transform: uppercase; color: var(--ink-3); }
+.muted { color: var(--ink-2); }
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+/* ============================================================
+   MATERIALS
+   ============================================================ */
+
+/* white knit surface */
+.m-knit { background: var(--tex-knit), var(--cotton); }
+/* white diamond knit (inner page sheet) */
+.m-diamond { background: var(--tex-diamond), var(--tex-knit), var(--cotton); }
+/* section-colored rolled cord */
+.m-cord { background: var(--tex-cord), var(--sec); }
+/* red twill ribbon */
+.m-ribbon { background: var(--tex-twill), var(--red); color: var(--white); }
+/* felt in any color: set --felt */
+.m-felt { background: var(--tex-felt), var(--felt, var(--cotton-2)); background-size: 160px, auto; }
+/* brown materials (mobile nav candidates) */
+.m-corduroy { background: var(--tex-corduroy), linear-gradient(180deg, #8a5a35, var(--brown)); color: #fff7ee; }
+.m-suede    { background: var(--tex-felt), linear-gradient(180deg, #8c5d3a, #6f4628); background-size: 160px, auto; color: #fff7ee; }
+.m-cork     { background: var(--tex-cork), #b98a5a; background-size: 120px, auto; color: var(--ink); }
+.m-burlap   { background: var(--tex-burlap), #8a6640; color: #fffaf2; }
+
+/* ============================================================
+   STITCHES & ROPE
+   ============================================================ */
+
+/* running stitch just inside an element's edge (follows border-radius) */
+.stitch {
+  outline: var(--stitch) dashed var(--stitch-color, rgba(31, 30, 30, .28));
+  outline-offset: calc(var(--stitch-inset) * -1);
+}
+.stitch-light { --stitch-color: rgba(255, 255, 255, .7); }
+.stitch-red   { --stitch-color: var(--red); }
+
+/* fabric patch: the default card */
+.patch {
+  position: relative;
+  background: var(--tex-knit), var(--white);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-patch);
+  outline: var(--stitch) dashed var(--stitch-color, rgba(31, 30, 30, .22));
+  outline-offset: calc(var(--stitch-inset) * -1);
+}
+
+/* twisted-rope ring that sews itself around an element.
+   add .rope to a positioned element; toggle .is-roped or hover/focus.
+   colors: --rope-a / --rope-b. width: --rope-w. */
+.rope { position: relative; isolation: isolate; }
+.rope::before {
+  content: "";
+  position: absolute;
+  inset: calc(var(--rope-gap, 5px) * -1 - var(--rope-w, 6px));
+  padding: var(--rope-w, 6px);
+  border-radius: calc(var(--rope-radius, 999px));
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.35), transparent 45%, rgba(0,0,0,.22)),
+    repeating-linear-gradient(62deg, var(--rope-a, var(--red)) 0 4px, var(--rope-b, var(--red-deep)) 4px 6.5px, var(--rope-a, var(--red)) 6.5px 9px);
+  -webkit-mask:
+    conic-gradient(from -90deg, #000 var(--sweep), transparent 0),
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: source-in, xor;
+          mask:
+    conic-gradient(from -90deg, #000 var(--sweep), transparent 0),
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+          mask-composite: intersect, exclude;
+  filter: drop-shadow(0 1.5px 0 rgba(31, 30, 30, .25));
+  pointer-events: none;
+  z-index: -1;
+  --sweep: 0deg;
+  opacity: 0;
+  /* un-sew: sweep back, then hide (avoids a hairline seam at 0deg) */
+  transition: --sweep 380ms var(--ease-out), opacity 0s linear 380ms;
+}
+.rope:hover::before,
+.rope:focus-visible::before,
+.rope.is-roped::before { --sweep: 360deg; opacity: 1; transition: --sweep 420ms var(--ease-out), opacity 0s; }
+.rope:focus-visible { outline: none; }
+
+/* yarn strokes for SVG paths: pair a .ply-base with a .ply-twist on the same d= */
+.ply-base  { fill: none; stroke: var(--ply, var(--ink)); stroke-linecap: round; stroke-linejoin: round; }
+.ply-twist { fill: none; stroke: var(--ply-shade, rgba(255,255,255,.28)); stroke-linecap: butt; stroke-dasharray: 1.4 2.6; }
+
+/* ============================================================
+   PAGE FRAME: section-colored cord around a white diamond sheet
+   <body class="frame" data-section="music"><main class="sheet">…
+   ============================================================ */
+.frame {
+  min-height: 100dvh;
+  padding: var(--frame);
+  background: var(--tex-cord), var(--sec);
+}
+.sheet {
+  position: relative;
+  min-height: calc(100dvh - var(--frame) * 2);
+  border-radius: var(--radius-sheet);
+  background: var(--tex-diamond), var(--tex-knit), var(--cotton);
+  box-shadow: inset 0 0 0 1px rgba(31,30,30,.06), 0 1px 0 rgba(255,255,255,.4), 0 3px 10px rgba(0,0,0,.18);
+  outline: var(--stitch) dashed rgba(31, 30, 30, .2);
+  outline-offset: -9px;
+}
+@media (max-width: 959px) {
+  :root { --frame: 7px; --radius-sheet: 16px; }
+}
+
+/* entering from home: the sheet unrolls out of the frame color */
+.frame.entering .sheet { animation: sheet-in 560ms var(--ease-out) both; }
+@keyframes sheet-in {
+  from { clip-path: inset(50% 50% 50% 50% round var(--radius-sheet)); }
+  to   { clip-path: inset(0 0 0 0 round var(--radius-sheet)); }
+}
+
+/* ============================================================
+   CONTROLS
+   ============================================================ */
+.btn {
+  --h: 44px;
+  display: inline-flex; align-items: center; gap: .5em;
+  min-height: var(--h); padding: 0 1.15em;
+  border: 0; border-radius: var(--radius-pill);
+  font: 800 .95rem/1 var(--font-display); letter-spacing: -0.005em;
+  background: var(--tex-knit), var(--white);
+  color: var(--ink);
+  box-shadow: var(--shadow-patch);
+  outline: var(--stitch) dashed rgba(31, 30, 30, .22);
+  outline-offset: -5px;
+  cursor: pointer; text-decoration: none;
+  transition: transform var(--press) var(--ease-out), box-shadow 160ms var(--ease-out);
+}
+.btn:active { transform: scale(.97); }
+.btn--red  { background: var(--tex-twill), var(--red); color: #fff; outline-color: rgba(255,255,255,.65); }
+.btn--ink  { background: var(--tex-twill), var(--ink); color: #fff; outline-color: rgba(255,255,255,.4); }
+.btn--sec  { background: var(--tex-twill), var(--sec); color: #fff; outline-color: rgba(255,255,255,.6); }
+.btn--ghost { background: transparent; box-shadow: none; outline-color: rgba(31,30,30,.25); }
+
+/* stitched outlines must not swallow the focus ring */
+.btn:focus-visible, .chip:focus-visible, .patch:focus-visible {
+  outline: 3px solid var(--red); outline-offset: 3px;
+}
+.btn.rope:focus-visible { outline: none; } /* the rope ring is the focus indicator */
+
+/* filter chip (toggle) */
+.chip {
+  display: inline-flex; align-items: center; gap: .4em;
+  min-height: 36px; padding: 0 .9em; border: 0; border-radius: 999px;
+  font: 750 .82rem/1 var(--font-display);
+  background: var(--cotton-2); color: var(--ink-2); cursor: pointer;
+  outline: 1.5px dashed transparent; outline-offset: -4px;
+  transition: background 160ms var(--ease-out), color 160ms var(--ease-out), transform var(--press) var(--ease-out);
+}
+.chip:active { transform: scale(.96); }
+@media (pointer: coarse) { .chip { min-height: 44px; } }
+.chip[aria-pressed="true"] { background: var(--tex-twill), var(--ink); color: #fff; outline-color: rgba(255,255,255,.45); }
+
+/* tag / status pill */
+.tag { display: inline-flex; align-items: center; gap: .35em; padding: .28em .6em; border-radius: 999px; font: 700 .72rem/1 var(--font-display); background: var(--cotton-2); color: var(--ink-2); }
+.tag--red { background: var(--red-soft); color: var(--red-deep); }
+.tag--sec { background: var(--sec-soft); color: var(--sec-deep); }
+
+/* ============================================================
+   NAV (rendered by <yarn-nav> in yarn.js)
+   desktop: top bar inside the sheet. mobile: bottom thumb bar.
+   ============================================================ */
+.ynav { display: flex; align-items: center; gap: 1rem; padding: 18px 26px 6px; }
+.ynav__brand { display: flex; align-items: center; gap: .55rem; text-decoration: none; color: var(--ink); }
+.ynav__brand svg { width: 26px; height: 26px; }
+.ynav__brand b { font: 900 1.15rem/1 var(--font-display); letter-spacing: -0.03em; }
+.ynav__brand b i { font-style: normal; color: var(--red); }
+.ynav__links { display: flex; gap: 8px; margin-left: auto; }
+.ynav__link {
+  --rope-w: 4px; --rope-gap: 3px;
+  display: inline-flex; align-items: center; gap: .45em;
+  min-height: 40px; padding: 0 1em; border-radius: 999px;
+  font: 800 .9rem/1 var(--font-display); color: var(--ink-2); text-decoration: none;
+  transition: color 160ms var(--ease-out), transform var(--press) var(--ease-out);
+}
+.ynav__link:hover { color: var(--ink); }
+.ynav__link:active { transform: scale(.97); }
+.ynav__link[aria-current="page"] { background: var(--tex-twill), var(--ink); color: #fff; }
+.ynav__link i { font-size: 1.15em; }
+
+.ybar { display: none; }
+@media (max-width: 959px) {
+  .ynav__links { display: none; }
+  .ynav { padding: 14px 18px 4px; }
+  .ybar {
+    display: grid; grid-auto-flow: column; grid-auto-columns: 1fr;
+    position: fixed; z-index: 50;
+    left: calc(var(--frame) + 8px); right: calc(var(--frame) + 8px);
+    bottom: calc(var(--frame) + 8px + env(safe-area-inset-bottom));
+    height: 62px; padding: 6px; border-radius: 22px;
+    box-shadow: 0 1px 0 rgba(255,255,255,.18) inset, 0 8px 22px rgba(31,30,30,.28);
+    outline: 2px dashed rgba(255, 248, 238, .55); outline-offset: -6px;
+  }
+  .ybar a {
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;
+    border-radius: 16px; text-decoration: none; color: inherit; opacity: .82;
+    font: 800 .72rem/1 var(--font-display); letter-spacing: .01em;
+    transition: transform var(--press) var(--ease-out), opacity 160ms;
+  }
+  .ybar a i { font-size: 1.35rem; }
+  .ybar a:active { transform: scale(.94); }
+  .ybar a[aria-current="page"] { opacity: 1; background: rgba(255,255,255,.16); box-shadow: inset 0 0 0 1.5px rgba(255,255,255,.35); }
+  .m-cork.ybar a[aria-current="page"] { background: rgba(255,255,255,.45); }
+  .m-cork.ybar { outline-color: rgba(31,30,30,.35); }
+  /* leave room for the bar (+ mini player if present) */
+  .sheet { padding-bottom: calc(var(--bottom-ui, 84px) + env(safe-area-inset-bottom)); }
+}
+
+/* ============================================================
+   ACCESSIBILITY: motion, transparency, contrast
+   ============================================================ */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 1ms !important; animation-iteration-count: 1 !important; scroll-behavior: auto !important; }
+  .rope::before { transition: opacity 160ms; --sweep: 360deg; opacity: 0; }
+  .rope:hover::before, .rope:focus-visible::before, .rope.is-roped::before { opacity: 1; }
+  .frame.entering .sheet { animation: none; }
+}
+@media (prefers-contrast: more) {
+  :root { --ink-2: #2a2727; --ink-3: #3d3939; }
+  .patch, .btn, .sheet { outline-color: var(--ink); }
+}

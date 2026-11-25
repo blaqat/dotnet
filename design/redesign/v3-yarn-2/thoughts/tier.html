@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en" data-section="thoughts">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Tier list · Thoughts · blaqat.net</title>
+<link rel="stylesheet" href="../kit/yarn.css">
+<link rel="stylesheet" href="tier.css">
+<script src="../kit/data.js"></script>
+<script src="../kit/thoughts-data.js"></script>
+<script src="../kit/yarn.js"></script>
+<script src="../kit/player.js" defer></script>
+<script src="common.js" defer></script>
+<script src="tier-images.js" defer></script>
+<script src="tier-drag.js" defer></script>
+<script src="tier.js" defer></script>
+</head>
+<body class="frame">
+<main class="sheet">
+  <yarn-nav active="thoughts" base="../"></yarn-nav>
+  <div class="ypage tl-app" id="tl">
+    <noscript><p style="padding:24px">The tier list needs JavaScript in this mock.</p></noscript>
+  </div>
+</main>
+<!-- floating clone layer for drags (outside every transformed ancestor) -->
+<div id="tl-layer" aria-hidden="true"></div>
+<!-- announcements for picks, moves and drops -->
+<div id="tl-live" class="sr-only" aria-live="assertive" aria-atomic="true"></div>
+<yarn-player></yarn-player>
+</body>
+</html>

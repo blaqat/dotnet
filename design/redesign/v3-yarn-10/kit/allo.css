@@ -1,0 +1,61 @@
+/* == i10 · system · L6 · Allo (?font=allo|allo-round) ============================================================
+   Loaded by kit/yarn.js only when chosen. allo-font@1.0.1 (OFL), pinned. Allo replaces Display, Heading, Title, Label,
+   Micro and Body; Numeric stays Maple Mono. allo = ROND 50 (its default), allo-round = ROND 100; opsz stays auto.
+
+   MEASURED (canvas, 100px; ~/dev/temp/r3i10-system/allo-measure.mjs), em/100:
+                     x-height  cap   space  avg advance
+     Nunito 900        50.1   71.4   28.6    54.8        Nunito Sans 400   48.6   70.5   25.7   50.8
+     Nunito 800        49.9   71.4   27.9    53.7        Nunito Sans 600   48.8   70.5   26.3   51.6
+     Allo 900          50.5   72.8   16.2    53.8        Allo 400          50.5   72.8   22.8   46.6
+     Allo 800          50.5   72.8   17.7    52.1        Allo 600          50.5   72.8   20.4   49.2
+   1. x-height: Allo is 3.9% taller than Nunito Sans → size-adjust 96% (48.5 vs 48.6: within 1%).
+   2. Its SPACE is the problem, not its letters: at 800–900 Allo's space is 0.16–0.18em against Nunito's 0.28–0.29em, so
+      the kit's Nunito tracking (−.03em on Display) closed the word spaces (the preview's "¼ of the tracking" hack only
+      hid it). Tracking can't fix a space without loosening every letter, so each role gets its own tracking (looser
+      than Nunito's: Allo began as Inter) AND a word-spacing (--ws-k, set per element so an em is its own size).
+   3. RENDERED (~/dev/temp/r3i10-system/allo-crops.mjs: the type ramp in kit/components.html#type, the gap between the
+      glyphs either side of each space ÷ font size; width/char = the sample's width ÷ size ÷ characters):
+        role      Nunito tr  gap    Allo tr   word-spacing  Allo gap   width/char Nunito → Allo
+        Heading   −.020     .261   −.010     +.095em       .264       .490 → .487
+        Title     −.012     .266   −.005     +.070em       .261       .495 → .493
+        Body      0         .256   0          0            .257       .451 → .448
+        Meta      0         .262   +.005     +.020em       .258       .494 → .503
+        Label     −.003     .274   +.005     +.070em       .277       .454 → .460
+        Micro     +.010     .357   +.020 (caps +.10)  +.07  .378       .603 → .622
+      Every word gap is within 2% of Nunito's (Micro's caps 6% looser, on purpose); the letters' density matches too.
+      Display (−.015em, +.095em) shares Heading's numbers; Numeric (Maple Mono) gets no word-spacing. */
+@font-face {
+  font-family: "Allo"; font-style: normal; font-weight: 100 900; font-display: swap;
+  src: url("https://cdn.jsdelivr.net/npm/allo-font@1.0.1/fonts/webfonts/AlloVariable.woff2") format("woff2");
+  size-adjust: 96%;
+}
+@font-face {
+  font-family: "Allo"; font-style: italic; font-weight: 400; font-display: swap;
+  src: url("https://cdn.jsdelivr.net/npm/allo-font@1.0.1/fonts/webfonts/Allo-Oblique.woff2") format("woff2");
+  size-adjust: 96%;
+}
+@font-face {
+  font-family: "Allo"; font-style: italic; font-weight: 700 900; font-display: swap;
+  src: url("https://cdn.jsdelivr.net/npm/allo-font@1.0.1/fonts/webfonts/Allo-BoldOblique.woff2") format("woff2");
+  size-adjust: 96%;
+}
+html:is([data-font="allo"], [data-font="allo-round"]),
+html:is([data-font="allo"], [data-font="allo-round"]) [data-body] {
+  --font-display: "Allo", ui-rounded, system-ui, sans-serif;
+  --font-body: "Allo", ui-sans-serif, system-ui, sans-serif;
+  --ff-head: var(--font-display); --ff-body: var(--font-body);
+}
+html:is([data-font="allo"], [data-font="allo-round"]) {
+  --tr-display: -.015em; --tr-heading: -.01em; --tr-title: -.005em; --tr-label: .005em; --tr-micro: .02em; --tr-caps: .1em; --tr-body: 0em; --tr-meta: .005em;
+  --ws-k: .07em;
+}
+html[data-font="allo"] { font-variation-settings: "ROND" 50; }
+html[data-font="allo-round"] { font-variation-settings: "ROND" 100; }
+/* the word gaps (see 2. above) */
+html:is([data-font="allo"], [data-font="allo-round"]) * { word-spacing: var(--ws-k); }
+html:is([data-font="allo"], [data-font="allo-round"]) :is(p, li, dd, td, blockquote, input, textarea, code, kbd, pre, .t-num, .t-body, .yprose, .ydetail__text, .ydetail__by, .yempty__s, .yp-notes) { --ws-k: 0em; }
+html:is([data-font="allo"], [data-font="allo-round"]) :is(.t-meta, .meta, .yfact, .ydate, .ytag, .ytoast, .yp-sub, .yp-who-sub, .yhint) { --ws-k: .02em; }
+html:is([data-font="allo"], [data-font="allo-round"]) :is(h1, h2, h3, h4, b, strong, button, .btn, .ychip, .yseg__btn, .ynav__tab, .t-title, .t-label, .t-micro, .ybadge, .yyear, .ysearch__opt, .ylinkbtn, .ydetail__mini) { --ws-k: .07em; }
+html:is([data-font="allo"], [data-font="allo-round"]) :is(.yhead__title, .t-display, .h1, .t-heading, .h2, .ydetail__title, .yp-title) { --ws-k: .095em; }
+/* (the kit's few hard-coded Nunito trackings that aren't roles: eased for Allo) */
+html:is([data-font="allo"], [data-font="allo-round"]) .ynav__brand b { letter-spacing: -.012em; }

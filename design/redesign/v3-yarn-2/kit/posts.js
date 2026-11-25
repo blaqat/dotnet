@@ -1,0 +1,241 @@
+/* ============================================================
+   blaqat.net · yarn kit · Thoughts post cards (iteration 2, mock-only)
+   Loaded by kit/yarn.js (sync). One renderer, so a post looks the same on
+   the Thoughts feed and in Studio's preview.
+
+   Yarn.post(p, ctx?) → <article class="ypost ypost--<type>">   (scratch · article · pick · tierlist · playlist · embed)
+   Yarn.post.TYPES / TYPE              post vocabulary (key, plural, one, icon)
+   Yarn.post.typeBadge(key, label?)    the kit type badge with the post vocabulary
+   Yarn.post.configure(ctx)            page defaults (Thoughts: storage-backed votes; Studio: its own collections)
+   Yarn.post.aggregate(p, vote) · crowdTiers(p, agg) · miniBoard(p, mode, ctx)
+   ctx: { collections, collCount(k), href: { article(p), collection(k, id), tier(p, mode, hash) },
+          vote(p), comments(p), scratch: "sticky"|"felt", tagsAs: "a"|"button", pressed: Set, tl: "owner"|"everyone",
+          inert: true (preview: card links lead nowhere) }
+   CSS: kit/yarn.css "== POST CARDS".
+   ============================================================ */
+(() => {
+  "use strict";
+  const Y = window.Yarn;
+  if (!Y || Y.post) return;
+  const esc = Y.esc;
+
+  const TYPES = [
+    { key: "scratch", plural: "Scratch", one: "Scratch", icon: "ph-scribble-loop" },
+    { key: "article", plural: "Articles", one: "Article", icon: "ph-article" },
+    { key: "pick", plural: "Picks", one: "Pick", icon: "ph-tag" },
+    { key: "tierlist", plural: "Tier lists", one: "Tier list", icon: "ph-ranking" },
+    { key: "playlist", plural: "Playlists", one: "Playlist", icon: "ph-playlist" },
+    { key: "embed", plural: "Images", one: "Images", icon: "ph-images" },
+  ];
+  const TYPE = Object.fromEntries(TYPES.map((t) => [t.key, t]));
+  const typeBadge = (key, label) => {
+    const t = TYPE[key] || { one: label || key, icon: "ph-tag" };
+    return Y.badge.type(key, { icon: t.icon, label: label || t.one });
+  };
+  const plural = (n, w) => `${n} ${w}${n === 1 ? "" : "s"}`;
+  const host = (url) => { try { return new URL(url).hostname.replace(/^www\./, ""); } catch { return String(url || ""); } };
+  const fmtSecs = (s) => `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`;
+  const secsOf = (dur) => { const [m, s] = String(dur || "0:00").split(":").map(Number); return (m || 0) * 60 + (s || 0); };
+
+  /* ---------- tier lists: community aggregate (+ an optional vote) ---------- */
+  const TIERS = ["S", "A", "B", "C", "D"];
+  const tierItems = (p) => TIERS.flatMap((t) => (p.tiers || {})[t] || []);
+  const tierOfVote = (vote, name) => (vote ? TIERS.find((t) => (vote.tiers[t] || []).includes(name)) || null : null);
+  function aggregate(p, vote = null) {
+    const base = p.community || { voters: 0, items: {} };
+    const voters = base.voters + (vote ? 1 : 0);
+    const items = {};
+    for (const name of tierItems(p)) {
+      const pct0 = base.items[name] || [20, 20, 20, 20, 20];
+      const sum0 = pct0.reduce((a, b) => a + b, 0) || 1;
+      const counts = pct0.map((v) => (v / sum0) * base.voters);
+      const yt = tierOfVote(vote, name);
+      if (yt) counts[TIERS.indexOf(yt)] += 1;
+      const tot = counts.reduce((a, b) => a + b, 0) || 1;
+      const pct = counts.map((c) => (c / tot) * 100);
+      let best = 0;
+      pct.forEach((v, i) => { if (v > pct[best]) best = i; });
+      const mean = pct.reduce((s, v, i) => s + v * (4 - i), 0) / 100;
+      items[name] = { name, counts, pct, best: TIERS[best], bestPct: Math.round(pct[best]), mean };
+    }
+    return { voters, items, withYou: !!vote };
+  }
+  function crowdTiers(p, agg = aggregate(p)) {
+    const out = Object.fromEntries(TIERS.map((t) => [t, []]));
+    Object.values(agg.items).forEach((it) => out[it.best].push(it.name));
+    TIERS.forEach((t) => out[t].sort((a, b) => agg.items[b].mean - agg.items[a].mean));
+    return out;
+  }
+
+  /* ---------- defaults (pages override with configure) ---------- */
+  const THOUGHTS = Y.kitURL("../thoughts/");
+  const defaults = {
+    collections: window.THOUGHTS?.collections || {},
+    collCount: (k) => (window.THOUGHTS?.posts || []).filter((p) => p.collection === k).length,
+    href: {
+      article: (p) => `${THOUGHTS}stitched.html?view=article&id=${encodeURIComponent(p.id)}`,
+      collection: (k, id) => `${THOUGHTS}stitched.html?view=collection&c=${encodeURIComponent(k)}${id ? `&item=${encodeURIComponent(id)}` : ""}`,
+      tier: (p, mode = "", hash = "") => `${THOUGHTS}tier.html?id=${encodeURIComponent(p.id)}${mode ? `&mode=${mode}` : ""}${hash}`,
+    },
+    vote: () => null,
+    comments: (p) => p.comments || [],
+    owner: "blaqat",
+    scratch: "sticky",
+    tagsAs: "a",
+    pressed: null,
+    tl: "owner",
+    inert: false,
+  };
+  let base = { ...defaults };
+  const configure = (c = {}) => { base = { ...base, ...c, href: { ...base.href, ...(c.href || {}) } }; return base; };
+
+  // playlist tracks are real BLAQAT songs: same object → same yarn swatch as the music page + player
+  const MUSIC = (() => {
+    const m = new Map();
+    for (const e of window.BLAQAT?.music || []) for (const s of e.songs || [e]) if (s.url) m.set(s.url, { ...s, instrument: s.instrument || e.instrument, collection: e.songs ? e.name : undefined });
+    return m;
+  })();
+  const trackItem = (t) => MUSIC.get(t.src) || { name: t.title, url: t.src, instrument: "daw" };
+
+  /* ---------- pieces ---------- */
+  const tagsHTML = (p, c) => (p.tags?.length ? `<div class="ypost__tags">${Y.tags(p.tags, c.tagsAs === "button" ? { as: "button", pressed: c.pressed } : {})}</div>` : "");
+  const metaRow = (p, extra = "", o = {}) =>
+    `<div class="ymeta ypost__meta">${typeBadge(p.type)}${extra ? `<span class="meta ypost__x">${extra}</span>` : ""}<span class="ypost__date">${Y.badge.date(p.date || new Date().toISOString(), { style: "day", ...o })}</span></div>`;
+  // the card's main link, stretched over the card (interactive bits sit above it)
+  const link = (c, href, inner, attrs = "") => (c.inert || !href ? `<a class="ypost__link" ${attrs}>${inner}</a>` : `<a class="ypost__link" href="${esc(href)}" ${attrs}>${inner}</a>`);
+
+  // a teardrop loop of red yarn through the pick tag's eyelet
+  const LOOP = "M17 26 C 9 22, -6 10, -5 -3 C -4 -12, 8 -13, 10 -4 C 12 5, 13 16, 17 26";
+  const STRING = `<svg class="ypost__string" viewBox="-14 -16 46 56" aria-hidden="true"><path class="ply-base" stroke-width="2.8" d="${LOOP}"/><path class="ply-twist" stroke-width="2.8" d="${LOOP}"/><circle cx="17" cy="26" r="2.6" fill="var(--red-deep)"/></svg>`;
+
+  // kit lightbox thumbs (same markup as Yarn.carousel), laid out as a photo grid
+  function thumbHTML(g, m, i, n) {
+    const src = Y.media(m.src), vid = Y.isVideo(m.src, m.kind), what = vid ? "video" : "image";
+    if (!src) return `<div class="ycar__thumb ypost__thumb" role="img" aria-label="${what} not included in this mock"><span class="ymissing"><i class="ph ${vid ? "ph-video-camera" : "ph-image"}" aria-hidden="true"></i>${what} not in this mock</span></div>`;
+    const inner = vid
+      ? `<video src="${src}#t=0.6" muted playsinline preload="metadata" aria-hidden="true" tabindex="-1" data-ydur></video><span class="ycar__dur" aria-hidden="true"><i class="ph-fill ph-play"></i><span>video</span></span>`
+      : `<img src="${src}" alt="" decoding="async" draggable="false">${/\.gif$/i.test(m.src) ? `<span class="ycar__dur" aria-hidden="true"><span>GIF</span></span>` : ""}`;
+    return `<button type="button" class="ycar__thumb ypost__thumb" data-ylb="${g}" data-src="${src}" data-alt="${esc(m.alt || "")}" data-kind="${what}" aria-haspopup="dialog" aria-label="Open ${what} ${i + 1} of ${n}${m.alt ? `: ${esc(m.alt)}` : ""}">${inner}</button>`;
+  }
+
+  // tier card: a mini felt board (Mine / Everyone)
+  function miniBoard(p, mode, c = base) {
+    const agg = aggregate(p, c.vote(p));
+    const rows = mode === "owner" ? p.tiers : crowdTiers(p, agg);
+    const label = mode === "owner" ? `${c.owner}'s ranking` : `Everyone's ranking, ${agg.voters} people`;
+    return `<ol class="ypost__rows" aria-label="${esc(label)}">${TIERS.map((t) => `
+      <li class="ypost__row" data-tier="${t}"><span class="ytierkey" data-tier="${t}" aria-hidden="true">${t}</span>
+        <ul class="ypost__items" aria-label="${t} tier">${(rows[t] || []).map((n) => {
+          const it = agg.items[n];
+          return `<li class="ypost__item" data-key="${esc(n)}" data-tier="${t}">${esc(n)}${mode === "everyone" && it ? `<span class="ypost__pct"><span class="sr-only">, </span>${it.bestPct}%<span class="sr-only"> agree</span></span>` : ""}</li>`;
+        }).join("") || `<li class="ypost__none">empty</li>`}</ul></li>`).join("")}</ol>
+      ${mode === "everyone" ? `<p class="ypost__note meta">Each sits where most of ${agg.voters} people put it · % who agree</p>` : ""}`;
+  }
+
+  /* ---------- the cards ---------- */
+  const card = {
+    scratch(p, c) {
+      const d = Y.parseDate(p.date) || new Date();
+      const felt = c.scratch === "felt";
+      return `<article class="ypost ypost--scratch ${felt ? "m-felt on-ink" : "ypost--sticky"}" id="post-${esc(p.id)}" data-id="${esc(p.id)}" aria-label="Scratch thought, ${Y.fmt.full(d)}">
+        ${felt ? "" : `<span class="ypost__tape" aria-hidden="true"></span>`}
+        ${metaRow(p, "", { time: true })}
+        <p class="ypost__quote">${esc(p.text || "…")}</p>
+        ${tagsHTML(p, c)}
+      </article>`;
+    },
+    article(p, c) {
+      const cover = p.cover && Y.media(p.cover);
+      const mins = p.readMins || Math.max(1, Math.round(String(p.body || "").split(/\s+/).length / 220));
+      return `<article class="ycard ylift ypost ypost--article${cover ? " has-cover" : ""}" id="post-${esc(p.id)}" data-id="${esc(p.id)}" aria-labelledby="h-${esc(p.id)}">
+        <span class="ypost__bookmark" aria-hidden="true"></span>
+        ${cover ? `<div class="ypost__cover"><img src="${esc(cover)}" alt="" loading="lazy" decoding="async"></div>` : ""}
+        <div class="ypost__body">
+          ${metaRow(p, `${mins} min read`)}
+          <h3 class="ypost__title" id="h-${esc(p.id)}">${link(c, c.href.article(p), esc(p.title || "Untitled article"))}</h3>
+          ${p.dek ? `<p class="ypost__dek">${esc(p.dek)}</p>` : ""}
+          <div class="ypost__foot">${tagsHTML(p, c)}<span class="ypost__go" aria-hidden="true">Read<i class="ph-bold ph-arrow-right"></i></span></div>
+        </div>
+      </article>`;
+    },
+    pick(p, c) {
+      const coll = c.collections[p.collection] || (p.collection ? { title: p.collection, icon: "ph-folder" } : null);
+      const n = p.collection ? c.collCount(p.collection) : 0, h = host(p.url);
+      return `<article class="ycard ylift ypost ypost--pick" id="post-${esc(p.id)}" data-id="${esc(p.id)}" aria-labelledby="h-${esc(p.id)}">
+        <span class="ypost__eyelet" aria-hidden="true"></span>${STRING}
+        ${metaRow(p)}
+        <h3 class="ypost__title" id="h-${esc(p.id)}">${esc(p.name || "Untitled pick")}</h3>
+        ${p.blurb ? `<p class="ypost__dek">${esc(p.blurb)}</p>` : ""}
+        <div class="ypost__foot">
+          ${p.url ? `<a class="ypost__ext" href="${esc(p.url)}" target="_blank" rel="noopener">${esc(h)}<i class="ph-bold ph-arrow-up-right" aria-hidden="true"></i><span class="sr-only"> (opens in a new tab)</span></a>` : ""}
+          ${coll ? `<a class="ypost__coll ypost__link"${c.inert ? "" : ` href="${esc(c.href.collection(p.collection, p.id))}"`} aria-label="${esc(p.name || "This pick")} in ${esc(coll.title)}, ${plural(n, "pick")}"><i class="ph-bold ${coll.icon}" aria-hidden="true"></i><span>${esc(coll.title)}</span><span class="ypost__colln" aria-hidden="true">${n}</span><i class="ph-bold ph-arrow-right" aria-hidden="true"></i></a>` : ""}
+        </div>
+        ${tagsHTML(p, c)}
+      </article>`;
+    },
+    tierlist(p, c) {
+      const mode = c.tl === "everyone" ? "everyone" : "owner";
+      const vote = c.vote(p), agg = aggregate(p, vote), nC = c.comments(p).length;
+      const href = (m, h) => (c.inert ? "" : ` href="${esc(c.href.tier(p, m, h))}"`);
+      return `<article class="ycard ylift ypost ypost--tier" id="post-${esc(p.id)}" data-id="${esc(p.id)}" aria-labelledby="h-${esc(p.id)}">
+        ${metaRow(p, `<i class="ph-bold ph-users" aria-hidden="true"></i>${agg.voters} ranked`)}
+        <h3 class="ypost__title" id="h-${esc(p.id)}">${link(c, c.href.tier(p), esc(p.title || "Untitled tier list"))}</h3>
+        <div class="ypost__seg">${Y.seg([{ value: "owner", label: "Mine" }, { value: "everyone", label: "Everyone", icon: "ph-users-three" }], { value: mode, label: "Whose ranking to show", name: p.id })}</div>
+        <div class="ypost__mini" data-mode="${mode}">${miniBoard(p, mode, c)}</div>
+        <div class="ypost__actions">
+          <a class="btn btn--red btn--sm"${href(vote ? "you" : "add", "")}>${vote ? `<i class="ph-bold ph-scales" aria-hidden="true"></i>You vs everyone` : `<i class="ph-bold ph-plus" aria-hidden="true"></i>Add your ranking`}</a>
+          <a class="btn btn--ghost btn--sm"${href("", "#comments")}><i class="ph-bold ph-chat-circle" aria-hidden="true"></i>${plural(nC, "comment")}</a>
+        </div>
+        ${tagsHTML(p, c)}
+      </article>`;
+    },
+    playlist(p, c) {
+      const tracks = p.tracks || [];
+      const secs = tracks.reduce((s, t) => s + secsOf(t.dur), 0);
+      return `<article class="ycard ypost ypost--playlist" id="post-${esc(p.id)}" data-id="${esc(p.id)}" aria-labelledby="h-${esc(p.id)}">
+        ${metaRow(p)}
+        <div class="ypost__plhead">
+          ${Y.disc(null, { size: 68, label: "cat" })}
+          <div class="ypost__plinfo">
+            <h3 class="ypost__title" id="h-${esc(p.id)}">${esc(p.title || "Untitled playlist")}</h3>
+            ${p.note ? `<p class="ypost__dek">${esc(p.note)}</p>` : ""}
+            <p class="meta">${plural(tracks.length, "track")} · ${fmtSecs(secs)}</p>
+          </div>
+        </div>
+        <ol class="ypost__tracks">${tracks.map((t, i) => `<li><button type="button" class="ypost__track ysel" data-pl="${esc(p.id)}" data-i="${i}" aria-current="false" aria-label="Play ${esc(t.title)}${t.by ? ` by ${esc(t.by)}` : ""}, ${esc(t.dur || "")}">
+            <span class="ypost__tsw" aria-hidden="true">${Y.swatchHTML(trackItem(t), { size: 34, radius: 8 })}<i class="ph-fill ph-play"></i><span class="ypost__teq"><b></b><b></b><b></b></span></span>
+            <span class="ypost__tt">${esc(t.title)}${t.by ? `<small>${esc(t.by)}</small>` : ""}</span>
+            <span class="ypost__tdur">${esc(t.dur || "")}</span>
+          </button></li>`).join("")}</ol>
+        <p class="ypost__now meta" aria-live="polite"></p>
+        <div class="ypost__foot"><button type="button" class="btn btn--red btn--sm ypost__all" data-pl="${esc(p.id)}"><i class="ph-fill ph-play" aria-hidden="true"></i><span>Play all</span></button>${tagsHTML(p, c)}</div>
+      </article>`;
+    },
+    embed(p, c) {
+      const media = p.media || [];
+      const n = media.length, vids = media.filter((m) => Y.isVideo(m.src, m.kind)).length;
+      const what = vids ? (vids === n ? plural(n, "video") : plural(n, "item")) : plural(n, "image");
+      const g = `post-${p.id}`;
+      return `<article class="ycard ylift ypost ypost--embed" id="post-${esc(p.id)}" data-id="${esc(p.id)}" data-ylb-title="${esc(p.title || "")}" aria-labelledby="h-${esc(p.id)}">
+        ${metaRow(p, what)}
+        <h3 class="ypost__title" id="h-${esc(p.id)}"><button type="button" class="ypost__link ypost__open" data-lbopen="${esc(g)}" aria-haspopup="dialog">${esc(p.title || "Untitled set")}<span class="sr-only">: open the ${what}</span></button></h3>
+        ${p.note ? `<p class="ypost__dek">${esc(p.note)}</p>` : ""}
+        ${n ? `<div class="ypost__grid" data-n="${Math.min(n, 4)}">${media.map((m, i) => thumbHTML(g, m, i, n)).join("")}</div>` : ""}
+        ${tagsHTML(p, c)}
+      </article>`;
+    },
+  };
+
+  function post(p, ctx = {}) {
+    if (!p || !card[p.type]) return "";
+    const c = { ...base, ...ctx, href: { ...base.href, ...(ctx.href || {}) } };
+    return card[p.type](p, c);
+  }
+  // the "Images" title / any [data-lbopen] opens its first image in the lightbox
+  document.addEventListener("click", (e) => {
+    const b = e.target.closest?.("[data-lbopen]");
+    if (b && Y.lightbox?.openGroup) { e.preventDefault(); Y.lightbox.openGroup(b.dataset.lbopen, 0); }
+  });
+
+  Y.post = Object.assign(post, { TYPES, TYPE, TIERS, typeBadge, aggregate, crowdTiers, miniBoard, thumbHTML, trackItem, configure, get ctx() { return base; } });
+})();

@@ -1,0 +1,216 @@
+/* ============================================================
+   home · round 3 "yarn" · iteration 4
+   Page-local CSS positions and lays out kit parts (.ysecbtn, .ystk,
+   .yscribble, .btn, <yarn-nav>); it never restyles them, except where the
+   owner asked for a Home-only look (stack tags: whiter cloth, icon-only circles on phones).
+   (?secrope=hover is the default here: the owner liked the rope on Home's section buttons, drawn on the button edge. Lists elsewhere keep hover = lift only.)
+   ============================================================ */
+
+/* the home sheet clips the intro (ball enters from under the top frame,
+   cat walks in from behind the left frame). Never transform .sheet:
+   it would capture the fixed mobile bar. */
+.home-sheet { overflow: clip; display: flex; flex-direction: column; }
+
+/* desktop: the lockup is the brand and the section buttons are the nav, so the kit nav shows only its sound toggle
+   (?soundui=nav); the default woven sound tag (kit) sits on the sheet edge, outside .ynav */
+@media (min-width: 960px) {
+  .home .ynav { position: absolute; top: 0; right: 0; z-index: 6; }
+  .home .ynav__brand, .home .ynav__tabs { display: none; }
+}
+
+/* owner (i4): anything that takes you to a new page shows the pointer */
+.home :is(a[href], [data-go], .contact-btn, .hcall__btn) { cursor: pointer; }
+
+.hero {
+  flex: 1;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  padding: clamp(40px, 7vh, 88px) 24px clamp(48px, 8vh, 96px);
+  text-align: center;
+}
+
+/* ---------- lockup ---------- */
+.lockup { width: min(700px, 100%); margin: 0; line-height: 0; cursor: default; }
+.lockup__svg { width: 100%; height: auto; overflow: visible; display: block; }
+html[data-intro="cursor"].fine .lockup { width: min(620px, 100%); }
+.lockup__svg .lk-letters { filter: drop-shadow(0 1.6px 0 rgba(31, 30, 30, .16)); }
+.lockup__svg .ply-hi { fill: none; stroke: rgba(255, 255, 255, .075); stroke-linecap: round; stroke-linejoin: round; }
+.lockup__svg .lk-letters .ply-twist { stroke: rgba(255, 255, 255, .17); stroke-dasharray: 2.6 3.4; }
+.lockup__svg .lk-strand .ply-twist { stroke: rgba(255, 255, 255, .38); stroke-dasharray: 1.5 2.1; }
+.lockup__svg .strand-shadow { fill: none; stroke: rgba(31, 30, 30, .14); stroke-linecap: round; transform: translateY(2.2px); }
+.lockup__svg .yball { filter: drop-shadow(0 1.2px 0 rgba(90, 10, 16, .28)); }
+
+.tagline {
+  margin: .9rem 0 0;
+  font: italic 700 clamp(.9rem, 1.1vw, 1rem)/1.2 var(--font-display);
+  color: var(--ink-3);
+}
+
+/* ---------- bio ---------- */
+.bio, .tagline, .hnav, .contact { position: relative; z-index: 3; } /* above the notes canvas (z 2) */
+.bio {
+  margin-top: clamp(1.4rem, 3.4vh, 2.2rem); max-width: 41rem;
+  color: var(--ink-2); font-size: clamp(1.0625rem, 1.25vw, 1.15rem); line-height: 1.7;
+}
+.bio p { margin: 0 0 .45em; text-wrap: pretty; }
+.bio strong { color: var(--ink); font-weight: 750; }
+.nw, .stk-run { white-space: nowrap; } /* the three stack tags + "and more" stay on one line */
+
+/* keywords: ink, bold, the kit's wave scribble (drawn in on arrival) in the colour of where the word leads.
+   i4: RIT is ink like the rest; one wave for every word (no double / loop); ?kwline=blue = all blue like "software engineer". */
+.bio .kw { position: relative; color: var(--ink); font-weight: 750; text-decoration: none; }
+@media (pointer: coarse) { .bio .kw::before { content: ""; position: absolute; left: 50%; top: 50%; width: max(calc(100% + 8px), 44px); height: 44px; translate: -50% -50%; } } /* 44px tap target, same look */
+/* a short line box keeps the scribble right under the word (and off the next line's badges) */
+.bio .kw.yscribble { padding: 0 .04em; line-height: 1.22; }
+html[data-kwline="blue"] .bio .kw.yscribble { --scribble: var(--blue) !important; }
+
+/* hover: a ripple runs through the letters (home.js animates each .kw__l; transform only) */
+.kw__l { display: inline-block; }
+
+/* i5 (owner H2): "composing" ripples like the rest; its ♫ caption is gone (home.js adds purple felt notes + the music sound) */
+.kw:focus-visible { border-radius: 6px; }
+
+/* stack keywords are the kit stack badge (icon + name), seated on the text line.
+   i4 (owner): on Home they sit on a whiter cloth than the kit's recessed chip (?stk=white knit, default | cotton) */
+.bio .ystk { vertical-align: middle; margin: -.1em 0 0 .04em; color: var(--ink); }
+.bio .ystk > span { line-height: 1; }
+html[data-stk="white"] .bio .ystk { background: var(--tex-knit), var(--white); box-shadow: 0 0 0 1px rgba(31, 30, 30, .1), 0 1px 2px rgba(31, 30, 30, .1); }
+html[data-stk="cotton"] .bio .ystk { background: var(--cotton); box-shadow: 0 0 0 1px rgba(31, 30, 30, .12); }
+@media (hover: hover) { .bio a.ystk:hover { box-shadow: 0 0 0 1px rgba(31, 30, 30, .12), 0 6px 12px -5px rgba(31, 30, 30, .3); } }
+/* i5 (owner H3): no ripple; hover = the kit's lift + icon shake. ?demo=kw-python freezes it via .is-hover (same values as the kit hover) */
+.bio a.ystk.is-hover { transform: translateY(-1.5px); background: var(--white); box-shadow: 0 0 0 1px rgba(31, 30, 30, .12), 0 6px 12px -5px rgba(31, 30, 30, .3); }
+.bio a.ystk.is-hover > :is(img, i) { animation: y-wiggle 460ms var(--ease-out); }
+
+/* ---------- section buttons (kit .ysecbtn: hover lifts + shakes the icon, selected = rope inside) ---------- */
+.hnav {
+  margin-top: clamp(1.7rem, 4.2vh, 2.6rem);
+  display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 16px;
+}
+.hbtn { min-width: 172px; }
+/* ?secrope=hover (default on Home): the rope sews in on hover, flush on the button's own edge.
+   A Home-only exception: the owner liked it here ("i like the rope … fit in the button"); the site-wide
+   rule (hover = lift + shadow, rope = selected) still holds for lists, cards and chips. */
+@media (hover: hover) {
+  html[data-secrope="hover"] .hnav .ysecbtn:hover::before { --sweep: 360deg; opacity: 1; transition: --sweep 460ms var(--ease-out), opacity 0s; }
+  html[data-secrope="hover"]:not([data-rope="out"]) .hnav .ysecbtn:hover { outline-color: transparent; }
+}
+html[data-secrope="hover"] .hnav .ysecbtn.is-hover::before { --sweep: 360deg; opacity: 1; transition: --sweep 460ms var(--ease-out), opacity 0s; }
+html[data-secrope="hover"]:not([data-rope="out"]) .hnav .ysecbtn.is-hover { outline-color: transparent; }
+
+/* ---------- contact: icon + username (the original contact page; i1). Kit link buttons: each fades to its site's
+   colour on hover / focus. Always on screen (?contact=icons) or behind a button on desktop (?contact=button). ---------- */
+.contact { margin-top: 22px; display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; }
+.hcontact { gap: .5em; }
+.hcontact > span { font-weight: var(--fw-label); }
+/* i5 (owner H4: "flashes … people naturally move the mouse to the edges"): a bigger, stable hover area. The kit lift moves
+   the link 2px up, so a pointer resting on its bottom edge fell off it, the link dropped back under the pointer, hovered
+   again… (the brand colour flashed). A clear hit pad (::after) reaches 9px past the top/bottom and 5px into each gap (the
+   pads meet: no dead strip between links) and moves 2px down while the link moves 2px up (same timing), so the area
+   under the pointer never moves. */
+.hcontact::after { content: ""; position: absolute; inset: -9px -5px; transition: transform 240ms var(--ease-crit); } /* square: round corners would leave dead notches in the gaps */
+@media (hover: hover) { .hcontact:hover::after { transform: translateY(2px); } }
+.contact-btn { display: none; }
+.contact.is-called .hcontact { animation: home-call 700ms var(--ease-out) both; }
+.contact.is-called .hcontact:nth-child(2) { animation-delay: 60ms; }
+.contact.is-called .hcontact:nth-child(3) { animation-delay: 120ms; }
+.contact.is-called .hcontact:nth-child(4) { animation-delay: 180ms; }
+@keyframes home-call { 0% { transform: none; } 30% { transform: translateY(-6px) rotate(-4deg); } 60% { transform: translateY(0) rotate(2deg); } 100% { transform: none; } }
+@media (min-width: 960px) {
+  html[data-contact="button"] .contact-btn { display: inline-flex; --h: 48px; }
+  /* the row is reserved, so opening it never moves the (vertically centred) hero */
+  html[data-contact="button"] .contact { visibility: hidden; }
+  html[data-contact="button"] .contact .hcontact { opacity: 0; transform: translateY(-8px) scale(.9); transition: opacity 160ms, transform 320ms var(--ease-spring); }
+  html[data-contact="button"] .contact.open { visibility: visible; }
+  html[data-contact="button"] .contact.open .hcontact { opacity: 1; transform: none; }
+  html[data-contact="button"] .contact.open .hcontact:nth-child(2) { transition-delay: 40ms; }
+  html[data-contact="button"] .contact.open .hcontact:nth-child(3) { transition-delay: 80ms; }
+  html[data-contact="button"] .contact.open .hcontact:nth-child(4) { transition-delay: 120ms; }
+}
+
+/* ---------- skip ---------- */
+/* hidden for the first ~600 ms so it doesn't compete with the drop, but always
+   focusable: keyboard focus reveals it immediately */
+.skip {
+  position: absolute; z-index: 20; right: 26px; bottom: 22px;
+  display: inline-flex; align-items: center; gap: .45em; min-height: 44px; padding: 0 18px;
+  border: 0; border-radius: 999px; cursor: pointer;
+  font: var(--t-label); letter-spacing: var(--tr-label); color: var(--ink-2); /* i10 · pages: Label */
+  background: var(--tex-knit), var(--white); outline: 1.5px dashed rgba(31, 30, 30, .28); outline-offset: -5px;
+  box-shadow: var(--shadow-patch);
+  opacity: 0; transform: translateY(8px); pointer-events: none;
+  transition: opacity 280ms var(--ease-out), transform 360ms var(--ease-out);
+}
+.skip.shown, .skip:focus-visible { opacity: 1; transform: none; pointer-events: auto; }
+.skip:focus-visible { outline: 3px solid var(--focus); outline-offset: 3px; }
+.skip:active { transform: scale(.96); transition-duration: var(--press); }
+.skip:hover { color: var(--ink); }
+html.intro-off .skip, .skip[hidden] { display: none; }
+
+/* ---------- entrance (JS drives opacity/transform per frame, so ?t= can freeze it) ---------- */
+html.intro-on .ent, html.intro-on .bio .kw { opacity: 0; }
+html.intro-on .ent { pointer-events: none; } /* home.js hands pointer events back as each line shows */
+.ent:focus-within { opacity: 1 !important; transform: none !important; }
+
+/* ---------- "Press unmute for sound" (Overall 8): an ink bubble pointing at the kit's sound toggle, wherever it is.
+   home.js places it (fixed, transform only) and runs the countdown bar; a red ring pulses on the toggle. ---------- */
+.hcall { position: fixed; left: 0; top: 0; z-index: var(--z-pop); pointer-events: none; --tail: 50%; } /* kit Z-INDEX SCALE */
+.hcall__in {
+  position: relative; pointer-events: auto;
+  transform-origin: var(--tail) 0; animation: hcall-in 420ms var(--ease-spring) both;
+}
+.hcall[data-side="above"] .hcall__in { transform-origin: var(--tail) 100%; }
+.hcall__in::before { /* the tail */
+  content: ""; position: absolute; left: calc(var(--tail) - 7px); top: -6px; width: 14px; height: 14px;
+  background: var(--ink); border-radius: 2px; rotate: 45deg;
+}
+.hcall[data-side="above"] .hcall__in::before { top: auto; bottom: -6px; }
+.hcall__btn {
+  position: relative; display: inline-flex; align-items: center; gap: .55em; min-height: 46px; padding: 0 18px 2px;
+  border: 0; border-radius: 15px; white-space: nowrap;
+  font: var(--t-label); letter-spacing: var(--tr-label); color: #fff; /* i10 · pages: Label */
+  background: var(--tex-twill), var(--ink); box-shadow: var(--shadow-pop);
+  outline: 1.5px dashed rgba(255, 255, 255, .38); outline-offset: -5px;
+  transition: transform var(--press) var(--ease-out);
+}
+.hcall__btn i { font-size: 1.15rem; color: color-mix(in srgb, var(--c-brand) 62%, #fff); } /* i10: the brand, lifted for the ink bubble (≥ 3:1) */
+.hcall__btn:active { transform: scale(.97); }
+.hcall__btn:focus-visible { outline: 3px solid var(--focus); outline-offset: 3px; }
+.hcall__time { position: absolute; left: 16px; right: 16px; bottom: 6px; height: 2px; border-radius: 2px; background: rgba(255, 255, 255, .5); transform-origin: 0 50%; pointer-events: none; }
+.hcall-ring { position: fixed; left: 0; top: 0; z-index: var(--z-pop-low); pointer-events: none; }
+.hcall-ring::before, .hcall-ring::after { content: ""; position: absolute; inset: -3px; border-radius: inherit; border: 2px solid var(--c-brand); } /* i10: brand */
+.hcall-ring::after { animation: hcall-ring 1300ms var(--ease-out) infinite; }
+@keyframes hcall-in { from { opacity: 0; transform: translateY(4px) scale(.86); } to { opacity: 1; transform: none; } }
+@keyframes hcall-ring { from { opacity: .8; transform: scale(1); } to { opacity: 0; transform: scale(1.45); } }
+
+/* ---------- cursor mode: floor lane + ball ---------- */
+.lane { position: fixed; inset: 0; z-index: 40; pointer-events: none; overflow: hidden; }
+.lane svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+
+/* ---------- mobile: one centred column above the kit bottom bar, on a 4px rhythm ---------- */
+@media (max-width: 959px) {
+  .home .ynav { display: none; } /* the lockup is the brand; the bottom bar (kit) is the nav */
+  .hnav { display: none; }       /* the bar replaces the section tiles */
+  .hero { padding: 24px 20px 32px; }
+  .lockup { width: 100%; }
+  .tagline { margin-top: 12px; font-size: .95rem; }
+  .bio { margin-top: 24px; font-size: 1.0625rem; line-height: 28px; max-width: 22.5rem; }
+  .bio p { margin-bottom: 16px; }
+  .bio p:last-child { margin-bottom: 0; }
+  /* owner (i4): the stack tags are just their icon on phones: 28px circles that sit inside the 28px line (name for AT) */
+  .bio .ystk { width: 28px; height: 28px; padding: 0; gap: 0; justify-content: center; border-radius: 50%; margin: -4px 0 0 1px; vertical-align: middle; }
+  .bio .ystk > img, .bio .ystk > i { width: 17px; height: 17px; font-size: 16px; }
+  .bio .ystk > span { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  /* i5 (owner H5): contact = icon-only circles, like the phone stack tags; 44px tap targets, one centred row.
+     The name stays for AT (each link's aria-label: "GitHub: blaqat (opens in a new tab)") */
+  .contact { margin-top: 28px; display: flex; justify-content: center; gap: 12px; }
+  .hcontact { width: 44px; height: 44px; --h: 44px; padding: 0; gap: 0; border-radius: 50%; }
+  .hcontact > i { font-size: 1.25rem; }
+  .hcontact > span { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  .hcontact::after { inset: -2px -6px; } /* the 12px gaps are part of the targets too */
+  .skip { top: 14px; left: 14px; right: auto; bottom: auto; }
+  .hcall__btn { font-size: .88rem; padding: 0 16px 2px; }
+}
+@media (max-width: 359px) { .bio { font-size: 1rem; } }
+
+@media (prefers-reduced-motion: reduce) { .hcall__in, .hcall-ring::after { animation: none !important; } }
+html.y-reduced .hcall__in, html.y-reduced .hcall-ring::after { animation: none !important; }
+

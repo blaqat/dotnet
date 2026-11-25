@@ -1,0 +1,175 @@
+<!doctype html>
+<html lang="en" data-section="home">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mobile nav options</title>
+<link rel="stylesheet" href="yarn.css">
+<link rel="stylesheet" href="vendor/phosphor/bold/style.css">
+<style>
+  /* kit/mnav.html · i4 round 2 (nav agent): every ?mnav option side by side, as live phone frames of real pages */
+  body { background: var(--cotton-2); }
+  .mnx { max-width: 1600px; margin: 0 auto; padding: 28px 24px 64px; }
+  .mnx-head { display: grid; gap: 10px; margin-bottom: 20px; }
+  .mnx-head p { margin: 0; max-width: 78ch; color: var(--ink-2); }
+  .mnx-head code, .mnx-opt code { font: 600 .8rem/1 var(--font-mono); padding: .3em .5em; border-radius: 7px; background: var(--white); box-shadow: inset 0 0 0 1px rgba(31,30,30,.1); white-space: nowrap; }
+  .mnx-ctl { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 18px; margin-top: 4px; }
+  .mnx-ctl > div { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+  .mnx-ctl .eyebrow { margin-right: 2px; }
+
+  /* side by side: one column per option */
+  .mnx-grid { --cols: 6; --gap: 16px; display: grid; grid-template-columns: repeat(var(--cols), minmax(0, 1fr)); gap: 34px var(--gap); align-items: start; }
+  /* text + phone share the grid's rows (subgrid), so every phone starts on one top line however long its note is */
+  .mnx-opt { display: grid; grid-template-columns: minmax(0, 1fr); grid-row: span 2; grid-template-rows: subgrid; row-gap: 12px; min-width: 0; }
+  .mnx-opt__text { display: grid; gap: 6px; align-content: start; }
+  .mnx-opt__top { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 8px; }
+  .mnx-opt h2 { margin: 0; font: 900 1.12rem/1.1 var(--font-display); letter-spacing: -.015em; }
+  .mnx-opt__pick { display: inline-flex; align-items: center; padding: .28em .6em; border-radius: 999px; background: var(--tex-twill), var(--red); color: #fff; font: 800 .7rem/1 var(--font-display); letter-spacing: .02em; }
+  .mnx-opt__note { margin: 0; font-size: .84rem; line-height: 1.42; color: var(--ink-2); }
+  .mnx-opt__note b { color: var(--ink); }
+  .mnx-opt__meta { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; font: 500 .74rem/1.2 var(--font-mono); color: var(--ink-3); }
+  .mnx-opt__meta a { display: inline-flex; align-items: center; gap: .3em; min-height: 32px; color: var(--red-deep); font: 700 .78rem/1 var(--font-body); text-decoration: none; }
+  .mnx-opt__meta a:hover { text-decoration: underline; }
+  .mnx-frames { display: grid; gap: 10px; }
+  .mnx-frames figure { margin: 0; display: grid; gap: 4px; }
+  .mnx-frames figcaption { font: 500 .72rem/1 var(--font-mono); color: var(--ink-3); }
+
+  /* a phone: the real page at its real size, scaled to the column (--s) */
+  .mnx-phone { --w: 390; --h: 844; --crop: var(--h); position: relative; overflow: hidden; width: calc(var(--w) * var(--s, .5) * 1px); height: calc(var(--crop) * var(--s, .5) * 1px);
+    border-radius: calc(26px * var(--s, .5) + 6px); background: var(--white);
+    box-shadow: 0 0 0 calc(5px * var(--s, .5) + 2px) var(--ink), 0 10px 26px -10px rgba(31,30,30,.5); }
+  .mnx-phone iframe { position: absolute; left: 0; top: 0; width: calc(var(--w) * 1px); height: calc(var(--h) * 1px); border: 0; background: var(--cotton);
+    transform-origin: 0 0; transform: scale(var(--s, .5)) translateY(calc((var(--crop) - var(--h)) * 1px)); }
+
+  /* the bottom close up: three to a row, so the bars show near 1:1 */
+  .mnx-grid[data-view="bottom"]:not(.is-all) { --cols: 3; }
+  /* all three pages: one row per option, the note on the left */
+  .mnx-grid.is-all { --cols: 1; gap: 34px; }
+  .mnx-grid.is-all .mnx-opt { grid-row: auto; grid-template-rows: none; grid-template-columns: minmax(200px, 280px) minmax(0, 1fr); gap: 8px 24px; }
+  .mnx-grid.is-all .mnx-frames { grid-template-columns: repeat(3, max-content); gap: 18px; }
+
+  @media (max-width: 959px) {
+    .mnx { padding: 18px 16px 48px; }
+    .mnx-grid { --cols: 2; }
+    .mnx-grid.is-all .mnx-opt { grid-template-columns: minmax(0, 1fr); }
+    .mnx-grid.is-all .mnx-frames { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  }
+</style>
+</head>
+<body>
+<main class="mnx">
+  <header class="mnx-head">
+    <h1 class="yhead__title">Mobile nav<span class="yhead__dot">.</span></h1>
+    <p>Six phone navs, live. Every frame is the real page with <code>?mnav=…</code>; tap around inside them. The number under each name is <code>--nav-bottom</code>, the room it takes from the bottom of the screen (the player and search sit on top of that). Desktop keeps its top nav in all six. Any page's ⚙ → Kit → Mobile nav switches it too.</p>
+    <div class="mnx-ctl">
+      <div role="group" aria-label="Page">
+        <span class="eyebrow">Page</span>
+        <button type="button" class="ychip ysel" data-page="home" aria-pressed="false"><span class="ychip__l">Home</span></button>
+        <button type="button" class="ychip ysel" data-page="projects" aria-pressed="false"><span class="ychip__l">Projects</span></button>
+        <button type="button" class="ychip ysel" data-page="music" aria-pressed="false"><span class="ychip__l">Music · playing</span></button>
+        <button type="button" class="ychip ysel" data-page="thoughts" aria-pressed="false"><span class="ychip__l">Thoughts</span></button>
+        <button type="button" class="ychip ysel" data-page="all" aria-pressed="false"><span class="ychip__l">Home + Projects + Music</span></button>
+      </div>
+      <div role="group" aria-label="Phone width">
+        <span class="eyebrow">Width</span>
+        <button type="button" class="ychip ysel" data-w="390" aria-pressed="false"><span class="ychip__l">390</span></button>
+        <button type="button" class="ychip ysel" data-w="360" aria-pressed="false"><span class="ychip__l">360</span></button>
+      </div>
+      <div role="group" aria-label="View">
+        <span class="eyebrow">View</span>
+        <button type="button" class="ychip ysel" data-view="phone" aria-pressed="false"><span class="ychip__l">Whole screen</span></button>
+        <button type="button" class="ychip ysel" data-view="bottom" aria-pressed="false"><span class="ychip__l">Bottom, close up</span></button>
+      </div>
+    </div>
+  </header>
+  <section class="mnx-grid" id="grid" aria-label="Options"></section>
+</main>
+<script>
+(() => {
+  "use strict";
+  // one line each: what it's good at · what it costs. nb = its --nav-bottom (kit/COMPONENTS.md § 12)
+  // i5 round 2 (owner: "i did not mean top strip i meant sections pill"): the pill is the decided default; top was round 1's
+  const OPTS = [
+    { v: "spool", name: "Sections pill", nb: "0", now: true,
+      good: "the most room of any option while the nav stays under your thumb; always there (i7: the slide-away on scroll is gone).",
+      cost: "two taps to switch; the other sections are hidden until you open it." },
+    { v: "top", name: "Top strip", nb: "0",
+      good: "the whole bottom goes to content, the player and search; it mirrors the desktop tabs.",
+      cost: "it sits at the top, away from your thumb: to switch from deep in a list you scroll back up for it." },
+    { v: "corduroy", name: "Corduroy bar", nb: "84px",
+      good: "familiar, labels under every dot, the biggest targets.",
+      cost: "the heaviest thing on screen, and brown appears nowhere else on the site." },
+    { v: "cotton", name: "Cotton pill", nb: "78px",
+      good: "the sheet's own cloth, same as the white FABs, so the bottom reads as one family.",
+      cost: "white on white: it leans on its shadow to stand off the cards." },
+    { v: "ink", name: "Ink, icons only", nb: "70px",
+      good: "the shortest bar; only the page you're on gets colour and a name, so it's calm and clear.",
+      cost: "the other three are bare icons (house, folder, notes, cloud) you learn once." },
+    { v: "frame", name: "Frame band", nb: "64px",
+      good: "nothing floats: the section's frame widens into the nav and the sheet ends on it.",
+      cost: "it changes colour with the section and always spans the full width (the most app-like)." },
+  ];
+  const PAGES = {
+    home: { label: "Home", url: "../home/index.html?skip" },
+    projects: { label: "Projects", url: "../projects/index.html" },
+    music: { label: "Music · playing", url: "../music/index.html?demo=1" },
+    thoughts: { label: "Thoughts", url: "../thoughts/stitched.html" },
+  };
+  const H = { 390: 844, 360: 780 }, CROP = 260;
+  const q = new URLSearchParams(location.search);
+  const st = {
+    page: ["home", "projects", "music", "thoughts", "all"].includes(q.get("page")) ? q.get("page") : "projects",
+    w: q.get("w") === "360" ? 360 : 390,
+    view: q.get("view") === "bottom" ? "bottom" : "phone",
+  };
+  const grid = document.getElementById("grid");
+  const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
+  const src = (p, v) => `${PAGES[p].url}${PAGES[p].url.includes("?") ? "&" : "?"}mnav=${v}&embed=1`;
+  const phone = (p, o) => `<figure><div class="mnx-phone"><iframe title="${esc(o.name)} on ${esc(PAGES[p].label)}" loading="lazy" src="${src(p, o.v)}"></iframe></div>${st.page === "all" ? `<figcaption>${esc(PAGES[p].label)}</figcaption>` : ""}</figure>`;
+
+  function render() {
+    const pages = st.page === "all" ? ["home", "projects", "music"] : [st.page];
+    grid.classList.toggle("is-all", st.page === "all");
+    grid.innerHTML = OPTS.map((o) => `
+      <article class="mnx-opt" aria-labelledby="o-${o.v}">
+        <div class="mnx-opt__text">
+          <div class="mnx-opt__top"><h2 id="o-${o.v}">${esc(o.name)}</h2>${o.now ? '<span class="mnx-opt__pick">decided</span>' : ""}</div>
+          <div class="mnx-opt__meta"><code>mnav=${o.v}</code><span title="--nav-bottom">${o.nb}</span><a href="${src(pages[0], o.v).replace("&embed=1", "")}" target="_blank" rel="noopener" aria-label="Open ${esc(o.name)} on ${esc(PAGES[pages[0]].label)} in a new tab">open<i class="ph-bold ph-arrow-up-right" aria-hidden="true"></i></a></div>
+          <p class="mnx-opt__note"><b>Good:</b> ${esc(o.good)} <b>Costs:</b> ${esc(o.cost)}</p>
+        </div>
+        <div class="mnx-frames">${pages.map((p) => phone(p, o)).join("")}</div>
+      </article>`).join("");
+    paint(); fit();
+  }
+  // the scale that fits the frames into their column (no layout work per frame: one custom property)
+  function fit() {
+    const h = H[st.w], crop = st.view === "bottom" ? CROP : h;
+    const box = grid.querySelector(".mnx-frames");
+    if (!box) return;
+    const n = st.page === "all" ? 3 : 1, gap = st.page === "all" ? 18 : 0;
+    const s = Math.min(1, (box.clientWidth - (n - 1) * gap) / (n * st.w));
+    if (grid.style.getPropertyValue("--s") !== s.toFixed(4)) grid.style.setProperty("--s", s.toFixed(4));
+    grid.querySelectorAll(".mnx-phone").forEach((el) => { el.style.setProperty("--w", st.w); el.style.setProperty("--h", h); el.style.setProperty("--crop", crop); });
+  }
+  function paint() {
+    document.querySelectorAll("[data-page]").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.page === st.page)));
+    document.querySelectorAll("[data-w]").forEach((b) => b.setAttribute("aria-pressed", String(+b.dataset.w === st.w)));
+    document.querySelectorAll("[data-view]").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.view === st.view)));
+    grid.dataset.view = st.view;
+    const u = new URL(location.href);
+    u.searchParams.set("page", st.page); u.searchParams.set("w", st.w); u.searchParams.set("view", st.view);
+    history.replaceState(null, "", u);
+  }
+  document.querySelector(".mnx-ctl").addEventListener("click", (e) => {
+    const b = e.target.closest("button");
+    if (!b) return;
+    if (b.dataset.page && b.dataset.page !== st.page) { st.page = b.dataset.page; render(); }
+    else if (b.dataset.w && +b.dataset.w !== st.w) { st.w = +b.dataset.w; render(); }
+    else if (b.dataset.view && b.dataset.view !== st.view) { st.view = b.dataset.view; paint(); fit(); }
+  });
+  new ResizeObserver(fit).observe(grid);
+  render();
+})();
+</script>
+</body>
+</html>

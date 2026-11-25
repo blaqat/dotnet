@@ -1,0 +1,166 @@
+/* ============================================================
+   home · round 3 "yarn" · iteration 2
+   Page-local CSS positions and lays out kit parts (.ysecbtn, .ystk,
+   .yscribble, .ylinkicon, <yarn-nav>); it never restyles them.
+   (?secrope=hover is the default here: the owner liked the rope on Home's section buttons, drawn on the button edge. Lists elsewhere keep hover = lift only.)
+   ============================================================ */
+
+/* the home sheet clips the intro (ball enters from under the top frame,
+   cat walks in from behind the left frame). Never transform .sheet:
+   it would capture the fixed mobile bar. */
+.home-sheet { overflow: clip; display: flex; flex-direction: column; }
+
+/* desktop: the lockup is the brand and the section buttons are the nav,
+   so only the kit nav's sound slot shows, where every other page has it */
+@media (min-width: 960px) {
+  .home .ynav { position: absolute; top: 0; right: 0; z-index: 6; }
+  .home .ynav__brand, .home .ynav__tabs { display: none; }
+}
+
+.hero {
+  flex: 1;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  padding: clamp(40px, 7vh, 88px) 24px clamp(48px, 8vh, 96px);
+  text-align: center;
+}
+
+/* ---------- lockup ---------- */
+.lockup { width: min(700px, 100%); margin: 0; line-height: 0; cursor: default; }
+.lockup__svg { width: 100%; height: auto; overflow: visible; display: block; }
+html[data-intro="cursor"].fine .lockup { width: min(620px, 100%); }
+.lockup__svg .lk-letters { filter: drop-shadow(0 1.6px 0 rgba(31, 30, 30, .16)); }
+.lockup__svg .ply-hi { fill: none; stroke: rgba(255, 255, 255, .075); stroke-linecap: round; stroke-linejoin: round; }
+.lockup__svg .lk-letters .ply-twist { stroke: rgba(255, 255, 255, .17); stroke-dasharray: 2.6 3.4; }
+.lockup__svg .lk-strand .ply-twist { stroke: rgba(255, 255, 255, .38); stroke-dasharray: 1.5 2.1; }
+.lockup__svg .strand-shadow { fill: none; stroke: rgba(31, 30, 30, .14); stroke-linecap: round; transform: translateY(2.2px); }
+.lockup__svg .yball { filter: drop-shadow(0 1.2px 0 rgba(90, 10, 16, .28)); }
+
+.tagline {
+  margin: .9rem 0 0;
+  font: italic 700 clamp(.9rem, 1.1vw, 1rem)/1.2 var(--font-display);
+  color: var(--ink-3);
+}
+
+/* ---------- bio ---------- */
+.bio, .tagline, .hnav, .contact { position: relative; z-index: 3; } /* above the paper-bit canvas (z 2) */
+.bio {
+  margin-top: clamp(1.4rem, 3.4vh, 2.2rem); max-width: 41rem;
+  color: var(--ink-2); font-size: clamp(1.0625rem, 1.25vw, 1.15rem); line-height: 1.7;
+}
+.bio p { margin: 0 0 .45em; text-wrap: pretty; }
+.bio strong { color: var(--ink); font-weight: 750; }
+.nw { white-space: nowrap; }
+
+/* keywords: kit scribble underline (drawn in on arrival) + a hover caption drawn in
+   in a bubbly face. The scribble's colour is the section the word leads to. */
+.bio .kw { position: relative; color: var(--ink); font-weight: 750; text-decoration: none; }
+@media (pointer: coarse) { .bio .kw::before { content: ""; position: absolute; left: 50%; top: 50%; width: max(calc(100% + 8px), 44px); height: 44px; translate: -50% -50%; } } /* 44px tap target, same look */
+/* a short line box keeps the scribble right under the word (and off the next line's badges) */
+.bio .kw.yscribble { padding: 0 .04em; line-height: 1.22; }
+.bio .kw--rit { color: var(--orange-deep); } /* RIT orange, 5.2:1 on the sheet */
+.kw__cap {
+  position: absolute; left: 50%; bottom: calc(100% - .05em);
+  font: var(--cap-w, 650) var(--cap-size, .9rem)/1 var(--cap-font, var(--font-display));
+  letter-spacing: var(--cap-ls, .01em);
+  white-space: nowrap; color: var(--cap, var(--red-deep)); pointer-events: none;
+  translate: -50% 0; rotate: -4deg;
+  /* "written" in: revealed left → right like a pen stroke */
+  clip-path: inset(-30% 104% -30% -8%);
+  transition: clip-path 160ms var(--ease-out);
+}
+.kw--rit .kw__cap { rotate: 5deg; }
+.kw[data-kw="composing"] .kw__cap { rotate: -2deg; }
+@media (hover: hover) {
+  .kw:hover .kw__cap { clip-path: inset(-30% -8% -30% -8%); transition: clip-path 440ms cubic-bezier(.45, .05, .35, 1); }
+}
+.kw:focus-visible .kw__cap, .kw.is-hover .kw__cap { clip-path: inset(-30% -8% -30% -8%); transition: clip-path 440ms cubic-bezier(.45, .05, .35, 1); }
+.kw:focus-visible { border-radius: 6px; }
+html[data-capfont="fredoka"] { --cap-font: "Fredoka", var(--font-display); --cap-w: 600; --cap-size: .95rem; }
+html[data-capfont="sniglet"] { --cap-font: "Sniglet", var(--font-display); --cap-w: 800; --cap-size: .92rem; }
+html[data-capfont="gluten"]  { --cap-font: "Gluten", var(--font-display); --cap-w: 700; --cap-size: .98rem; --cap-ls: .02em; }
+html[data-capfont="nunito"]  { --cap-w: 800; --cap-size: .8rem; }
+.kw .kw__cap { font-style: normal; }
+
+/* stack keywords are the kit stack badge (icon + name); here we only seat it on the text line */
+.bio .ystk { vertical-align: middle; margin: -.1em 0 0 .04em; }
+.bio .ystk > span { line-height: 1; }
+
+/* ---------- section buttons (kit .ysecbtn: hover lifts + shakes the icon, selected = rope inside) ---------- */
+.hnav {
+  margin-top: clamp(1.7rem, 4.2vh, 2.6rem);
+  display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 16px;
+}
+.hbtn { min-width: 172px; }
+/* ?secrope=hover (default on Home): the rope sews in on hover, flush on the button's own edge.
+   A Home-only exception: the owner liked it here ("i like the rope … fit in the button"); the site-wide
+   rule (hover = lift + shadow, rope = selected) still holds for lists, cards and chips. */
+@media (hover: hover) {
+  html[data-secrope="hover"] .hnav .ysecbtn:hover::before { --sweep: 360deg; opacity: 1; transition: --sweep 460ms var(--ease-out), opacity 0s; }
+  html[data-secrope="hover"]:not([data-rope="out"]) .hnav .ysecbtn:hover { outline-color: transparent; }
+}
+html[data-secrope="hover"] .hnav .ysecbtn.is-hover::before { --sweep: 360deg; opacity: 1; transition: --sweep 460ms var(--ease-out), opacity 0s; }
+html[data-secrope="hover"]:not([data-rope="out"]) .hnav .ysecbtn.is-hover { outline-color: transparent; }
+
+/* contact: always on screen as kit round icon links (?contact=icons), or behind a button on desktop (?contact=button) */
+.contact { margin-top: 22px; display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; }
+.contact-btn { display: none; }
+.contact.is-called .ylinkicon { animation: home-call 700ms var(--ease-out) both; }
+.contact.is-called .ylinkicon:nth-child(2) { animation-delay: 60ms; }
+.contact.is-called .ylinkicon:nth-child(3) { animation-delay: 120ms; }
+.contact.is-called .ylinkicon:nth-child(4) { animation-delay: 180ms; }
+@keyframes home-call { 0% { transform: none; } 30% { transform: translateY(-6px) rotate(-8deg); } 60% { transform: translateY(0) rotate(5deg); } 100% { transform: none; } }
+@media (min-width: 960px) {
+  html[data-contact="button"] .contact-btn { display: inline-flex; --h: 48px; }
+  /* the row is reserved, so opening it never moves the (vertically centred) hero */
+  html[data-contact="button"] .contact { visibility: hidden; }
+  html[data-contact="button"] .contact .ylinkicon { opacity: 0; transform: translateY(-8px) scale(.9); transition: opacity 160ms, transform 320ms var(--ease-spring); }
+  html[data-contact="button"] .contact.open { visibility: visible; }
+  html[data-contact="button"] .contact.open .ylinkicon { opacity: 1; transform: none; }
+  html[data-contact="button"] .contact.open .ylinkicon:nth-child(2) { transition-delay: 40ms; }
+  html[data-contact="button"] .contact.open .ylinkicon:nth-child(3) { transition-delay: 80ms; }
+  html[data-contact="button"] .contact.open .ylinkicon:nth-child(4) { transition-delay: 120ms; }
+}
+
+/* ---------- skip ---------- */
+/* hidden for the first ~600 ms so it doesn't compete with the drop, but always
+   focusable: keyboard focus reveals it immediately */
+.skip {
+  position: absolute; z-index: 20; right: 26px; bottom: 22px;
+  display: inline-flex; align-items: center; gap: .45em; min-height: 44px; padding: 0 18px;
+  border: 0; border-radius: 999px; cursor: pointer;
+  font: 800 .88rem/1 var(--font-display); color: var(--ink-2);
+  background: var(--tex-knit), var(--white); outline: 1.5px dashed rgba(31, 30, 30, .28); outline-offset: -5px;
+  box-shadow: var(--shadow-patch);
+  opacity: 0; transform: translateY(8px); pointer-events: none;
+  transition: opacity 280ms var(--ease-out), transform 360ms var(--ease-out);
+}
+.skip.shown, .skip:focus-visible { opacity: 1; transform: none; pointer-events: auto; }
+.skip:focus-visible { outline: 3px solid var(--focus); outline-offset: 3px; }
+.skip:active { transform: scale(.96); transition-duration: var(--press); }
+.skip:hover { color: var(--ink); }
+html.intro-off .skip, .skip[hidden] { display: none; }
+
+/* ---------- entrance (JS drives opacity/transform per frame, so ?t= can freeze it) ---------- */
+html.intro-on .ent, html.intro-on .bio .kw { opacity: 0; }
+.ent:focus-within { opacity: 1 !important; transform: none !important; }
+
+/* ---------- cursor mode: floor lane + ball ---------- */
+.lane { position: fixed; inset: 0; z-index: 40; pointer-events: none; overflow: hidden; }
+.lane svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+
+/* ---------- mobile: one centred column above the kit bottom bar ---------- */
+@media (max-width: 959px) {
+  .home .ynav { display: none; } /* the lockup is the brand; the bottom bar (kit) is the nav */
+  .hnav { display: none; }       /* the bar replaces the section tiles */
+  .hero { padding: 24px 20px 30px; }
+  .lockup { width: 100%; }
+  .tagline { margin-top: .7rem; font-size: .95rem; }
+  .bio { margin-top: 1.5rem; font-size: 1.0625rem; line-height: 1.62; max-width: 22.5rem; }
+  .bio p { margin-bottom: .8em; }
+  .contact { margin-top: 1.1rem; gap: 12px; }
+  .skip { top: 14px; left: 14px; right: auto; bottom: auto; }
+}
+@media (max-width: 359px) { .bio { font-size: 1rem; } }
+
+@media (prefers-reduced-motion: reduce) { .kw__cap { transition: none !important; } }
+html.y-reduced .kw__cap { transition: none !important; }

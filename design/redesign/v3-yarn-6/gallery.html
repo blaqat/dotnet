@@ -1,0 +1,218 @@
+<title>Yarn Iteration 6</title>
+<link rel="stylesheet" href="kit/yarn.css">
+<style>
+  /* gallery layout only: every part on this page is a kit part (header, cards, felt dots, buttons, rows, badges) */
+  .sheet > .ypage { padding-top: 36px; } /* no nav on this page: the header gets the room the nav would take */
+  .g-lede { margin: 0 0 30px; max-width: 72ch; color: var(--ink-2); font-size: 1.05rem; line-height: 1.55; }
+  .g-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 420px), 1fr)); gap: 22px; }
+  .g-card { display: grid; grid-template-rows: auto 1fr; padding: 0; overflow: clip; }
+  .g-shots { display: grid; grid-template-columns: minmax(0, 1fr) 27%; gap: 10px; align-items: start; padding: 10px 10px 0; }
+  .g-shots img { width: 100%; height: auto; border-radius: 10px; box-shadow: 0 1px 0 rgba(31,30,30,.1), 0 2px 6px rgba(31,30,30,.14); background: var(--cotton-2); }
+  .g-body { display: grid; gap: 10px; align-content: start; padding: 14px 18px 18px; }
+  .g-title { display: flex; align-items: center; gap: 10px; margin: 0; font: 900 1.3rem/1.1 var(--font-display); letter-spacing: -.02em; }
+  .g-title .ydot { --d: 32px; }
+  .g-body p { margin: 0; color: var(--ink-2); font-size: .94rem; line-height: 1.5; }
+  .g-links { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 2px; }
+  .g-links .meta { align-self: center; margin: 0 2px 0 6px; }
+  .g-sec { margin-top: 44px; }
+  .g-sec > h2 { margin: 0 0 14px; }
+  .g-two { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 28px; align-items: start; }
+  .g-changes { margin: 0; padding: 16px 20px 18px; list-style: none; display: grid; gap: 12px; }
+  .g-changes li { display: grid; gap: 4px; padding-bottom: 12px; border-bottom: 1.5px dashed rgba(31,30,30,.12); }
+  .g-changes li:last-child { border-bottom: 0; padding-bottom: 0; }
+  .g-changes q { font: 700 italic .92rem/1.4 var(--font-display); color: var(--ink-2); quotes: "“" "”"; }
+  .g-changes span { font-size: .95rem; line-height: 1.5; }
+  .g-rows { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+  .g-rows .yrow { gap: 12px; }
+  .g-rows .ydot { --d: 34px; }
+  .g-rows b { display: block; font: 850 .98rem/1.2 var(--font-display); }
+  .g-rows small { display: block; margin-top: 2px; font: 500 .74rem/1.3 var(--font-mono); color: var(--ink-3); }
+  .g-rows .yrow > i:last-child { margin-left: auto; color: var(--ink-3); }
+  .g-foot { margin-top: 36px; color: var(--ink-3); }
+  /* i5 · review tools (R3): the round-up card, first thing under the title */
+  .g-roundup { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 8px 18px; margin: 0 0 28px; padding: 16px 18px 16px 16px; box-shadow: var(--shadow-patch), inset 4px 0 0 var(--red); }
+  .g-roundup .ydot { --d: 46px; --sec: var(--red); }
+  .g-roundup b { display: block; font: 900 1.2rem/1.15 var(--font-display); letter-spacing: -.015em; }
+  .g-roundup small { display: block; margin-top: 4px; color: var(--ink-2); font-size: .92rem; line-height: 1.45; }
+  .g-roundup .g-roundup__n { margin-top: 6px; font: 600 .76rem/1.3 var(--font-mono); color: var(--red-deep); }
+  .g-roundup__n:empty { display: none; }
+  @media (max-width: 959px) {
+    .g-roundup { grid-template-columns: auto minmax(0, 1fr); }
+    .g-roundup > .btn { grid-column: 1 / -1; justify-self: start; }
+  }
+  @media (max-width: 959px) {
+    .sheet > .ypage { padding-top: 22px; }
+    .g-two { grid-template-columns: minmax(0, 1fr); }
+    .g-shots { grid-template-columns: minmax(0, 1fr) 30%; }
+  }
+</style>
+<script src="kit/yarn.js" defer></script>
+<div class="frame" data-section="home">
+<main class="sheet">
+  <div class="ypage">
+    <header class="yhead">
+      <div class="yhead__text">
+        <h1 class="yhead__title">Yarn, iteration 6<span class="yhead__dot" aria-hidden="true">.</span></h1>
+        <p class="yhead__meta meta">blaqat.net redesign · round 3 · Nov 14, 2026</p>
+      </div>
+      <div class="yhead__actions"><a class="btn btn--sm" href="../v3-yarn-5/index.html"><i class="ph-bold ph-clock-counter-clockwise" aria-hidden="true"></i>Iteration 5</a><a class="btn btn--sm btn--ghost" href="../v3-yarn-4/index.html">Iteration 4</a><a class="btn btn--sm btn--ghost" href="../v3-yarn-3/index.html">Iteration 3</a><a class="btn btn--sm btn--ghost" href="../v3-yarn-2/index.html">Iteration 2</a><a class="btn btn--sm btn--ghost" href="../v3-yarn/index.html">Iteration 1</a></div>
+    </header>
+    <a class="ycard ylift g-roundup" href="review.html">
+      <span class="ydot" aria-hidden="true"><i class="ph-fill ph-list-checks"></i></span>
+      <span><b>Round-up: your picks, the open questions, your notes</b><small>Pick in ⚙ on any page (it's saved and follows you), note anything with ✎ or “Note on something”, then copy everything back to the chat from one page.</small><small class="g-roundup__n" data-ru-count></small></span>
+      <span class="btn btn--red btn--sm">Open the round-up<i class="ph-bold ph-arrow-right" aria-hidden="true"></i></span>
+    </a>
+    <script>
+      addEventListener("load", () => setTimeout(() => {
+        const R = window.YarnReview, el = document.querySelector("[data-ru-count]");
+        if (!R || !el) return;
+        const d = R.load(), s = (n, w) => `${n} ${w}${n === 1 ? "" : "s"}`;
+        const picks = R.countChoices(d), notes = Object.keys(d.notes.page).length + Object.keys(d.notes.opt).length + d.notes.el.length;
+        const answers = Object.values(d.answers).filter((a) => a && a.v).length;
+        el.textContent = picks + notes + answers ? `So far: ${s(picks, "pick")} · ${s(answers, "answer")} · ${s(notes, "note")}` : "";
+      }, 60));
+    </script>
+    <p class="g-lede"><b>Iteration 6 is the owner's i5 review, built</b> (the round-up word for word in <code>_feedback/roundup-i5.md</code>, the build list in <code>FEEDBACK-i6.md</code>). Floating chrome now lives on its own top layer and phones never scroll sideways; the opened item defaults to “label first”; cards share the opened item's facts; stack tags read like hashtags; ongoing is a badge again.</p>
+    <p class="g-lede">Review the same way as last time: pick in ⚙ (saved, follows you to every page), note anything with ✎ or “Note on something”, then copy everything from the round-up. i6 keeps its own store, so i5's picks don't carry over. Iteration 5 (<code>../v3-yarn-5/</code>) stays frozen for comparison.</p>
+
+    <section class="g-cards" aria-label="Pages">
+      <article class="ycard ylift g-card" data-section="home">
+        <div class="g-shots"><img src="_shots/gallery-home-d.png" alt="Home on desktop: the cat and yarn wordmark, the bio with wavy-underlined keywords, three section buttons and contact links with usernames" loading="lazy"><img src="_shots/gallery-home-m.png" alt="Home on a phone: the lockup, bio with icon-only stack tags, and a row of round contact icons, with the section tabs at the top" loading="lazy"></div>
+        <div class="g-body">
+          <h2 class="g-title"><span class="ydot" aria-hidden="true"><i class="ph-fill ph-house"></i></span>Home</h2>
+          <p>Unchanged in i6 apart from the kit: the sound tag is red with a white icon when on, and always starts muted; pressing a link inside a card no longer presses the card.</p>
+          <div class="g-links">
+            <a class="btn btn--red btn--sm" href="home/index.html?visit=first">First visit</a>
+            <a class="btn btn--sm" href="home/index.html?demo=callout">Sound prompt</a>
+            <a class="btn btn--sm" href="home/index.html?skip">End state</a>
+            <a class="btn btn--sm" href="home/index.html?skip&demo=kw-python">Stack tag shake</a>
+            <a class="btn btn--sm btn--ghost" href="research/stack-icons.html">Stack icons: colour vs mono</a>
+          </div>
+        </div>
+      </article>
+
+      <article class="ycard ylift g-card" data-section="projects">
+        <div class="g-shots"><img src="_shots/gallery-projects-d.png" alt="Projects on desktop: one filter line, a timeline with dashed year rules and a yarn ball on the selected project, the open project on white felt" loading="lazy"><img src="_shots/gallery-projects-m.png" alt="Projects on a phone: a simple list grouped by year, the sections pill and a white search button at the bottom" loading="lazy"></div>
+        <div class="g-body">
+          <h2 class="g-title"><span class="ydot" aria-hidden="true"><i class="ph-fill ph-folder-simple"></i></span>Projects</h2>
+          <p>Cards show the opened item's facts (type · status · date; <code>?cardmeta</code>), a flat type colour that passes contrast, and a stack line that works like Thoughts' hashtags. One empty state. While searching, grid years fold together (<code>?gridyears</code>). The opened item defaults to “label first”, with a new left rail (<code>?dlayout=side</code>); ‹ 3 / 14 › shows the neighbour on hover.</p>
+          <div class="g-links">
+            <a class="btn btn--red btn--sm" href="projects/index.html">Timeline + stage</a>
+            <a class="btn btn--sm" href="projects/index.html?p=sonata&dlayout=rail">Layout: rail</a>
+            <a class="btn btn--sm" href="projects/index.html?p=sonata&dlayout=label">Layout: label</a>
+            <a class="btn btn--sm" href="projects/index.html?view=grid">Grid</a>
+            <a class="btn btn--sm" href="projects/item.html?p=sonata">Item page</a>
+            <a class="btn btn--sm" href="projects/index.html?type=school,work&q=python">Filtered + matches</a>
+            <a class="btn btn--sm btn--ghost" href="projects/index.html?ongoing=badge&passed=dot&tlstack=off&ptype=plain">i4 look</a>
+            <span class="meta">phone:</span>
+            <a class="btn btn--sm btn--ghost" href="projects/index.html?fab=open">Search open</a>
+          </div>
+        </div>
+      </article>
+
+      <article class="ycard ylift g-card" data-section="music">
+        <div class="g-shots"><img src="_shots/gallery-music-d.png" alt="Music on desktop: Projects' timeline layout with folder cards and singles by year, the open release beside it" loading="lazy"><img src="_shots/gallery-music-m.png" alt="Music on a phone: releases in a list by year with round play buttons, a white search button at the bottom" loading="lazy"></div>
+        <div class="g-body">
+          <h2 class="g-title"><span class="ydot" aria-hidden="true"><i class="ph-fill ph-music-notes"></i></span>Music + the player</h2>
+          <p>Instrument chips tint on hover, “Collection - Song”, no “No notes”, a trash can for Dropped, Projects' passed rings. An opened collection shows which tracks match a search (<code>?trackmatch</code>). The player shows an ongoing release (<code>?pwip</code>); long-press Next disables on the last song; notes read “About this song” / “About [collection]”.</p>
+          <div class="g-links">
+            <a class="btn btn--red btn--sm" href="music/index.html">Timeline + stage</a>
+            <a class="btn btn--sm" href="music/index.html?view=grid">Grid</a>
+            <a class="btn btn--sm" href="music/item.html">Release page</a>
+            <a class="btn btn--sm" href="music/index.html?view=grid">Song notes: hover a tab</a>
+            <a class="btn btn--sm" href="music/index.html?player=panel&demo=1">Player panel</a>
+            <a class="btn btn--sm" href="music/index.html?player=disc&demo=1">Disc (hold it)</a>
+            <a class="btn btn--sm btn--ghost" href="music/player-test.html">Player test bench</a>
+          </div>
+        </div>
+      </article>
+
+      <article class="ycard ylift g-card" data-section="thoughts">
+        <div class="g-shots"><img src="_shots/gallery-thoughts-d.png" alt="Thoughts on desktop: the title, welcome to my void, search and filters in the left rail, the feed starting on the title's line under dashed month rules" loading="lazy"><img src="_shots/gallery-thoughts-m.png" alt="Thoughts on a phone: the feed as one list with a white search button at the bottom" loading="lazy"></div>
+        <div class="g-body">
+          <h2 class="g-title"><span class="ydot" aria-hidden="true"><i class="ph-fill ph-cloud"></i></span>Thoughts</h2>
+          <p>No “See the post”; Back returns to what you clicked. Eight tags plus a tag browser, and a year filter. Write-up links on cards (<code>?cardwu</code>), where “about” goes (<code>?aboutgo</code>), collection icons (<code>?collicon</code>), the article pager in the top bar (<code>?apager=top</code>). One rope at a time: the old selection un-sews as the new one sews in.</p>
+          <div class="g-links">
+            <a class="btn btn--red btn--sm" href="thoughts/stitched.html">Feed</a>
+            <a class="btn btn--sm" href="thoughts/stitched.html?view=article&project=bank-simulation">Project write-up</a>
+            <a class="btn btn--sm" href="thoughts/stitched.html?view=collection&c=tools">Tools I like</a>
+            <a class="btn btn--sm" href="thoughts/stitched.html?pickart=article">Pick as article</a>
+            <a class="btn btn--sm" href="thoughts/stitched.html?kicon=bare">Bare kicker icons</a>
+            <a class="btn btn--sm btn--ghost" href="thoughts/stitched.html?lb=post-e1:0">Lightbox</a>
+          </div>
+        </div>
+      </article>
+
+      <article class="ycard ylift g-card" data-section="thoughts">
+        <div class="g-shots"><img src="_shots/gallery-tier-d.png" alt="A ranking page: S to D felt tiers with app icons, the owner's note and crowd notes beside them" loading="lazy"><img src="_shots/gallery-tier-m.png" alt="The ranking on a phone" loading="lazy"></div>
+        <div class="g-body">
+          <h2 class="g-title"><span class="ydot" aria-hidden="true"><i class="ph-fill ph-ranking"></i></span>Rankings page</h2>
+          <p>Comments can mention items: tap a tile or type @ / # (<code>?rmention</code>); hovering a comment lights its tiles. Write-up marks on tiles (<code>?wumark</code>), the write-up pill in white, the “A” key passes contrast.</p>
+          <div class="g-links">
+            <a class="btn btn--red btn--sm" href="thoughts/tier.html?id=tl1">blaqat's ranking</a>
+            <a class="btn btn--sm" href="thoughts/tier.html?id=tl1&item=helium">Helium lit</a>
+            <a class="btn btn--sm" href="thoughts/tier.html?id=tl3">Custom tier names</a>
+            <a class="btn btn--sm" href="thoughts/tier.html?id=tl1&mode=everyone">Everyone</a>
+            <a class="btn btn--sm" href="thoughts/tier.html?id=tl1&mode=add">Add yours</a>
+          </div>
+        </div>
+      </article>
+
+      <article class="ycard ylift g-card" data-section="studio">
+        <div class="g-shots"><img src="_shots/gallery-studio-d.png" alt="Studio on desktop: the dashboard with section patches, drafts and recent activity" loading="lazy"><img src="_shots/gallery-studio-m.png" alt="Studio on a phone: drafts list and a New button above the Studio nav" loading="lazy"></div>
+        <div class="g-body">
+          <h2 class="g-title"><span class="ydot" aria-hidden="true"><i class="ph-fill ph-squares-four"></i></span>Studio</h2>
+          <p>Where the owner adds and manages content, in the same yarn. Lists with publish states and drag to reorder, editors with a live preview made of the real cards, uploads with poster frames and waveforms, history, media library.</p>
+          <div class="g-links">
+            <a class="btn btn--red btn--sm" href="studio/index.html">Dashboard</a>
+            <a class="btn btn--sm" href="studio/index.html?view=signin">Sign in</a>
+            <a class="btn btn--sm" href="studio/index.html?view=reorder">Reorder</a>
+            <a class="btn btn--sm" href="studio/index.html?view=project">Project editor</a>
+            <a class="btn btn--sm" href="studio/index.html?view=publish">Publish check</a>
+            <a class="btn btn--sm" href="studio/index.html?view=collection">Music collection</a>
+            <a class="btn btn--sm" href="studio/index.html?view=playlist">Playlist</a>
+            <a class="btn btn--sm" href="studio/index.html?view=tierlist">Ranking editor</a>
+            <a class="btn btn--sm" href="studio/index.html?view=history">History</a>
+            <a class="btn btn--sm" href="studio/index.html?view=media">Media</a>
+            <a class="btn btn--sm btn--ghost" href="studio/index.html?view=project&layout=single">Edit / Preview toggle</a>
+            <a class="btn btn--sm btn--ghost" href="studio/index.html?view=project&offline=1">Offline</a>
+          </div>
+        </div>
+      </article>
+    </section>
+
+    <div class="g-sec g-two">
+      <section aria-labelledby="g-changes-h">
+        <h2 class="h2" id="g-changes-h">What changed in iteration 6</h2>
+        <ul class="ycard g-changes">
+          <li><q>lets have these floating elements on their own plane of existance</q><span>Pill, search, chips, Browse, player, toasts and hints share one fixed top layer; nothing in the page draws over them, and phones never scroll sideways. The Browse → SoundCloud mess came from hidden folder tabs widening the page by 41px.</span></li>
+          <li><q>if label first we can put the action buttons on the bottom right</q><span>“Label first” is the opened item's default, links bottom right, no gap; a left rail like articles is new (<code>?dlayout=side</code>). Notes in LAYOUT-i6.md.</span></li>
+          <li><q>i also kinda like how it looks on the opened card with the icon in the circle</q><span>Cards use those facts, type · status · date (<code>?cardmeta=facts|badges</code>).</span></li>
+          <li><q>when you press down on the inner buttons it shouldnt play the press animation for the whole container</q><span>A kit rule now; hover also no longer flickers at a card's edge.</span></li>
+          <li><q>maybe just doing away with the feature is the best option</q><span>Hiding the bottom items on scroll is off by default (<code>?mhide=all</code> to try it).</span></li>
+        </ul>
+      </section>
+
+      <section aria-labelledby="g-kit-h">
+        <h2 class="h2" id="g-kit-h">Kit, research, notes</h2>
+        <ul class="g-rows">
+          <li><a class="yrow ylift" href="kit/components.html"><span class="ydot" aria-hidden="true" style="--sec: var(--red)"><i class="ph-fill ph-puzzle-piece"></i></span><span><b>Components</b><small>every shared part, every state</small></span><i class="ph-bold ph-arrow-right" aria-hidden="true"></i></a></li>
+          <li><a class="yrow ylift" href="LAYOUT-i6.md"><span class="ydot" aria-hidden="true" style="--sec: var(--blue)"><i class="ph-fill ph-layout"></i></span><span><b>Open-item layouts</b><small>LAYOUT-i6.md, label first · left rail · rail · stack</small></span><i class="ph-bold ph-arrow-right" aria-hidden="true"></i></a></li>
+          <li><a class="yrow ylift" href="thoughts/CONCEPTS.md"><span class="ydot" aria-hidden="true" style="--sec: var(--gold)"><i class="ph-fill ph-graph"></i></span><span><b>Thoughts concepts</b><small>post · article · write-up · pick · collection · ranking</small></span><i class="ph-bold ph-arrow-right" aria-hidden="true"></i></a></li>
+          <li><a class="yrow ylift" href="research/STACK-ICONS.md"><span class="ydot" aria-hidden="true" style="--sec: var(--ink)"><i class="ph-fill ph-code"></i></span><span><b>Stack icon research</b><small>mono glyphs: white on red, coloured elsewhere</small></span><i class="ph-bold ph-arrow-right" aria-hidden="true"></i></a></li>
+          <li><a class="yrow ylift" href="kit/mnav.html"><span class="ydot" aria-hidden="true" style="--sec: var(--blue)"><i class="ph-fill ph-device-mobile"></i></span><span><b>Mobile nav options</b><small>sections pill chosen; the other five for comparison</small></span><i class="ph-bold ph-arrow-right" aria-hidden="true"></i></a></li>
+          <li><a class="yrow ylift" href="kit/bg/index.html"><span class="ydot" aria-hidden="true" style="--sec: var(--gold)"><i class="ph-fill ph-diamonds-four"></i></span><span><b>Sheet backgrounds</b><small>jersey (default) · intarsia · quilt · speckle</small></span><i class="ph-bold ph-arrow-right" aria-hidden="true"></i></a></li>
+          <li><a class="yrow ylift" href="kit/sound-test.html"><span class="ydot" aria-hidden="true" style="--sec: var(--purple)"><i class="ph-fill ph-speaker-high"></i></span><span><b>Sound test</b><small>every sound effect, by name</small></span><i class="ph-bold ph-arrow-right" aria-hidden="true"></i></a></li>
+          <li><a class="yrow ylift" href="kit/COMPONENTS.md"><span class="ydot" aria-hidden="true" style="--sec: var(--ink)"><i class="ph-fill ph-book-open"></i></span><span><b>COMPONENTS.md</b><small>markup + JS API for each part</small></span><i class="ph-bold ph-arrow-right" aria-hidden="true"></i></a></li>
+          <li><a class="yrow ylift" href="research/SOUNDS.md"><span class="ydot" aria-hidden="true" style="--sec: var(--purple)"><i class="ph-fill ph-waveform"></i></span><span><b>Sound research</b><small>research/SOUNDS.md</small></span><i class="ph-bold ph-arrow-right" aria-hidden="true"></i></a></li>
+          <li><a class="yrow ylift" href="research/cat-animation.md"><span class="ydot" aria-hidden="true" style="--sec: var(--ink)"><i class="ph-fill ph-cat"></i></span><span><b>Cat animation research</b><small>research/cat-animation.md</small></span><i class="ph-bold ph-arrow-right" aria-hidden="true"></i></a></li>
+          <li><a class="yrow ylift" href="FEEDBACK-i6.md"><span class="ydot" aria-hidden="true" style="--sec: var(--red)"><i class="ph-fill ph-chat-centered-text"></i></span><span><b>Owner feedback</b><small>FEEDBACK-i6.md + your round-up, word for word</small></span><i class="ph-bold ph-arrow-right" aria-hidden="true"></i></a></li>
+          <li><a class="yrow ylift" href="../v3-yarn-5/index.html"><span class="ydot" aria-hidden="true" style="--sec: var(--blue)"><i class="ph-fill ph-clock-counter-clockwise"></i></span><span><b>Iteration 5</b><small>frozen at ../v3-yarn-5/</small></span><i class="ph-bold ph-arrow-right" aria-hidden="true"></i></a></li>
+        </ul>
+      </section>
+    </div>
+
+    <p class="meta g-foot">Static mocks, opened from disk; not production code. Open on every page: <code>?browseicon=shake|caret</code> · <code>?uisnd=quiet|always</code> · <code>?mhide=all|nav|off</code> · <code>?mactive=start|end|count|top</code> · <code>?toast=top|bottom</code> · <code>?stkicon=color|mono</code>. Earlier options (decided) still work by URL.</p>
+  </div>
+</main>
+</div>

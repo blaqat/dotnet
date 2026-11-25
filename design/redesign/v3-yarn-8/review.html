@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en" data-section="home">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Round-up · Yarn iteration 7</title>
+<link rel="stylesheet" href="kit/yarn.css">
+<link rel="stylesheet" href="review/roundup.css">
+<script src="kit/theme.js"></script><!-- i8 · DK: the theme before first paint (yarn.js is deferred here) -->
+<script src="kit/yarn.js" defer></script>
+<script src="kit/review.js" defer></script>
+<script src="review/options-i8.js" defer></script>
+<script src="review/questions-i8.js" defer></script>
+<script src="review/roundup.js" defer></script>
+</head>
+<body class="frame">
+<main class="sheet">
+  <div class="ypage" id="ru">
+    <header class="yhead">
+      <div class="yhead__text">
+        <h1 class="yhead__title">Round-up<span class="yhead__dot" aria-hidden="true">.</span></h1>
+        <p class="yhead__meta meta">Iteration 7 · your ⚙ picks, the open questions and your notes, in one place</p>
+      </div>
+      <div class="yhead__actions">
+        <a class="btn btn--sm btn--ghost" href="index.html"><i class="ph-bold ph-arrow-left" aria-hidden="true"></i>Index</a>
+        <button type="button" class="btn btn--sm btn--red" data-act="copy"><i class="ph-bold ph-copy" aria-hidden="true"></i>Copy everything</button>
+      </div>
+    </header>
+
+    <ol class="ru-how" aria-label="How to review">
+      <li><b>Pick</b> in ⚙ on any page, or below. A pick is saved and follows you to every page.</li>
+      <li><b>Note</b> anything: the page, an option (✎), or a part of the page (⚙ → Note on something).</li>
+      <li><b>Copy everything</b> here and paste it into the chat.</li>
+    </ol>
+
+    <nav class="ru-toc" aria-label="Sections"><a class="ychip ychip--sm" href="#decisions"><span>Decisions</span><span class="ychip__c" data-count="decisions"></span></a><a class="ychip ychip--sm" href="#questions"><span>Questions</span><span class="ychip__c" data-count="questions"></span></a><a class="ychip ychip--sm" href="#notes"><span>Notes</span><span class="ychip__c" data-count="notes"></span></a><a class="ychip ychip--sm" href="#copy"><span>Copy</span></a></nav>
+
+    <section class="ru-sec" id="decisions" aria-labelledby="ru-dec-h">
+      <div class="ru-sec__head"><h2 class="h2" id="ru-dec-h">Decisions</h2><p class="meta" data-sub="decisions"></p></div>
+      <p class="ru-lede">Every option still open in ⚙. Click a value to make it your pick (click it again to drop it); <span class="ru-def-eg">default</span> marks today's default, ↗ opens the page with that value.</p>
+      <div data-mount="decisions"></div>
+    </section>
+
+    <section class="ru-sec" id="questions" aria-labelledby="ru-q-h">
+      <div class="ru-sec__head"><h2 class="h2" id="ru-q-h">Questions</h2><p class="meta" data-sub="questions"></p></div>
+      <p class="ru-lede">From the agents' reports and Fable's review. Suggested cuts are crossed out until you keep them.</p>
+      <div data-mount="questions"></div>
+    </section>
+
+    <section class="ru-sec" id="notes" aria-labelledby="ru-n-h">
+      <div class="ru-sec__head"><h2 class="h2" id="ru-n-h">Notes</h2><p class="meta" data-sub="notes"></p></div>
+      <div data-mount="notes"></div>
+    </section>
+
+    <section class="ru-sec ru-copy" id="copy" aria-labelledby="ru-c-h">
+      <div class="ru-sec__head"><h2 class="h2" id="ru-c-h">Copy everything</h2></div>
+      <div class="ycard ru-copy__card">
+        <p>One Markdown block with your picks (changed and confirmed defaults), answers, kept and cut items and every note, grouped by page. Paste it into the chat.</p>
+        <div class="ru-copy__acts">
+          <button type="button" class="btn btn--red" data-act="copy"><i class="ph-bold ph-copy" aria-hidden="true"></i>Copy everything</button>
+          <span class="ru-copy__status" role="status" aria-live="polite"></span>
+          <button type="button" class="btn btn--sm btn--ghost ru-clear" data-act="clear"><i class="ph-bold ph-trash" aria-hidden="true"></i>Clear everything</button>
+        </div>
+        <details class="ru-md-box"><summary>See the Markdown</summary><textarea class="ru-md" readonly rows="14" aria-label="The Markdown that Copy everything copies"></textarea></details>
+        <p class="meta ru-store"></p>
+      </div>
+    </section>
+  </div>
+</main>
+</body>
+</html>

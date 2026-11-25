@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en" data-section="projects">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Projects · blaqat.net</title>
+<meta name="description" content="Things blaqat has made: web apps, bots, embedded systems and tools.">
+<link rel="stylesheet" href="../kit/yarn.css">
+<link rel="stylesheet" href="projects.css">
+<script src="../kit/data.js"></script>
+<script src="../kit/yarn.js"></script>
+<script src="../kit/player.js" defer></script>
+<script src="pj-core.js" defer></script>
+<script src="projects.js" defer></script>
+</head>
+<body class="frame">
+<main class="sheet">
+  <yarn-nav active="projects" base="../"></yarn-nav>
+  <div class="ypage pj" id="pj">
+    <div id="pj-head"></div>
+    <div class="pj-top" id="pj-top"></div>
+    <div class="pj-body" id="pj-body" tabindex="-1">
+      <noscript><p class="muted">This mock needs JavaScript to lay out the projects.</p></noscript>
+    </div>
+    <p class="sr-only" id="pj-live" aria-live="polite"></p>
+  </div>
+</main>
+<yarn-player></yarn-player>
+</body>
+</html>

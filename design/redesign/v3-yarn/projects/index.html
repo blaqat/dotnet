@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en" data-section="projects">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Projects · blaqat.net</title>
+<meta name="description" content="Things blaqat has made: web apps, bots, embedded systems and tools.">
+<link rel="stylesheet" href="../kit/yarn.css">
+<link rel="stylesheet" href="projects.css">
+<script src="../kit/data.js"></script>
+<script src="../kit/yarn.js" defer></script>
+<script src="../kit/player.js" defer></script>
+<script src="projects.js" defer></script>
+</head>
+<body class="frame">
+<a class="skip btn btn--ink" href="#pj-main">Skip to projects</a>
+<main class="sheet">
+  <yarn-nav active="projects" base="../"></yarn-nav>
+
+  <div class="pj" id="pj-main" tabindex="-1">
+    <header class="pj-head">
+      <div class="pj-title">
+        <h1 class="h1 pj-h1">Projects</h1>
+        <p class="meta pj-count" id="pj-count" aria-live="polite"></p>
+      </div>
+      <div class="pj-views desktop-only" role="group" aria-label="Layout">
+        <button type="button" data-view="stage" aria-pressed="true"><i class="ph ph-rows" aria-hidden="true"></i>List</button>
+        <button type="button" data-view="grid" aria-pressed="false"><i class="ph ph-squares-four" aria-hidden="true"></i>Grid</button>
+      </div>
+    </header>
+
+    <div class="pj-filters" id="pj-filters"></div>
+
+    <div class="pj-body" id="pj-body">
+      <noscript><p class="muted">This mock needs JavaScript to lay out the projects.</p></noscript>
+    </div>
+
+    <p class="sr-only" id="pj-live" aria-live="polite"></p>
+  </div>
+</main>
+<yarn-player></yarn-player>
+</body>
+</html>

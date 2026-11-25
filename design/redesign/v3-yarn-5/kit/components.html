@@ -1,0 +1,472 @@
+<!doctype html>
+<html lang="en" data-section="projects">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Yarn kit · components</title>
+<link rel="stylesheet" href="yarn.css">
+<script>
+  // showcase-only: ?section= picks the frame color, ?embed= renders a tiny page for the phone frames
+  (function () {
+    var p = new URLSearchParams(location.search), s = p.get("section");
+    if (/^(home|projects|music|thoughts)$/.test(s || "")) document.documentElement.dataset.section = s;
+    if (p.get("embed")) document.documentElement.classList.add("kc-embed");
+  })();
+</script>
+<script src="data.js"></script>
+<script src="thoughts-data.js"></script>
+<script src="yarn.js"></script>
+<style>
+  /* ---------- showcase layout only (not part of the kit) ---------- */
+  .kc { padding: 4px clamp(16px, 3.4vw, 44px) 96px; }
+  .kc-intro { color: var(--ink-2); max-width: 74ch; margin: 0 0 6px; }
+  .kc-toc { display: flex; flex-wrap: wrap; gap: 6px; margin: 14px 0 0; padding: 0; list-style: none; }
+  .kc-toc a { display: inline-flex; align-items: center; min-height: 32px; padding: 0 .75em; border-radius: 999px; background: var(--cotton-2); color: var(--ink-2); text-decoration: none; font: 750 .78rem/1 var(--font-display); }
+  .kc-toc a:hover { background: var(--white); color: var(--ink); box-shadow: var(--shadow-patch); }
+  .kc-sec { margin-top: 34px; padding-top: 26px; border-top: 2px dashed rgba(31,30,30,.12); scroll-margin-top: 16px; }
+  .kc-sec > h2 { display: flex; align-items: baseline; gap: .55em; margin: 0 0 4px; font: 900 1.55rem/1.1 var(--font-display); letter-spacing: -.02em; }
+  .kc-sec > h2 .n { font: 500 .76rem/1 var(--font-mono); color: var(--ink-3); letter-spacing: 0; }
+  .kc-note { color: var(--ink-2); max-width: 76ch; margin: 0 0 16px; font-size: .95rem; }
+  .kc-note a { color: var(--red-deep); text-underline-offset: 3px; }
+  .kc-note code, .kc code { font: 500 .84em/1 var(--font-mono); background: var(--cotton-2); padding: .15em .4em; border-radius: 5px; }
+  .kc-label { font: 500 .72rem/1.3 var(--font-mono); color: var(--ink-3); margin: 0 0 8px; }
+  .kc-row { display: flex; flex-wrap: wrap; align-items: center; gap: 14px 12px; }
+  .kc-col { display: grid; gap: 10px; align-content: start; }
+  .kc-grid2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 340px), 1fr)); gap: 26px 30px; }
+  .kc-box { padding: 18px; border-radius: 18px; background: var(--tex-knit), rgba(255,255,255,.55); box-shadow: inset 0 0 0 1.5px rgba(31,30,30,.07); }
+  .kc-ink { background: var(--tex-twill), var(--ink); color: #fff; box-shadow: none; }
+  .kc-fonts { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr)); gap: 18px; }
+  .kc-fonts .big { font: 900 2.2rem/1 var(--font-display); letter-spacing: -.035em; margin: 0 0 6px; }
+  .kc-fonts p { margin: 0; }
+  .kc-mono { font: 500 1rem/1.5 var(--font-mono); }
+  .kc-body { font-size: 1rem; line-height: 1.6; color: #2a2828; }
+  /* state matrix */
+  .kc-matrix { overflow-x: auto; padding: 14px 4px 6px; margin: 0 -4px; }
+  .kc-matrix table { border-collapse: separate; border-spacing: 18px 16px; margin: -16px -18px; }
+  .kc-matrix th { font: 500 .72rem/1.2 var(--font-mono); color: var(--ink-3); text-align: left; white-space: nowrap; vertical-align: middle; }
+  .kc-matrix td { vertical-align: middle; }
+  .kc-matrix .yrow { width: 230px; }
+  .kc-matrix .ycard { width: 200px; padding: 12px 14px; }
+  .kc-matrix .ycard b, .kc-tlrow b, .kc-card b { display: block; font: 850 1rem/1.15 var(--font-display); letter-spacing: -.01em; }
+  /* FLIP demo */
+  .kc-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 250px), 1fr)); gap: 14px; margin-top: 16px; }
+  .kc-card { display: grid; gap: 10px; align-content: start; cursor: pointer; }
+  .kc-card p { margin: 0; color: var(--ink-2); font-size: .9rem; line-height: 1.45; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  .kc-empty { padding: 30px; text-align: center; color: var(--ink-2); }
+  /* integration pass parts */
+  .kc-folders { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 320px), 1fr)); gap: 12px 22px; --yfolder-top: 22px; align-items: stretch; }
+  .kc-folders > div { display: flex; }
+  .kc-railbox { display: flex; gap: 22px; align-items: flex-start; max-height: 520px; overflow: auto; padding: 8px 6px; border-radius: 18px; box-shadow: inset 0 0 0 1.5px rgba(31,30,30,.08); }
+  .kc-railbox .yrail { width: 84px; flex: none; top: 0; }
+  .kc-railbox .kc-flow { flex: 1; display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 10px; }
+  .kc-railbox .kc-flow .ycard { padding: 10px 12px; }
+  .kc-posts { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr)); gap: 18px; align-items: start; }
+  .kc-wave { max-width: 520px; display: grid; gap: 10px; }
+  .kc-wave .ywave { height: 44px; }
+  /* timeline */
+  .kc-tl { max-width: 720px; }
+  .kc-tlrow { gap: 14px; justify-content: space-between; flex-wrap: wrap; padding: 10px 14px; }
+  .kc-tlrow .ymeta { margin-left: auto; }
+  /* detail demo */
+  .kc-detailbox { --bottom-ui: 0px; height: 560px; overflow: auto; border-radius: 20px; padding: 0 20px; background: var(--tex-knit), var(--cotton); box-shadow: inset 0 0 0 1.5px rgba(31,30,30,.1); }
+  /* phone frames */
+  .kc-phones { display: flex; flex-wrap: wrap; gap: 18px; }
+  .kc-phone { width: 390px; max-width: 100%; height: 230px; border: 0; border-radius: 26px; box-shadow: 0 0 0 8px var(--ink), var(--shadow-pop); background: var(--ink); }
+  .kc-swatches { display: grid; grid-template-columns: repeat(auto-fill, minmax(92px, 1fr)); gap: 16px 12px; }
+  .kc-swatches figure { margin: 0; display: grid; gap: 6px; justify-items: start; }
+  .kc-swatches figcaption { font: 750 .78rem/1.2 var(--font-display); color: var(--ink); }
+  .kc-swatches figcaption span { display: block; font: 500 .68rem/1.3 var(--font-mono); color: var(--ink-3); }
+  .kc-words { font: 600 1.15rem/2.2 var(--font-body); color: var(--ink-2); }
+  .kc-words b { color: var(--ink); font-weight: 800; }
+  .kc-mats { display: flex; flex-wrap: wrap; gap: 12px; }
+  .kc-mats > div { width: 96px; height: 64px; border-radius: 12px; box-shadow: var(--shadow-patch); position: relative; }
+  .kc-mats span { position: absolute; left: 0; bottom: -18px; font: 500 .66rem/1 var(--font-mono); color: var(--ink-3); white-space: nowrap; }
+  .kc-search-demo { min-height: 360px; }
+  .kc-browse-demo { min-height: 660px; }
+  @media (max-width: 959px) {
+    .kc-matrix .yrow { width: 200px; }
+    .kc-detailbox { height: 520px; padding: 0 12px; }
+    .kc-search-demo { min-height: 380px; }
+    .kc-browse-demo { min-height: 720px; }
+  }
+  /* embed mode (phone frames) */
+  html.kc-embed .mockpanel { display: none !important; }
+  html.kc-embed .kc-embedtext { padding: 10px 22px; color: var(--ink-2); font-size: .9rem; }
+</style>
+</head>
+<body class="frame">
+<main class="sheet" id="sheet">
+  <yarn-nav active="projects" base="../"></yarn-nav>
+  <div class="kc" id="kc"></div>
+</main>
+<script>
+(() => {
+  const Y = window.Yarn, P = Y.params, B = window.BLAQAT;
+  const $ = (s, r = document) => r.querySelector(s);
+  const esc = Y.esc;
+  const root = $("#kc");
+
+  /* ---------- embed: the mobile bottom nav in a phone frame ---------- */
+  if (P.get("embed") === "nav") {
+    $("yarn-nav").setAttribute("active", P.get("active") || "music");
+    root.innerHTML = `<p class="kc-embedtext">Mobile bottom nav · <b>${esc(P.get("active") || "music")}</b> selected · sel=${Y.opts.sel}, rope=${Y.opts.rope}</p>`;
+    return;
+  }
+
+  /* ---------- data ---------- */
+  const PJ = B.projects;
+  const byName = (n) => PJ.find((p) => p.name.startsWith(n));
+  const songs = B.music.flatMap((m) => (m.songs ? [m, ...m.songs.map((s) => ({ ...s, instrument: s.instrument || m.instrument, coll: m.name }))] : [m]));
+  const dropped = songs.find((s) => Y.status(s.status)?.key === "dropped");
+  const paused = PJ.find((p) => Y.status(p.status)?.key === "paused");
+  const site = byName("blaqat.net"), fitr = byName("FiTR"), rust = byName("Rust"), sonata = byName("Sonata") || PJ[1];
+  const crossYear = PJ.find((p) => p.end && Y.parseDate(p.start).getFullYear() !== Y.parseDate(p.end).getFullYear() && Y.status(p.status)?.key !== "ongoing");
+  const key = (p) => Y.slug(p.name);
+  const STACKS = [...new Set(PJ.flatMap((p) => p.stack))];
+  const qs = (extra = {}) => { const u = new URLSearchParams(); for (const k of ["sel", "rope", "body", "bg", "nav", "reduced"]) if (P.get(k) != null) u.set(k, P.get(k)); for (const [k, v] of Object.entries(extra)) u.set(k, v); return u.toString(); };
+
+  const SECTIONS = [
+    ["type", "Fonts"], ["header", "Page header"], ["search", "Search"], ["filters", "Filter row + Browse"], ["flip", "FLIP"],
+    ["badges", "Badges + meta"], ["states", "Hover vs selected"], ["timeline", "Year pill + timeline"], ["lightbox", "Lightbox"],
+    ["carousel", "Media carousel"], ["detail", "Detail shell"], ["nav", "Navigation"], ["transition", "Transition"],
+    ["scribble", "Scribble"], ["swatches", "Swatches"], ["folder", "Music folder"], ["rail", "Year rail"], ["disc", "Disc + waveform"],
+    ["posts", "Post cards"], ["fab", "FAB → panel"], ["prose", "Prose"], ["small", "Small parts"], ["i3", "i3: toggles, rule, pager, strand, colours"], ["materials", "Materials"],
+  ];
+  const sec = (id, title, n, note, body) => `<section class="kc-sec" id="${id}" aria-labelledby="${id}-h"><h2 id="${id}-h">${title}<span class="n">${n}</span></h2>${note ? `<p class="kc-note">${note}</p>` : ""}${body}</section>`;
+
+  /* ---------- filter model used by the live search + row + FLIP grid ---------- */
+  const groupsFor = () => [
+    { key: "type", label: "Type", row: true, values: ["Personal", "Work", "School"] },
+    { key: "status", label: "Status", row: true, values: ["ongoing", "complete", "paused"] },
+    { key: "stack", label: "Stack", values: STACKS },
+  ];
+
+  const cardHTML = (p) => `<article class="ycard ylift ysel kc-card" data-key="${key(p)}" tabindex="0" aria-label="${esc(p.name)}">
+      <b>${esc(p.name)}</b>${Y.meta(p)}<p>${esc(p.description.replace(/[*#]+/g, "").trim().split("\n")[0])}</p>${Y.stack(p.stack, { variant: "icons", max: 6 })}</article>`;
+
+  const stateRow = (label, html) => `<tr><th scope="row">${label}</th>${html}</tr>`;
+  const variants = (make) => ["", "is-hover", "is-focus", "sel", "sel is-hover"].map((v) => `<td>${make(v)}</td>`).join("");
+  const selAttr = (v, attr = "aria-pressed") => (v.includes("sel") ? `${attr}="true"` : attr === "aria-pressed" ? `aria-pressed="false"` : "");
+  const cls = (v) => v.replace("sel", "").trim();
+
+  root.innerHTML = `
+    ${Y.header({ title: "Components", meta: "kit · iteration 3", actions: Y.seg([{ value: "list", label: "List", icon: "ph-rows" }, { value: "grid", label: "Grid", icon: "ph-squares-four" }], { value: "list", label: "Layout", name: "layout" }) })}
+    <p class="kc-intro">Every shared part, in every state. Switch the kit options in the ⚙ panel (or <code>?toggle=red|ink|tint|rope</code>, <code>?sel=ink</code>, <code>?dfoot=float</code>, <code>?motion=i2</code>, <code>?rope=out</code>, <code>?body=figtree</code>, <code>?section=music</code>). Docs: <code>kit/COMPONENTS.md</code>.</p>
+    <ul class="kc-toc">${SECTIONS.map(([id, t]) => `<li><a href="#${id}">${t}</a></li>`).join("")}</ul>
+
+    ${sec("type", "Fonts", "1", `Display: Nunito (rounded). Body: <b>${({ "nunito-sans": "Nunito Sans", figtree: "Figtree", atkinson: "Atkinson Hyperlegible Next", system: "System UI" })[Y.opts.body]}</b> (<code>?body=nunito-sans|figtree|atkinson|system</code>). Mono for meta, dates and counts: Maple Mono.`, `
+      <div class="kc-fonts">
+        <div class="kc-box"><p class="big">Thoughts<span class="yhead__dot">.</span></p><p class="kc-label">Nunito 900 · display</p></div>
+        <div class="kc-box"><p class="kc-body">My personal website, built with Astro and Svelte, showcasing my programming and music projects. It's designed to feel somewhat playful while also being responsive.</p><p class="kc-label" style="margin-top:8px">body · 16px / 1.6</p></div>
+        <div class="kc-box"><p class="kc-mono">Sep 2025 – now · 12 projects · 3:41</p><p class="kc-label" style="margin-top:8px">Maple Mono 500 · meta</p></div>
+      </div>`)}
+
+    ${sec("header", "Page header", "2", `<code>Yarn.header({ title, meta?, actions? })</code>. Same size on every page; red period; no subtext unless you pass <code>meta</code>. Actions sit right (here a <code>Yarn.seg</code> list/grid toggle).`, `
+      <div class="kc-col">
+        ${Y.header({ title: "Projects", actions: Y.seg([{ value: "list", label: "List", icon: "ph-rows" }, { value: "grid", label: "Grid", icon: "ph-squares-four" }], { value: "grid", label: "Layout" }) })}
+        ${Y.header({ title: "Music", meta: "58 tracks · 2017 → now" })}
+      </div>`)}
+
+    ${sec("search", "Search", "3", `<code>Yarn.search(el, F)</code>. Free text filters as you type. A known term (stack, type, status, tag) becomes a token on <kbd>Enter</kbd>, <kbd>Tab</kbd> or <kbd>,</kbd> (or pick it from the list). Terms whose group is in the chip row light that chip instead of adding a duplicate token. Click a token or press <kbd>⌫</kbd> twice on an empty field to remove it. <kbd>/</kbd> focuses the field.`, `
+      <p class="kc-label">live (try “python”, “sv”, “school”)</p>
+      <div id="search-live"></div>
+      <p class="kc-label" style="margin-top:22px">state: two tokens + typed “sv” with suggestions open</p>
+      <div class="kc-search-demo"><div id="search-demo"></div></div>`)}
+
+    ${sec("filters", "Filter row + Browse", "4", `<code>Yarn.filterRow(el, F, { sticky })</code>. Thoughts' row: <b>All</b> (i4; was "Show all"), the row groups split by a stitched divider, scrolling sideways; <b>Browse</b> opens a sheet with every group (stack with icons). None selected = all, tap solos, more taps add, tap a selected one to remove it (red strike-through on hover/focus).`, `
+      <div id="row-live"></div>
+      <div class="kc-cards" id="cards"></div>
+      <p class="kc-label" style="margin-top:30px">state: Browse sheet open, Python + Personal selected (hover strike on Personal)</p>
+      <div class="kc-browse-demo"><div id="row-demo"></div></div>`)}
+
+    ${sec("flip", "FLIP filter animation", "5", `<code>Yarn.flip(container, "[data-key]", () => { …hide/show or re-render… })</code>. The grid above uses it: survivors glide on a spring, new items grow in, leaving items fade out where they were. Reduced motion: no movement.`, ``)}
+
+    ${sec("badges", "Badges + meta", "6", `<code>Yarn.meta(item)</code> = status, type, then the date. One renderer on every page. Status vocab is normalized (<code>Ongoing / wip</code> → Ongoing, <code>Completed / complete</code> → Complete).`, `
+      <div class="kc-grid2">
+        <div class="kc-col"><p class="kc-label">status · Yarn.badge.status()</p>
+          <div class="kc-row">${["ongoing", "complete", "paused", "dropped"].map((s) => Y.badge.status(s)).join("")}</div>
+          <div class="kc-row">${["ongoing", "complete", "paused", "dropped"].map((s) => Y.badge.status(s, { compact: true })).join("")}<span class="kc-label" style="margin:0">compact (icon + sr text + title)</span></div></div>
+        <div class="kc-col"><p class="kc-label">type · instrument · type with a custom vocabulary ({ icon, label })</p>
+          <div class="kc-row">${["Personal", "Work", "School"].map((t) => Y.badge.type(t)).join("")}</div>
+          <div class="kc-row">${["piano", "beepbox", "daw"].map((t) => Y.badge.instrument(t)).join("")}</div>
+          <div class="kc-row">${Y.post.TYPES.map((t) => Y.post.typeBadge(t.key)).join("")}</div></div>
+        <div class="kc-col"><p class="kc-label">publication state · Yarn.badge.pub() (Studio: a second axis next to status)</p>
+          <div class="kc-row">${["live", "changed", "draft", "hidden"].map((s) => Y.badge.pub(s)).join("")}</div>
+          <div class="kc-row">${["live", "changed", "draft", "hidden"].map((s) => Y.badge.pub(s, { compact: true })).join("")}${Y.badge.pub("live", { text: "11 live" })}<span class="kc-label" style="margin:0">compact · with a count</span></div></div>
+        <div class="kc-col"><p class="kc-label">date · Yarn.badge.date() (real items)</p>
+          <div class="kc-col" style="gap:6px">
+            <div class="kc-row">${Y.badge.date(site)} <span class="kc-label" style="margin:0">${esc(site.name)} (ongoing)</span></div>
+            <div class="kc-row">${Y.badge.date(fitr, { dur: true })} <span class="kc-label" style="margin:0">${esc(fitr.name)} (same year, + dur)</span></div>
+            <div class="kc-row">${Y.badge.date(crossYear)} <span class="kc-label" style="margin:0">${esc(crossYear.name)}</span></div>
+            <div class="kc-row">${Y.badge.date(dropped)} <span class="kc-label" style="margin:0">${esc(dropped.name)} (one month)</span></div>
+            <div class="kc-row">${Y.badge.date(THOUGHTS.posts[0].date, { style: "day", time: true })} <span class="kc-label" style="margin:0">a thought (ISO date)</span></div>
+          </div></div>
+        <div class="kc-col"><p class="kc-label">meta rows · Yarn.meta(item)</p>
+          ${Y.meta(site)}${Y.meta(fitr)}${Y.meta(paused || rust)}${Y.meta(dropped)}</div>
+        <div class="kc-col"><p class="kc-label">stack · Yarn.stack(list) and { variant: "icons", max }</p>
+          ${Y.stack(site.stack)}${Y.stack(rust.stack, { as: "button" })}${Y.stack(STACKS.slice(0, 14), { variant: "icons", max: 9 })}
+          <p class="kc-label">unknown names fall back to { } (Zola, TOML…) · buttons filter the page (data-yf)</p></div>
+        <div class="kc-col"><p class="kc-label">topic tags · Yarn.tag() → ../thoughts/stitched.html?tag=…</p>
+          ${Y.tags(["svelte", "learnings", "tools"])}
+          <div class="kc-row"><button type="button" class="ytag" aria-pressed="true"><span class="ychip__l"><span class="ytag__h" aria-hidden="true">#</span>svelte</span></button><button type="button" class="ytag is-hover" aria-pressed="true"><span class="ychip__l"><span class="ytag__h" aria-hidden="true">#</span>design</span></button><span class="kc-label" style="margin:0">pressed · pressed + hover (strike)</span></div></div>
+        <div class="kc-col kc-box kc-ink on-ink"><p class="kc-label">on ink (.on-ink, or an ink-selected card): everything flips</p>
+          ${Y.meta(site)}${Y.meta(fitr)}${Y.stack(site.stack)}${Y.tags(["svelte", "tools"])}</div>
+      </div>`)}
+
+    ${sec("states", "Hover vs selected", "7", `Hover = <code>.ylift</code> (rises + soft shadow, never the rope). Selected = <code>.ysel</code> + <code>aria-pressed / aria-selected / aria-current</code>: rope ring (<code>?sel=rope</code>) or ink fill (<code>?sel=ink</code>); rope inside the edge (<code>?rope=in</code>) or around it (<code>?rope=out</code>). Now: <b>sel=${Y.opts.sel}, rope=${Y.opts.rope}</b>. Columns force the state with <code>.is-hover</code> / <code>.is-focus</code> (showcase only).`, `
+      <div class="kc-matrix"><table>
+        <thead><tr><th></th><th>rest</th><th>hover</th><th>focus</th><th>selected</th><th>selected + hover</th></tr></thead>
+        <tbody>
+          ${stateRow("chip", variants((v) => `<button type="button" class="ychip ysel ${cls(v)}" ${selAttr(v)}><i class="ph-bold ph-briefcase" aria-hidden="true"></i><span class="ychip__l">Work</span></button>`))}
+          ${stateRow("stack chip", variants((v) => `<button type="button" class="ychip ysel ${cls(v)}" ${selAttr(v)}>${Y.stackIcon("Python")}<span class="ychip__l">Python</span></button>`))}
+          ${stateRow("list row", variants((v) => `<button type="button" class="yrow ylift ysel ${cls(v)}" ${selAttr(v, "aria-current")}><span><b style="font:850 .95rem/1.2 var(--font-display)">Sonata</b>${Y.meta(sonata, { compact: true })}</span></button>`))}
+          ${stateRow("card", variants((v) => `<div class="ycard ylift ysel ${cls(v)} ${v.includes("sel") ? "is-selected" : ""}" tabindex="0"><b>FiTR Roadmaps</b>${Y.meta(fitr)}</div>`))}
+          ${stateRow("segmented", variants((v) => `<div class="yseg"><button type="button" class="yseg__btn ysel ${cls(v)}" ${selAttr(v)}><i class="ph-bold ph-rows" aria-hidden="true"></i>List</button></div>`))}
+          ${stateRow("nav tab", variants((v) => `<a class="ynav__tab ysel ylift ${cls(v)}" data-section="music" href="#states" ${v.includes("sel") ? 'aria-current="page"' : ""}><span class="ydot" aria-hidden="true"><i class="ph-bold ph-music-notes"></i></span><span>Music</span></a>`))}
+          ${stateRow("section button", variants((v) => `<a class="ysecbtn ylift ysel ${cls(v)}" data-section="thoughts" href="#states" ${v.includes("sel") ? 'aria-current="true"' : ""}><span class="ydot" aria-hidden="true"><i class="ph-bold ph-cloud"></i></span><span><b>Thoughts</b><small>15 posts</small></span></a>`))}
+          ${stateRow("topic tag", variants((v) => `<button type="button" class="ytag ${cls(v)}" aria-pressed="${v.includes("sel")}"><span class="ychip__l"><span class="ytag__h" aria-hidden="true">#</span>svelte</span></button>`))}
+        </tbody></table></div>`)}
+
+    ${sec("timeline", "Year pill + timeline", "8", `<code>Yarn.timelineHTML(Yarn.byYear(items), render)</code> + <code>Yarn.timeline(el).select(key)</code>. Sticky white oval year pills; a dashed thread; the red yarn ball rolls (spring) to the selected item and leaves a red strand behind it. Click rows.`, `
+      <div class="kc-tl" id="tl"></div>`)}
+
+    ${sec("lightbox", "Lightbox", "9", `<code>kit/lightbox.js</code>. Opens from the thumbnail and closes back into it; drag down to dismiss, swipe or <kbd>←</kbd><kbd>→</kbd> to page, <kbd>Esc</kbd> closes, focus is trapped. Videos start muted with real controls (play/pause, time, scrub, mute; <kbd>Space</kbd>, <kbd>M</kbd>, <kbd>Shift</kbd>+<kbd>←</kbd><kbd>→</kbd>). Screenshot states: <code>?lb=demo:0</code> (image) · <code>?lb=demo:1</code> (video).`, `
+      ${Y.carousel([{ src: "/media/site-plan.png", alt: "Planning of this very page :0" }, { src: "/media/musicpagecomp.mp4", alt: "Comparing an AI generated music page vs my handcrafted design" }, { src: "/media/sona.png", alt: "Sonata in a Discord chat" }], { group: "demo", title: "blaqat.net (this site)", label: "Open one" })}`)}
+
+    ${sec("carousel", "Media carousel", "10", `<code>Yarn.carousel(item.images, { title })</code>. A compact strip under the metadata, not a hero: content stays primary. Videos show a frame + their length. Media that isn't in the repo shows a designed placeholder, never a broken image.`, `
+      <div class="kc-grid2">
+        <div class="kc-col"><p class="kc-label">${esc(sonata.name)} · ${sonata.images?.length || 0} items</p>${Y.carousel(sonata.images || [], { title: sonata.name })}</div>
+        <div class="kc-col"><p class="kc-label">${esc(fitr.name)} (video + gif) · one remote file → placeholder</p>${Y.carousel([...(fitr.images || []), { src: "https://music.blaqat.net/Fishbowl_Demo_1.mp4", alt: "Fishbowl demo" }], { title: fitr.name })}</div>
+      </div>`)}
+
+    ${sec("detail", "Detail shell", "11", `<code>Yarn.detail({ back, title, meta, media, body, links, end, kicker, top, size })</code>. i3: <code>?dfoot=inline</code> (default) puts <code>links</code> in the flow right under the metadata and <code>end</code> (e.g. <code>Yarn.pager</code>) after the text; <code>?dfoot=float</code> is the i2 floating links bar. <code>Yarn.detailPage(html, { side, rail })</code>: <code>side</code> = a left meta rail (articles: three columns on one top line). An item as its own page (or opened in place): sticky header (back, title, metadata) and (float) a sticky footer (links), content in between in the order title → metadata → media → text → links. Top actions are round <code>.ylinkicon</code>s (44px); the footer bar is always 60px; body text is ink at 16px. As a page, wrap it in <code>Yarn.detailPage(html, { rail, wide })</code>: one reading column (<code>--ydetail-w</code>, 760px) at the same x on every detail page, a rail beside it (TOC, side links), <code>wide</code> spans both (tier board). On phones, while a page's footer floats, the nav bar steps away and the footer takes its place (<code>html.y-navaway</code>); the player's disc sits above it. Scroll the box.`, `
+      <div class="kc-detailbox" id="detailbox"></div>`)}
+
+    ${sec("nav", "Navigation", "12", `<code>&lt;yarn-nav active="projects" base="../"&gt;</code> renders both bars (top of this page = desktop). Raised knit tabs with a felt dot in each section's color; current page uses the selected rule. Mobile: corduroy bottom bar, Home / Projects / Music / Thoughts. <b>i4:</b> no Contact tab (Contact lives on Home); the nav sits on the page column's edges; the sound toggle left the bars: <code>?soundui=tag</code> (default, the woven label on this sheet's top edge) · <code>brand</code> · <code>nav</code> (i3), and <code>Yarn.soundToggle()</code> finds the visible one. The nav also carries the page's <b>skip link</b> (first Tab stop, lands on <code>.ypage</code>). <code>--bottom-ui</code> tells pages how much room the bar (and later the player FAB) takes.`, `
+      <div class="kc-phones">
+        <iframe class="kc-phone" title="Mobile nav, Music selected" src="components.html?${qs({ embed: "nav", active: "music", section: "music" })}"></iframe>
+        <iframe class="kc-phone" title="Mobile nav, Home selected" src="components.html?${qs({ embed: "nav", active: "home", section: "home" })}"></iframe>
+      </div>`)}
+
+    ${sec("transition", "Section transition", "13", `<code>Yarn.transition.go(buttonEl, href, section)</code>. A cord cloth in the next section's color grows out of the button on one critically damped spring (fast start, soft landing) and navigates the moment the screen is covered. The next page stays behind its cord until the white sheet grows open from the same spot; content fades in under the white. <kbd>Esc</kbd> plays it back. Reduced motion: a fade. Frozen states: <a href="?${qs({ demo: "cloth", p: "0.45" })}#transition">cloth at 45%</a> · <a href="?${qs({ from: "home", trp: "0.3", section: "music" })}">arriving at 30%</a>.`, `
+      <div class="kc-row" id="tr-row">
+        ${["projects", "music", "thoughts"].map((s) => `<a class="ysecbtn ylift ysel" data-section="${s}" href="components.html?${qs({ section: s })}#transition" data-go="${s}"><span class="ydot" aria-hidden="true"><i class="ph-bold ${{ projects: "ph-folder-simple", music: "ph-music-notes", thoughts: "ph-cloud" }[s]}"></i></span><span><b>${s[0].toUpperCase() + s.slice(1)}</b><small>open with the transition</small></span></a>`).join("")}
+      </div>`)}
+
+    ${sec("scribble", "Scribble underline", "14", `<code>&lt;span class="yscribble" style="--scribble:var(--blue)"&gt;</code> (yarn.js adds the hand-drawn SVG). <code>data-draw</code> + <code>.is-drawn</code> or <code>Yarn.scribble.draw(el)</code> draws it in; <code>data-draw="auto"</code> draws on scroll-in. Shapes: <code>data-scribble="wave|loop|double"</code>.`, `
+      <p class="kc-words">hi, i'm <b>aiden</b>! a <a href="../projects/index.html" class="yscribble" data-draw style="--scribble:var(--blue)"><b>software engineer</b></a> with a soft spot for ui design ·
+        recent <span class="yscribble" data-draw data-scribble="double" style="--scribble:var(--orange)"><b style="color:var(--orange-deep)">RIT</b></span> grad ·
+        i'm <span class="yscribble" data-draw data-scribble="loop" style="--scribble:var(--purple)"><b>composing</b></span> for piano ·
+        <span class="yscribble" data-draw style="--scribble:var(--gold)"><b>thoughts</b></span> · <span class="yscribble" data-draw style="--scribble:var(--red)"><b>red</b></span></p>
+      <button type="button" class="btn btn--sm" id="redraw"><i class="ph-bold ph-arrow-counter-clockwise" aria-hidden="true"></i>Draw again</button>`)}
+
+    ${sec("swatches", "Instrument swatches", "15", `<code>Yarn.swatch(item)</code> → data URI; <code>Yarn.swatchHTML(item, { size })</code> → element. Piano = black yarn (keys, stripes, argyle), BeepBox = purple with circles (ring, rings, dots, bubbles), DAW = blue with waves (sine, square, triangle, saw). Seeded by the item, so the same track always gets the same swatch.`, `<div class="kc-col" id="swatches"></div>`)}
+
+    ${sec("folder", "Music folder card", "16", `<code>Yarn.folder(entry, { tracks, current, links, action, open })</code>. Music's library card, also Studio's music preview. A collection is a folder: one tab per track peeks above the card (count at a glance), the playing track's tab stands up with a red thread, hover/focus shows its name, click plays it; arrows move along the strip. On touch, each tab is 44px tall, and a strip packed tighter than 44px per tab becomes one target that opens the folder (<code>.is-dense</code>). In a grid, set <code>--yfolder-top: 22px</code> so singles line up with collections.`, `
+      <div class="kc-folders" id="folders"></div>`)}
+
+    ${sec("rail", "Year rail", "17", `<code>Yarn.yearRail(host, list, { item: "[data-year]" })</code>. Year pills on a dashed thread, sticky beside <b>one continuous flow</b> (no row break per year, so a year with one release leaves no hole). The year at the top of the view is selected (rope); a pill jumps there. Music desktop uses it; on phones the flow is one column and each year gets the sticky year pill instead. Scroll the box.`, `
+      <div class="kc-railbox" id="railbox"><nav id="kc-rail"></nav><div class="kc-flow" id="flow"></div></div>`)}
+
+    ${sec("disc", "Disc, waveform, equalizer", "18", `<code>Yarn.disc(track?, { size, label: "swatch"|"cat" })</code>: the felt record (the player's collapsed FAB, Thoughts playlists); spins under <code>.is-playing</code>. <code>Yarn.wave.html(track, { played })</code> / <code>.svg()</code> / <code>.values()</code>: stitched bars seeded by the track, so the player's scrub, Studio's upload and its preview draw the same waveform; <code>--f</code> = played. <code>Yarn.EQ</code>: three red bars.`, `
+      <div class="kc-row">${Y.disc(B.music[0], { size: 60 })}${Y.disc(B.music[0], { size: 60, label: "cat" })}<span class="is-playing" style="display:inline-flex">${Y.disc(B.music[2], { size: 68 })}</span><span class="kc-label" style="margin:0">swatch · cat · spinning</span>
+        <span class="is-playing" style="display:inline-flex;gap:8px;align-items:center">${Y.EQ}<span class="kc-label" style="margin:0">.yeq (playing)</span></span></div>
+      <div class="kc-wave" style="margin-top:16px">${Y.wave.html({ url: "https://music.blaqat.net/vgm-class/combat.mp3" }, { n: 96, played: 0.38 })}<p class="kc-label" style="margin:0">vgm-class/combat · 38% played (same bars as the player's scrub for this track)</p>
+        ${Y.wave.html("revealed_seeds-you-planted", { n: 96 })}<p class="kc-label" style="margin:0">another track, nothing played</p></div>`)}
+
+    ${sec("posts", "Thoughts post cards", "19", `<code>Yarn.post(post, ctx)</code> (<code>kit/posts.js</code>). One renderer for the Thoughts feed and Studio's previews: scratch (sticky note, or felt with <code>scratch: "felt"</code>), article (bookmark), pick (hang tag on red yarn, links to its collection with <code>&amp;item=</code>), tier list (mini felt board, Mine / Everyone), playlist (disc + swatch rows), images (photo grid → lightbox). <code>Yarn.post.configure()</code> sets a page's data (collections, votes, comments); <code>inert: true</code> for previews.`, `
+      <div class="kc-posts" id="kc-posts"></div>`)}
+
+    ${sec("fab", "FAB ⇄ slot (i4 round 2)", "20", `<code>const f = Yarn.fab({ icon, label, title })</code> → <code>{ btn, panel, body, float, open(), close(), badge(n), count(text), away(on), destroy() }</code>. A quiet white knit knob resting on the slot's centre line (left of the player's disc). Tap: the search bar unrolls into <b>the slot</b>, 8px above the phone nav and over it, out of the knob, the way the player's bar unrolls out of its disc (one interruptible spring); the knob ends at the bar's right end as a ⌄ that folds it back, and the bar folds on a drag right / down too. The bar holds only the field in <code>f.body</code>; <code>f.float</code> floats above it (the filter chips). One owner at a time (<code>Yarn.slot</code>): opening it folds the player's bar into a small disc above; opening the player folds this. Suggestions and Browse open upward. Esc, outside tap and the on-screen keyboard are handled. Z-index: one scale in <code>kit/yarn.css</code> (§ 21 in COMPONENTS.md). <code>{ lift }</code> stacks it above another FAB (Studio's "New").<br><b>One mobile search pattern:</b> <code>Yarn.listTools(F, { tools, search, row, sticky, count })</code> places a list page's search line + filter row by the kit option <code>?msearch=</code>: <code>fab</code> (i4 default) = on phones the field goes into the slot, the row floats above it (its All turns into a ✕ once something is on), the FAB shows the active count, and a strip of removable chips (<code>.yactive</code>, below) stays at the top of the list; <code>bar</code> = search on top, filter row sticky on phones (and <code>--sticky-top</code> set on the list). Projects, Music, Thoughts and Studio's lists all use it.`, `
+      <div class="kc-row"><button type="button" class="btn btn--sm" id="fab-demo"><i class="ph-bold ph-magnifying-glass" aria-hidden="true"></i>Show the FAB on this page</button><span class="kc-label" style="margin:0">bottom-right; open it, then ⌄</span></div>
+      <p class="kc-label">.yactive (msearch=fab): what's on stays visible above the list; tap to remove</p>
+      <div class="yactive" role="group" aria-label="Active filters (demo)"><button type="button" class="ychip ychip--sm ysel" aria-pressed="true"><i class="ph-bold ph-user" aria-hidden="true"></i><span class="ychip__l">Personal</span></button><button type="button" class="ychip ychip--sm ysel" aria-pressed="true"><i class="ph-bold ph-magnifying-glass" aria-hidden="true"></i><span class="ychip__l">“bot”</span></button><button type="button" class="ylinkbtn">Clear all</button></div>`)}
+
+    ${sec("prose", "Prose", "21", `Markdown bodies everywhere: <code>.ydetail__text</code> gets the basics (headings, lists with red yarn bullets (only class-less <code>ul</code>/<code>ol</code>: kit lists in a body keep their look), quotes on a knit patch with a red twill edge, inline code, felt code blocks, tables, rules); add <code>.yprose</code> for the reading size (Thoughts articles, Studio's article preview). Prose links are red; kit parts in a body (tags, stack, buttons, link icons) keep their own colors.`, `
+      <div class="kc-box ydetail__text yprose" style="max-width:68ch">
+        <h2>Why yarn</h2><p>Textures carry the play, so the layout can stay calm. <a href="#prose">A prose link</a>, <code>inline code</code>, <strong>bold</strong>, and a tag that stays a tag: ${Y.tag("design")}.</p>
+        <ul><li>One kit, every page</li><li>Hover lifts; the rope means selected</li></ul>
+        <blockquote><p>the best ui feedback is the one you only notice when it's missing</p></blockquote>
+        <pre><code>Yarn.post(p, { scratch: "sticky" })</code></pre>
+        <table><thead><tr><th>Part</th><th>Where</th></tr></thead><tbody><tr><td>Folder card</td><td>Music, Studio</td></tr><tr><td>Post card</td><td>Thoughts, Studio</td></tr></tbody></table>
+      </div>`)}
+
+    ${sec("small", "Small parts", "22", `<code>.btn:disabled</code> (flat, quiet, readable) · <code>.btn--m-icon</code> (label on desktop, icon-only on phones) · <code>Yarn.linkIcon(kind, href, label, { sm })</code> with github, soundcloud, youtube, beepbox, spotify, instagram, x, discord, email · <code>Yarn.yearPill(y, { attrs })</code> · <code>Yarn.detail({ wide })</code> · <code>Yarn.stack(list, { variant: "icons", size: "sm" })</code> · <code>Yarn.timelineHTML(…, { cls: "ytl--sm" })</code> · chips with <code>role="radio"|"option"</code> never show the remove strike · <code>Yarn.px("--bottom-ui")</code> reads a length token as a number · <code>Yarn.filterRow(el, F, { wrap, extra })</code> (two-line row; link groups in Browse) · <code>Yarn.navHTML({ pages, brand, badge, extra })</code> / <code>navEl.config</code> for another page list (Studio) · <code>.ypage</code> + <code>.ytools</code>: the page column and the search/filter stack, same on every page.`, `
+      <div class="kc-col">
+        <div class="kc-row"><button class="btn btn--red" disabled><i class="ph-bold ph-check" aria-hidden="true"></i>Published</button><button class="btn" disabled>Disabled</button><button class="btn btn--sm btn--m-icon" aria-label="Shuffle everything"><i class="ph-bold ph-shuffle" aria-hidden="true"></i><span>Shuffle all</span></button></div>
+        <div class="kc-row">${["github", "soundcloud", "youtube", "beepbox", "instagram", "x", "discord", "email"].map((k) => Y.linkIcon(k, "#small")).join("")}${["soundcloud", "youtube", "beepbox"].map((k) => Y.linkIcon(k, "#small", "", { sm: true })).join("")}<span class="kc-label" style="margin:0">44px · 32px (--sm)</span></div>
+        <div class="kc-row">${["github", "youtube", "beepbox", "soundcloud", "spotify", "discord", "instagram", "x"].map((k) => Y.linkIcon(k, "#small").replace('class="ylinkicon', 'class="ylinkicon is-hover')).join("")}${Y.linkIcon("view", "https://discord.com/oauth2/authorize", "Add to Discord").replace('class="ylinkicon', 'class="ylinkicon is-hover')}${Y.linkIcon("view", "https://example.org", "Visit site")}<span class="kc-label" style="margin:0">i4 · hover / focus: the site's colour, white icon (a view to discord.com → Discord) · unknown site: default</span></div>
+        <div class="kc-row">${Y.stack(STACKS.slice(0, 6), { variant: "icons", size: "sm" })}<span class="kc-label" style="margin:0">stack icons, small</span>
+          <div role="radiogroup" aria-label="Post type" style="display:flex;gap:6px"><button type="button" class="ychip ysel is-hover" role="radio" aria-checked="true" aria-pressed="true"><i class="ph-bold ph-article" aria-hidden="true"></i><span class="ychip__l">Article</span></button><button type="button" class="ychip ysel" role="radio" aria-checked="false" aria-pressed="false"><i class="ph-bold ph-tag" aria-hidden="true"></i><span class="ychip__l">Pick</span></button></div><span class="kc-label" style="margin:0">radio chips: no strike</span></div>
+        <div id="wrap-row" style="max-width:360px"></div><p class="kc-label" style="margin:0">filterRow({ wrap: true }) in a narrow box</p>
+      </div>`)}
+
+    ${sec("i3", "Iteration 3 parts", "24", `Toggles fill (<code>.ytog</code>, <code>?toggle=red|ink|tint|rope</code>; single choices keep the rope, <code>?sel=</code>) · <code>.ychip--row</code> with <code>Yarn.post.swatch(key)</code> · <code>Yarn.yearPill(…, { rule: true })</code> · caps kicker + owner colours on post cards (<code>?kicker</code>, <code>?colors</code>) · <code>Yarn.pager()</code> · <code>Yarn.strand()</code>. Detail pages put their links in the flow under the meta (<code>?dfoot=inline</code>); see section 11.`, `
+      <div class="kc-grid2">
+        <div class="kc-col"><p class="kc-label">toggles (multi-select) · current: ?toggle=${esc(Y.opts.toggle)}</p>
+          <div class="kc-row">${["Personal", "Work", "School"].map((t, i) => `<button type="button" class="ychip ysel ytog" aria-pressed="${i < 2}"><i class="ph-bold ${["ph-user", "ph-briefcase", "ph-graduation-cap"][i]}" aria-hidden="true"></i><span class="ychip__l">${t}</span></button>`).join("")}</div>
+          <div class="kc-row">${["tools", "music", "web", "design"].map((t, i) => `<button type="button" class="ychip ysel ytog ychip--sm" aria-pressed="${i < 3}"><span class="ychip__l">#${t}</span></button>`).join("")}${Y.tag("svelte", { as: "button", pressed: true })}${Y.tag("learnings", { as: "button" })}</div>
+          <p class="kc-label">single choice keeps the rope · Yarn.seg</p>${Y.seg([{ value: "mine", label: "Mine" }, { value: "all", label: "Everyone", icon: "ph-users-three" }], { value: "mine", label: "Demo" })}</div>
+        <div class="kc-col"><p class="kc-label">rail rows · .ychip--row + Yarn.post.swatch(key)</p>
+          <div style="display:grid;gap:3px;max-width:260px">${[["all", "Everything", 16, false], ...Y.post.TYPES.map((t, i) => [t.key, t.plural, [4, 2, 5, 1, 1, 3][i], i === 1 || i === 2])].map(([k, l, n, on]) => `<button type="button" class="ychip ysel ytog ychip--row" aria-pressed="${on}">${Y.post.swatch(k)}<span class="ychip__l">${l}</span><span class="ychip__c">${n}</span></button>`).join("")}</div></div>
+        <div class="kc-col" style="grid-column:1/-1"><p class="kc-label">month mark · Yarn.yearPill("November 2026", { count, unit, rule: true })</p>
+          <section style="position:relative">${Y.yearPill("November 2026", { count: 6, unit: "post", rule: true, level: 3 })}</section></div>
+        <div class="kc-col" style="grid-column:1/-1"><p class="kc-label">post cards: caps kicker · sticky note colours (p.color) · pick stub colours (p.color)</p>
+          <div class="kc-row" style="align-items:flex-start;gap:14px;flex-wrap:wrap">${Y.post.NOTE_COLORS.map(([k], i) => `<div style="width:210px;margin-top:10px">${Y.post({ id: "kc-n" + i, type: "scratch", date: "2026-11-07T23:41", tags: [], color: k, text: k + " note" }, { inert: true })}</div>`).join("")}</div>
+          <div class="kc-row" style="align-items:flex-start;gap:16px;flex-wrap:wrap;margin-top:14px;padding-left:14px">${Y.post.STUB_COLORS.map(([k, n], i) => `<div style="width:250px;margin-top:16px">${Y.post({ id: "kc-s" + i, type: "pick", date: "2026-11-04T18:20", tags: [], color: k, name: n + " stub", url: "https://zed.dev", blurb: "The tag the yarn loops through.", collection: "tools" }, { inert: true })}</div>`).join("")}</div></div>
+        <div class="kc-col" style="grid-column:1/-1"><p class="kc-label">pager · Yarn.pager({ prev, next, ends })</p>
+          ${Y.pager({ prev: { href: "#i3", title: "Springs, not durations", meta: "Oct 20, 2026 · 4 min" }, ends: { next: { label: "Newest article", title: "Back to all thoughts", href: "#i3" } }, label: "Demo pager" })}</div>
+        <div class="kc-col" style="grid-column:1/-1"><p class="kc-label">strand · Yarn.strand(host, items) · distance = time, min gap, colliding labels drop to lane 2</p><div id="kc-strand"></div></div>
+      </div>`)}
+
+    ${sec("materials", "Materials", "23", `Unchanged from iteration 1. <code>.sheet</code> and <code>.m-diamond</code> now read <code>var(--sheet-bg, …)</code>; <code>?bg=&lt;name&gt;</code> loads <code>kit/bg/&lt;name&gt;.css</code>.`, `
+      <div class="kc-mats">${[["m-knit"], ["m-diamond"], ["m-cord", "projects"], ["m-cord", "music"], ["m-cord", "thoughts"], ["m-cord", "home"], ["m-ribbon"], ["m-felt", "", "--felt:#1f1e1e"], ["m-corduroy"], ["m-cork"]].map(([c, s, st]) => `<div class="${c}" ${s ? `data-section="${s}"` : ""} style="${st || ""}"><span>${c}${s ? " · " + s : ""}</span></div>`).join("")}</div>`)}
+  `;
+
+  Y.strand($("#kc-strand"), (THOUGHTS.posts || []).filter((p) => p.type === "pick"), { date: (p) => p.date, label: (p) => p.name, key: (p) => p.id });
+  /* ---------- live search + row + FLIP grid ---------- */
+  const F = Y.filters({ groups: groupsFor(), items: PJ });
+  Y.search($("#search-live"), F, { placeholder: "Search projects…" });
+  Y.filterRow($("#row-live"), F);
+  const cards = $("#cards");
+  cards.innerHTML = PJ.map(cardHTML).join("") + `<p class="kc-empty" hidden>Nothing matches. <button type="button" class="ylinkbtn" id="reset">Show all</button></p>`;
+  const BYK = Object.fromEntries(PJ.map((p) => [key(p), p]));
+  const apply = () => {
+    let n = 0;
+    cards.querySelectorAll("[data-key]").forEach((el) => { const on = F.test(BYK[el.dataset.key]); el.hidden = !on; n += on; });
+    cards.querySelector(".kc-empty").hidden = n > 0;
+  };
+  apply();
+  F.on(() => Y.flip(cards, "[data-key]", apply));
+  cards.addEventListener("click", (e) => {
+    if (e.target.closest("#reset")) return F.clear();
+    const c = e.target.closest(".kc-card"); if (!c) return;
+    cards.querySelectorAll(".kc-card").forEach((x) => x.classList.toggle("is-selected", x === c && !c.classList.contains("is-selected")));
+  });
+
+  /* ---------- state demos (url:false so they don't touch the address bar) ---------- */
+  const F2 = Y.filters({ groups: groupsFor(), url: false });
+  F2.toggle("stack", "Python"); F2.toggle("stack", "Rust");
+  const sd = Y.search($("#search-demo"), F2, { placeholder: "Search projects…", hint: false });
+  sd.typeDemo("sv");
+  const F3 = Y.filters({ groups: groupsFor(), url: false, items: PJ });
+  F3.toggle("stack", "Python"); F3.toggle("type", "Personal");
+  const rd = Y.filterRow($("#row-demo"), F3);
+  Y.filters.current = F; // [data-yf] buttons drive the live demo
+  requestAnimationFrame(() => {
+    rd.sheet.hidden = false; rd.el.querySelector(".yfilter__browse").setAttribute("aria-expanded", "true");
+    const hov = rd.el.querySelector(".ybrowse .ychip[aria-pressed='true']"); hov?.classList.add("is-hover");
+  });
+
+  /* ---------- timeline ---------- */
+  const tlHost = $("#tl");
+  tlHost.innerHTML = Y.timelineHTML(Y.byYear(PJ), (p) => `<button type="button" class="yrow ylift ysel kc-tlrow" aria-current="false"><b>${esc(p.name)}</b>${Y.meta(p)}</button>`, { key, unit: "project" });
+  const tl = Y.timeline(tlHost.querySelector(".ytl"));
+  const pickRow = (li) => {
+    tlHost.querySelectorAll(".kc-tlrow").forEach((b) => b.setAttribute("aria-current", String(b.closest(".ytl__item") === li)));
+    tl.select(li);
+  };
+  pickRow(tlHost.querySelector(".ytl__item"));
+  tlHost.addEventListener("click", (e) => { const li = e.target.closest(".ytl__item"); if (li) pickRow(li); });
+
+  /* ---------- detail ---------- */
+  const links = `<a class="btn btn--red" href="${esc(site.view)}" target="_blank" rel="noopener"><i class="ph-bold ph-arrow-up-right" aria-hidden="true"></i>Visit site</a>${Y.linkIcon("github", site.github)}<span class="ydetail__spacer"></span><a class="btn btn--ghost btn--sm" href="${Y.tagHref("svelte")}">Read the write-up <i class="ph-bold ph-arrow-right" aria-hidden="true"></i></a>`;
+  $("#detailbox").innerHTML = Y.detail({
+    back: { href: "#detail", label: "Projects" },
+    actions: `<button type="button" class="btn btn--icon btn--sm btn--ghost" aria-label="Copy link"><i class="ph-bold ph-link" aria-hidden="true"></i></button>`,
+    title: site.name, level: 3,
+    meta: Y.meta(site, { dur: true }) + Y.stack(site.stack),
+    media: Y.carousel(site.images, { title: site.name }),
+    body: site.description.split(/\n+/).map((p) => `<p>${esc(p.trim())}</p>`).join("") + `<p>${esc(fitr.description.split("\n")[0])}</p><p>${esc(rust.description)}</p>`,
+    links,
+  });
+
+  /* ---------- transition ---------- */
+  $("#tr-row").addEventListener("click", (e) => {
+    const a = e.target.closest("[data-go]"); if (!a || e.metaKey || e.ctrlKey) return;
+    e.preventDefault();
+    Y.transition.go(a, `components.html?${qs({ section: a.dataset.go, from: "home" })}#transition`, a.dataset.go);
+  });
+  if (P.get("demo") === "cloth") requestAnimationFrame(() => { const a = $("#tr-row [data-go='music']"); a.scrollIntoView({ block: "center", behavior: "instant" }); requestAnimationFrame(() => Y.transition.go(a, "#", "music", { freeze: parseFloat(P.get("p") || ".5") })); });
+
+  /* ---------- scribble ---------- */
+  const words = [...document.querySelectorAll("#scribble .yscribble")];
+  const drawAll = () => words.forEach((w, i) => setTimeout(() => Y.scribble.draw(w), i * 140));
+  $("#redraw").addEventListener("click", drawAll);
+  new IntersectionObserver((es, io) => { if (es.some((e) => e.isIntersecting)) { drawAll(); io.disconnect(); } }, { threshold: 0.4 }).observe($("#scribble .kc-words"));
+
+  /* ---------- swatches (real tracks per instrument) ---------- */
+  const SW = window.YarnSwatch;
+  $("#swatches").innerHTML = ["piano", "beepbox", "daw"].map((inst) => {
+    const list = songs.filter((s) => s.instrument === inst).slice(0, 8);
+    return `<div><p class="kc-label">${({ piano: "Piano", beepbox: "BeepBox", daw: "DAW" })[inst]} · ${list.length} real tracks</p><div class="kc-swatches">${list.map((s) =>
+      `<figure>${Y.swatchHTML(s, { size: 84, label: `${s.name}, ${inst} swatch` })}<figcaption>${esc(s.name)}<span>${SW.motif(s)}</span></figcaption></figure>`).join("")}</div></div>`;
+  }).join("") + `<div><p class="kc-label">every motif, forced</p><div class="kc-swatches">${Object.entries(SW.MOTIFS).filter(([k]) => k !== "other").flatMap(([inst, ms]) => [...new Set(ms)].map((m) =>
+      `<figure>${Y.swatchHTML({ instrument: inst, seed: inst + m }, { size: 64, motif: m })}<figcaption>${m}<span>${inst}</span></figcaption></figure>`)).join("")}</div></div>`;
+
+  /* ---------- music folder cards (real entries) ---------- */
+  const colls = B.music.filter((m) => m.songs);
+  const c7 = colls.find((m) => m.songs.length >= 7) || colls[0], c4 = colls.find((m) => m.songs.length === 4) || colls[1];
+  const single = B.music.find((m) => !m.songs && m.description);
+  const tr = (m) => m.songs.map((s, i) => ({ ...s, id: `${Y.slug(m.name)}-${i}` }));
+  const linkRow = (m) => Object.entries(m.links || {}).filter(([, v]) => v).map(([k, v]) => Y.linkIcon(k, v)).join("");
+  $("#folders").innerHTML = [
+    `<div>${Y.folder(single, { links: linkRow(single) || Y.linkIcon("soundcloud", "#folder"), action: `<button type="button" class="btn btn--red btn--icon" aria-label="Play ${esc(single.name)}"><i class="ph-fill ph-play" aria-hidden="true"></i></button>`, open: { attrs: 'data-kc-open', label: `Open ${single.name}` } })}</div>`,
+    `<div class="is-current is-playing">${Y.folder(c4, { tracks: tr(c4), current: `${Y.slug(c4.name)}-1`, links: `<button type="button" class="ylinkicon" aria-label="Copy link"><i class="ph-bold ph-link" aria-hidden="true"></i></button>`, action: `<button type="button" class="btn btn--red btn--sm"><i class="ph-fill ph-pause" aria-hidden="true"></i><span>Pause</span></button>`, open: { attrs: 'data-kc-open' } })}</div>`,
+    `<div>${Y.folder(c7, { tracks: tr(c7), links: `<button type="button" class="ylinkicon" aria-label="Copy link"><i class="ph-bold ph-link" aria-hidden="true"></i></button>`, action: `<button type="button" class="btn btn--red btn--sm"><i class="ph-fill ph-play" aria-hidden="true"></i><span>Play all</span></button>`, open: { attrs: 'data-kc-open' } })}</div>`,
+  ].join("");
+  $("#folders").addEventListener("click", (e) => { if (e.target.closest(".yfolder__tab, [data-kc-open]")) Y.sound("tap"); });
+
+  /* ---------- year rail beside a continuous flow ---------- */
+  const flow = $("#flow"), items = [...B.music].sort((a, b) => Y.parseDate(b.start) - Y.parseDate(a.start));
+  flow.innerHTML = items.map((m) => `<div class="ycard" data-year="${Y.yearOf(m)}"><b style="font:850 .9rem/1.2 var(--font-display)">${esc(m.name)}</b>${Y.meta(m)}</div>`).join("");
+  const rail = Y.yearRail($("#kc-rail"), flow, { item: "[data-year]", top: 0 });
+  $("#railbox").addEventListener("scroll", () => {
+    const box = $("#railbox").getBoundingClientRect();
+    const first = [...flow.children].find((el) => el.getBoundingClientRect().bottom > box.top + 20);
+    if (first) $$rail(first.dataset.year);
+  }, { passive: true });
+  function $$rail(y) { document.querySelectorAll("#kc-rail .yrail__y").forEach((a) => a.setAttribute("aria-current", String(a.dataset.year === y))); }
+  $("#kc-rail").addEventListener("click", (e) => { const a = e.target.closest(".yrail__y"); if (!a) return; e.stopImmediatePropagation(); e.preventDefault(); const el = flow.querySelector(`[data-year="${a.dataset.year}"]`); $("#railbox").scrollTo({ top: el.offsetTop - flow.offsetTop, behavior: Y.reduced() ? "auto" : "smooth" }); $$rail(a.dataset.year); }, true);
+  $$rail(String(Y.yearOf(items[0])));
+
+  /* ---------- post cards (one of each type, real Thoughts data) ---------- */
+  const posts = window.THOUGHTS.posts;
+  $("#kc-posts").innerHTML = ["scratch", "article", "pick", "tierlist", "playlist", "embed"].map((t) => posts.find((p) => p.type === t)).filter(Boolean).map((p) => Y.post(p)).join("") +
+    Y.post(posts.find((p) => p.type === "scratch"), { scratch: "felt" });
+
+  /* ---------- FAB ---------- */
+  let fabDemo = null;
+  $("#fab-demo").addEventListener("click", () => {
+    if (!fabDemo) {
+      fabDemo = Y.fab({ label: "Search and filter projects", title: "Find a project" });
+      const F4 = Y.filters({ groups: groupsFor(), url: false, items: PJ });
+      const r = document.createElement("div"), sr = document.createElement("div");
+      fabDemo.float.append(r); fabDemo.body.append(sr); // i4: the field in the slot, the chips floating above it
+      Y.filterRow(r, F4, { wrap: true }); Y.search(sr, F4, { placeholder: "Search projects…", hint: false });
+      r.classList.add("yfilter--float");
+      fabDemo.count(`${PJ.length} of ${PJ.length} projects`);
+      Y.filters.current = F;
+    }
+    fabDemo.el.hidden = false; fabDemo.open();
+  });
+  if (P.get("fab") === "open") requestAnimationFrame(() => $("#fab-demo").click());
+
+  /* ---------- wrap row ---------- */
+  Y.filterRow($("#wrap-row"), Y.filters({ groups: groupsFor(), url: false }), { wrap: true });
+  Y.filters.current = F;
+
+  /* ---------- seg demo: header toggle just announces ---------- */
+  document.addEventListener("ychange", (e) => { if (e.detail.name === "layout") Y.sound("tap"); });
+
+  /* ---------- mock panel ---------- */
+  Y.mockPanel([
+    { label: "Frame", param: "section", options: [["projects", "Projects"], ["music", "Music"], ["thoughts", "Thoughts"], ["home", "Home"]], default: "projects" },
+    { label: "Lightbox", param: "lb", options: [["", "Closed"], ["demo:0", "Image"], ["demo:1", "Video"]], default: "" },
+    { label: "Browse sheet (live row)", param: "browse", options: [["", "Closed"], ["open", "Open"]], default: "" },
+    { label: "FAB demo", param: "fab", options: [["", "Closed"], ["open", "Open"]], default: "" },
+  ], { title: "Kit options" });
+})();
+</script>
+</body>
+</html>

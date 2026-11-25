@@ -1,0 +1,745 @@
+/* ============================================================
+   Studio · core (studio agent, iteration 2). Mock-only, client-side.
+   window.Studio: state + autosave, router, nav, sheets, toasts,
+   field binding, waveform, markdown, word diff, media library,
+   publish flow, revisions. Screens register into Studio.screens
+   (studio-screens.js, studio-editors.js, studio-tiers.js);
+   studio.js boots it.
+   ============================================================ */
+(() => {
+  "use strict";
+  const Y = window.Yarn, D = window.StudioData;
+  const S = (window.Studio = window.Studio || {});
+  S.screens = S.screens || {};
+  const html = document.documentElement;
+  const $ = (s, r = document) => r.querySelector(s);
+  const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+  const esc = Y.esc;
+  Object.assign(S, { $, $$, esc, Y, D });
+
+  /* ============================================================
+     OPTIONS (page params; all in the ⚙ panel)
+     ============================================================ */
+  const P0 = new URLSearchParams(location.search);
+  const pick = (v, ok, d) => (ok.includes(v) ? v : d);
+  // i7 · studio (S1): the owner decided frame=ink, layout=split, confirm=smart. The old values stay reachable (Earlier).
+  S.opt = {
+    frame: pick(P0.get("frame"), ["ink", "section"], "ink"),
+    layout: pick(P0.get("layout"), ["split", "single"], "split"),
+    confirm: pick(P0.get("confirm"), ["smart", "always"], "smart"),
+    offline: P0.get("offline") === "1",
+    pstate: pick(P0.get("pstate"), ["ok", "error"], "ok"),
+  };
+  html.dataset.frame = S.opt.frame;
+  html.dataset.layout = S.opt.layout;
+  // params that survive navigation inside the Studio: every kit option (Yarn.opts) + the page options + the review's
+  S.KEEP = [...new Set([...Object.keys(Y.opts || {}), "reduced", "frame", "layout", "confirm", "offline", "pstate", "sound", "kicker", "colors", "kicon", "ptype", "mtype", "embed", "mdgallery"])]; // (mdgallery: i9 · blocks)
+
+  /* ============================================================
+     STATE (+ optional localStorage; every access in try/catch)
+     ============================================================ */
+  const KEY = "blaqat.studio.i2";
+  const boot = Date.now();
+  S.now = () => D.NOW + (Date.now() - boot);
+  let data = null;
+  try {
+    if (P0.has("reset")) localStorage.removeItem(KEY);
+    const s = JSON.parse(localStorage.getItem(KEY) || "null");
+    if (s && s.v === 3 && s.data) data = s.data;
+  } catch (_) {}
+  if (!data) data = { ...D.seed(), activity: D.ACTIVITY.slice(), uploads: [], removed: [], revs: {} };
+  D.migrate?.(data); // i9 · links (S5): every links field → [{ url, text? }], in this one place (studio-data.js)
+  S.data = data;
+  let persistT = 0;
+  S.persist = () => {
+    clearTimeout(persistT);
+    persistT = setTimeout(() => {
+      try {
+        const lite = { ...data, uploads: data.uploads.filter((u) => !/^blob:/.test(u.src)) };
+        localStorage.setItem(KEY, JSON.stringify({ v: 3, data: lite }));
+      } catch (_) {}
+    }, 250);
+  };
+  S.items = (sec) => (sec === "home" ? [data.home] : data[sec] || []);
+  S.find = (sec, id) => (sec === "home" ? data.home : sec === "music" && String(id) === "order" && S.musicOrderItem ? S.musicOrderItem() : (data[sec] || []).find((x) => String(x.id) === String(id))); // i9 · music · S10: the Music order is an item too (History)
+  S.titleOf = (it) => it?.name || it?.title || (it?.text ? it.text.slice(0, 60) + (it.text.length > 60 ? "…" : "") : "") || "Untitled";
+
+  /* ---------- section vocabulary ---------- */
+  S.SECTIONS = {
+    projects: { key: "projects", label: "Projects", one: "project", icon: "ph-folder-simple" },
+    music: { key: "music", label: "Music", one: "piece", icon: "ph-music-notes" },
+    thoughts: { key: "thoughts", label: "Thoughts", one: "post", icon: "ph-cloud" },
+    home: { key: "home", label: "Home & About", one: "page", icon: "ph-house" },
+    media: { key: "studio", label: "Media", one: "file", icon: "ph-images-square" },
+  };
+  // same names + icons as the Thoughts page
+  S.TTYPES = {
+    scratch: { label: "Scratch", icon: "ph-scribble-loop", hint: "a quick line, no title" },
+    article: { label: "Article", icon: "ph-article", hint: "markdown, cover, read time" },
+    pick: { label: "Pick", icon: "ph-tag", hint: "a link into a collection" },
+    playlist: { label: "Playlist", icon: "ph-playlist", hint: "your songs + SoundCloud, Spotify, Bandcamp, YouTube" }, // i9 · links (S2, pin 2)
+    embed: { label: "Images", icon: "ph-images", hint: "photos, a set, or an embed" },
+    tierlist: { label: "Ranking", icon: "ph-ranking", hint: "rank things; visitors add theirs" },
+  };
+
+  /* ---------- time ---------- */
+  S.clock = (t) => Y.fmt.time(new Date(t));
+  S.ago = (t) => {
+    const d = S.now() - t, m = Math.round(d / 60e3);
+    if (m < 1) return "just now";
+    if (m < 60) return `${m} min ago`;
+    const h = Math.round(m / 60);
+    if (h < 24) return `${h} h ago`;
+    const day = new Date(t), today = new Date(S.now());
+    const yest = new Date(today); yest.setDate(today.getDate() - 1);
+    if (day.toDateString() === yest.toDateString()) return `yesterday, ${S.clock(t)}`;
+    return Y.fmt.day(day);
+  };
+  S.dayLabel = (t) => {
+    const day = new Date(t), today = new Date(S.now());
+    const yest = new Date(today); yest.setDate(today.getDate() - 1);
+    if (day.toDateString() === today.toDateString()) return "Today";
+    if (day.toDateString() === yest.toDateString()) return "Yesterday";
+    return Y.fmt.day(day);
+  };
+  S.bytes = (n) => (n >= 1e9 ? `${(n / 1e9).toFixed(1)} GB` : n >= 1e6 ? `${(n / 1e6).toFixed(1)} MB` : `${Math.max(1, Math.round(n / 1e3))} KB`);
+
+  /* ============================================================
+     PUBLISH STATE + AUTOSAVE
+     ============================================================ */
+  // publication state, a second axis next to status: the kit's fact (Yarn.fact.pub, promoted from here in i7 · C1)
+  //   compact = the disc alone (its label for screen readers + the kit hint), like an icon-only fact on a card
+  S.PUB = Y.PUB;
+  S.pub = (state, o) => Y.fact.pub(state, o);
+  // autosave: a fact too (disc + label), so it reads in the head's facts line next to the publish state
+  S.saveHTML = (item) => `<span class="yfact yfact--text st-save" data-save data-state="${S.opt.offline ? "offline" : "saved"}" role="status" aria-live="polite"><span class="yfact__i" aria-hidden="true"><i class="ph-bold ${S.opt.offline ? "ph-cloud-slash" : "ph-check"}"></i><span class="st-save__run"></span></span><span class="yfact__l" data-save-t>${S.opt.offline ? "Offline · saved on this device" : `Saved ${S.clock(item?._edited || S.now())}`}</span></span>`;
+  // edit → mark changed, show "Saving…", then "Saved h:mm" (debounced)
+  let saveT = 0, saveT2 = 0;
+  S.touch = (sec, item, { quiet = false } = {}) => {
+    item._edited = S.now();
+    if (item._pub === "live") { item._pub = "changed"; S.emit("pub", item); }
+    S.persist();
+    if (quiet) return;
+    const pills = $$("[data-save]");
+    pills.forEach((p) => { p.dataset.state = "saving"; $("[data-save-t]", p).textContent = "Saving…"; });
+    clearTimeout(saveT); clearTimeout(saveT2);
+    saveT = setTimeout(() => {
+      saveT2 = setTimeout(() => {
+        $$("[data-save]").forEach((p) => {
+          p.dataset.state = S.opt.offline ? "offline" : "saved";
+          const i = $("i", p); if (i) i.className = `ph-bold ${S.opt.offline ? "ph-cloud-slash" : "ph-check"}`;
+          $("[data-save-t]", p).textContent = S.opt.offline ? "Offline · saved on this device" : `Saved ${S.clock(S.now())}`;
+        });
+      }, 380);
+    }, 520);
+  };
+
+  /* ---------- tiny event bus ---------- */
+  const subs = {};
+  S.on = (n, fn) => ((subs[n] ||= new Set()).add(fn), () => subs[n].delete(fn));
+  S.emit = (n, ...a) => subs[n]?.forEach((fn) => { try { fn(...a); } catch (e) { console.warn(e); } });
+
+  /* ---------- activity + revisions ---------- */
+  S.log = (verb, section, item, icon = "ph-pencil-simple", extra = {}) => {
+    data.activity.unshift({ t: S.now(), verb, section, id: item?.id ?? "", title: S.titleOf(item), icon, ...extra });
+    S.persist();
+  };
+  S.revisions = (section, item) => {
+    const k = `${section}:${item.id}`;
+    if (!data.revs[k]) data.revs[k] = D.revisions(item, section);
+    return data.revs[k];
+  };
+
+  /* ============================================================
+     ROUTER — every screen is a URL (?screen=…); links are real <a href>
+     ============================================================ */
+  S.href = (screen, params = {}) => {
+    const u = new URLSearchParams();
+    const cur = new URLSearchParams(location.search);
+    for (const k of S.KEEP) if (cur.has(k)) u.set(k, cur.get(k));
+    u.set("screen", screen);
+    for (const [k, v] of Object.entries(params)) if (v != null && v !== "") u.set(k, v);
+    return `?${u}`;
+  };
+  S.go = (screen, params = {}, { replace = false, trigger = null } = {}) => {
+    const url = S.href(screen, params);
+    history[replace ? "replaceState" : "pushState"]({ st: 1 }, "", url);
+    S.render({ trigger });
+  };
+  // intercept in-app links (same page, ?screen=…)
+  document.addEventListener("click", (e) => {
+    if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+    const a = e.target.closest?.("a[href^='?']");
+    if (!a || a.target === "_blank" || a.closest(".st-prevbox")) return;
+    e.preventDefault();
+    history.pushState({ st: 1 }, "", a.getAttribute("href"));
+    S.render({ trigger: a });
+  });
+  addEventListener("popstate", () => S.render({ pop: true }));
+
+  // keep the kit's params object in step with the address bar (filters + ⚙ panel read it)
+  function syncParams() {
+    const p = Y.params;
+    [...p.keys()].forEach((k) => p.delete(k));
+    new URLSearchParams(location.search).forEach((v, k) => p.set(k, v));
+  }
+
+  S.view = () => $("#st-view");
+  let cleanup = [];
+  S.onLeave = (fn) => cleanup.push(fn);
+  // i9 · polish (S1, pin 1: "New post" opened 6 sheets after moving between sections). Root cause: every screen wires
+  // its clicks on the view element itself (view.addEventListener), and the view used to be one element emptied with
+  // innerHTML, so each render left its handlers on it: after n renders one click ran n handlers (n sheets, n samples,
+  // n swaps). Now every render gets a fresh view element (the old one, and every listener on it, leaves with its
+  // content) and a fresh AbortSignal (S.signal) for anything a render puts on document / window / the layer
+  // (TierDrag's window listeners take it by default); S.onLeave still runs first.
+  let renderAC = null;
+  S.signal = null;
+  S.render = ({ trigger = null, pop = false } = {}) => {
+    syncParams();
+    const q = new URLSearchParams(location.search);
+    let name = q.get("screen") || "dashboard";
+    if (!S.screens[name]) name = "dashboard";
+    const def = S.screens[name];
+    cleanup.forEach((fn) => { try { fn(); } catch (_) {} }); cleanup = [];
+    renderAC?.abort(); renderAC = new AbortController(); S.signal = renderAC.signal;
+    S.closeAllSheets(true);
+    const sec = def.section ? def.section(q) : "studio";
+    html.dataset.section = S.opt.frame === "section" ? sec : "studio";
+    html.classList.toggle("st-focus", !!def.focus);
+    S.renderNav(def.nav === false ? null : (def.navKey ? def.navKey(q) : sec));
+    const old = S.view(), view = old.cloneNode(false); // (attributes only: no children, no listeners)
+    old.replaceWith(view);
+    view.classList.remove("is-enter");
+    S.fab(null); // a screen that wants the floating "+" asks for it again
+    def.render(view, q);
+    void view.offsetWidth;
+    if (!pop) view.classList.add("is-enter");
+    if (!pop) scrollTo(0, 0);
+    document.title = `${def.title ? def.title(q) : "Studio"} · Studio · blaqat.net`;
+    S.state = { name, q };
+    S.emit("render", name, q);
+    if (trigger && !trigger.closest?.(".ybar, .ynav, .yspool, .st-plus")) view.focus({ preventScroll: true });
+  };
+
+  /* ============================================================
+     NAV — the kit nav (Yarn.navHTML) with Studio's own page list
+     ============================================================ */
+  // Studio's page list for the kit nav (Yarn.navHTML): Studio home is a bar item, Home & About a desktop tab; ink felt for Studio's own pages
+  const NAV = () => [
+    { key: "studio", label: "Studio", icon: "ph-squares-four", href: S.href("dashboard"), section: "studio", tab: false },
+    { key: "projects", label: "Projects", icon: "ph-folder-simple", href: S.href("list", { section: "projects" }) },
+    { key: "music", label: "Music", icon: "ph-music-notes", href: S.href("list", { section: "music" }) },
+    { key: "thoughts", label: "Thoughts", icon: "ph-cloud", href: S.href("list", { section: "thoughts" }) },
+    { key: "home", label: "Home", icon: "ph-house", href: S.href("home"), bar: false },
+    { key: "media", label: "Media", icon: "ph-images-square", href: S.href("media"), section: "studio" },
+  ];
+  // i7 · studio (S1): the kit's own <yarn-nav> element (config = Studio's page list), so the phone's sections pill
+  // moves onto the floating layer like every page's, and the sound toggle is the kit's tag on the sheet's top edge.
+  // A screen without a nav (sign-in) takes the element out of the page: the kit removes its pill with it.
+  const navEl = () => S._nav || (S._nav = Object.assign(document.createElement("yarn-nav"), { id: "st-nav" }));
+  S.renderNav = (active) => {
+    const el = navEl();
+    if (active == null) { if (el.isConnected) el.remove(); return; }
+    el.setAttribute("base", "../");
+    el.setAttribute("active", active);
+    el.config = {
+      pages: NAV(), label: "Studio",
+      brand: { href: S.href("dashboard"), label: "Studio dashboard" },
+      badge: `<span class="st-label" aria-hidden="true"><i class="ph-fill ph-lock-simple"></i>Studio</span>`,
+      extra: `<a class="btn btn--ghost btn--sm st-viewsite" href="${Y.siteURL("home/index.html?skip")}" target="_blank" rel="noopener" aria-label="View the live site (opens in a new tab)"><i class="ph-bold ph-arrow-up-right" aria-hidden="true"></i><span>View site</span></a>`,
+    };
+    if (!el.isConnected) $("#sheet").prepend(el); // (config first: it renders Studio's list on connect, never the site's)
+  };
+
+  /* ============================================================
+     THE FLOATING "+" (phones) — Studio's one FAB, on the kit's floating layer (Yarn.layer(), B2) with the other
+     floaters: it rests at the right end of the kit's FAB row (where the player's disc rests on the site), the search
+     knob waits left of it (html.st-has-plus), and it steps away while search holds the slot. A bottom toast lifts it with
+     the rest (--ytoast-push). Desktop: never (New is in the header).
+     S.fab({ label, href | onClick }) shows it for this screen · S.fab(null) takes it away (every render).
+     ============================================================ */
+  let plus = null;
+  S.fab = (o) => {
+    if (!o) { plus?.remove(); plus = null; html.classList.remove("st-has-plus"); return null; }
+    plus?.remove();
+    plus = document.createElement(o.href ? "a" : "button");
+    plus.className = "st-plus";
+    if (o.href) plus.href = o.href; else plus.type = "button";
+    plus.setAttribute("aria-label", o.label);
+    plus.innerHTML = `<i class="ph-bold ph-plus" aria-hidden="true"></i>`;
+    if (o.onClick) plus.addEventListener("click", () => o.onClick(plus));
+    (Y.layer() || document.body).appendChild(plus);
+    html.classList.add("st-has-plus");
+    return plus;
+  };
+
+  /* ============================================================
+     SHEETS — grow from the trigger, close back into it.
+     Desktop: centred card (or docked right). Phone: bottom sheet, drag down to dismiss.
+     ============================================================ */
+  const sheets = [];
+  const isPhone = () => innerWidth < 960;
+  const FOCUSABLE = "a[href], button:not([disabled]), input:not([disabled]), textarea, select, [tabindex]:not([tabindex='-1'])";
+  S.sheet = ({ from = null, title = "", html: body = "", foot = "", width = 560, side = "center", label = "", onMount, onClose, cls = "" } = {}) => {
+    const wrap = document.createElement("div");
+    wrap.className = "st-sheetwrap";
+    const id = Y.uid("sheet");
+    wrap.innerHTML = `<div class="st-scrim" data-close></div>
+      <section class="st-sheet ${side === "right" ? "st-sheet--right" : ""} ${cls}" role="dialog" aria-modal="true" aria-labelledby="${id}-t" style="--w:${width}px">
+        <button type="button" class="st-grab" aria-label="Drag down to close" tabindex="-1"></button>
+        <header class="st-sheet__head"><h2 id="${id}-t">${title}${/[?!.]$/.test(title) ? "" : `<span class="yhead__dot" aria-hidden="true">.</span>`}</h2>
+          <button type="button" class="ylinkicon" data-close aria-label="Close"><i class="ph-bold ph-x" aria-hidden="true"></i></button></header>
+        <div class="st-sheet__body">${body}</div>
+        ${foot ? `<footer class="st-sheet__foot">${foot}</footer>` : ""}
+      </section>`;
+    S.layer().appendChild(wrap); // i7: on the kit's floating layer (under its toast + hint, over the knob + pill)
+    const sheet = $(".st-sheet", wrap), scrim = $(".st-scrim", wrap);
+    const api = { el: sheet, wrap, body: $(".st-sheet__body", sheet), foot: $(".st-sheet__foot", sheet), from, closed: false, close: (o) => close(o) };
+    sheets.push(api);
+    html.style.overflow = "hidden";
+    const returnTo = document.activeElement;
+    Y.sound("open", { el: from || undefined });
+    let anim = null;
+    const fromRect = () => (from && from.isConnected ? from.getBoundingClientRect() : null);
+    function openAnim() {
+      if (Y.reduced()) { sheet.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 160 }); return; }
+      const sr = sheet.getBoundingClientRect();
+      scrim.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 220, easing: "ease-out" });
+      if (isPhone()) {
+        const sp = Y.springEasing({ response: 0.42 });
+        anim = sheet.animate([{ transform: `translateY(${sr.height + 20}px)` }, { transform: "none" }], { duration: sp.duration, easing: sp.easing });
+        return;
+      }
+      const fr = fromRect();
+      const sp = Y.springEasing({ response: 0.4 });
+      if (fr) {
+        const dx = fr.left + fr.width / 2 - (sr.left + sr.width / 2), dy = fr.top + fr.height / 2 - (sr.top + sr.height / 2);
+        const s = Math.max(0.08, Math.min(fr.width / sr.width, 0.5));
+        anim = sheet.animate([{ transform: `translate(${dx}px, ${dy}px) scale(${s})`, opacity: 0, borderRadius: "40px" }, { transform: "none", opacity: 1, offset: 0.35 }, { transform: "none", opacity: 1, borderRadius: "24px" }], { duration: sp.duration, easing: sp.easing });
+      } else anim = sheet.animate([{ transform: "translateY(12px) scale(.97)", opacity: 0 }, { transform: "none", opacity: 1 }], { duration: sp.duration, easing: sp.easing });
+    }
+    function close({ instant = false, silent = false } = {}) {
+      if (api.closed) return;
+      api.closed = true;
+      sheets.splice(sheets.indexOf(api), 1);
+      if (!sheets.length) html.style.overflow = "";
+      if (!silent) Y.sound("close", { el: from || undefined });
+      onClose?.();
+      document.removeEventListener("keydown", onKey, true);
+      const done = () => wrap.remove();
+      if (instant || Y.reduced()) { done(); }
+      else {
+        anim?.cancel();
+        const sr = sheet.getBoundingClientRect(), fr = fromRect();
+        scrim.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 200, fill: "forwards" });
+        let to = isPhone() ? { transform: `translateY(${innerHeight - sr.top}px)` } : { transform: "translateY(8px) scale(.97)", opacity: 0 };
+        if (!isPhone() && fr) { const dx = fr.left + fr.width / 2 - (sr.left + sr.width / 2), dy = fr.top + fr.height / 2 - (sr.top + sr.height / 2); to = { transform: `translate(${dx}px, ${dy}px) scale(${Math.max(0.08, Math.min(fr.width / sr.width, 0.5))})`, opacity: 0 }; }
+        sheet.animate([{ transform: getComputedStyle(sheet).transform === "none" ? "none" : getComputedStyle(sheet).transform, opacity: 1 }, to], { duration: 230, easing: "cubic-bezier(.4,0,.8,.6)", fill: "forwards" }).onfinish = done;
+      }
+      if (!instant && returnTo && returnTo.isConnected) returnTo.focus({ preventScroll: true });
+    }
+    function onKey(e) {
+      if (sheets[sheets.length - 1] !== api) return;
+      if (e.key === "Escape") { e.stopPropagation(); e.preventDefault(); close(); return; }
+      if (e.key === "Tab") {
+        const f = $$(FOCUSABLE, sheet).filter((n) => n.getClientRects().length && !n.classList.contains("st-grab"));
+        if (!f.length) return;
+        const first = f[0], last = f[f.length - 1];
+        if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+        else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+      }
+    }
+    document.addEventListener("keydown", onKey, true);
+    // a fast second click on the button that opened it lands on the scrim: it mustn't close what it just opened
+    const opened = performance.now();
+    wrap.addEventListener("click", (e) => { const c = e.target.closest("[data-close]"); if (!c || (c.classList.contains("st-scrim") && performance.now() - opened < 400)) return; close(); });
+    // phone: drag the grabber / header down to dismiss (spring back otherwise)
+    const grab = $(".st-grab", sheet), head = $(".st-sheet__head", sheet);
+    let dg = null;
+    const ty = new Y.Spring(0, { onUpdate: (v) => (sheet.style.transform = v > 0.3 ? `translateY(${v}px)` : "") });
+    const down = (e) => { if (!isPhone() || e.target.closest("button:not(.st-grab)")) return; dg = { y0: e.clientY, t: e.timeStamp, last: e.clientY, lt: e.timeStamp, v: 0 }; e.currentTarget.setPointerCapture(e.pointerId); anim?.cancel(); };
+    const move = (e) => { if (!dg) return; const d = e.clientY - dg.y0; dg.v = (e.clientY - dg.last) / Math.max(1, e.timeStamp - dg.lt) * 1000; dg.last = e.clientY; dg.lt = e.timeStamp; ty.set(d > 0 ? d : d / 4); };
+    const up = () => { if (!dg) return; const d = ty.value, v = dg.v; dg = null; if (d > 120 || v > 900) close(); else ty.to(0, { velocity: v, response: 0.36 }); };
+    for (const h of [grab, head]) { h.addEventListener("pointerdown", down); h.addEventListener("pointermove", move); h.addEventListener("pointerup", up); h.addEventListener("pointercancel", up); }
+    onMount?.(api);
+    requestAnimationFrame(openAnim);
+    requestAnimationFrame(() => { const f = $("[autofocus]", sheet) || $$(FOCUSABLE, sheet).find((n) => !n.classList.contains("st-grab") && !n.hasAttribute("data-close")) || $("[data-close]", sheet); f?.focus({ preventScroll: true }); });
+    return api;
+  };
+  S.closeAllSheets = (instant = false) => [...sheets].forEach((s) => s.close({ instant, silent: instant }));
+  S.layer = () => Y.layer() || document.body;
+  S.topSheet = () => sheets[sheets.length - 1] || null;
+
+  /* ============================================================
+     TOASTS — the kit's (Yarn.toast: one at a time, on the floating layer, Undo / one action at its right end).
+     i7 · studio (S1): Studio's own stack of toasts is gone. S.toast keeps the old call shape for the screens:
+       { icon: "ph-…", title, text, undo: fn, action: "View" (the button's name, default Undo), ms }
+     ============================================================ */
+  S.toast = ({ icon = "ph-check-circle", title = "", text = "", undo = null, action = "", ms = 4200, duration = 0 } = {}) =>
+    Y.toast({ icon: String(icon).replace(/^ph-/, ""), html: `<b>${title}</b>${text ? ` <span class="st-tsub">${text}</span>` : ""}`, undo, action, ms: duration || ms });
+  S.say = (msg) => { const l = $("#st-live"); if (l) { l.textContent = ""; setTimeout(() => (l.textContent = msg), 30); } };
+
+  /* ============================================================
+     FIELDS — markup helpers + one binder (data-f="path" on controls)
+     ============================================================ */
+  const get = (o, p) => p.split(".").reduce((a, k) => (a == null ? a : a[k]), o);
+  const set = (o, p, v) => { const ks = p.split("."); let a = o; ks.slice(0, -1).forEach((k) => (a = a[k] ??= {})); a[ks[ks.length - 1]] = v; };
+  S.get = get; S.set = set;
+  S.f = {
+    text: (item, path, { label, placeholder = "", type = "text", hint = "", mono = false, id = Y.uid("f"), max = 0, inputmode = "", autocomplete = "off" } = {}) =>
+      `<div class="st-field"><label for="${id}">${label}</label><input class="yfield st-in${mono ? " st-mono" : ""}" id="${id}" type="${type}" data-f="${path}" value="${esc(get(item, path) ?? "")}" placeholder="${esc(placeholder)}" autocomplete="${autocomplete}"${inputmode ? ` inputmode="${inputmode}"` : ""}${max ? ` maxlength="${max}"` : ""}${hint ? ` aria-describedby="${id}-h"` : ""}>${hint ? `<p class="st-hint" id="${id}-h">${hint}</p>` : ""}</div>`,
+    area: (item, path, { label, placeholder = "", rows = 4, hint = "", id = Y.uid("f"), max = 0, cls = "" } = {}) =>
+      `<div class="st-field"><label for="${id}">${label}${max ? ` <span class="meta" data-count-for="${id}"></span>` : ""}</label><textarea class="yfield st-ta ${cls}" id="${id}" data-f="${path}" rows="${rows}" placeholder="${esc(placeholder)}"${max ? ` data-max="${max}"` : ""}${hint ? ` aria-describedby="${id}-h"` : ""}>${esc(get(item, path) ?? "")}</textarea>${hint ? `<p class="st-hint" id="${id}-h">${hint}</p>` : ""}</div>`,
+    select: (item, path, options, { label, id = Y.uid("f") } = {}) =>
+      `<div class="st-field"><label for="${id}">${label}</label><select class="yfield st-select" id="${id}" data-f="${path}">${options.map(([v, l]) => `<option value="${esc(v)}"${String(get(item, path) ?? "") === String(v) ? " selected" : ""}>${esc(l)}</option>`).join("")}</select></div>`,
+    toggle: (item, path, { label, text = "" } = {}) =>
+      `<button type="button" class="st-toggle" role="switch" data-f="${path}" aria-checked="${!!get(item, path)}"><span class="st-toggle__track" aria-hidden="true"><span class="st-toggle__knob"></span></span><span class="st-toggle__txt"><b>${label}</b>${text ? `<span>${text}</span>` : ""}</span></button>`,
+    // single choice = the kit chip (.ychip.ysel, role=radio: the rope when chosen, never the remove strike) holding the
+    // real kit fact (status / type disc + label), so the picker shows exactly what the site will show
+    choice: (item, path, options, { label, id = Y.uid("c") } = {}) =>
+      `<div class="st-field"><span class="st-lab" id="${id}">${label}</span><div class="st-choice" role="radiogroup" aria-labelledby="${id}">${options.map(([v, inner, name]) => {
+        const on = String(get(item, path) ?? "").toLowerCase() === String(v).toLowerCase() || (Y.status(v) && Y.status(get(item, path))?.key === Y.status(v)?.key);
+        return `<button type="button" class="ychip ysel st-opt${on ? " is-selected" : ""}" role="radio" aria-checked="${!!on}" data-f="${path}" data-v="${esc(v)}" aria-label="${esc(name || v)}" tabindex="${on ? 0 : -1}">${inner}</button>`;
+      }).join("")}</div></div>`,
+  };
+  // month/year pair (data model keeps "Sep 2025" strings like the site)
+  const MON = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  S.f.month = (item, path, { label, allowEmpty = false, id = Y.uid("m") } = {}) => {
+    const d = Y.parseDate(get(item, path));
+    const years = []; for (let y = 2027; y >= 2016; y--) years.push(y);
+    return `<div class="st-field"><span class="st-lab" id="${id}">${label}</span><div class="st-fieldrow" style="grid-template-columns:1fr 1fr" role="group" aria-labelledby="${id}">
+      <select class="yfield st-select" data-month="${path}" data-part="m" aria-label="${label} month">${allowEmpty ? `<option value="">—</option>` : ""}${MON.map((m, i) => `<option value="${i}"${d && d.getMonth() === i ? " selected" : ""}>${m}</option>`).join("")}</select>
+      <select class="yfield st-select" data-month="${path}" data-part="y" aria-label="${label} year">${allowEmpty ? `<option value="">—</option>` : ""}${years.map((y) => `<option${d && d.getFullYear() === y ? " selected" : ""}>${y}</option>`).join("")}</select></div></div>`;
+  };
+  S.bind = (root, item, onChange) => {
+    const fire = (path, el) => onChange?.(path, el);
+    // a nested [data-scope] (e.g. the selected track inside a collection) binds to its own object
+    const mine = (el) => { const sc = el.closest("[data-scope]"); return !sc || sc === root || !root.contains(sc); };
+    root.addEventListener("input", (e) => {
+      const el = e.target;
+      if (!mine(el)) return;
+      if (el.matches("[data-f]") && !el.matches(".st-toggle, .st-opt")) {
+        let v = el.value;
+        if (el.type === "number") v = el.value === "" ? null : +el.value;
+        set(item, el.dataset.f, v);
+        if (el.dataset.max) counter(el);
+        if (el.getAttribute("aria-invalid") === "true" && v) el.removeAttribute("aria-invalid");
+        fire(el.dataset.f, el);
+      }
+    });
+    root.addEventListener("change", (e) => {
+      const el = e.target;
+      if (!mine(el)) return;
+      if (el.matches("select[data-month]")) {
+        const path = el.dataset.month;
+        const sels = $$(`select[data-month="${CSS.escape(path)}"]`, root);
+        const m = sels.find((s) => s.dataset.part === "m").value, y = sels.find((s) => s.dataset.part === "y").value;
+        set(item, path, m === "" || y === "" ? "" : `${MON[+m]} ${y}`);
+        fire(path, el);
+      } else if (el.matches("select[data-f]")) { set(item, el.dataset.f, el.value); fire(el.dataset.f, el); }
+    });
+    root.addEventListener("click", (e) => {
+      const t = e.target.closest(".st-toggle[data-f]");
+      if (t && root.contains(t) && mine(t)) {
+        const on = t.getAttribute("aria-checked") !== "true";
+        t.setAttribute("aria-checked", String(on));
+        set(item, t.dataset.f, on);
+        Y.sound(on ? "chip-on" : "chip-off", { el: t });
+        fire(t.dataset.f, t);
+        return;
+      }
+      const o = e.target.closest(".st-opt[data-f]");
+      if (o && root.contains(o) && mine(o)) {
+        const grp = o.closest("[role=radiogroup]");
+        $$(".st-opt", grp).forEach((b) => { const on = b === o; b.classList.toggle("is-selected", on); b.setAttribute("aria-checked", String(on)); b.tabIndex = on ? 0 : -1; });
+        set(item, o.dataset.f, o.dataset.v);
+        Y.sound("chip-on", { el: o });
+        fire(o.dataset.f, o);
+      }
+    });
+    // arrow keys move inside radio groups
+    root.addEventListener("keydown", (e) => {
+      const o = e.target.closest?.(".st-opt[role=radio]");
+      if (!o || !/^Arrow(Left|Right|Up|Down)$/.test(e.key)) return;
+      e.preventDefault();
+      const all = $$(".st-opt", o.closest("[role=radiogroup]"));
+      const n = all[(all.indexOf(o) + (/Right|Down/.test(e.key) ? 1 : -1) + all.length) % all.length];
+      n.focus(); n.click();
+    });
+    $$("textarea[data-max]", root).forEach(counter);
+  };
+  function counter(el) {
+    const c = el.ownerDocument.querySelector(`[data-count-for="${el.id}"]`);
+    if (!c) return;
+    const max = +el.dataset.max, n = el.value.length;
+    c.textContent = `${n} / ${max}`;
+    c.classList.toggle("is-over", n > max);
+  }
+
+  /* ============================================================
+     WAVEFORM — seeded peaks (mock) or real ones from a decoded file
+     ============================================================ */
+  // the kit waveform (Yarn.wave): seeded by the track, so an upload looks the same here as in the player's scrub
+  S.peaks = (seed, n = 96) => Y.wave.values(seed, n);
+  S.waveSVG = (peaks) => Y.wave.svg(peaks);
+  S.paintWave = (el, frac) => {
+    el.style.setProperty("--f", frac.toFixed(4));
+    el.style.setProperty("--p", `${(frac * 100).toFixed(2)}%`);
+  };
+  S.decodeAudio = async (file, n = 96) => {
+    const AC = window.AudioContext || window.webkitAudioContext;
+    const ctx = new AC();
+    try {
+      const buf = await ctx.decodeAudioData(await file.arrayBuffer());
+      const ch = buf.getChannelData(0), step = Math.floor(ch.length / n), peaks = [];
+      for (let i = 0; i < n; i++) { let m = 0; for (let j = i * step; j < (i + 1) * step; j += 32) m = Math.max(m, Math.abs(ch[j] || 0)); peaks.push(m); }
+      const max = Math.max(...peaks, 0.01);
+      return { peaks: peaks.map((p) => Math.max(0.05, p / max)), duration: buf.duration, rate: buf.sampleRate };
+    } finally { ctx.close?.(); }
+  };
+  // mock duration (seconds) for a track with no known length
+  const KNOWN_DUR = new Map((window.THOUGHTS?.posts || []).flatMap((p) => p.tracks || []).map((t) => [t.src, t.dur]));
+  S.durOf = (t) => {
+    const d = t?.dur || KNOWN_DUR.get(t?.url || t?.src);
+    if (d) { if (typeof d === "number") return d; const [m, s] = String(d).split(":"); return +m * 60 + +s; }
+    return 80 + (Y.hash(t?.url || t?.name || "x") % 190);
+  };
+
+  /* ============================================================
+     MARKDOWN (marked, like the Thoughts page; tiny fallback offline)
+     ============================================================ */
+  S.md = (src = "") => {
+    // i9 · blocks (S3): the kit's renderer (Yarn.md: marked + the yarn blocks as kit parts), with Studio's own data
+    if (Y.md) return Y.md(src, S.mdCtx?.() || {});
+    const fix = (s) => s.replace(/\(\.\.\/media\//g, "(" + Y.kitURL("../media/"));
+    if (window.marked?.parse) return window.marked.parse(fix(src), { gfm: true, breaks: false });
+    return src.split(/\n{2,}/).map((b) => {
+      if (/^#{2,4} /.test(b)) { const l = b.match(/^#+/)[0].length; return `<h${l}>${esc(b.slice(l + 1))}</h${l}>`; }
+      if (/^> /.test(b)) return `<blockquote><p>${esc(b.replace(/^> /gm, ""))}</p></blockquote>`;
+      if (/^- /.test(b)) return `<ul>${b.split("\n").map((l) => `<li>${esc(l.slice(2))}</li>`).join("")}</ul>`;
+      return `<p>${esc(b).replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>").replace(/`(.+?)`/g, "<code>$1</code>")}</p>`;
+    }).join("");
+  };
+  // i9 · blocks (S3): the words a reader sees (yarn directives, URLs and markdown syntax don't count)
+  S.words = (s = "") => (Y.md ? Y.md.words(String(s)) : (String(s).trim().match(/\S+/g) || []).length);
+
+  /* word diff (LCS) → <del>/<ins> */
+  S.diff = (a = "", b = "") => {
+    const A = String(a).split(/(\s+)/), B = String(b).split(/(\s+)/);
+    if (A.length * B.length > 250000) return `<del>${esc(a)}</del> <ins>${esc(b)}</ins>`;
+    const m = A.length, n = B.length, L = Array.from({ length: m + 1 }, () => new Uint16Array(n + 1));
+    for (let i = m - 1; i >= 0; i--) for (let j = n - 1; j >= 0; j--) L[i][j] = A[i] === B[j] ? L[i + 1][j + 1] + 1 : Math.max(L[i + 1][j], L[i][j + 1]);
+    let i = 0, j = 0, out = "";
+    while (i < m && j < n) {
+      if (A[i] === B[j]) { out += esc(A[i]); i++; j++; }
+      else if (L[i + 1][j] >= L[i][j + 1]) { out += /^\s+$/.test(A[i]) ? esc(A[i]) : `<del>${esc(A[i])}</del>`; i++; }
+      else { out += /^\s+$/.test(B[j]) ? esc(B[j]) : `<ins>${esc(B[j])}</ins>`; j++; }
+    }
+    while (i < m) { out += /^\s+$/.test(A[i]) ? esc(A[i]) : `<del>${esc(A[i])}</del>`; i++; }
+    while (j < n) { out += /^\s+$/.test(B[j]) ? esc(B[j]) : `<ins>${esc(B[j])}</ins>`; j++; }
+    return out.replace(/<\/del>(\s*)<del>/g, "$1").replace(/<\/ins>(\s*)<ins>/g, "$1");
+  };
+
+  /* ============================================================
+     MEDIA — resolve any src the data uses; the library with usage counts
+     ============================================================ */
+  const PUBLIC = ["bankresult.png", "beepsearch.png", "fitr-recruiter.mp4", "fitr-redesign.gif", "harrypotter.mp4", "musicpagecomp.mp4", "portal-coach.gif", "portal-student.png", "rawsy.png", "site-plan.png", "sona-auri.png", "sona-different.png", "sona.png", "sub-overrides.mp4", "sub-terminal-sexy.mp4", "webcheckers.mp4", "wsg.mp4", "blaqat.svg", "nina.jpg"];
+  S.norm = (src) => String(src || "").replace(/^\.\.\/media\//, "/media/");
+  S.url = (src) => {
+    const s = S.norm(src);
+    if (/^blob:|^data:/.test(s)) return s;
+    return Y.media(s);
+  };
+  S.isVideo = (src, kind) => Y.isVideo(S.norm(src), kind);
+  S.fileOf = (src) => { const s = S.norm(src); const up = data.uploads.find((u) => u.src === s); return up ? up.file : decodeURIComponent(s.split(/[/?#]/).filter(Boolean).pop() || s); };
+  // <img>/<video> markup for a src: poster frame for videos, designed placeholder when missing
+  S.mediaEl = (src, { alt = "", poster = 0.6 } = {}) => {
+    const u = S.url(src);
+    if (!u) return `<span class="ymissing"><i class="ph ${S.isVideo(src) ? "ph-video-camera" : "ph-image"}" aria-hidden="true"></i>${S.isVideo(src) ? "remote video" : "not in this mock"}</span>`;
+    if (S.isVideo(src)) return `<video src="${u}#t=${poster}" muted playsinline preload="metadata" aria-hidden="true" tabindex="-1" data-ydur></video>`;
+    return `<img src="${u}" alt="${esc(alt)}" loading="lazy" decoding="async" draggable="false">`;
+  };
+  S.library = () => {
+    const files = new Map();
+    const add = (key, o) => { if (!files.has(key)) files.set(key, { key, uses: [], ...o }); return files.get(key); };
+    const kindOf = (f) => (/\.(mp4|webm|mov|m4v)$/i.test(f) ? "video" : /\.(mp3|wav|m4a|ogg|flac)$/i.test(f) ? "audio" : "image");
+    const R = (k) => Y.rng(Y.hash(k));
+    for (const f of PUBLIC) {
+      if (data.removed.includes(f)) continue;
+      const r = R(f), kind = kindOf(f);
+      add(f, { file: f, src: `/media/${f}`, kind, size: kind === "video" ? 2e6 + r() * 14e6 : f.endsWith(".gif") ? 1.2e6 + r() * 3e6 : 90e3 + r() * 700e3, dims: kind === "video" ? "1920×1080" : `${1200 + Math.round(r() * 8) * 80}×${700 + Math.round(r() * 6) * 60}`, t: D.NOW - (20 + r() * 400) * D.DAY });
+    }
+    for (const u of data.uploads) add(u.file, { file: u.file, src: u.src, kind: u.kind, size: u.size, dims: u.dims || "", dur: u.dur, t: u.t, upload: true, poster: u.poster });
+    for (const x of D.LIBRARY_EXTRA) if (!data.removed.includes(x.file)) add(x.file, { ...x, src: `/media/${x.file}` });
+    const use = (src, sec, item, kindHint) => {
+      if (!src) return;
+      const s = S.norm(src);
+      const key = data.uploads.find((u) => u.src === s)?.file || decodeURIComponent(s.split(/[/?#]/).filter(Boolean).pop());
+      const f = files.get(key) || add(key, { file: key, src: s, kind: kindHint || kindOf(key), size: (kindHint === "audio" ? 2e6 : 4e6) + (Y.hash(key) % 3e6), remote: /^https?:/.test(s), t: D.NOW - (60 + (Y.hash(key) % 900)) * D.DAY });
+      if (!f.uses.some((u) => u.section === sec && u.id === item.id)) f.uses.push({ section: sec, id: item.id, title: S.titleOf(item) });
+    };
+    for (const p of data.projects) (p.images || []).forEach((m) => use(m.src, "projects", p));
+    for (const m of data.music) {
+      if (m.url) use(m.url, "music", m, "audio");
+      (m.songs || []).forEach((s) => s.url && use(s.url, "music", m, "audio"));
+    }
+    for (const t of data.thoughts) {
+      (t.media || []).forEach((m) => use(m.src, "thoughts", t));
+      if (t.cover) use(t.cover, "thoughts", t);
+      (t.tracks || []).forEach((tr) => tr.src && use(tr.src, "thoughts", t, "audio"));
+      (t.tracks || []).forEach((tr) => tr.art && use(tr.art, "thoughts", t)); // i9 · links (S2): an external track's art from Media
+    }
+    for (const x of D.LIBRARY_EXTRA) (x.usedBy || []).forEach(([sec, id]) => { const it = S.find(sec, id); if (it && files.has(x.file)) files.get(x.file).uses.push({ section: sec, id, title: S.titleOf(it) }); });
+    return [...files.values()].filter((f) => !data.removed.includes(f.key)).sort((a, b) => b.t - a.t);
+  };
+  // a fake upload (file picker or "use a sample"): returns the entry + a progress driver
+  S.addUpload = ({ file, src, kind, size, dims = "", dur = 0, poster = 0 }) => {
+    const u = { file, src, kind, size, dims, dur, poster, t: S.now() };
+    data.uploads.unshift(u);
+    S.persist();
+    return u;
+  };
+  // generate a poster frame for a real (blob) video: seek, draw, return a data URL
+  S.posterFrom = (src, at = 0.5) => new Promise((res) => {
+    const v = document.createElement("video");
+    v.muted = true; v.playsInline = true; v.preload = "auto"; v.src = src;
+    const fail = setTimeout(() => res(null), 4000);
+    v.addEventListener("loadedmetadata", () => { v.currentTime = Math.min(at, Math.max(0, (v.duration || 1) - 0.1)); }, { once: true });
+    v.addEventListener("seeked", () => {
+      try { const c = document.createElement("canvas"); c.width = 480; c.height = Math.round(480 * (v.videoHeight / v.videoWidth || 0.625)); c.getContext("2d").drawImage(v, 0, 0, c.width, c.height); clearTimeout(fail); res({ poster: c.toDataURL("image/jpeg", 0.8), dur: v.duration, dims: `${v.videoWidth}×${v.videoHeight}` }); }
+      catch (_) { clearTimeout(fail); res(null); }
+    }, { once: true });
+  });
+  // fake network progress: calls step(0..1), then done()
+  S.progress = (ms, step, done) => {
+    if (Y.reduced()) { step(1); done?.(); return () => {}; }
+    const t0 = performance.now();
+    let raf = 0;
+    const tick = (t) => { const f = Math.min(1, (t - t0) / ms); step(1 - Math.pow(1 - f, 1.6)); if (f < 1) raf = requestAnimationFrame(tick); else done?.(); };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  };
+
+  /* ============================================================
+     PUBLISH FLOW
+     checks: [{ ok: true|false|"warn", title, text, fix?: () => void }]
+     smart = straight to live when everything passes; always = the checklist sheet every time
+     ============================================================ */
+  S.publish = ({ section, item, btn, checks = [], label = "", onDone } = {}) => {
+    const bad = checks.filter((c) => c.ok === false), warn = checks.filter((c) => c.ok === "warn");
+    if (bad.length) {
+      Y.sound("nope", { el: btn });
+      btn?.classList.remove("is-shake"); void btn?.offsetWidth; btn?.classList.add("is-shake");
+      S.say(`Can't publish yet: ${bad.map((b) => b.title).join(", ")}`);
+      bad[0].fix?.();
+      if (!bad[0].fix) S.checkSheet({ section, item, btn, checks, onDone });
+      else S.toast({ icon: "ph-warning-circle", title: `Can't publish yet`, text: `needs ${bad.map((b) => b.title.toLowerCase()).join(" · ")}` });
+      return;
+    }
+    if (S.opt.confirm === "always" || warn.length) return S.checkSheet({ section, item, btn, checks, onDone });
+    go({ section, item, btn, label, onDone });
+  };
+  // i9 · polish (S4, pin 4: "pin icon makes no sense here should be a warning icon also dark red on medium dark grey
+  // looks bad"). One look per check state, on the kit's own fact discs (studio.css "i9 · polish · S4"):
+  //   ready    = ink felt + white ✓ (the kit's live / complete disc)
+  //   warn     = flat gold + ink ⚠ ph-warning (the kit's attention gold, as its WIP disc: 7.3:1)
+  //   blocking = red felt + white ✕, on a red-soft row
+  // The pin was the Studio's "edits" mark, borrowed by mistake. Each state also says its word to screen readers.
+  S.CHECK = { true: { icon: "ph-check", sr: "Ready" }, warn: { icon: "ph-warning", sr: "Worth a look" }, false: { icon: "ph-x", sr: "Needs fixing" } };
+  S.checkMark = (ok, icon = "") => { const st = S.CHECK[String(ok)] || S.CHECK.true; return `<span class="yfact__i" aria-hidden="true"><i class="ph-bold ${icon || st.icon}"></i></span><span class="sr-only">${st.sr}: </span>`; };
+  S.plural = (n, one, many = `${one}s`) => `${n} ${n === 1 ? one : many}`; // "1 word", "36 words"
+  S.checkSheet = ({ section, item, btn, checks, onDone }) => {
+    const bad = checks.some((c) => c.ok === false);
+    const sh = S.sheet({
+      from: btn, title: bad ? "Not quite ready" : "Ready to go live?", width: 520,
+      html: `<p class="st-note">${bad ? "Fix the red ones and Publish again." : `This replaces what visitors see on <b>${S.SECTIONS[section]?.label || "the site"}</b>. No redeploy: it's live in a few seconds.`}</p>
+        <ul class="st-checks">${checks.map((c, i) => `<li class="st-check" data-ok="${c.ok}">${S.checkMark(c.ok)}<div><b>${c.title}</b>${c.text ? `<span>${c.text}</span>` : ""}${c.fix && c.ok !== true ? `<button type="button" class="ylinkbtn" data-fix="${i}">${c.fixLabel || "Fix it"}</button>` : ""}</div></li>`).join("")}</ul>`,
+      foot: `<button type="button" class="btn btn--ghost" data-close>Not yet</button><span class="ydetail__spacer"></span><button type="button" class="btn btn--red" data-go${bad ? " disabled" : " autofocus"}><i class="ph-bold ph-paper-plane-tilt" aria-hidden="true"></i>${bad ? "Publish" : checks.some((c) => c.ok === "warn") ? "Publish anyway" : "Publish now"}</button>`,
+      onMount: (s) => {
+        s.el.addEventListener("click", (e) => {
+          const f = e.target.closest("[data-fix]"); if (f) { s.close(); checks[+f.dataset.fix].fix(); return; }
+          if (e.target.closest("[data-go]")) { s.close({ silent: true }); go({ section, item, btn, onDone }); }
+        });
+      },
+    });
+    return sh;
+  };
+  function go({ section, item, btn, onDone }) {
+    const fail = S.opt.pstate === "error" || S.opt.offline;
+    const lab = btn ? $("span", btn) : null, old = lab?.innerHTML;
+    if (btn) { btn.classList.add("ysel", "is-publishing"); btn.setAttribute("aria-busy", "true"); if (lab) lab.textContent = "Publishing…"; }
+    S.say("Publishing…");
+    setTimeout(() => {
+      if (btn) { btn.classList.remove("is-publishing"); btn.removeAttribute("aria-busy"); if (lab) lab.innerHTML = old; }
+      if (fail) {
+        Y.sound("nope", { el: btn });
+        btn?.classList.remove("is-shake"); void btn?.offsetWidth; btn?.classList.add("is-shake");
+        S.toast({ icon: "ph-cloud-slash", title: "Couldn't reach blaqat.net", text: "Nothing changed. Your draft is safe here.", ms: 9000, action: "Retry", undo: () => { S.opt.pstate = "ok"; S.opt.offline = false; go({ section, item, btn, onDone }); } });
+        return;
+      }
+      const was = item._pub;
+      // i7 · W1: seed the item's history from its state *before* publishing (seeding after it, from _edited = now and
+      // _pub = live, began the list with its own "Published" at this minute, so History showed the publish twice)
+      const revs = section && item.id != null ? S.revisions(section, item) : null;
+      item._pub = "live"; item._published = S.now(); item._edited = S.now();
+      if (revs) revs.unshift({ id: `r${Date.now()}`, t: S.now(), who: "you", kind: "publish", summary: "Published", changes: [] });
+      S.log(was === "draft" ? "Published" : "Published edits to", section, item, "ph-broadcast", { live: true });
+      S.persist();
+      Y.sound("post", { el: btn });
+      S.emit("pub", item);
+      onDone?.();
+      // one kit toast, updated in place: "going live" → "Live now" + View (the kit replaces the text and bumps it)
+      S.toast({ icon: "ph-paper-plane-tilt", title: "Published", text: "going live on blaqat.net · no redeploy", ms: 6000 });
+      clearTimeout(S._liveT);
+      S._liveT = setTimeout(() => { S.liveToast(section, item); S.say("Live now"); }, Y.reduced() ? 600 : 2200);
+    }, Y.reduced() ? 300 : 1350);
+  }
+  S.liveToast = (section, item) => S.toast({ icon: "ph-broadcast", title: "Live now", text: S.publicURL(section, item).replace(/^https?:\/\//, ""), ms: 7000, action: "View", undo: () => window.open(S.publicHref(section, item), "_blank", "noopener") });
+  S.publicURL = (section, item) => {
+    const sl = Y.slug(S.titleOf(item));
+    if (section === "projects") return `https://blaqat.net/projects/${sl}`;
+    if (section === "music") return `https://blaqat.net/music/${sl}`;
+    if (section === "thoughts") return item.type === "tierlist" ? `https://blaqat.net/thoughts/tier/${sl}` : `https://blaqat.net/thoughts/${item.id}`;
+    return "https://blaqat.net";
+  };
+  // the mock's public pages (other agents own them)
+  S.publicHref = (section, item) => Y.siteURL(({ projects: "projects/index.html", music: "music/index.html", thoughts: item?.type === "tierlist" ? "thoughts/tier.html?id=" + encodeURIComponent(item.id) : "thoughts/stitched.html", home: "home/index.html?skip" })[section] || "home/index.html?skip"); // i9: the site lives in i8
+
+  /* ============================================================
+     SMALL RENDER HELPERS
+     ============================================================ */
+  S.dot = (section, icon, { cls = "" } = {}) => `<span class="ydot ${cls}" data-section="${section === "media" ? "studio" : section}" aria-hidden="true"><i class="ph-bold ${icon || S.SECTIONS[section]?.icon || "ph-circle"}"></i></span>`;
+  // i7 · studio (S1): a row's / card's meta in the site's own grammar (Yarn.cardMeta: type · status · date facts),
+  // with the publish state as one more fact. Thoughts: the post type as a fact + the date + its hashtags (display-only).
+  S.TTYPE_FACT = (t) => Y.fact.text(S.TTYPES[t]?.icon || "ph-note", S.TTYPES[t]?.label || "Post", { attrs: `data-ptype="${esc(t)}"`, cls: "st-tyf" });
+  S.hashtags = (list, max = 3) => Y.tags(list, { as: "span", tag: "span", max, cls: "st-tags" }); // the kit's display-only tags (i7 · C1)
+  // (a Studio row is a link: an icon-only fact inside it is no tab stop of its own; the row's name says the row)
+  const noTab = (h) => h.replace(/ tabindex="0"/g, "");
+  S.itemMeta = (section, it, { compact = false } = {}) => {
+    if (section === "projects") return noTab(Y.cardMeta(it, { compact }));
+    if (section === "music") return noTab(Y.cardMeta(it, { compact, parts: ["status", "date"] })); // Music cards: no instrument (M1); the swatch says it
+    if (section === "thoughts") return `<div class="ymeta ymeta--facts${compact ? " ymeta--compact" : ""}">${S.TTYPE_FACT(it.type)}${it.date ? Y.fact.text("ph-calendar-blank", Y.fmt.day(new Date(it.date))) : ""}</div>`;
+    return "";
+  };
+  S.secIcon = (section, item) => (section === "thoughts" && item?.type ? S.TTYPES[item.type]?.icon : S.SECTIONS[section]?.icon);
+  S.editHref = (section, item) => {
+    if (section === "projects") return S.href("project", { id: item.id });
+    if (section === "music") return item.id === "order" ? S.href("list", { section: "music" }) : S.href("music", { id: item.id }); // i9 · music · S10: the order lives on the list
+    if (section === "thoughts") return S.href("compose", { type: item.type, id: item.id });
+    if (section === "home") return S.href("home");
+    return S.href("media");
+  };
+  S.thumb = (section, item) => {
+    if (section === "music") return S.swatch(item, { size: 56 });
+    if (section === "thoughts") return `<span class="st-thumb st-thumb--ic${item.type === "scratch" ? " is-scratch" : ""}" aria-hidden="true"><i class="ph-bold ${S.TTYPES[item.type]?.icon || "ph-note"}"></i></span>`;
+    const imgs = item.images || [];
+    const c = imgs[item._cover || 0] || imgs[0];
+    if (c && S.url(c.src)) return `<span class="st-thumb" aria-hidden="true">${S.mediaEl(c.src, { poster: c.poster || 0.6 })}</span>`;
+    const ini = S.titleOf(item).replace(/[^A-Za-z0-9 ]/g, "").split(/\s+/).filter(Boolean).slice(0, 2).map((w) => w[0]).join("").toUpperCase();
+    return `<span class="st-thumb st-thumb--text" aria-hidden="true">${esc(ini || "·")}</span>`;
+  };
+  // swatches seed from url|name like the public music page (never from the Studio's own id)
+  S.swatch = (item, o = {}) => Y.swatchHTML({ instrument: item.instrument, url: item.url || undefined, name: item.name, mix: item.type === "collection" && item.songs ? Y.musicFacts(item).mix : undefined }, { motif: item._motif || undefined, ...o }); // i9 · music · S6: a mixed collection's yarns
+  S.allSongs = () => data.music.flatMap((m) => (m.songs ? m.songs.map((s) => ({ ...s, instrument: s.instrument || m.instrument, coll: m.name, collId: m.id })) : [{ ...m }])).filter((s) => s.url);
+})();

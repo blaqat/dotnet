@@ -1,0 +1,106 @@
+/* ============================================================
+   music · iteration 2 (music agent; merged into the kit by the integration pass)
+   Layout only: every part is a kit part (.ypage, header, .ytools search +
+   filter row, Yarn.folder cards, Yarn.yearRail, year pills, Yarn.meta,
+   swatches, detail shell, .ylinkicon, .yeq). Nothing here restyles them.
+   ============================================================ */
+
+.mu-body { display: flex; align-items: flex-start; }
+.mu-listwrap { flex: 1 1 auto; min-width: 0; }
+.mu-empty { margin: 40px 0; text-align: center; color: var(--ink-2); }
+
+/* ---------- desktop: year rail + one continuous flow (density: no row break per year) ---------- */
+.mu-rail { flex: none; width: 104px; margin: 0 22px 0 -4px; } /* the kit year pills (.yyear) on the rail's thread */
+.mu-list {
+  --yfolder-top: 22px; /* singles line up with the collections' tabs in a row */
+  position: relative;
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 12px 22px; align-items: stretch;
+}
+.mu-year, .mu-grid { display: contents; }
+.mu-yr { display: none; } /* the rail names the years on desktop */
+.mu-grid { list-style: none; margin: 0; padding: 0; }
+.mu-item { position: relative; display: flex; min-width: 0; }
+
+/* copy-link feedback */
+.mu-copy-t { position: relative; display: inline-flex; }
+.mu-copied { position: absolute; left: 50%; bottom: calc(100% + 8px); translate: -50% 0; padding: 4px 8px; border-radius: 7px; background: var(--ink); color: #fff; font: 600 .7rem/1 var(--font-mono); white-space: nowrap; pointer-events: none; z-index: 5; }
+
+/* ---------- detail: track rows (kit .yrow) ---------- */
+.mu-trks-h { margin: 0 0 10px; }
+.mu-trks { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.mu-trk { display: grid; grid-template-columns: 24px auto minmax(0, 1fr) auto auto; gap: 12px; min-height: 58px; padding: 8px 12px 8px 10px; }
+.mu-trk__btn { position: absolute; inset: 0; z-index: 1; border: 0; padding: 0; background: none; border-radius: inherit; cursor: pointer; }
+.mu-trk__btn:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; border-radius: 14px; }
+.mu-trk > :not(.mu-trk__btn) { position: relative; z-index: 2; pointer-events: none; }
+.mu-trk :is(a, button):not(.mu-trk__btn) { pointer-events: auto; }
+.mu-trk__n { display: grid; place-items: center; font: 600 .74rem/1 var(--font-mono); color: var(--ink-3); }
+.mu-trk__n > * { grid-area: 1 / 1; }
+.mu-trk__n i, .mu-trk__n .yeq { opacity: 0; }
+.mu-trk__n i { color: var(--red-deep); font-size: 15px; }
+@media (hover: hover) { .mu-trk:not(.is-off):hover .mu-trk__n > span:first-child { opacity: 0; } .mu-trk:not(.is-off):hover .mu-trk__n i { opacity: 1; } }
+.mu-trk[aria-current="true"] .mu-trk__n > span:first-child, .mu-trk[aria-current="true"] .mu-trk__n i { opacity: 0 !important; }
+.mu-trk[aria-current="true"] .mu-trk__n .yeq { opacity: 1; }
+.mu-trk__t { display: grid; gap: 2px; min-width: 0; }
+.mu-trk__t b { font: 800 .95rem/1.2 var(--font-display); overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.mu-trk__t small { font-size: .8rem; color: var(--ink-3); overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.mu-trk__links { display: flex; gap: 4px; }
+.mu-trk.is-off { cursor: default; }
+.mu-trk.is-off .mu-trk__t b { color: var(--ink-2); }
+.mu-dmeta { padding-left: 2px; }
+.ydetail__bar .mu-dates { margin-left: auto; }
+
+/* ---------- open: in place (a sheet grows out of the card, nothing below moves) ---------- */
+.mu-list.is-dim .mu-item:not(.is-open) { opacity: .5; transition: opacity 220ms var(--ease-out); }
+.mu-list .mu-item { transition: opacity 220ms var(--ease-out); }
+/* the sheet / dock scroll on their own: their sticky bars start at their own top, not under the list's sticky filter row */
+.mu-pop, .mu-dock { --sticky-top: 0px; }
+.mu-pop { position: absolute; z-index: 20; filter: drop-shadow(0 2px 2px rgba(31,30,30,.08)) drop-shadow(0 18px 34px rgba(31,30,30,.24)); }
+.mu-pop__sheet {
+  --ysel-r: 18px; position: absolute; inset: 0; border-radius: 18px;
+  background: var(--patch-bg, var(--tex-knit), var(--white));
+  outline: var(--stitch) dashed rgba(31,30,30,.18); outline-offset: -6px;
+}
+.mu-pop__scroll { position: absolute; inset: 0; z-index: 0; isolation: isolate; overflow: auto; overscroll-behavior: contain; padding: 0 22px; border-radius: 18px; }
+/* the detail's sticky bars sit on the white panel here, not on the cotton sheet (surface, not a restyle) */
+.mu-pop .ydetail__top, .mu-dock .ydetail__top { background: var(--tex-knit), var(--white); }
+.mu-pop .ydetail__foot, .mu-dock .ydetail__foot { bottom: 0; background: linear-gradient(rgba(255,255,255,0), var(--white) 20px); }
+
+/* ---------- open: docked right (the list zooms so its layout never changes) ---------- */
+.mu-dock { position: sticky; top: 14px; flex: none; width: 0; height: calc(100dvh - 28px - var(--bottom-ui, 0px)); max-height: 900px; clip-path: inset(-40px -40px -40px 0); }
+.mu-dock__in {
+  --ysel-r: 20px; position: absolute; top: 0; bottom: 0; right: 0;
+  border-radius: 20px; background: var(--patch-bg, var(--tex-knit), var(--white)); box-shadow: var(--shadow-pop);
+  outline: var(--stitch) dashed rgba(31,30,30,.18); outline-offset: -6px;
+}
+.mu-dock__scroll { position: absolute; inset: 0; z-index: 0; isolation: isolate; overflow: auto; overscroll-behavior: contain; padding: 0 22px; border-radius: 20px; }
+
+/* ---------- item page ---------- */
+/* the item page uses the kit's detail-page skeleton (Yarn.detailPage) */
+.mu-none { display: grid; justify-items: start; gap: 10px; max-width: 560px; padding: 22px 24px; }
+.mu-none p { margin: 0; }
+.mu-none a:not(.btn) { color: var(--red-deep); }
+
+/* ---------- mobile: one column, a sticky kit year pill heads each year ---------- */
+@media (max-width: 959px) {
+  .mu-rail { display: none; }
+  .mu-list { display: block; --yfolder-top: 0px; }
+  .mu-year { display: block; margin-top: 14px; }
+  .mu-yr { display: flex; }
+  .mu-grid { display: grid; grid-template-columns: 1fr; gap: 12px; }
+  /* dock on a phone = a sheet sliding in from the right, over the page (the player stays on top) */
+  .mu-dock { position: fixed; top: var(--frame); bottom: var(--frame); left: var(--frame); right: var(--frame); z-index: 55; width: auto !important; height: auto; max-height: none; clip-path: none; margin: 0 !important; }
+  .mu-dock__in { left: 0; right: 0; width: auto !important; border-radius: var(--radius-sheet); }
+  .mu-dock__scroll { padding: 0 16px; border-radius: var(--radius-sheet); }
+  .mu-dock .ydetail__foot { bottom: var(--bottom-ui, 0px); }
+  .mu-pop__scroll { padding: 0 14px; }
+  .mu-trk { grid-template-columns: 20px auto minmax(0, 1fr) auto; gap: 10px; padding: 8px 10px 8px 8px; }
+  .mu-trk__links { display: none; }
+  /* the player's disc sits at the right edge above the nav: the card's play button moves to the left so the disc never covers it */
+  .mu-list .yfolder__foot { flex-direction: row-reverse; }
+  .mu-list .yfolder__links { margin-right: 0; margin-left: auto; }
+}
+/* 640–959: two columns instead of one stretched one */
+@media (min-width: 640px) and (max-width: 959px) {
+  .mu-list { --yfolder-top: 22px; }
+  .mu-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px 16px; }
+}

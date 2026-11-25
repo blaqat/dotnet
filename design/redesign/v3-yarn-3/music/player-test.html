@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en" data-section="music">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Player test · blaqat.net</title>
+<link rel="stylesheet" href="../kit/yarn.css">
+<script src="../kit/data.js"></script>
+<script src="../kit/yarn.js"></script>
+<script src="../kit/notes.js" defer></script>
+<script src="../kit/player.js" defer></script>
+<style>
+  .pt { max-width: 1060px; margin: 0 auto; padding: 8px 28px 40px; }
+  .pt h2 { margin: 26px 0 10px; }
+  .pt p { color: var(--ink-2); max-width: 70ch; margin: 0 0 12px; }
+  .pt-row { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 8px; }
+  .pt-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 8px; margin: 0; padding: 0; list-style: none; }
+  .pt-grid a { display: block; padding: 10px 12px; border-radius: 12px; text-decoration: none; color: inherit; background: var(--tex-knit), var(--white); box-shadow: var(--shadow-patch); outline: 1.5px dashed rgba(31,30,30,.16); outline-offset: -5px; }
+  .pt-grid a b { display: block; font: 800 .92rem/1.2 var(--font-display); }
+  .pt-grid a span { display: block; font: 500 .72rem/1.3 var(--font-mono); color: var(--ink-3); margin-top: 3px; word-break: break-all; }
+  .pt pre { background: var(--white); border-radius: 12px; padding: 12px 14px; font: 500 .74rem/1.45 var(--font-mono); color: var(--ink-2); max-height: 260px; overflow: auto; box-shadow: var(--shadow-patch); }
+  @media (max-width: 959px) { .pt { padding: 6px 16px 24px; } }
+</style>
+</head>
+<body class="frame">
+<main class="sheet">
+  <yarn-nav active="music" base="../"></yarn-nav>
+  <div class="pt">
+    <div id="head"></div>
+    <p>Every state of the global <code>&lt;yarn-player&gt;</code> (<code>kit/player.js</code>). The links below reload this page with review params: forced views, frozen morph progress (<code>?pb</code> disc↔bar, <code>?pe</code> bar↔panel), frozen swipes with a finger ghost (<code>?pdrag</code> + <code>?pp</code>), frozen hover previews (<code>?phover</code>). <code>?demo</code> = a believable playing state with no audio.</p>
+
+    <h2 class="h3">Drive it (window.YarnPlayer)</h2>
+    <div class="pt-row">
+      <button class="btn btn--sm" data-call="play:vgm-class_combat">play("vgm-class_combat")</button>
+      <button class="btn btn--sm" data-call="play:cast adrift">play("cast adrift")</button>
+      <button class="btn btn--sm" data-call="ext">play({ name, url }) not in the library</button>
+      <button class="btn btn--sm" data-call="toggle">toggle()</button>
+      <button class="btn btn--sm" data-call="prev">prev()</button>
+      <button class="btn btn--sm" data-call="next">next()</button>
+    </div>
+    <div class="pt-row">
+      <button class="btn btn--sm" data-call="minimize">minimize() → disc</button>
+      <button class="btn btn--sm" data-call="show">show() → bar</button>
+      <button class="btn btn--sm" data-call="expand">expand() → panel</button>
+      <button class="btn btn--sm" data-call="collapse">collapse() → bar</button>
+      <button class="btn btn--sm" data-call="shuffle">setShuffle()</button>
+      <button class="btn btn--sm" data-call="mute">setMuted(!muted)</button>
+    </div>
+
+    <h2 class="h3">States by URL</h2>
+    <ul class="pt-grid" id="links"></ul>
+
+    <h2 class="h3">State</h2>
+    <pre id="out">state will appear here</pre>
+    <p class="meta">Disc kit-candidate preview (<code>YarnPlayer.discHTML</code>): <span id="disc"></span></p>
+  </div>
+</main>
+<yarn-player></yarn-player>
+<script>
+  document.getElementById("head").innerHTML = Yarn.header({ title: "Player test", meta: "kit/player.js · every state" });
+  Yarn.mockPanel([
+    { label: "Player view", param: "player", options: [["", "Saved"], ["disc", "Disc"], ["bar", "Bar"], ["panel", "Panel"]], default: "" },
+    { label: "Disc label", param: "disc", options: [["swatch", "Yarn swatch"], ["cat", "Red cat (Thoughts)"]], default: "swatch" },
+    { label: "Notes on play", param: "burst", options: [["subtle", "Subtle"], ["off", "Off"]], default: "subtle" },
+    { label: "Demo", param: "demo", options: [["", "Off"], ["1", "Playing"], ["live", "Live clock"]], default: "" },
+  ], { title: "Player options" });
+  const L = [
+    ["Disc (FAB)", "?demo&player=disc"], ["Disc · paused", "?demo&paused=1&player=disc"], ["Disc · cat label", "?demo&player=disc&disc=cat"],
+    ["Bar", "?demo&player=bar"], ["Panel", "?demo&player=panel"], ["Panel · a single", "?demo=cast adrift&player=panel"],
+    ["Morph disc→bar 35%", "?demo&player=bar&pb=0.35"], ["Morph disc→bar 70%", "?demo&player=bar&pb=0.7"], ["Morph bar→panel 50%", "?demo&player=panel&pe=0.5"],
+    ["Scrub hover ahead", "?demo&player=bar&phover=scrub:0.72"], ["Scrub hover back", "?demo&player=bar&phover=scrub:0.18"],
+    ["Volume hover", "?demo&player=bar&phover=vol:0.35"], ["Volume hover up", "?demo&player=bar&phover=vol:0.95"],
+    ["Swipe up on bar 40%", "?demo&pdrag=bar-up&pp=0.4"], ["Swipe right on bar 50%", "?demo&pdrag=bar-right&pp=0.5"],
+    ["Swipe ↖ from disc 35%", "?demo&pdrag=disc-up&pp=0.35"], ["Drag left from disc 50%", "?demo&pdrag=disc-left&pp=0.5"], ["Drag panel down 30%", "?demo&pdrag=panel-down&pp=0.3"],
+    ["iOS (mute only)", "?demo&player=panel&ios=1"], ["Reduced motion", "?demo&player=bar&reduced=1"],
+  ];
+  document.getElementById("links").innerHTML = L.map(([t, q]) => `<li><a href="player-test.html${q}"><b>${t}</b><span>${q}</span></a></li>`).join("");
+  document.addEventListener("click", (e) => {
+    const b = e.target.closest("[data-call]"); if (!b) return;
+    const [c, arg] = b.dataset.call.split(/:(.*)/s), P = window.YarnPlayer;
+    if (c === "play") P.play(arg);
+    else if (c === "ext") P.play({ name: "a thoughts playlist pick", url: "https://music.blaqat.net/daw/midnight-wish.mp3", artist: "someone else" });
+    else if (c === "shuffle") P.setShuffle();
+    else if (c === "mute") P.setMuted(!P.state.muted);
+    else P[c]();
+  });
+  addEventListener("DOMContentLoaded", () => {
+    const out = document.getElementById("out");
+    const show = (s, kind) => { if (kind === "time") return; out.textContent = JSON.stringify({ kind, view: s.view, track: s.track?.name, id: s.track?.id, index: s.index, queue: s.queue.map((t) => t.name), playing: s.playing, time: Math.round(s.time), duration: Math.round(s.duration), volume: s.volume, muted: s.muted, shuffle: s.shuffle, repeat: s.repeat, expanded: s.expanded, demo: s.demo }, null, 2); };
+    YarnPlayer.on(show);
+    show(YarnPlayer.state, "init");
+    document.getElementById("disc").innerHTML = YarnPlayer.discHTML("vgm-class_combat", { size: 44 });
+  });
+</script>
+</body>
+</html>

@@ -1,0 +1,1183 @@
+/* ============================================================
+   Studio · page CSS (studio agent). Mock-only.
+   == i7 · studio · S1 ("studio also needs to match the design" · "each page should be resuing the same components") ==
+   Studio is built on the kit as it stands in i7: the kit nav element (pill on the floating layer, the sound tag),
+   Yarn.toast, Yarn.layer() (sheets, the "+", drag ghosts), the detail shell's sticky top bar with Back, Yarn.fact /
+   Yarn.cardMeta facts, hashtags (.ytag), kit chips / toggles / rows / cards / buttons, the filter row + search + Browse,
+   the hint. This file only positions and lays out those, plus the Studio-only parts nothing in the kit covers:
+     fields (.st-in / .st-ta / .st-select / .st-toggle) · sheets (.st-sheet) · the publish check (.st-checks) ·
+     the storage meter · upload progress (.st-knitbar) · the media strip (.st-mtile) · drag handles (.st-grip) ·
+     the markdown editor (.st-md) · the waveform scrub (.st-wave) · collection tabs (.st-tab) · the tier creator ·
+     media library tiles (.st-ltile) · the sign-in tag card · the floating "+" (.st-plus)
+   They wear the kit's materials and tokens (knit, twill, dashed stitch, --shadow-*, --y-*), never their own colours.
+   Sections ("== "): FRAME · NAV · PUBLISH STATE · THE "+" · FIELDS · DASHBOARD · LISTS · EDITOR SHELL · MEDIA STRIP ·
+   MARKDOWN · MUSIC · THOUGHTS · TIER CREATOR · SHEETS + PUBLISH CHECK · HISTORY · MEDIA LIBRARY · SIGN-IN · HOME ·
+   RESPONSIVE
+   ============================================================ */
+
+/* == FRAME =================================================== */
+/* frame=ink (decided, i7): the kit's "studio" section = the ink cord frame on every Studio screen.
+   frame=section (Earlier): the frame re-dyes per section (registered so it can transition). */
+@property --sec { syntax: "<color>"; inherits: true; initial-value: #d62f38; }
+html[data-frame="section"] body.frame { transition: --sec 520ms var(--ease-crit); }
+.st-view { min-height: 60vh; } /* + .ypage: the kit gutters, same as every page */
+.st-view:focus { outline: none; }
+.st-eyebrow-row { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin: 26px 0 10px; }
+.st-eyebrow-row .eyebrow { display: inline-flex; align-items: center; gap: .5em; margin: 0; }
+.st-eyebrow-row .eyebrow .meta { letter-spacing: 0; text-transform: none; }
+.st-note { margin: 0; color: var(--y-fg-2); font-size: .92rem; line-height: 1.45; }
+.st-note i { vertical-align: -2px; }
+/* screen change: the new view rises in (opacity/transform on the children only; reduced = fade) */
+.st-view.is-enter > :not(.st-wrap), .st-view.is-enter > .st-wrap > * { animation: st-in 360ms var(--ease-crit) backwards; }
+@keyframes st-in { from { opacity: 0; transform: translateY(10px); } }
+html.y-reduced .st-view.is-enter > :not(.st-wrap), html.y-reduced .st-view.is-enter > .st-wrap > * { animation: st-fade 200ms ease-out backwards; }
+@keyframes st-fade { from { opacity: 0; } }
+/* (a sticky top bar must not sit inside a transformed box while it animates in: the shell's bar stays put) */
+.st-view.is-enter > .ydetail { animation-name: st-fade; }
+
+/* == NAV ===================================================== */
+/* the kit nav with Studio's page list (studio-core.js); Studio adds a woven "STUDIO" label by the brand and View site */
+.st-label {
+  display: inline-flex; align-items: center; gap: .35em; height: 26px; padding: 0 .7em; margin-left: -4px;
+  border-radius: 4px; background: var(--tex-twill), var(--ink); color: #fff; transform: rotate(-2deg);
+  font: 850 .7rem/1 var(--font-display); letter-spacing: .14em; text-transform: uppercase;
+  outline: 1px dashed rgba(255,255,255,.5); outline-offset: -4px; box-shadow: 0 1px 0 rgba(0,0,0,.2), 0 3px 6px -2px rgba(31,30,30,.35);
+}
+.st-label i { font-size: .95em; color: var(--ink-3); }
+.ynav .st-viewsite { margin-left: 4px; }
+/* the kit's sound tag (i7: Studio wears it like every page). Studio's tabs fill the middle of the nav, so on desktop the
+   tag hangs from the sheet's top edge just right of the STUDIO label (where Studio's old brand button sat) */
+@media (min-width: 960px) { #st-nav .ysound--tag { left: 304px; translate: none; } }
+/* 960–1099: Studio's five tabs fill the nav; the STUDIO label steps aside (the ink frame and the brand's name still say
+   Studio) and the tag hangs just right of the brand */
+@media (min-width: 960px) and (max-width: 1099px) { #st-nav .st-label { display: none; } #st-nav .ysound--tag { left: 188px; } }
+@media (max-width: 959px) {
+  .ynav .st-viewsite > span { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  .ynav .st-viewsite { margin-left: auto; margin-right: 50px; width: 44px; padding: 0; --h: 44px; } /* clear of the tag (top right) */
+}
+/* 960–1199: the tabs run out of room: View site goes icon-only (its name stays in aria-label + the kit hint) */
+@media (min-width: 960px) and (max-width: 1199px) {
+  .st-viewsite { width: var(--h); padding: 0; }
+  .st-viewsite > span { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+}
+
+/* == PUBLISH STATE ============================================
+   The publish state is the kit's Yarn.fact.pub (its disc colours live in kit/yarn.css "facts"; i7 · C1). */
+.st-pubslot { display: contents; }
+/* autosave, a fact beside it: ✓ Saved 2:31 pm → Saving… (a running stitch in the disc) → Offline */
+.st-save .yfact__i { position: relative; overflow: hidden; }
+.st-save__run { display: none; position: absolute; left: 3px; right: 3px; top: 50%; height: 2px; margin-top: -1px; background: repeating-linear-gradient(90deg, var(--ink) 0 3px, transparent 3px 5px); animation: st-run 600ms linear infinite; } /* i9 · polish · S12: every loader is ink (was ink-2) */
+.st-save[data-state="saving"] .st-save__run { display: block; }
+.st-save[data-state="saving"] .yfact__i > i { display: none; }
+.st-save[data-state="offline"] { --fact-c: var(--red-soft); --fact-on: var(--red-deep); --fact-g: var(--red-deep); color: var(--red-deep); } /* (i10: facts are a quiet glyph; Studio's red = an error) */
+@keyframes st-run { to { background-position: 10px 0; } }
+.st-tsub { font-weight: 500; opacity: .82; } /* a toast's second part (Yarn.toast html) */
+
+/* == THE "+" (phones) =========================================
+   Studio's one FAB lives on the kit's floating layer and rests on the kit's FAB row like the player's disc does on the
+   site: the slot's centre line (--yslot-mid), right end. The search knob waits left of it (html.st-has-plus, the kit's
+   y-disc offset). It steps away while search holds the slot; a bottom toast lifts it with the rest. */
+.st-plus {
+  position: fixed; z-index: var(--z-chrome); right: calc(var(--yslot-side) + 9px); bottom: calc(var(--yslot-mid) - 26px);
+  display: none; place-items: center; width: 52px; height: 52px; padding: 0; border: 0; border-radius: 50%; cursor: pointer;
+  background: var(--tex-twill), var(--c-primary-bg); color: var(--c-primary-fg); font-size: 1.5rem; text-decoration: none;
+  box-shadow: 0 1px 0 rgba(31,30,30,.1), 0 8px 18px -6px rgba(180,32,43,.6);
+  outline: 1.5px dashed rgba(255,255,255,.65); outline-offset: -6px;
+  translate: 0 calc(-1 * var(--ytoast-push, 0px)); scale: 1;
+  transition: translate 300ms var(--ease-crit), scale 280ms var(--ease-crit), opacity 160ms, transform 240ms var(--ease-crit), visibility 0s;
+  -webkit-tap-highlight-color: transparent;
+}
+/* (i10: ?redbtn=deep is moot: the FAB is the primary role, ink) */
+@media (max-width: 959px) { .st-plus { display: grid; } html.st-has-plus .yfab__btn { --yfab-x: -75px; } }
+@media (hover: hover) { .st-plus:hover { transform: translateY(-2px); box-shadow: 0 2px 0 rgba(31,30,30,.08), 0 12px 24px -6px rgba(180,32,43,.6); } }
+.st-plus:active { transform: scale(.94); }
+.st-plus:focus-visible { outline: 3px solid var(--focus); outline-offset: 3px; }
+.st-plus > i { transition: rotate 320ms var(--ease-crit); }
+@media (hover: hover) { .st-plus:hover > i { rotate: 90deg; } }
+html[data-yslot="search"] .st-plus { scale: .6; opacity: 0; pointer-events: none; visibility: hidden; transition: opacity 160ms, scale 280ms var(--ease-crit), visibility 0s 280ms; }
+html.y-reduced .st-plus { transition: opacity 160ms, visibility 0s; }
+
+/* == FIELDS ===================================================
+   Studio-only (no other page has forms). The kit search field's surface (.ysearch): knit, inset, dashed stitch;
+   focus = the solid red edge + soft red halo (the search's focus), never the rope. */
+.st-sec { display: grid; gap: 10px; padding: 18px 0; border-top: 1.5px dashed rgba(31,30,30,.13); grid-template-columns: minmax(0, 1fr); }
+.st-sec:first-child { border-top: 0; padding-top: 4px; }
+.st-sec__h { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin: 0; }
+.st-sec__h .eyebrow { display: inline-flex; align-items: center; gap: .55em; margin: 0; }
+.st-sec__h .meta { text-transform: none; letter-spacing: 0; }
+.st-fieldrow { display: grid; gap: 10px 12px; grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr)); }
+.st-field { display: grid; gap: 6px; min-width: 0; }
+.st-field > label, .st-field > .st-lab, .st-lab { font: 800 .8rem/1.2 var(--font-display); color: var(--y-fg-2); }
+.st-field > label .meta, .st-lab .meta { font-weight: 500; margin-left: .4em; }
+/* the fields' surface (.st-in / .st-ta / .st-select) is the kit's .yfield (i7 · C1); these classes are only hooks now */
+.st-titlein[aria-invalid="true"] { outline: 2.5px solid var(--red-deep); outline-offset: 0; }
+.st-mono { font-family: var(--font-mono); font-size: .9rem; }
+.st-hint { margin: 0; font: 500 .72rem/1.4 var(--font-mono); color: var(--y-fg-3); }
+.st-hint b { color: var(--y-fg-2); font-weight: 600; }
+.st-field, .st-fieldrow > * { min-width: 0; }
+[data-count-for].is-over { color: var(--red-deep); }
+/* the big title IS the input: the detail shell's title type, no box until hover / focus */
+.st-titlein {
+  display: block; width: calc(100% + 10px); margin: 0 0 0 -10px; padding: 4px 10px 6px; border: 0; border-radius: 14px; resize: none; overflow: hidden;
+  background: transparent; color: var(--ink); field-sizing: content; min-height: 1.3em;
+  font: 900 clamp(1.8rem, 3vw, 2.4rem)/1.08 var(--font-display); letter-spacing: -.03em;
+  outline: 1.5px dashed transparent; outline-offset: -2px; transition: outline-color 160ms, background 160ms;
+}
+.st-titlein::placeholder { color: rgba(31,30,30,.32); }
+@media (hover: hover) { .st-titlein:hover { outline-color: rgba(31,30,30,.2); } }
+.st-titlein:focus { outline: 2px solid var(--focus); outline-offset: 0; background: var(--white); box-shadow: 0 0 0 4px rgba(31,30,30,.1); }
+/* single choice = the kit chip with the kit fact inside (S.f.choice): the rope when chosen */
+.st-choice { display: flex; flex-wrap: wrap; gap: 8px; }
+.st-opt.ychip { min-height: 44px; padding: 0 14px 0 10px; }
+.st-opt .yfact { pointer-events: none; color: var(--y-fg); }
+.st-opt .yfact.yfact { padding: 0; margin: 0; }
+/* switch: a felt knob sliding in a recessed channel; on = the kit's red twill (Studio-only) */
+.st-toggle { display: flex; align-items: center; gap: 12px; min-height: 48px; padding: 6px 0; border: 0; background: none; cursor: pointer; text-align: left; color: var(--ink); width: 100%; border-radius: 12px; }
+.st-toggle__track { position: relative; flex: none; width: 52px; height: 30px; border-radius: 999px; background: var(--cotton-2); box-shadow: inset 0 1px 3px rgba(31,30,30,.2), inset 0 -1px 0 rgba(255,255,255,.7); transition: background 200ms var(--ease-out); }
+.st-toggle__knob {
+  position: absolute; top: 3px; left: 3px; width: 24px; height: 24px; border-radius: 50%;
+  background: radial-gradient(circle at 34% 28%, rgba(255,255,255,.5), transparent 55%), var(--tex-knit), var(--white);
+  box-shadow: 0 1px 2px rgba(31,30,30,.35), inset 0 -1px 2px rgba(31,30,30,.12);
+  outline: 1px dashed rgba(31,30,30,.3); outline-offset: -4px; transition: transform 320ms var(--ease-spring);
+}
+.st-toggle[aria-checked="true"] .st-toggle__track { background: var(--c-on-tex), var(--c-on-bg); }
+.st-toggle[aria-checked="true"] .st-toggle__knob { transform: translateX(22px); }
+.st-toggle:active .st-toggle__knob { scale: .92; }
+.st-toggle:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+.st-toggle__txt b { display: block; font: 800 .95rem/1.2 var(--font-display); }
+.st-toggle__txt span { display: block; font-size: .84rem; color: var(--y-fg-2); line-height: 1.35; }
+/* "On the card": the site card's own facts, live (Yarn.cardMeta) */
+.st-shows { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; min-height: 48px; padding: 8px 14px; border-radius: 16px; background: var(--tex-knit), var(--white); box-shadow: var(--shadow-patch); outline: 1.5px dashed rgba(31,30,30,.16); outline-offset: -5px; }
+.st-shows > .eyebrow { margin: 0; }
+
+/* == DASHBOARD =============================================== */
+.st-dash { display: grid; gap: 4px 34px; grid-template-columns: minmax(0, 1fr); grid-template-areas: "drafts" "secs" "recent"; }
+.st-dash > * { min-width: 0; }
+.st-dash__secs { grid-area: secs; } .st-dash__drafts { grid-area: drafts; } .st-recent { grid-area: recent; }
+@media (min-width: 960px) { .st-dash { grid-template-columns: minmax(0, 1fr) 340px; grid-template-areas: "secs recent" "drafts recent"; align-items: start; } }
+/* the site's status: a patch (Studio-only: the storage meter) */
+.st-strip { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 22px; padding: 12px 18px; margin: 4px 0; border-radius: 18px; }
+.st-strip__live { display: inline-flex; align-items: center; gap: .55em; font: 850 .92rem/1.2 var(--font-display); }
+.st-strip__dot { width: 10px; height: 10px; border-radius: 50%; background: var(--c-now); box-shadow: 0 0 0 3px var(--c-now-soft); /* i10 r2 · colour: the site is live = now, not music */ animation: st-pulse 2.4s ease-in-out infinite; }
+@keyframes st-pulse { 50% { box-shadow: 0 0 0 6px color-mix(in srgb, var(--c-now) 8%, transparent); } } /* i10 r2 · colour: the dot's own role, not raw red */
+.st-strip .meta { margin: 0; }
+.st-strip__store { display: flex; align-items: center; gap: 10px; min-width: 220px; flex: 1; max-width: 420px; }
+.st-strip__orph { margin-left: auto; }
+.st-meter { position: relative; flex: 1; height: 10px; border-radius: 999px; background: var(--cotton-2); box-shadow: inset 0 1px 2px rgba(31,30,30,.18); overflow: hidden; }
+.st-meter::after { content: ""; position: absolute; inset: 4px 6px; border-top: 1.5px dashed rgba(31,30,30,.16); }
+.st-meter > b { position: absolute; z-index: 1; inset: 0 auto 0 0; width: var(--v, 0%); border-radius: inherit; background: var(--tex-rope); }
+/* section cards: kit cards (.ycard.ylift), the name is the stretched opener */
+.st-secs { display: grid; gap: 14px; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.st-seccard { position: relative; display: grid; grid-template-columns: minmax(0, 1fr); gap: 12px; align-content: start; padding: 16px 16px 14px; min-height: 196px; }
+.st-seccard__top { display: flex; align-items: center; gap: 12px; min-width: 0; }
+.st-seccard__top .ydot { --d: 44px; font-size: 1.3rem; }
+.st-seccard__name { flex: 1 1 auto; min-width: 0; margin: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font: 900 1.3rem/1.1 var(--font-display); letter-spacing: -.02em; }
+.st-seccard__name a { color: inherit; text-decoration: none; }
+.st-seccard__name a::after { content: ""; position: absolute; inset: 0; border-radius: inherit; z-index: 1; }
+.st-seccard__name a:focus-visible { outline: none; }
+.st-seccard:has(.st-seccard__name a:focus-visible) { outline: 3px solid var(--focus); outline-offset: 3px; }
+.st-seccard__add { position: relative; z-index: 2; margin-left: auto; }
+.st-seccard__counts { gap: 4px 14px; }
+.st-seccard__last { margin: 0; font-size: .86rem; color: var(--y-fg-2); line-height: 1.35; }
+.st-seccard__last b { color: var(--ink); font-weight: 800; }
+.st-seccard .ydot i { transform-origin: 50% 70%; }
+@media (hover: hover) { .st-seccard:hover .ydot i { animation: y-shake 620ms var(--ease-out); } }
+.st-fan { display: flex; align-items: center; height: 54px; padding-left: 6px; }
+.st-fan > * { margin-left: -8px; flex: none; box-shadow: 0 0 0 2.5px var(--white), 0 2px 6px rgba(31,30,30,.2); }
+.st-fan > :nth-child(odd) { rotate: -4deg; } .st-fan > :nth-child(even) { rotate: 3deg; }
+.st-fan__img { width: 68px; height: 46px; border-radius: 8px; object-fit: cover; background: var(--cotton-2); }
+.st-fan > .st-fan__img { flex: 0 1 68px; min-width: 40px; }
+.st-fan .yswatch { --sw: 46px; --sw-r: 10px; }
+.st-fan__ic { display: grid; place-items: center; width: 42px; height: 42px; border-radius: 50%; background: var(--tex-knit), var(--white); color: var(--ink); font-size: 1.15rem; }
+.st-fan:has(.st-fan__words) { height: auto; min-height: 54px; padding: 4px 0 6px; }
+.st-fan__words { flex: 1 1 auto !important; min-width: 0; font: 800 1rem/1.5 var(--font-display); color: var(--y-fg-2); box-shadow: none !important; rotate: 0deg !important; margin: 0 !important; white-space: normal; }
+/* drafts: kit rows */
+.st-drafts { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; grid-template-columns: minmax(0, 1fr); }
+.st-drow { gap: 12px; padding: 10px 14px 10px 10px; min-height: 66px; }
+.st-drow .ydot { --d: 38px; font-size: 1.05rem; }
+.st-drow__t { flex: 1; min-width: 0; display: grid; gap: 4px; }
+.st-drow__t b { display: block; font: 850 1rem/1.2 var(--font-display); letter-spacing: -.01em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.st-go { flex: none; margin-left: auto; font-size: 1.05rem; color: var(--y-fg-3); } /* the site row's › (projects' .pj-mrow__go) */
+.st-ago { white-space: nowrap; }
+/* recent activity: the kit timeline (no ball), day pills */
+.st-recent .ytl { --ytl-gap: 14px; }
+.st-act { display: block; color: inherit; text-decoration: none; font-size: .92rem; line-height: 1.35; border-radius: 10px; padding: 2px 4px; margin: -2px -4px; }
+a.st-act:hover b { text-decoration: underline; text-decoration-color: currentColor; text-underline-offset: 3px; }
+.st-act b { font-weight: 800; }
+.st-act .meta { display: flex; align-items: center; gap: .5em; margin-top: 3px; }
+.st-act .ydot { --d: 16px; font-size: 9px; outline: 0; }
+/* "what are you making?" (a sheet of kit cards) */
+.st-newgrid { display: grid; gap: 18px; grid-template-columns: minmax(0, 1fr); }
+.st-newgrp h3 { margin: 0 0 8px; }
+.st-newopts { display: grid; gap: 10px; grid-template-columns: repeat(auto-fill, minmax(min(100%, 200px), 1fr)); }
+.st-newopt { display: flex; align-items: center; gap: 12px; padding: 12px 14px 12px 12px; border: 0; cursor: pointer; text-align: left; font: inherit; color: inherit; text-decoration: none; }
+.st-newopt .ydot { --d: 38px; font-size: 1.1rem; }
+.st-newopt b { display: block; font: 850 .98rem/1.2 var(--font-display); }
+.st-newopt small { display: block; margin-top: 2px; font-size: .8rem; color: var(--y-fg-2); line-height: 1.3; }
+
+/* == LISTS ===================================================
+   A row = the site's phone row (.pj-mrow): thumb · name over the facts · Studio's column (publish state + edited) · ›.
+   The grip beside it is Studio-only (drag to reorder; Space + arrows). Every column sits at the same x in every row. */
+.st-listhead { margin-bottom: 16px; }
+.st-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; position: relative; grid-template-columns: minmax(0, 1fr); }
+.st-li { position: relative; display: flex; align-items: stretch; gap: 8px; touch-action: manipulation; }
+.st-li > .yrow { flex: 1; min-width: 0; gap: 14px; padding: 9px 14px 9px 9px; min-height: 78px; }
+.st-li.is-slot > * { opacity: 0; }
+.st-li.is-slot::before { content: ""; position: absolute; inset: 0; border-radius: 14px; border: 2px dashed var(--c-pick-a); background: rgba(31,30,30,.05); }
+.st-li.is-lifted > .yrow, .st-li.is-settling > .yrow { box-shadow: var(--shadow-pop); }
+.st-li.is-lifted, .st-li.is-settling { z-index: 5; }
+.st-ghost { position: fixed !important; z-index: var(--z-drag, 9500); margin: 0; pointer-events: none; will-change: transform; list-style: none; }
+.st-ghost .yrow, .st-ghost .st-titem__btn { box-shadow: var(--shadow-pop); }
+html.st-dragging, html.st-dragging * { cursor: grabbing !important; user-select: none; -webkit-user-select: none; }
+/* the grip: a 44px handle, the only place a drag starts (rows stay tappable, lists stay scrollable) */
+.st-grip {
+  --ysel-r: 12px; flex: none; display: grid; place-items: center; width: 40px; border: 0; border-radius: 12px; cursor: grab; touch-action: none;
+  background: transparent; color: var(--y-fg-3); font-size: 1.25rem; transition: background 140ms, color 140ms, transform var(--press) var(--ease-out);
+}
+@media (hover: hover) { .st-grip:hover { background: var(--y-chip); color: var(--ink); } }
+.st-grip:active { transform: scale(.94); }
+.st-grip:focus-visible { outline: 3px solid var(--focus); outline-offset: -3px; }
+.st-grip[aria-pressed="true"] { background: var(--c-on-tex), var(--c-on-bg); color: var(--c-on-fg); box-shadow: var(--shadow-patch); } /* held: the kit toggle's on fill (i10) */
+.st-list.is-locked .st-grip { visibility: hidden; } /* (a filter locks it for now: the column keeps its place, rows don't jump) */
+.st-list.is-fixed .st-grip { display: none; }
+.st-thumb { position: relative; flex: none; width: 76px; height: 58px; border-radius: 10px; overflow: hidden; background: var(--tex-felt), var(--cotton-2); background-size: 120px, auto; box-shadow: inset 0 0 0 1px rgba(31,30,30,.08); }
+.st-thumb > img, .st-thumb > video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.st-thumb--text { display: grid; place-items: center; padding: 6px; background: var(--tex-knit), var(--white); color: var(--y-fg-2); font: 900 1.25rem/1 var(--font-display); letter-spacing: -.03em; }
+.st-thumb--ic { display: grid; place-items: center; font-size: 1.5rem; color: var(--ink); background: var(--tex-knit), var(--white); box-shadow: inset 0 0 0 1px rgba(31,30,30,.1); }
+.st-thumb--ic.is-scratch { background: var(--tex-twill), var(--ink); color: #fff; }
+.st-li .yswatch { --sw: 58px; }
+.st-row__main { flex: 1; min-width: 0; display: grid; gap: 6px; }
+.st-row__title { margin: 0; display: flex; align-items: center; gap: 8px; min-width: 0; font: 850 1.02rem/1.2 var(--font-display); letter-spacing: -.01em; }
+.st-row__title > span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.st-row__title small { flex: none; font: 500 .7rem/1 var(--font-mono); color: var(--y-fg-3); }
+.st-row__sub { display: flex; align-items: center; flex-wrap: wrap; gap: 4px 14px; min-width: 0; }
+.st-row__sub > .ymeta { min-width: 0; } /* the kit's facts line wraps (status + date travel together) */
+/* Studio's column: one fixed width, so the publish state and the time line up down the list whatever the row holds */
+.st-row__side { flex: none; width: 128px; display: grid; justify-items: start; gap: 6px; }
+.st-row__side .meta { white-space: nowrap; }
+/* display-only hashtags: the kit's Yarn.tags(list, { as: "span" }) → .ytag.is-static (i7 · C1); a row's tighter gap */
+.st-tags { gap: 0 2px; }
+.st-order { min-width: 1.6em; font: 500 .72rem/1 var(--font-mono); color: var(--y-fg-3); text-align: right; }
+/* the order changed: a patch in the flow (Publish order · Undo) */
+.st-orderbar { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; padding: 8px 8px 8px 16px; margin: 0 0 12px; border-radius: 999px; }
+.st-orderbar p { margin: 0; flex: 1; display: flex; align-items: center; gap: .5em; flex-wrap: wrap; }
+.st-orderbar p > .yfact { flex: none; }
+.st-lockhint { margin: 0 0 12px; }
+.st-month { margin: 18px 0 10px; }
+
+/* == EDITOR SHELL ============================================
+   The kit's detail shell (.ydetail.ydetail--page): sticky top bar (Back · compact title · Preview / History / Publish),
+   the facts line as a label over the title (?dlayout=label), then form | live preview (the public renderers, layout=split
+   decided). Phones (and layout=single, Earlier): the Preview toggle in the top bar swaps form and preview. */
+.st-ed { min-height: calc(100dvh - 120px); }
+.st-ed > .ydetail__top { z-index: 30; }
+.st-ed > .ydetail__top .ydetail__actions { align-items: center; }
+.st-ed .ydetail__head { padding-bottom: 0; }
+.st-ed__facts { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 14px; margin: 6px 0 8px; min-height: 28px; }
+.st-ed__headmeta { margin-top: 10px; }
+.st-ed__grid { display: grid; gap: 28px; align-items: start; padding-top: 10px; grid-template-columns: minmax(0, 1fr); }
+@media (min-width: 960px) { html[data-layout="split"] .st-ed:not(.st-ed--wide) .st-ed__grid { grid-template-columns: minmax(0, 1.04fr) minmax(400px, .96fr); } }
+.st-ed__form, .st-ed__preview { min-width: 0; }
+.st-panebtn { display: none; }
+@media (min-width: 960px) {
+  html[data-layout="split"] .st-ed__preview { position: sticky; top: 74px; }
+  html[data-layout="single"] .st-panebtn { display: inline-grid; }
+  html[data-layout="single"] .st-ed[data-pane="edit"] .st-ed__preview, html[data-layout="single"] .st-ed[data-pane="preview"] .st-ed__form { display: none; }
+}
+@media (max-width: 959px) {
+  .st-panebtn { display: inline-grid; }
+  .st-ed[data-pane="edit"] .st-ed__preview, .st-ed[data-pane="preview"] .st-ed__form { display: none; }
+}
+/* the Preview toggle is a kit toggle (.ysel.ytog): the red fill + white eye while the preview shows */
+.st-panebtn[aria-pressed="true"] { background: var(--c-on-tex), var(--c-on-bg); color: var(--c-on-fg); box-shadow: var(--shadow-patch); }
+/* (i10: ?redbtn=deep is moot here: the on role) */
+.st-prevbox {
+  --bottom-ui: 0px; --sticky-top: 0px;
+  position: relative; max-height: calc(100dvh - 190px); overflow: auto; overscroll-behavior: contain;
+  padding: 0 22px; border-radius: 20px; background: var(--sheet-bg, var(--tex-diamond), var(--tex-knit), var(--cotton));
+  box-shadow: inset 0 0 0 1.5px rgba(31,30,30,.1), 0 2px 0 rgba(255,255,255,.6);
+}
+@media (max-width: 959px) { .st-prevbox { max-height: none; overflow: visible; padding: 0 14px; } }
+.st-prevhead { display: flex; align-items: center; gap: 8px; margin: 0 0 10px; }
+.st-prevhead .eyebrow { display: inline-flex; align-items: center; gap: .5em; margin: 0; }
+.st-prevbox .ydetail { min-height: 0; }
+.st-prevbox .ydetail__top { background: transparent; }
+.st-prevbox .ydetail__top.is-stuck { background: var(--tex-knit), var(--cotton); }
+.st-prevrow { padding: 18px 0 22px; display: grid; gap: 12px; }
+/* the publish button: the kit's red button. Publishing: the rope sews all the way round it (the progress) */
+.st-pubbtn { position: relative; isolation: isolate; --ysel-r: 999px; --rope-inset: 3px; --rope-w-in: 3.5px; }
+.st-pubbtn.is-publishing::before { --sweep: 0deg; opacity: 1; background: var(--st-load-rope); animation: st-sew 1300ms var(--ease-out) forwards; transition: none; } /* i9 · polish · S12: ink (was a white / pink twist that read tan) */
+@keyframes st-sew { to { --sweep: 360deg; } }
+.st-pubbtn.is-publishing { pointer-events: none; }
+.is-shake { animation: st-shake 380ms var(--ease-out); }
+@keyframes st-shake { 20% { translate: -5px 0; } 45% { translate: 4px 0; } 70% { translate: -2px 0; } }
+.st-sheetacts { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.st-sheetacts .ydetail__spacer { flex: 1; }
+
+/* == MEDIA STRIP (project / images / cover editors, Studio-only) ==
+   The kit carousel's thumbs, editable: drag the handle to reorder, the cover ribbon, the poster frame, alt text. */
+.st-media { list-style: none; margin: 0; padding: 4px 4px 10px; display: flex; gap: 10px; overflow-x: auto; scrollbar-width: thin; }
+.st-media.is-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); overflow: visible; }
+.st-mtile { position: relative; flex: none; width: 168px; touch-action: manipulation; }
+.st-media.is-grid .st-mtile { width: auto; }
+.st-mtile__btn {
+  position: relative; display: block; width: 100%; aspect-ratio: 16 / 10; padding: 0; border: 0; border-radius: 12px; overflow: hidden; cursor: pointer;
+  background: var(--tex-felt), var(--cotton-2); background-size: 120px, auto; box-shadow: var(--shadow-patch);
+  transition: transform 260ms var(--ease-crit), box-shadow 260ms var(--ease-crit);
+}
+@media (hover: hover) { .st-mtile__btn:hover { transform: translateY(-2px); box-shadow: var(--shadow-lift); } }
+.st-mtile__btn:active { transform: scale(.97); transition-duration: var(--press); }
+.st-mtile__btn:focus-visible { outline: 3px solid var(--focus); outline-offset: 3px; }
+.st-mtile__btn > img, .st-mtile__btn > video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; pointer-events: none; }
+.st-mtile__btn::after { content: ""; position: absolute; inset: 5px; border-radius: 8px; border: 1.5px dashed rgba(255,255,255,.66); pointer-events: none; }
+.st-mtile.is-slot > * { opacity: 0; }
+.st-mtile.is-slot::before { content: ""; position: absolute; inset: 0 0 26px; border-radius: 12px; border: 2px dashed var(--c-pick-a); background: rgba(31,30,30,.05); }
+.st-mtile__cap { display: flex; align-items: center; gap: 4px; margin-top: 6px; min-height: 30px; }
+.st-mtile__cap .meta { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.st-mtile__cap .meta.is-missing { color: var(--red-deep); }
+.st-mtile__grip { --ysel-r: 8px; display: grid; place-items: center; width: 30px; height: 30px; border: 0; border-radius: 8px; background: transparent; color: var(--y-fg-3); cursor: grab; touch-action: none; font-size: 1.05rem; }
+@media (hover: hover) { .st-mtile__grip:hover { background: var(--y-chip); color: var(--ink); } }
+.st-mtile__grip[aria-pressed="true"] { background: var(--c-on-tex), var(--c-on-bg); color: var(--c-on-fg); }
+.st-mtile__grip:focus-visible { outline: 3px solid var(--focus); outline-offset: 1px; }
+.st-cover { position: absolute; z-index: 2; left: 8px; top: 8px; display: inline-flex; align-items: center; gap: .3em; height: 22px; padding: 0 .6em 0 .45em; border-radius: 3px;
+  font: 850 .68rem/1 var(--font-display); letter-spacing: .03em; color: #fff; background: var(--tex-twill), var(--c-pick-a); box-shadow: 0 1px 3px rgba(0,0,0,.3); outline: 1px dashed rgba(255,255,255,.6); outline-offset: -3px; }
+.st-mtile .ycar__dur { z-index: 2; }
+.st-poster { position: absolute; z-index: 2; left: 8px; bottom: 9px; padding: 3px 6px; border-radius: 6px; background: rgba(251,248,243,.92); color: var(--ink); font: 600 .62rem/1 var(--font-mono); }
+/* upload progress: a knit row filling with red stitches (Studio-only) */
+.st-knitbar { position: absolute; z-index: 3; left: 10px; right: 10px; bottom: 10px; height: 8px; border-radius: 999px; background: rgba(255,255,255,.85); box-shadow: 0 1px 3px rgba(0,0,0,.2); overflow: hidden; }
+.st-knitbar > b { position: absolute; inset: 0 auto 0 0; width: var(--v, 0%); background: repeating-linear-gradient(62deg, var(--c-pick-a) 0 3px, var(--c-pick-b) 3px 5px, var(--c-pick-a) 5px 7px); transition: width 200ms linear; }
+/* i9 · polish · S12 (pin 16: "the published loading had a like tan loading color make it black") · every loader in the
+   Studio is one ink stitch on a white track: the publish rope, the upload knit bar (media tiles), the audio upload bar.
+   (Was: a white / pink rope on the red button that read tan, red stitches, a cotton-2 track.) While a tile uploads, its
+   poster and length chips step aside: they sat on the bar. Playback (the waveform's red) is not a loader: unchanged. */
+:root { --st-load-rope: linear-gradient(180deg, rgba(255,255,255,.22), transparent 45%, rgba(0,0,0,.28)), repeating-linear-gradient(62deg, var(--ink) 0 4px, #4d4747 4px 6.5px, var(--ink) 6.5px 9px); }
+.st-knitbar { background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,.22), inset 0 0 0 1px rgba(31,30,30,.14); }
+.st-knitbar > b { background: repeating-linear-gradient(62deg, var(--ink) 0 3px, #4d4747 3px 5px, var(--ink) 5px 7px); }
+[data-audio-busy] .st-mprev { background: #fff !important; box-shadow: inset 0 1px 2px rgba(31,30,30,.2), inset 0 0 0 1px rgba(31,30,30,.12); } /* (its track is an inline cotton-2 in E.loadAudio) */
+.st-mtile__btn:has(.st-knitbar) :is(.st-poster, .ycar__dur) { display: none; }
+.st-upmsg { position: absolute; z-index: 3; left: 10px; top: 10px; padding: 3px 7px; border-radius: 6px; background: rgba(22,20,20,.78); color: #fff; font: 600 .64rem/1 var(--font-mono); }
+/* the add tile: an open pocket with a dashed seam */
+.st-add {
+  display: grid; place-content: center; justify-items: center; gap: 4px; width: 100%; aspect-ratio: 16 / 10; padding: 8px; border: 0; border-radius: 12px; cursor: pointer;
+  background: var(--tex-knit), rgba(255,255,255,.5); color: var(--y-fg-2); text-align: center;
+  outline: 2px dashed rgba(31,30,30,.3); outline-offset: -4px; font: 850 .84rem/1.15 var(--font-display);
+  transition: background 160ms, color 160ms, transform var(--press) var(--ease-out);
+}
+.st-add i { font-size: 1.5rem; color: var(--ink-2); }
+.st-add small { font: 500 .66rem/1.2 var(--font-mono); color: var(--y-fg-3); }
+.st-add:hover, .st-drop.is-over .st-add { background: var(--tex-knit), var(--white); color: var(--ink); outline-color: var(--ink); }
+.st-add:active { transform: scale(.97); }
+.st-add:has(input:focus-visible) { outline: 3px solid var(--focus); outline-offset: 2px; }
+.st-drop { position: relative; }
+.st-drop.is-over::after { content: "Drop to upload"; position: absolute; inset: -6px; z-index: 5; display: grid; place-items: center; border-radius: 18px; background: rgba(251,248,243,.88); outline: 2.5px dashed var(--ink); outline-offset: -4px; font: var(--t-title); color: var(--ink); }
+/* media sheet: poster frame picker (single choice: the kit rope) */
+.st-mprev { position: relative; border-radius: 14px; overflow: hidden; background: var(--tex-felt), #2b2828; aspect-ratio: 16 / 10; }
+.st-mprev > img, .st-mprev > video { width: 100%; height: 100%; object-fit: contain; }
+.st-frames { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 6px; }
+.st-frame { --ysel-r: 8px; --rope-w-in: 3px; --rope-inset: 2px; position: relative; aspect-ratio: 16 / 10; padding: 0; border: 0; border-radius: 8px; overflow: hidden; cursor: pointer; background: var(--cotton-2); }
+.st-frame video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; pointer-events: none; }
+.st-frame span { position: absolute; z-index: 3; right: 4px; bottom: 4px; padding: 2px 4px; border-radius: 4px; background: rgba(22,20,20,.75); color: #fff; font: 600 .58rem/1 var(--font-mono); }
+
+/* == MARKDOWN (Studio-only editor; previews use the kit prose .ydetail__text / .yprose) == */
+.st-md { display: grid; gap: 8px; }
+.st-mdbar { display: flex; align-items: center; gap: 2px; flex-wrap: wrap; padding: 4px; border-radius: 14px; background: var(--y-chip); box-shadow: inset 0 1px 2px rgba(31,30,30,.1); }
+.st-mdbar > button { display: grid; place-items: center; width: 38px; height: 38px; border: 0; border-radius: 10px; background: transparent; color: var(--y-fg-2); cursor: pointer; font-size: 1.05rem; transition: background 140ms, color 140ms, transform var(--press) var(--ease-out); }
+@media (hover: hover) { .st-mdbar > button:hover { background: var(--white); color: var(--ink); } }
+.st-mdbar > button:active { transform: scale(.92); }
+.st-mdbar > button:focus-visible { outline: 3px solid var(--focus); outline-offset: -2px; }
+.st-mdbar .yseg { margin-left: auto; }
+.st-mdbar__sep { width: 0; height: 22px; margin: 0 4px; border-left: 1.5px dashed rgba(31,30,30,.2); }
+.st-md__panes { display: grid; gap: 10px; }
+.st-md[data-mode="split"] .st-md__panes { grid-template-columns: 1fr 1fr; }
+.st-md[data-mode="write"] .st-md__prev, .st-md[data-mode="preview"] .st-md__ta { display: none; }
+.st-md__ta { min-height: 260px; font: 500 .92rem/1.6 var(--font-mono); }
+.st-md__prev { min-height: 260px; padding: 14px 18px; border-radius: 16px; background: var(--tex-knit), rgba(255,255,255,.7); box-shadow: inset 0 0 0 1.5px rgba(31,30,30,.08); overflow: auto; }
+[data-yarn], .st-folder__body [data-track] { display: grid; gap: 14px; }
+
+/* == MUSIC =================================================== */
+/* instrument + pattern: single choices (the kit rope) holding the kit swatch */
+.st-insts { display: grid; gap: 8px; grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.st-insts .yrow { gap: 10px; padding: 6px 14px 6px 6px; min-height: 58px; font: 800 .86rem/1.15 var(--font-display); }
+.st-insts .yrow small { display: block; font: 500 .68rem/1.2 var(--font-mono); color: var(--y-fg-3); }
+.st-insts .yswatch { --sw: 44px; --sw-r: 10px; }
+.st-motifs { display: flex; flex-wrap: wrap; gap: 8px; }
+.st-motif { --ysel-r: 12px; --rope-w-in: 3px; --rope-inset: 2px; padding: 0; border: 0; border-radius: 12px; background: none; cursor: pointer; display: grid; gap: 4px; justify-items: center; font: 500 .66rem/1 var(--font-mono); color: var(--y-fg-3); transition: transform 240ms var(--ease-crit); }
+@media (hover: hover) { .st-motif:hover { transform: translateY(-2px); } }
+.st-motif:active { transform: scale(.95); }
+.st-motif .yswatch { --sw: 52px; --sw-r: 12px; }
+.st-motif[aria-pressed="true"] { color: var(--ink); }
+/* the audio box: the kit waveform (Yarn.wave, the player's bars, same seed per track) + Studio's scrub pin */
+.st-audio { display: grid; gap: 10px; padding: 14px; border-radius: 16px; }
+.st-audio__top { display: flex; align-items: center; gap: 12px; }
+.st-audio__top .btn--icon { flex: none; }
+.st-audio__name { flex: 1; min-width: 0; }
+.st-audio__name b { display: block; font: 850 .95rem/1.2 var(--font-display); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.st-audio__name .meta { display: block; margin-top: 2px; }
+.st-wave { --bw: 3px; position: relative; height: 64px; cursor: pointer; touch-action: none; border-radius: 10px; }
+.st-wave--prev { height: 52px; cursor: default; }
+.st-wave__pin { position: absolute; top: -4px; bottom: -4px; width: 2px; margin-left: -1px; left: var(--p, 0%); background: var(--c-live-deep); border-radius: 2px; pointer-events: none; }
+.st-wave__pin::after { content: ""; position: absolute; left: 50%; top: -6px; width: 12px; height: 12px; margin-left: -6px; border-radius: 50%; background: radial-gradient(circle at 35% 35%, #fff, var(--c-live) 55%, var(--c-live-deep)); box-shadow: 0 1px 2px rgba(0,0,0,.3); }
+.st-wave.is-drawing .ywave__l { animation: st-wipe 900ms var(--ease-out) both; }
+@keyframes st-wipe { from { clip-path: inset(0 100% 0 0); } to { clip-path: inset(0 0 0 0); } }
+.st-wave:focus-visible { outline: 3px solid var(--focus); outline-offset: 4px; }
+.st-audio__empty { display: grid; justify-items: center; gap: 6px; padding: 18px; text-align: center; border-radius: 16px; outline: 2px dashed rgba(31,30,30,.28); outline-offset: -4px; background: rgba(255,255,255,.45); }
+.st-audio__empty i { font-size: 1.7rem; color: var(--ink-3); }
+.st-audio__empty b { font: 850 1rem/1.2 var(--font-display); }
+/* a collection = a folder with track tabs (the editor's version of the kit folder card's tabs; Studio-only) */
+.st-folder { position: relative; margin-top: 30px; }
+.st-tabs { list-style: none; margin: 0; padding: 0 0 0 10px; display: flex; gap: 4px; align-items: flex-end; position: absolute; left: 0; right: 0; bottom: 100%; overflow-x: auto; scrollbar-width: none; }
+.st-tab { flex: none; position: relative; touch-action: manipulation; }
+.st-tab__btn {
+  --ysel-r: 10px; --rope-w-in: 3px; --rope-inset: 2px;
+  display: flex; align-items: center; gap: 6px; height: 34px; max-width: 160px; padding: 0 10px 0 6px; margin-bottom: -6px; border: 0; border-radius: 10px 10px 0 0; cursor: pointer;
+  background: var(--tex-knit), var(--cotton-2); color: var(--y-fg-2); font: 800 .76rem/1 var(--font-display); white-space: nowrap;
+  box-shadow: inset 0 -6px 6px -6px rgba(31,30,30,.2); transition: transform 220ms var(--ease-crit), background 160ms;
+}
+.st-tab__btn span { overflow: hidden; text-overflow: ellipsis; }
+.st-tab__btn .yswatch { --sw: 20px; --sw-r: 5px; }
+@media (hover: hover) { .st-tab__btn:hover { transform: translateY(-3px); color: var(--ink); } }
+.st-tab__btn:focus-visible { outline: 3px solid var(--focus); outline-offset: -3px; }
+.st-tab__btn[aria-selected="true"] { background: var(--tex-knit), var(--white); color: var(--ink); transform: translateY(-4px); }
+.st-tab.is-slot > * { opacity: 0; }
+.st-tab.is-slot::before { content: ""; position: absolute; inset: 0 0 -6px; border-radius: 10px 10px 0 0; border: 2px dashed var(--c-pick-a); border-bottom: 0; }
+.st-tab--add .st-tab__btn { color: var(--ink); background: transparent; box-shadow: none; outline: 1.5px dashed rgba(31,30,30,.3); outline-offset: -3px; padding: 0 10px; }
+.st-folder__body { position: relative; z-index: 1; padding: 18px; border-radius: 4px 18px 18px 18px; }
+/* the release preview (music.js's detail): swatch kicker, tracks as rows with fixed columns (B1) */
+.st-art .yswatch { --sw: 64px; --sw-r: 14px; }
+.st-trks { display: grid; gap: 8px; }
+.st-trks .eyebrow { margin: 0; }
+.st-tracks { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; grid-template-columns: minmax(0, 1fr); }
+.st-track { display: grid; grid-template-columns: 40px minmax(0, 1fr) 28px 3.2em; align-items: center; gap: 10px; min-height: 48px; }
+.st-track .yswatch { --sw: 40px; --sw-r: 10px; }
+.st-track b { min-width: 0; font: 800 .9rem/1.2 var(--font-display); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.st-track .yfact.yfact { margin: 0; justify-self: center; }
+.st-track__d { text-align: right; font-variant-numeric: tabular-nums; }
+
+/* == THOUGHTS ================================================ */
+.st-types { display: flex; gap: 6px; overflow-x: auto; padding: 10px; margin: -10px; scrollbar-width: none; }
+.st-types::-webkit-scrollbar { display: none; }
+.st-tagfield .ysearch { min-height: 48px; }
+/* i9 · polish · S11 · logos for tools that are new here: the chip exactly as it will show (the kit's stack tag), where
+   its logo came from, and the owner's way in (upload one, paste a link, look again) */
+.st-logos { display: grid; gap: 8px; margin-top: 14px; }
+.st-logos[hidden], .st-logo__url[hidden] { display: none; }
+.st-logos > .st-lab { margin: 0; }
+.st-logos__list { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.st-logo { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 8px 12px; padding: 8px 10px 8px 8px; border-radius: 14px; background: var(--tex-knit), var(--white); box-shadow: var(--shadow-patch); }
+.st-logo > .ytag { max-width: 14em; }
+.st-logo__st { min-width: 0; line-height: 1.35; }
+.st-logo__st code { font: 600 .74rem/1 var(--font-mono); color: var(--ink-2); }
+.st-logo__acts { display: flex; align-items: center; justify-content: flex-end; flex-wrap: wrap; gap: 6px; }
+.st-logo__url { grid-column: 1 / -1; display: flex; gap: 8px; }
+.st-logo__url .st-in { flex: 1; min-width: 0; }
+@media (max-width: 640px) { .st-logo { grid-template-columns: auto minmax(0, 1fr); } .st-logo__acts { grid-column: 1 / -1; justify-content: flex-start; } }
+.st-post__cover { width: 100%; aspect-ratio: 16 / 9; object-fit: cover; border-radius: 12px; }
+.st-dek { margin: 0; font: 600 1.2rem/1.45 var(--font-display); color: var(--y-fg-2); letter-spacing: -.005em; text-wrap: pretty; }
+.st-prevcard .eyebrow { margin: 0; }
+.st-prevcard .yfolder { max-width: 420px; }
+/* the playlist editor: your music (add / remove) · the playlist (drag to order). Rows keep fixed columns:
+   swatch · name · duration · action, at the same x in every row */
+.st-pl { display: grid; gap: 14px; grid-template-columns: minmax(0, 1fr); }
+@media (min-width: 1240px) { .st-pl { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); } } /* side by side once both rows fit their 4 columns */
+.st-plpick { max-height: 420px; overflow: auto; display: grid; gap: 6px; padding: 4px 4px 10px; margin: -4px; list-style: none; grid-template-columns: minmax(0, 1fr); }
+.st-plrow { display: grid !important; grid-template-columns: 40px minmax(0, 1fr) 3.2em 32px; align-items: center; min-height: 54px; padding: 6px 8px 6px 6px; gap: 10px; }
+.st-plrow .yswatch { --sw: 40px; --sw-r: 8px; }
+.st-plrow b { min-width: 0; font: 800 .9rem/1.2 var(--font-display); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.st-plrow .meta { text-align: right; font-variant-numeric: tabular-nums; }
+.st-plus-ic { display: grid; place-items: center; width: 32px; height: 32px; border-radius: 50%; background: var(--y-chip); color: var(--ink); }
+.st-plrow[aria-pressed="true"] .st-plus-ic { background: var(--c-on-tex), var(--c-on-bg); color: var(--c-on-fg); }
+.st-plrow .btn--icon { justify-self: end; }
+/* a pick's collection: single choice kit cards (the rope when chosen) */
+.st-colls { display: grid; gap: 10px; grid-template-columns: repeat(auto-fill, minmax(min(100%, 210px), 1fr)); }
+.st-coll { display: flex; align-items: center; gap: 12px; padding: 12px; border: 0; cursor: pointer; text-align: left; font: inherit; color: inherit; }
+.st-coll__ic { flex: none; display: grid; place-items: center; width: 40px; height: 40px; border-radius: 12px; background: var(--tex-twill), var(--gold); color: #fff; font-size: 1.2rem; box-shadow: inset 0 -2px 3px rgba(0,0,0,.2); }
+.st-coll b { display: block; font: 850 .95rem/1.2 var(--font-display); }
+.st-coll .meta { display: block; margin-top: 2px; }
+.st-coll--new .st-coll__ic { background: transparent; color: var(--ink); box-shadow: none; outline: 2px dashed rgba(31,30,30,.3); outline-offset: -2px; }
+.st-icons { display: flex; flex-wrap: wrap; gap: 6px; }
+.st-icons button { --ysel-r: 10px; --rope-w-in: 3px; --rope-inset: 2px; display: grid; place-items: center; width: 44px; height: 44px; border: 0; border-radius: 10px; background: var(--tex-knit), var(--white); box-shadow: var(--shadow-patch); cursor: pointer; font-size: 1.2rem; color: var(--ink); }
+/* owner colours (note / stub): single choice → the kit rope.
+   i9 · polish · S13: each swatch IS the thing in miniature, the kit's .ystub (the pick's stub, twill and all) or .ynote
+   (the sticky note); the button keeps only the interaction (lift on hover, press, the rope on its own edge). */
+.st-swatches { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 10px; padding-top: 4px; }
+.st-swatch { --rope-w-in: 3.5px; border: 0; cursor: pointer; padding: 0; transition: transform 240ms var(--ease-crit), box-shadow 240ms var(--ease-crit), filter 240ms var(--ease-crit); }
+@media (hover: hover) { .st-swatch:hover { transform: translateY(-2px); filter: drop-shadow(0 4px 5px rgba(31,30,30,.16)); } }
+.st-swatch:active { transform: scale(.94); }
+.st-swatch:focus-visible { outline: 3px solid var(--focus); outline-offset: 3px; }
+@media (pointer: coarse) { .st-swatch.ynote { width: 44px; height: 44px; } .st-swatch.ystub { width: 40px; height: 52px; } }
+.st-favicon { flex: none; display: block; overflow: hidden; }
+.st-favicon svg { width: 100%; height: 100%; }
+
+/* == TIER CREATOR (Studio-only: only the owner makes rankings) ==
+   Rows wear the kit's felt palette (data-tc → --tc), the same felts as the public ranking page. */
+.st-tl { display: grid; gap: 18px; grid-template-columns: minmax(0, 1fr); }
+@media (min-width: 960px) { .st-tl { grid-template-columns: minmax(0, 1fr) 360px; align-items: start; } .st-tl__side { position: sticky; top: 74px; } }
+.st-tl__main { min-width: 0; }
+.st-tl__side { display: grid; gap: 14px; align-content: start; }
+.st-tiers { display: grid; gap: 8px; }
+.st-tier { position: relative; display: flex; align-items: stretch; min-height: 92px; border-radius: 16px; background: var(--tex-knit), var(--white); box-shadow: var(--shadow-patch); outline: 1.5px dashed rgba(31,30,30,.16); outline-offset: -5px; }
+.st-tier.is-over { box-shadow: var(--shadow-patch), 0 0 0 2.5px var(--c-pick-a); }
+.st-tier__lab { flex: none; display: grid; place-items: center; width: 78px; border-radius: 16px 0 0 16px; font: 900 2rem/1 var(--font-display); outline: 1.5px dashed rgba(31,30,30,.3); outline-offset: -6px; position: relative;
+  background: linear-gradient(color-mix(in srgb, var(--tc, var(--red)) var(--tc-wash, 62%), transparent) 0 0), var(--tex-felt), var(--tc, var(--red)); background-size: auto, 140px, auto; color: var(--ink); }
+.st-tier:is([data-tc="red"], [data-tc="ink"], [data-tc-dark]) .st-tier__lab { color: #fff; outline-color: rgba(255,255,255,.55); }
+.st-tier__lab input { width: 100%; height: 100%; border: 0; background: transparent; color: inherit; font: inherit; text-align: center; border-radius: inherit; }
+.st-tier__lab input:focus-visible { outline: 3px solid var(--focus); outline-offset: -3px; }
+.st-tier__c { position: absolute; right: 5px; bottom: 5px; width: 22px; height: 22px; padding: 0; border: 0; border-radius: 50%; cursor: pointer;
+  background: var(--tex-felt), var(--tc, var(--red)); background-size: 60px, auto; box-shadow: 0 0 0 2px #fff, 0 1px 3px rgba(31,30,30,.35); transition: transform var(--press) var(--ease-out); }
+.st-tier__c:active { transform: scale(.9); }
+.st-tier__c:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+@media (pointer: coarse) { .st-tier__c::after { content: ""; position: absolute; left: 50%; top: 50%; width: 44px; height: 44px; translate: -50% -50%; } }
+.st-tiers[data-named] .st-tier { flex-direction: column; min-height: 0; }
+.st-tiers[data-named] .st-tier__lab { align-self: flex-start; display: flex; align-items: center; gap: 8px; width: auto; max-width: calc(100% - 12px); min-height: 40px; margin: 6px 0 0 6px; padding: 0 8px 0 4px; border-radius: 12px 12px 0 0; font: 850 .95rem/1.2 var(--font-display); outline-offset: -4px; }
+.st-tiers[data-named] .st-tier__lab input { width: auto; max-width: 100%; height: 34px; padding: 0 8px; text-align: left; field-sizing: content; min-width: 2ch; }
+.st-tiers[data-named] .st-tier__c { position: relative; right: auto; bottom: auto; flex: none; width: 18px; height: 18px; }
+.st-tiers[data-named] .st-zone { margin: 0 6px 6px; min-height: 84px; background: color-mix(in srgb, var(--tc) 12%, transparent); border-radius: 0 12px 12px 12px; }
+.st-zone { position: relative; flex: 1; min-width: 0; list-style: none; margin: 0; padding: 8px; display: flex; flex-wrap: wrap; gap: 8px; align-content: flex-start; min-height: 92px; }
+/* an empty tier (T4, owner: "the drop here text is lazy"): an empty pocket the size of one item, sewn in place, waiting */
+.st-zone:empty::before { content: ""; width: 76px; height: 88px; border-radius: 12px; outline: 2px dashed rgba(31,30,30,.2); outline-offset: -2px; background: rgba(255,255,255,.35); }
+.st-tier.is-over .st-zone:empty::before, .st-tl__main[data-selecting] .st-zone:empty::before { outline-color: var(--c-pick-a); background: rgba(31,30,30,.05); }
+.st-tray { padding: 12px; border-radius: 16px; background: var(--tex-knit), var(--cotton-2); box-shadow: inset 0 1px 3px rgba(31,30,30,.12); }
+.st-tray.is-over { box-shadow: inset 0 1px 3px rgba(31,30,30,.12), 0 0 0 2.5px var(--c-pick-a); }
+.st-tray .st-zone { padding: 6px 0 0; min-height: 84px; }
+.st-tray .st-zone:empty::before { content: "Things you add land here first"; width: auto; height: auto; outline: 0; background: none; align-self: center; margin-left: 8px; font: 500 .74rem/1 var(--font-mono); color: var(--y-fg-3); }
+.st-titem { position: relative; list-style: none; width: 76px; touch-action: manipulation; user-select: none; -webkit-user-select: none; }
+.st-titem__btn {
+  --ysel-r: 12px; --rope-w-in: 3px; --rope-inset: 2px;
+  display: flex; flex-direction: column; align-items: center; gap: 3px; width: 100%; height: 88px; padding: 5px 4px 4px; border: 0; border-radius: 12px; cursor: grab;
+  background: var(--tex-knit), var(--white); color: var(--ink); box-shadow: var(--shadow-patch); outline: 1.5px dashed rgba(31,30,30,.18); outline-offset: -3px;
+  transition: transform 240ms var(--ease-crit), box-shadow 240ms var(--ease-crit);
+}
+@media (hover: hover) { .st-titem__btn:hover { transform: translateY(-2px); box-shadow: var(--shadow-lift); } }
+.st-titem__btn:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+.st-titem__img { display: block; width: 60px; height: 60px; border-radius: 9px; overflow: hidden; flex: none; }
+.st-titem__img svg { width: 100%; height: 100%; }
+.st-titem__name { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font: 800 .7rem/1.1 var(--font-display); }
+.st-titem.is-slot > * { opacity: 0; }
+.st-titem.is-slot::before { content: ""; position: absolute; inset: 0; border-radius: 12px; border: 2px dashed var(--c-pick-a); background: rgba(31,30,30,.06); }
+.st-titem.is-lifted .st-titem__btn, .st-titem.is-settling .st-titem__btn { box-shadow: var(--shadow-pop); }
+.st-titem.is-lifted, .st-titem.is-settling { z-index: 6; }
+.st-titem.is-enter { animation: st-pop 360ms var(--ease-spring) both; }
+@keyframes st-pop { from { opacity: 0; transform: scale(.6); } }
+.st-tl__add { display: grid; gap: 12px; padding: 16px; border-radius: 18px; }
+.st-tl__add h2 { margin: 0; display: flex; align-items: center; gap: .45em; font: 900 1.1rem/1.2 var(--font-display); }
+.st-tl__add h2 i { color: var(--ink-3); }
+.st-sugs { display: flex; gap: 6px; overflow-x: auto; padding: 6px; margin: -6px; scrollbar-width: none; }
+.st-sugs .ychip small { font: 500 .66rem/1 var(--font-mono); color: var(--y-fg-3); }
+.st-imgs { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.st-imgopt { --ysel-r: 12px; --rope-w-in: 3px; --rope-inset: 2px; display: grid; gap: 3px; justify-items: center; padding: 5px 5px 7px; border: 0; border-radius: 12px; cursor: pointer; background: var(--tex-knit), var(--white); box-shadow: var(--shadow-patch); color: var(--ink); text-align: center; }
+.st-imgopt > span:first-child { display: block; width: 100%; aspect-ratio: 1; border-radius: 9px; overflow: hidden; }
+.st-imgopt svg { width: 100%; height: 100%; }
+.st-imgopt b { font: 850 .74rem/1.1 var(--font-display); }
+.st-imgopt small { font: 500 .6rem/1 var(--font-mono); color: var(--y-fg-3); }
+/* i9 · polish · S15 · the tier colour picker: a popover on the kit's floating layer (Yarn.layer(), --z-pop) dressed as
+   the kit's Browse sheet (knit, the pop shadow, the dashed stitch); its swatches are real tier keys (.ytierkey: felt +
+   wash + the tier's letter), chosen = the rope on their own edge; then a colour of the owner's own */
+.st-tcp { position: fixed; z-index: var(--z-pop, 70); display: grid; gap: 10px; width: max-content; max-width: calc(100vw - 24px); padding: 14px; border-radius: 18px;
+  background: var(--tex-knit), var(--white); box-shadow: var(--shadow-pop); outline: 1.5px dashed rgba(31,30,30,.2); outline-offset: -7px; }
+.st-tcp__grid { display: grid; grid-template-columns: repeat(5, 40px); gap: 8px; }
+.st-tcp__sw { --ysel-r: 8px; --rope-w-in: 3px; width: 40px; height: 40px; min-height: 0; padding: 0; border: 0; cursor: pointer; font: 900 1rem/1 var(--font-display); transition: transform 220ms var(--ease-crit); }
+@media (hover: hover) { .st-tcp__sw:hover { transform: translateY(-2px); } }
+.st-tcp__sw:active { transform: scale(.93); }
+.st-tcp__sw:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+.st-tcp__own { display: flex; align-items: center; gap: 10px; padding-top: 10px; border-top: 1.5px dashed rgba(31,30,30,.16); font: 800 .86rem/1.2 var(--font-display); cursor: pointer; }
+.st-tcp__own .meta { font-weight: 500; }
+.st-tcp__ownsw { --ysel-r: 8px; --rope-w-in: 3px; display: block; width: 40px; height: 40px; border-radius: 8px; flex: none; }
+.st-tcp__own input[type="color"] { display: block; width: 100%; height: 100%; padding: 0; border: 0; border-radius: 8px; background: none; cursor: pointer; }
+.st-tcp__own input[type="color"]::-webkit-color-swatch-wrapper { padding: 0; }
+.st-tcp__own input[type="color"]::-webkit-color-swatch { border: 0; border-radius: 8px; box-shadow: inset 0 0 0 1px rgba(31,30,30,.18); }
+.st-tcp__own input[type="color"]::-moz-color-swatch { border: 0; border-radius: 8px; }
+.st-tcp__own input[type="color"]:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+@media (pointer: coarse) { .st-tcp__grid { grid-template-columns: repeat(5, 46px); } .st-tcp__sw, .st-tcp__ownsw { width: 46px; height: 46px; } }
+.st-tier__c[aria-expanded="true"] { box-shadow: 0 0 0 2px #fff, 0 0 0 4px var(--ink); }
+/* i9 · polish · S16 · an item's editor (a sheet): name · image · a line about it · tier · Remove */
+.st-ited .st-ited__imgs { grid-template-columns: repeat(auto-fill, minmax(88px, 1fr)); }
+.st-ited .st-imgopt img { display: block; }
+.st-ited__tiers { flex-wrap: wrap; }
+.st-ited__tier { gap: .45em; }
+.st-ited__key.ytierkey { width: 22px; min-height: 22px; height: 22px; border-radius: 6px; font-size: .74rem; outline-offset: -3px; }
+.st-tl__rows { display: flex; gap: 8px; flex-wrap: wrap; }
+.st-tl__main[data-selecting] .st-tier, .st-tl__main[data-selecting] .st-tray { cursor: pointer; }
+@media (hover: hover) { .st-tl__main[data-selecting] .st-tier:hover { box-shadow: var(--shadow-patch), 0 0 0 2px rgba(31,30,30,.35); } }
+.st-tl__set .st-toggle { padding: 2px 0; }
+
+/* == SHEETS + PUBLISH CHECK (Studio-only) ====================
+   On the kit's floating layer (Yarn.layer()) at the kit's sheet tokens: over the pill, the search knob and the "+",
+   under the toast and the hint (so a toast after "Fix it" and an icon's name stay readable). Desktop: a card that grows
+   out of its trigger. Phone: a bottom sheet with a grabber (drag down to close). ✕, Esc, the scrim and choosing close it. */
+.st-sheetwrap { position: fixed; inset: 0; z-index: var(--z-sheet, 80); display: grid; grid-template-columns: minmax(0, 1fr); grid-template-rows: minmax(0, 1fr); place-items: center; padding: 24px; }
+.st-scrim { position: absolute; inset: 0; background: rgba(31,30,30,.38); }
+.st-sheet {
+  position: relative; display: flex; flex-direction: column; width: min(var(--w, 560px), 100%); max-height: min(86dvh, 820px);
+  border-radius: 24px; background: var(--tex-knit), var(--cotton); box-shadow: var(--shadow-pop);
+  outline: 1.5px dashed rgba(31,30,30,.2); outline-offset: -7px; overflow: hidden;
+}
+.st-sheet__head { display: flex; align-items: center; gap: 10px; padding: 16px 16px 6px 22px; }
+.st-sheet__head h2 { margin: 0; flex: 1; min-width: 0; font: 900 1.4rem/1.1 var(--font-display); letter-spacing: -.02em; overflow-wrap: anywhere; }
+.st-sheet__head h2 .yhead__dot { color: var(--c-now); } /* i10 r2 · colour: the title's dot (not music) */
+.st-sheet__head .ylinkicon { flex: none; }
+.st-sheet__body { padding: 8px 22px 22px; overflow: auto; overscroll-behavior: contain; display: grid; gap: 14px; align-content: start; grid-template-columns: minmax(0, 1fr); }
+.st-sheet__foot { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; padding: 12px 18px 18px; border-top: 1.5px dashed rgba(31,30,30,.12); }
+.st-sheet__foot .ydetail__spacer { flex: 1; }
+.st-grab { display: none; }
+@media (max-width: 959px) {
+  .st-sheetwrap { align-items: end; justify-items: stretch; padding: 0; }
+  .st-sheet { width: 100%; max-height: 90dvh; border-radius: 24px 24px 0 0; padding-bottom: env(safe-area-inset-bottom); }
+  .st-grab { display: block; align-self: center; width: 100%; height: 22px; border: 0; padding: 0; background: none; cursor: grab; touch-action: none; position: relative; flex: none; }
+  .st-grab::before { content: ""; position: absolute; left: 50%; top: 10px; width: 44px; height: 5px; margin-left: -22px; border-radius: 3px; background: rgba(31,30,30,.22); }
+  .st-sheet__head { padding: 0 12px 4px 18px; }
+  .st-sheet__body { padding: 6px 16px 18px; }
+}
+/* the publish check: what's ready, what needs a look (warn), what blocks it */
+.st-checks { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; grid-template-columns: minmax(0, 1fr); }
+.st-check { display: flex; align-items: flex-start; gap: 12px; padding: 10px 12px; border-radius: 14px; background: var(--tex-knit), var(--white); box-shadow: var(--shadow-patch); }
+.st-check > .yfact__i { margin-top: 1px; width: 22px; height: 22px; font-size: 13px; }
+.st-check[data-ok="true"] { --fact-c: var(--ink); --fact-on: #fff; }
+.st-check[data-ok="warn"] { --fact-c: var(--gold); --fact-on: var(--ink); } /* i9 · polish · S4: was red-deep on the grey felt chip */
+.st-check[data-ok="false"] { --fact-c: var(--red); --fact-on: #fff; background: var(--red-soft); box-shadow: none; }
+.st-check > div { min-width: 0; }
+.st-check > div > b { display: block; font: 850 .92rem/1.25 var(--font-display); }
+.st-check > div > span { display: block; font-size: .84rem; color: var(--y-fg-2); line-height: 1.35; }
+.st-check .ylinkbtn { padding: 4px 0 0; }
+/* i9 · polish · S4 (pin 4) · the warn disc is the kit's attention gold worn flat with an ink glyph, exactly as its WIP
+   fact (yarn.css .yfact[data-status="ongoing"]): no felt noise, so it never reads as grey. Ink on gold 7.3:1 · the
+   blocking row's link (red-deep on red-soft) 5.0:1 · white on the red disc 4.6:1 (measured: r3i9-polish/s4-checks.mjs) */
+.st-check[data-ok="warn"] > .yfact__i { background: var(--gold); box-shadow: inset 0 -1.5px 2px rgba(80, 50, 0, .18); }
+.st-check > .yfact__i > i { line-height: 1; }
+.st-livecard { display: flex; align-items: center; gap: 12px; padding: 12px 14px; }
+.st-livecard .meta { display: block; }
+
+/* == HISTORY (the kit's detail shell, Yarn.detail) =========== */
+.st-hist { display: grid; gap: 22px; grid-template-columns: minmax(0, 1fr); }
+@media (min-width: 960px) { .st-hist { grid-template-columns: minmax(0, .9fr) minmax(0, 1.1fr); align-items: start; } .st-hist__cmp { position: sticky; top: 74px; } }
+.st-hist .ytl { --ytl-knot: 28px; }
+.st-rev { gap: 12px; padding: 10px 14px; min-height: 58px; }
+.st-rev__time { flex: none; width: 5.6em; white-space: nowrap; font: 500 .76rem/1.2 var(--font-mono); color: var(--y-fg-3); }
+.st-rev__t { flex: 1; min-width: 0; }
+.st-rev__t b { display: block; font: 850 .95rem/1.2 var(--font-display); }
+.st-rev__t .meta { display: block; margin-top: 2px; }
+.st-rev > .yfact { flex: none; }
+.st-cmp { display: grid; gap: 14px; padding: 18px; border-radius: 18px; }
+.st-cmp__h { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.st-cmp__h h2 { margin: 0; font: 900 1.2rem/1.2 var(--font-display); flex: 1; }
+.st-diff { display: grid; gap: 4px; margin: 0; }
+.st-diff__f { font: 800 .74rem/1 var(--font-display); letter-spacing: .1em; text-transform: uppercase; color: var(--y-fg-3); }
+.st-diff__v { margin: 0; padding: 10px 12px; border-radius: 12px; background: rgba(255,255,255,.7); box-shadow: inset 0 0 0 1.5px rgba(31,30,30,.07); line-height: 1.55; font-size: .95rem; }
+.st-diff del { color: var(--red-deep); text-decoration: line-through; text-decoration-color: var(--red); text-decoration-thickness: 2px; background: var(--red-soft); border-radius: 3px; padding: 0 .1em; }
+.st-diff ins { text-decoration: none; background: linear-gradient(transparent 60%, rgba(214,47,56,.22) 60%); font-weight: 700; }
+.st-diff .st-diff__legend { font: 500 .7rem/1 var(--font-mono); color: var(--y-fg-3); display: flex; flex-wrap: wrap; gap: 6px 14px; }
+
+/* == MEDIA LIBRARY (Studio-only tiles on kit cards) ========== */
+.st-lib { list-style: none; margin: 0; padding: 0; display: grid; gap: 14px; grid-template-columns: repeat(auto-fill, minmax(176px, 1fr)); }
+.st-ltile { position: relative; display: grid; grid-template-columns: minmax(0, 1fr); gap: 8px; align-content: start; padding: 8px 8px 10px; width: 100%; border: 0; cursor: pointer; text-align: left; font: inherit; color: inherit; }
+.st-ltile__pv { position: relative; display: block; aspect-ratio: 4 / 3; border-radius: 10px; overflow: hidden; background: var(--tex-felt), var(--cotton-2); background-size: 120px, auto; }
+.st-ltile__pv > img, .st-ltile__pv > video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.st-ltile__pv .yswatch { position: absolute; inset: 0; width: 100%; height: 100%; --sw-r: 0; box-shadow: none; }
+.st-ltile__pv .st-wave { position: absolute; left: 10px; right: 10px; bottom: 8px; height: 34px; pointer-events: none; --wave-fg: rgba(255,255,255,.75); }
+.st-ltile__name { display: block; padding: 0 4px; font: 600 .78rem/1.25 var(--font-mono); color: var(--ink); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.st-ltile__row { display: flex; align-items: center; justify-content: space-between; gap: 6px; padding: 0 4px; min-height: 24px; }
+.st-ltile__row .meta { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+/* usage: a fact (in use = the chip disc · unused = the basted dashed disc, red) */
+.st-use.yfact { flex: none; }
+.st-use--none { --fact-c: var(--white); --fact-on: var(--red-deep); --fact-g: var(--red-deep); color: var(--red-deep); }
+.st-use--none > .yfact__i { box-shadow: none; outline: 1.5px dashed rgba(180,32,43,.6); outline-offset: -1.5px; }
+.st-lcheck { position: absolute; z-index: 3; top: 14px; left: 14px; display: grid; place-items: center; width: 28px; height: 28px; border-radius: 50%; background: rgba(255,255,255,.92); color: transparent; box-shadow: 0 0 0 2px rgba(31,30,30,.25), 0 2px 4px rgba(0,0,0,.2); font-size: 15px; pointer-events: none; }
+.st-ltile[aria-pressed="true"] .st-lcheck { background: var(--c-on-tex), var(--c-on-bg); color: var(--c-on-fg); box-shadow: 0 0 0 2px #fff, 0 2px 4px rgba(0,0,0,.25); }
+.st-lib:not(.is-selecting) .st-lcheck { display: none; }
+/* selecting: a bar that sticks under the top (no floating footer, owner rule): n selected · Cancel · Remove */
+.st-bulk { position: sticky; top: calc(var(--sticky-top, 0px) + 8px); z-index: 25; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin: 0 0 14px; padding: 8px 8px 8px 18px; border-radius: 999px; box-shadow: var(--shadow-lift); }
+.st-bulk p { margin: 0; flex: 1; min-width: 0; font: 850 .95rem/1.2 var(--font-display); }
+.st-bulk p .meta { margin-left: .4em; }
+.st-orphnote { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; padding: 12px 14px; margin: 0 0 14px; border-radius: 18px; }
+.st-orphnote > i { font-size: 1.5rem; color: var(--red-deep); }
+.st-orphnote p { margin: 0; flex: 1; min-width: 200px; }
+.st-orphnote b { font-family: var(--font-display); font-weight: 850; }
+.st-uses { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; grid-template-columns: minmax(0, 1fr); }
+.st-uses .yrow { min-height: 52px; }
+.st-uses .ydot { --d: 30px; font-size: .9rem; }
+.st-facts { display: grid; grid-template-columns: auto 1fr; gap: 6px 16px; margin: 0; }
+.st-facts dt { font: 800 .8rem/1.4 var(--font-display); color: var(--y-fg-2); }
+.st-facts dd { margin: 0; font: 500 .8rem/1.4 var(--font-mono); color: var(--ink); }
+
+/* == SIGN-IN (Studio-only: the tag card on a thread) ========= */
+.st-gate { min-height: calc(100dvh - var(--frame) * 2); display: grid; place-items: center; padding: 30px 16px 60px; }
+.st-gate__brand { display: flex; align-items: center; gap: .55rem; justify-content: center; margin-bottom: 4px; color: var(--ink); }
+.st-gate__brand svg { width: 30px; height: 30px; }
+.st-gate__brand b { font: 900 1.2rem/1 var(--font-display); letter-spacing: -.03em; }
+.st-gate__brand b i { font-style: normal; color: var(--c-brand); }
+.st-gate__hang { position: relative; display: grid; justify-items: center; width: min(420px, 100%); }
+.st-gate__thread { width: 120px; height: 70px; margin-bottom: -14px; overflow: visible; position: relative; z-index: 1; }
+.st-tagcard { position: relative; width: 100%; padding: 34px 26px 22px; display: grid; gap: 14px; border-radius: 26px; }
+.st-tagcard::before { content: ""; position: absolute; left: 50%; top: 12px; width: 16px; height: 16px; margin-left: -8px; border-radius: 50%; background: var(--cotton-2); box-shadow: inset 0 2px 3px rgba(31,30,30,.35), 0 0 0 3px var(--white), 0 0 0 4.5px rgba(31,30,30,.14); }
+.st-tagcard .yhead { justify-content: center; margin: 4px 0 0; min-height: 0; }
+.st-tagcard .yhead__text { justify-content: center; text-align: center; }
+.st-tagcard > p { margin: 0; text-align: center; color: var(--y-fg-2); line-height: 1.45; }
+.st-or { display: flex; align-items: center; gap: 10px; font: 500 .72rem/1 var(--font-mono); color: var(--y-fg-3); }
+.st-or::before, .st-or::after { content: ""; flex: 1; border-top: 1.5px dashed rgba(31,30,30,.18); }
+.st-pin { display: flex; justify-content: center; gap: 8px; }
+.st-pin input { width: 46px; height: 56px; padding: 0; text-align: center; font: 600 1.4rem/1 var(--font-mono); }
+.st-gate__foot { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: .5em; margin: 0; text-align: center; text-wrap: balance; font: 500 .72rem/1.4 var(--font-mono); color: var(--y-fg-3); }
+.st-gate .btn { width: 100%; }
+.st-gate__denied { display: flex; gap: 10px; align-items: flex-start; padding: 12px 14px; border-radius: 14px; background: var(--red-soft); color: var(--red-deep); font-size: .9rem; line-height: 1.4; }
+.st-gate__denied i { font-size: 1.2rem; flex: none; }
+.st-gate__denied b { font-family: var(--font-display); font-weight: 850; display: block; }
+
+/* == HOME ===================================================== */
+.st-kw { display: grid; gap: 8px; padding: 12px; border-radius: 16px; }
+.st-kw__row { display: grid; grid-template-columns: 1fr 1.2fr 1fr; gap: 8px; }
+.st-kw__opts { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.st-colors { display: flex; gap: 4px; }
+/* i9 · polish · S13: a scribble colour is shown as the scribble itself (the kit's .yscribble under "Aa", the way the
+   keyword wears it on Home), on a knit patch; chosen = the rope on its edge (it had no .ysel: nothing showed the pick) */
+.st-color { --ysel-r: 10px; --rope-w-in: 3px; display: inline-grid; place-items: center; width: 46px; height: 38px; padding: 0 0 7px; border: 0; border-radius: 10px; cursor: pointer;
+  background: var(--tex-knit), var(--white); box-shadow: var(--shadow-patch); color: var(--ink); font: 850 .92rem/1 var(--font-display); transition: transform 240ms var(--ease-crit), box-shadow 240ms var(--ease-crit); }
+.st-color .yscribble { --scribble-w: 2.4px; }
+@media (hover: hover) { .st-color:hover { transform: translateY(-2px); box-shadow: var(--shadow-lift); } }
+.st-color:active { transform: scale(.94); }
+.st-color:focus-visible { outline: 3px solid var(--focus); outline-offset: 3px; }
+@media (pointer: coarse) { .st-color { width: 48px; height: 44px; } }
+.st-bio { font: 600 1.2rem/1.9 var(--font-body); color: var(--y-fg-2); }
+.st-bio p { margin: 0 0 .4em; }
+.st-bio .yscribble { color: var(--ink); font-weight: 800; }
+.st-hello { margin: 0 0 6px; font: 900 2.2rem/1.05 var(--font-display); letter-spacing: -.035em; }
+.st-contact { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+
+/* == RESPONSIVE ============================================== */
+@media (max-width: 959px) {
+  .st-hide-m { display: none !important; }
+  .st-li > .yrow { gap: 12px; padding: 9px 12px 9px 9px; min-height: 78px; }
+  .st-li .yswatch { --sw: 56px; }
+  .st-thumb { width: 60px; height: 56px; }
+  .st-thumb--ic { width: 56px; }
+  .st-grip { width: 34px; }
+  .st-row__side { width: 28px; justify-items: end; align-self: start; padding-top: 2px; }
+  .st-row__side .meta { display: none; }
+  .st-md[data-mode="split"] .st-md__panes { grid-template-columns: 1fr; }
+  .st-insts { grid-template-columns: 1fr; }
+  .st-kw__row { grid-template-columns: 1fr; }
+  .st-mtile { width: 140px; }
+  .st-lib { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+  .st-strip { gap: 8px 16px; padding: 12px 14px; }
+  .st-strip__orph { margin-left: 0; }
+  .st-tier__lab { width: 56px; font-size: 1.6rem; }
+  .st-tier, .st-zone { min-height: 84px; }
+  .st-zone { gap: 6px; padding: 6px; }
+  .st-titem { width: 66px; }
+  .st-titem__btn { height: 80px; }
+  .st-titem__img { width: 52px; height: 52px; }
+  .st-zone:empty::before { width: 66px; height: 80px; }
+  .st-frames { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .st-seccard { min-height: 0; }
+  .st-orderbar { border-radius: 22px; padding: 10px 10px 10px 14px; }
+  .st-orderbar p { flex-basis: 100%; }
+  .st-orderbar .btn--red { margin-left: auto; }
+  .st-bulk { border-radius: 22px; }
+  .st-tl__side { display: contents; }
+  .st-tl__side > .st-tl__add:first-child { order: -1; }
+  .st-tl__set { order: 2; }
+  /* the editor's top bar on a phone: Back · Preview · History · Publish on one line (the publish verb stays) */
+  .st-ed > .ydetail__top { gap: 6px; }
+  .st-ed > .ydetail__top .ydetail__mini { display: none; }
+  .st-ed > .ydetail__top .ydetail__back { min-width: 0; overflow: hidden; }
+  .st-ed > .ydetail__top .st-pubbtn { --h: 44px; padding: 0 .9em; }
+}
+/* the narrowest phones (≤ 400px): the publish verb drops its second word ("Publish edits" → "Publish"; the facts line
+   says Edits) and the utilities close up, so Back · Preview · History · Publish stay on one line at 360 */
+@media (max-width: 400px) {
+  .st-pubw { display: none; }
+  .st-ed > .ydetail__top { gap: 4px; }
+  .st-ed > .ydetail__top .ydetail__actions { gap: 4px; }
+  .st-ed > .ydetail__top .st-pubbtn { padding: 0 .75em; gap: .4em; }
+}
+@media (pointer: coarse) {
+  .st-grip { min-width: 44px; }
+  .st-mdbar > button { width: 44px; height: 44px; }
+  .st-mtile__grip { width: 44px; height: 44px; }
+  .st-tab__btn { height: 44px; }
+  .st-titlein { min-height: 44px; }
+  .st-viewsite { --h: 44px; }
+}
+/* phones: a compact 2×2 of section cards (the "+" makes new things) */
+@media (max-width: 640px) {
+  .st-secs { gap: 10px; }
+  .st-seccard { padding: 12px; gap: 8px; }
+  .st-seccard__top { gap: 10px; }
+  .st-seccard__top .ydot { --d: 36px; font-size: 1.05rem; }
+  .st-seccard__name { font-size: 1.05rem; white-space: normal; overflow: visible; }
+  .st-seccard__add, .st-fan, .st-seccard__last { display: none; }
+  .st-seccard__counts { gap: 4px 10px; }
+}
+html.y-reduced .st-strip__dot, html.y-reduced .st-save__run { animation: none; }
+@media (prefers-reduced-motion: reduce) { .st-strip__dot, .st-save__run { animation: none; } }
+
+/* i9 · music · S8 · the track tabs (pin 8: "the tab is cut off on the top hard to see its highlighted"): the strip
+   scrolls sideways, so it clips. It now has room above for the chosen tab's 4px rise and its rope (flush on the tab's
+   own edge, the tab's radius), and it reaches 6px down behind the folder, so a tab's foot tucks under the body
+   instead of being cut at the folder's top line. */
+.st-folder { margin-top: 40px; }
+.st-tabs { padding-top: 10px; padding-bottom: 6px; bottom: calc(100% - 6px); }
+
+/* i9 · music · S9 · a track has every field a single has: its sections sit inside the folder, one step smaller */
+.st-folder__body [data-track] > .st-sec--sub { padding: 12px 0; }
+.st-folder__body [data-track] > .st-field + .st-sec--sub { border-top: 0; padding-top: 6px; }
+.st-sec--sub .st-sec__h .eyebrow { font-size: .7rem; }
+/* the collection's own: its instrument from its tracks (the kit swatch + the kit fact), its dates and status read-only */
+.st-instmix { display: flex; align-items: center; gap: 12px; min-height: 58px; padding: 6px 14px 6px 6px; border-radius: 14px; background: var(--tex-knit), var(--white); box-shadow: var(--shadow-patch); }
+.st-instmix .yswatch { --sw: 44px; --sw-r: 10px; }
+.st-instmix__t { display: grid; gap: 3px; min-width: 0; }
+.st-instmix__t .yfact { font: 800 .86rem/1.15 var(--font-display); }
+.st-instmix__t small { font: 500 .68rem/1.2 var(--font-mono); color: var(--y-fg-3); }
+.st-derived { display: grid; gap: 8px 12px; grid-template-columns: repeat(auto-fit, minmax(min(100%, 150px), 1fr)); margin: 0; }
+.st-derived > div { display: grid; gap: 4px; align-content: start; min-width: 0; padding: 10px 12px; border-radius: 14px; outline: 1.5px dashed rgba(31,30,30,.16); outline-offset: -1.5px; }
+.st-derived dt { font: 800 .8rem/1.2 var(--font-display); color: var(--y-fg-2); }
+.st-derived dd { margin: 0; display: grid; gap: 2px; justify-items: start; min-width: 0; }
+.st-derived dd > b { font: 800 1rem/1.25 var(--font-display); font-variant-numeric: tabular-nums; }
+.st-derived .meta { overflow-wrap: anywhere; }
+.st-from.ylinkbtn { display: inline; min-height: 0; padding: 0; font: inherit; }
+
+/* i9 · music · S7 · status ↔ finished: WIP disables the finish (and says why); Complete / Dropped fill it, visibly */
+.st-finish { display: grid; gap: 6px; align-content: start; min-width: 0; }
+/* i9 · walk (F4): beside a WIP's finish (its "runs to now" line makes that column taller), Started's own grid stretched its
+   rows, so its selects sat 19–27px below the Finished ones. Both columns hold their rows at the top. */
+.st-fieldrow:has(> .st-finish) > .st-field { align-content: start; }
+.st-finish.is-off .st-lab { color: var(--y-fg-3); }
+.st-finish select { outline: 3px solid transparent; outline-offset: 2px; }
+.st-finish.is-filled select { animation: st-fill 1600ms var(--ease-out); }
+@keyframes st-fill { 0%, 35% { outline-color: var(--gold); background-color: #fff4cf; } 100% { outline-color: transparent; } }
+html.y-reduced .st-finish.is-filled select { animation-duration: 1ms; outline-color: var(--gold); }
+
+/* i9 · music · S10 · the Music order on the site: a single choice (the kit seg, its rope) + the rule it follows.
+   The list under it is that order, with the site's year pills. Phones: the seg takes the row, short words. */
+.st-siteorder { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 8px 12px; margin: 0 0 14px; }
+.st-siteorder[hidden] { display: none; }
+.st-siteorder__seg { justify-self: start; }
+.st-siteorder__rule { grid-column: 1 / -1; }
+.st-so__short { display: none; }
+.st-year { margin: 18px 0 10px; }
+.st-year:first-child { margin-top: 4px; }
+@media (max-width: 959px) {
+  .st-siteorder { grid-template-columns: minmax(0, 1fr) auto; }
+  .st-siteorder__seg { grid-column: 1 / -1; grid-row: 2; display: flex; width: 100%; }
+  .st-siteorder__seg .yseg__btn { flex: 1; justify-content: center; padding-inline: 6px; }
+  .st-so__long { display: none; }
+  .st-so__short { display: inline; }
+}
+.st-tabs { padding-right: 10px; scroll-padding-inline: 14px; } /* i9 · music · S8: the last tab never sits on the strip's clipped edge */
+
+/* == i9 · links · the one links field (E.links, studio-links.js) + the playlist's tracks from anywhere (S5, S2) ======
+   A link row: grip · the brand mark (the kit's .ylinkicon: it opens the link; the kind under it) · its text over its
+   address (kit .yfield) · ✕. Every column sits at one x in every row (measured in the tests). The add box under the
+   list takes one link or a pasted list (one per line); lines that aren't links stay in it, and it says why. */
+.st-links { display: grid; gap: 10px; }
+.st-lklist { gap: 8px; }
+.st-lklist[hidden] { display: none; }
+.st-li.st-lk > .st-lkrow { display: grid; grid-template-columns: 44px minmax(0, 1fr) 32px; align-items: start; gap: 6px 12px; min-height: 0; padding: 10px; cursor: default; }
+.st-lk__mark { display: grid; justify-items: center; align-content: start; gap: 4px; }
+.st-lk__kind { font: 600 .6rem/1 var(--font-mono); letter-spacing: .04em; text-transform: uppercase; color: var(--y-fg-3); }
+.st-lk__none { cursor: default; color: var(--red-deep); background: var(--cotton-2); box-shadow: inset 0 0 0 1.5px rgba(160,26,36,.35); }
+.st-lk__f { display: grid; gap: 6px; min-width: 0; }
+.st-lk__f .yfield { min-width: 0; }
+.st-lk__t { min-height: 42px; padding: 8px 14px; font-weight: 700; }
+.st-lk__u { min-height: 34px; padding: 5px 14px; font-size: .78rem; line-height: 1.3; color: var(--y-fg-2); }
+.st-lk__err { display: flex; align-items: baseline; gap: 6px; margin: 0; font: 600 .76rem/1.35 var(--font-body); color: var(--red-deep); }
+.st-lk__err[hidden] { display: none; }
+.st-lk__err i { flex: none; translate: 0 1px; }
+.st-lk__rm { margin-top: 6px; }
+.st-lkrow.is-flash { animation: st-lkflash 1.2s var(--ease-out); }
+@keyframes st-lkflash { 0%, 45% { box-shadow: 0 0 0 3px var(--c-pick-a), var(--shadow-patch); } 100% { box-shadow: var(--shadow-patch); } }
+.st-lkadd { display: grid; gap: 6px; }
+.st-lkadd__row { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 8px; align-items: start; }
+textarea.st-lkadd__in { min-height: 48px; max-height: 200px; resize: none; field-sizing: content; padding: 12px 16px; font-size: .84rem; line-height: 1.5; overflow-wrap: anywhere; }
+.st-lkadd__btn { min-height: 48px; }
+/* the playlist: an external track's row keeps the playlist's columns (art · title · length · ✕); its title + artist
+   are quiet inputs (a field only on hover / focus), its art opens the picker */
+.st-plfrom { margin-top: 10px; }
+@media (min-width: 1240px) { .st-pl { grid-template-columns: minmax(0, 2fr) minmax(0, 3fr); } } /* the playlist side gets the room: its titles are fields */
+.st-plrow--x { cursor: default; }
+.st-plart { display: grid; place-items: center; width: 40px; height: 40px; padding: 0; border: 0; border-radius: 8px; background: none; cursor: pointer; transition: transform 200ms var(--ease-crit); }
+@media (hover: hover) { .st-plart:hover { transform: translateY(-2px); } .st-plart:hover .yxart { box-shadow: var(--shadow-lift); } }
+.st-plart:active { transform: scale(.94); }
+.st-plart:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+.st-plmeta { display: flex; align-items: center; gap: 2px; min-width: 0; }
+.st-pln { flex: none; font: 800 .9rem/1.2 var(--font-display); }
+.st-plins { flex: 1; display: grid; min-width: 0; }
+.st-plin { width: 100%; min-width: 0; margin: 0; padding: 2px 6px; border: 0; border-radius: 6px; background: transparent; color: var(--ink); text-overflow: ellipsis; }
+.st-plin--t { font: 800 .9rem/1.35 var(--font-display); }
+.st-plin--b { font: 500 .78rem/1.3 var(--font-body); color: var(--y-fg-2); }
+.st-plin::placeholder { color: var(--y-fg-3); opacity: 1; }
+.st-plin--t:placeholder-shown { text-decoration: underline 1.5px dashed var(--ink-3); text-underline-offset: 4px; }
+@media (hover: hover) { .st-plin:hover { background: var(--y-chip); } }
+.st-plin:focus { outline: 2px solid var(--focus); outline-offset: 0; background: var(--white); }
+.st-plin[aria-invalid="true"] { outline: 2px solid var(--red-deep); outline-offset: 0; }
+input.st-pldur { padding: 6px 2px; text-align: right; font-variant-numeric: tabular-nums; }
+@media (pointer: coarse) { .st-plin { min-height: 32px; } input.st-pldur { min-height: 40px; } }
+/* track art: the service's mark, or any picture in Media (a single choice: the rope) */
+.st-artfor { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 12px; margin: 0 0 14px; }
+.st-artfor > span:not(.yxart) { flex: 1 1 140px; min-width: 0; display: grid; gap: 2px; font: 800 1rem/1.25 var(--font-display); }
+.st-artpick { display: grid; grid-template-columns: repeat(auto-fill, minmax(76px, 1fr)); gap: 10px; padding: 4px; margin: -4px; }
+.st-artopt { --ysel-r: 12px; display: block; aspect-ratio: 1; padding: 0; border: 0; border-radius: 12px; background: var(--cotton-2); cursor: pointer; transition: transform 200ms var(--ease-crit); }
+.st-artopt > img, .st-artopt > .yxart { display: block; width: 100%; height: 100%; object-fit: cover; border-radius: 12px; }
+.st-artopt > .yxart { font-size: 1.9rem; }
+@media (hover: hover) { .st-artopt:hover { transform: translateY(-2px); } }
+.st-artopt:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+@media (max-width: 959px) {
+  .st-li.st-lk > .st-lkrow { grid-template-columns: 40px minmax(0, 1fr) 32px; gap: 6px 10px; padding: 8px; }
+  .st-lk__mark .ylinkicon { width: 40px; height: 40px; }
+}
+/* i9 · links · a collection preview's track rows carry each track's links (the site's song rows do): one column, as
+   wide as the track with the most, so the status + length columns stay at one x */
+.st-tracks.has-lk .st-track { grid-template-columns: 40px minmax(0, 1fr) calc(var(--lkn) * 36px - 4px) 28px 3.2em; }
+.st-track__lk { display: flex; justify-content: flex-end; gap: 4px; }
+
+/* == i9 · blocks · the block editor (studio-blocks.js), every markdown field ====================================
+   You write on a knit sheet in the site's own article type (.ydetail__text), block by block. The bar is the old
+   markdown bar's cloth; the handle and + sit in the sheet's left margin; menus and forms are the kit's popover cloth
+   (.ysearch__pop's) on Yarn.layer(). Hover only lifts; the block menu's current type wears the rope; a pressed format
+   toggle is the red fill. */
+.st-bk { display: grid; gap: 8px; min-width: 0; grid-template-columns: minmax(0, 1fr); }
+.st-bk__bar {
+  position: sticky; top: var(--st-bk-top, 66px); z-index: 12;
+  display: flex; flex-wrap: wrap; align-items: center; gap: 2px; padding: 4px; border-radius: 14px;
+  background: var(--tex-knit), var(--cotton-2); box-shadow: inset 0 1px 2px rgba(31,30,30,.1), 0 6px 12px -10px rgba(31,30,30,.4);
+}
+.st-bk__tb {
+  --ysel-r: 10px; display: inline-flex; align-items: center; justify-content: center; gap: 6px; min-width: 38px; height: 38px; padding: 0 9px;
+  border: 0; border-radius: 10px; background: transparent; color: var(--y-fg-2); cursor: pointer; font: 800 .84rem/1 var(--font-display);
+  transition: background 140ms, color 140ms, transform var(--press) var(--ease-out);
+}
+.st-bk__tb > i { font-size: 1.08rem; }
+@media (hover: hover) { .st-bk__tb:not(:disabled):not([aria-pressed="true"]):hover { background: var(--white); color: var(--ink); } }
+.st-bk__tb:active:not(:disabled) { transform: scale(.92); }
+.st-bk__tb:disabled { opacity: .38; cursor: default; }
+.st-bk__tb:focus-visible { outline: 3px solid var(--focus); outline-offset: -2px; }
+.st-bk__tb--ins { padding: 0 13px 0 10px; color: var(--ink); background: var(--white); box-shadow: 0 1px 0 rgba(31,30,30,.12); }
+.st-bk__sep { width: 0; height: 22px; margin: 0 4px; border-left: 1.5px dashed rgba(31,30,30,.2); }
+.st-bk__grow { flex: 1 1 0; }
+.st-bk__bar .yseg { margin-left: auto; }
+.st-bk__wrap {
+  position: relative; min-height: 220px; padding: 18px 22px 26px 60px; border-radius: 16px; cursor: text;
+  background: var(--tex-knit), var(--white); box-shadow: inset 0 0 0 1.5px rgba(31,30,30,.08);
+}
+.st-bk[data-mode="md"] .st-bk__wrap { padding: 0; background: none; box-shadow: none; min-height: 0; cursor: auto; }
+.st-bk[data-compact] .st-bk__wrap { min-height: 130px; }
+.st-bk__doc { min-height: 170px; outline: none; }
+.st-bk[data-compact] .st-bk__doc { min-height: 90px; }
+.st-bk__doc > :last-child { margin-bottom: 0; }
+.st-bk__doc .yb { position: relative; outline: none; white-space: pre-wrap; overflow-wrap: anywhere; caret-color: var(--ink); scroll-margin: 150px 0 120px; }
+.st-bk__doc :is(h1, h5, h6).yb { margin: 1.6em 0 .5em; font: 850 1.6rem/1.15 var(--font-display); letter-spacing: -.02em; color: var(--ink); }
+.st-bk__doc :is(h5, h6).yb { font-size: 1rem; }
+.st-bk__doc .yb:first-child { margin-top: 0; }
+/* an empty block's hint (a pseudo element, so it's never text; ::after, since a list item's bead is its ::before) */
+.st-bk__doc .yb.is-empty[data-ph]::after { content: attr(data-ph); position: absolute; left: var(--ph-x, 0); top: var(--ph-y, 0); color: var(--ink-3); pointer-events: none; white-space: nowrap; overflow: hidden; max-width: 100%; text-overflow: ellipsis; }
+.st-bk__doc blockquote.yb { --ph-x: 24px; --ph-y: 14px; }
+.st-bk__doc li.yb { margin-left: calc(var(--ind, 0) * 1.5em); }
+.st-bk__doc :is(ul, ol) + :is(ul, ol) { margin-top: -.8em; }
+/* atoms (a yarn block, an image, a divider, kept markdown): the real part, a click edits it; hover lifts */
+.st-bk__doc .yb-atom { position: relative; margin: 1.2em 0; border-radius: 14px; cursor: pointer; outline: none; transition: transform 200ms var(--ease-out); }
+/* i9 · walk (F2): an atom is the kit's own part, drawn as the site draws it: the text blocks' pre-wrap (for typing) must not
+   reach it, or the whitespace in its HTML becomes blank lines (a post card was 606px here, 162px in the preview) */
+.st-bk__doc .yb-atom, .st-bk__ghost .yb-atom { white-space: normal; }
+@media (hover: hover) { .st-bk__doc .yb-atom:hover { transform: translateY(-2px); } .st-bk__doc .yb-yarn:hover .yb-atom__in > .ymd > :is(.ycard, .ypost) { box-shadow: var(--shadow-lift); } }
+.st-bk__doc .yb-atom:focus-visible { outline: 3px solid var(--focus); outline-offset: 4px; }
+.st-bk__doc .yb-atom__in > .ymd { margin: 0; }
+.st-bk__doc .yb-img img { display: block; }
+.st-bk__doc .yb-hr { margin: .4em 0; padding: 10px 0; }
+.st-bk__doc .yb-hr hr { margin: 0; }
+.yb-yarn__empty { display: flex; align-items: center; gap: 8px; min-height: 56px; padding: 0 16px; border-radius: 14px; outline: 2px dashed rgba(31,30,30,.25); outline-offset: -2px; color: var(--ink-3); font: 750 .9rem/1.2 var(--font-display); }
+.st-bk__doc .yb-raw { padding: 2px 0; }
+.yb-raw__tag { position: absolute; top: -10px; right: 6px; display: inline-flex; align-items: center; gap: 4px; padding: 3px 7px; border-radius: 999px; background: var(--white); box-shadow: 0 1px 2px rgba(31,30,30,.18); font: 500 .66rem/1 var(--font-mono); color: var(--ink-3); }
+/* block selection: a soft red wash (Esc, a drag across blocks, the handle's menu) */
+.st-bk__doc .is-bsel { background: color-mix(in srgb, var(--c-pick-a) 7%, transparent); box-shadow: 0 0 0 6px color-mix(in srgb, var(--c-pick-a) 7%, transparent); border-radius: 6px; }
+.st-bk__doc .yb-atom.is-bsel { border-radius: 14px; }
+/* code: the kit's felt pre, a plain textarea inside it */
+.st-bk__doc .yb-code { position: relative; margin: 1.2em 0 1.4em; }
+.st-bk__doc .yb-code pre { margin: 0; padding-top: 28px; }
+.yb-code__t { display: block; width: 100%; min-height: 1.65em; margin: 0; padding: 0; border: 0; background: none; color: inherit; font: inherit; resize: none; overflow-x: auto; overflow-y: hidden; white-space: pre; outline: none; caret-color: #fff; tab-size: 2; }
+.yb-code__lang { position: absolute; top: 8px; right: 14px; width: 11ch; padding: 2px 0; border: 0; border-bottom: 1px dashed rgba(244,239,232,.25); background: transparent; color: rgba(244,239,232,.72); font: 500 .72rem/1.2 var(--font-mono); text-align: right; outline: none; }
+.yb-code__lang::placeholder { color: rgba(244,239,232,.4); }
+.yb-code__lang:focus { border-bottom-color: rgba(244,239,232,.7); }
+/* the margin: + (a block below / here) and the handle (drag, or the menu) */
+.st-bk__gut { position: absolute; left: 12px; z-index: 3; display: flex; gap: 1px; }
+.st-bk__gbtn { position: relative; display: grid; place-items: center; width: 22px; height: 30px; padding: 0; border: 0; border-radius: 8px; background: transparent; color: var(--ink-3); cursor: pointer; font-size: 1.05rem; transition: background 140ms, color 140ms, transform var(--press) var(--ease-out); }
+@media (hover: hover) { .st-bk__gbtn:hover { background: var(--cotton-2); color: var(--ink); } }
+.st-bk__gbtn:active { transform: scale(.9); }
+.st-bk__gbtn:focus-visible { outline: 3px solid var(--focus); outline-offset: 0; }
+.st-bk__grip { cursor: grab; touch-action: none; }
+html.st-bk-dragging, html.st-bk-dragging * { cursor: grabbing !important; user-select: none !important; }
+.st-bk__drop { position: absolute; left: 56px; right: 18px; z-index: 4; height: 4px; margin-top: -2px; border-radius: 2px; background: var(--tex-twill), var(--c-pick-a); pointer-events: none; }
+.st-bk__ghost { position: fixed; left: 0; top: 0; z-index: var(--z-drag, 9500); max-height: 220px; overflow: hidden; padding: 4px 14px; border-radius: 14px; background: var(--tex-knit), var(--white); box-shadow: var(--shadow-lift); opacity: .94; pointer-events: none; }
+.st-bk__ghost > :first-child { margin-top: 0; } .st-bk__ghost > :last-child { margin-bottom: 0; }
+.st-bk__doc .is-moving { opacity: .28; }
+/* the raw markdown */
+.st-bk__raw { min-height: 260px; font: 500 .9rem/1.6 var(--font-mono); resize: vertical; }
+.st-bk__hint kbd { font: 500 .68rem/1 var(--font-mono); padding: 2px 5px; border-radius: 5px; background: var(--cotton-2); color: var(--ink-2); }
+.st-bk__hint [data-chars].is-over { color: var(--red-deep); font-weight: 700; }
+.st-bk__warn { color: var(--red-deep); }
+/* popovers on the layer: the kit's popover cloth (.ysearch__pop) */
+.st-bk__pop { position: fixed; left: 0; top: 0; z-index: var(--z-pop, 70); box-sizing: border-box; overflow: auto; overscroll-behavior: contain; padding: 6px; border-radius: 16px; background: var(--tex-knit), var(--white); box-shadow: var(--shadow-pop); outline: 1.5px dashed rgba(31,30,30,.2); outline-offset: -5px; }
+.st-bk__pop.is-docked { top: auto; border-radius: 20px; }
+.st-bk__grp { padding: 10px 10px 4px; font: 500 .72rem/1 var(--font-mono); color: var(--ink-3); }
+.st-bk__opt { gap: 12px; min-height: 50px; }
+.st-bk__oic { flex: none; display: grid; place-items: center; width: 34px; height: 34px; border-radius: 10px; background: var(--cotton-2); color: var(--ink); box-shadow: inset 0 0 0 1px rgba(31,30,30,.08); font-size: 1.05rem; }
+.st-bk__oic.is-yarn { border-radius: 50%; background: var(--tex-felt), var(--c-brand); background-size: 120px, auto; color: #fff; box-shadow: inset 0 0 0 1.5px rgba(255,255,255,.2); }
+.st-bk__ot { display: grid; gap: 2px; min-width: 0; }
+.st-bk__ot b { font: 800 .92rem/1.2 var(--font-display); }
+.st-bk__ot small { font: 500 .76rem/1.3 var(--font-body); color: var(--ink-3); }
+.st-bk__okbd { margin-left: auto; padding: 4px 6px; border-radius: 6px; background: var(--cotton-2); font: 500 .7rem/1 var(--font-mono); color: var(--ink-3); }
+.st-bk__none { margin: 0; padding: 12px; color: var(--ink-3); font-size: .9rem; }
+.st-bk__mi { --ysel-r: 10px; display: flex; align-items: center; gap: 10px; width: 100%; min-height: 40px; padding: 0 10px; border: 0; border-radius: 10px; background: transparent; color: var(--ink); font: 750 .9rem/1.2 var(--font-display); cursor: pointer; text-align: left; }
+.st-bk__mi > i { flex: none; width: 20px; font-size: 1.05rem; color: var(--ink-2); }
+.st-bk__mi kbd { margin-left: auto; font: 500 .7rem/1 var(--font-mono); color: var(--ink-3); }
+.st-bk__mi:is(:hover, :focus) { background: var(--cotton-2); outline: none; }
+html[data-yinput="key"] .st-bk__mi:focus-visible { box-shadow: inset 0 0 0 2.5px var(--focus); }
+.st-bk__mi[data-danger] { color: var(--red-deep); } .st-bk__mi[data-danger] > i { color: inherit; }
+.st-bk__turn { display: grid; gap: 2px; }
+.st-bk__hr { margin: 6px 6px; border: 0; border-top: 1.5px dashed rgba(31,30,30,.14); }
+@media (pointer: coarse) { .st-bk__mi { min-height: 44px; } }
+/* the forms */
+.st-bk__form, .st-bk__lnk { padding: 0; display: flex; flex-direction: column; overflow: hidden; }
+.st-bk__lnk { padding: 14px; gap: 10px; overflow: auto; }
+.st-bk__fh { flex: none; display: flex; align-items: center; gap: 8px; padding: 12px 12px 10px 14px; border-bottom: 1.5px dashed rgba(31,30,30,.12); }
+.st-bk__fh h2 { margin: 0; font: 850 1.02rem/1.1 var(--font-display); color: var(--ink); }
+.st-bk__fh .st-bk__oic { width: 30px; height: 30px; font-size: .95rem; }
+.st-bk__fbody { min-height: 0; overflow: auto; overscroll-behavior: contain; display: grid; gap: 12px; padding: 12px 14px 16px; }
+.st-bk__links { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+.st-bk__link { position: relative; padding: 10px 44px 8px 12px; border-radius: 12px; background: var(--cotton-2); }
+.st-bk__link .st-hint:empty { display: none; }
+.st-bk__lrm { position: absolute; top: 8px; right: 6px; }
+.st-bk__picks { display: grid; gap: 6px; max-height: 300px; overflow: auto; padding: 4px; margin: -4px; list-style: none; }
+.st-bk__pick { --ysel-r: 14px; display: grid !important; grid-template-columns: 34px minmax(0, 1fr) auto; align-items: center; gap: 10px; min-height: 50px; padding: 6px 12px 6px 8px; text-align: left; }
+.st-bk__pick > b { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font: 800 .9rem/1.2 var(--font-display); }
+.st-bk__pick > .meta { max-width: 14ch; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.st-bk__libl { list-style: none; margin: 0; padding: 4px; display: grid; grid-template-columns: repeat(auto-fill, minmax(84px, 1fr)); gap: 8px; max-height: 260px; overflow: auto; }
+.st-bk__libt { --ysel-r: 12px; position: relative; display: block; width: 100%; aspect-ratio: 1; padding: 0; border: 0; border-radius: 12px; background: var(--cotton-2); cursor: pointer; transition: transform 200ms var(--ease-out); }
+.st-bk__libt > :is(img, video, .ymissing) { width: 100%; height: 100%; object-fit: cover; border-radius: 12px; }
+@media (hover: hover) { .st-bk__libt:hover { transform: translateY(-2px); } }
+.st-bk__libc { position: absolute; right: 6px; bottom: 6px; display: grid; place-items: center; width: 26px; height: 26px; border-radius: 50%; background: var(--white); color: var(--ink); box-shadow: 0 1px 3px rgba(31,30,30,.3); font-size: .85rem; }
+.st-bk__libt[aria-pressed="true"] { outline: 3px solid var(--c-pick-a); outline-offset: -3px; }
+.st-bk__libt[aria-pressed="true"] .st-bk__libc { background: var(--c-on-tex), var(--c-on-bg); color: var(--c-on-fg); }
+.st-bk__rawta { font: 500 .86rem/1.55 var(--font-mono); }
+.st-bk__picks .st-plrow b small { font: 500 .72rem/1 var(--font-mono); }
+@media (max-width: 959px) {
+  .st-bk__wrap { padding: 14px 14px 22px 44px; }
+  .st-bk__gut { left: 4px; }
+  .st-bk__gbtn { width: 34px; height: 34px; }
+  .st-bk__gut[data-empty="true"] .st-bk__grip, .st-bk__gut[data-empty="false"] [data-bkplus] { display: none; }
+  .st-bk__drop { left: 40px; right: 12px; }
+  .st-bk__keys { display: none; }
+  .st-bk__bar { top: var(--st-bk-top-m, 64px); }
+  .st-bk__bar .yseg { margin-left: 0; }
+}
+@media (pointer: coarse) { .st-bk__gbtn::after { content: ""; position: absolute; inset: -5px; } .st-bk__tb { min-width: 42px; height: 42px; } }
+.st-bk__fh .ydetail__spacer, .st-bk__lnk .ydetail__spacer { flex: 1 1 auto; }
+/* phones: the editor's bar stays in the flow (two tidy rows); while a block has the cursor, the keyboard bar docks
+   above the on-screen keyboard on the kit's layer (popovers dock above it) */
+.st-bk__br { display: none; }
+.st-bk__kbar {
+  position: fixed; left: 8px; z-index: var(--z-pop-low, 69); display: flex; align-items: center; gap: 2px; padding: 4px; border-radius: 16px;
+  background: var(--tex-knit), var(--cotton-2); box-shadow: var(--shadow-pop); outline: 1.5px dashed rgba(31,30,30,.2); outline-offset: -5px;
+}
+.st-bk__kbar[hidden] { display: none; }
+.st-bk__kbar .st-bk__tb { flex: 1 1 auto; min-width: 0; }
+.st-bk__kbar .st-bk__tb--ins { flex: 0 0 auto; }
+@media (max-width: 959px) {
+  .st-bk__bar { position: static; }
+  .st-bk__br { display: block; flex-basis: 100%; height: 0; }
+  .st-bk__sep--hist { display: none; }
+}
+/* while the keyboard bar is up, the sections pill steps away (the kit's own step-away, html.y-navaway's): a real
+   keyboard would cover it anyway, and the two never overlap */
+@media (max-width: 959px) {
+  html[data-mnav="spool"].st-bk-kbar .yspool {
+    opacity: 0; scale: .7; visibility: hidden; pointer-events: none;
+    transition: translate 380ms var(--ease-crit), scale 280ms var(--ease-crit), opacity 160ms, visibility 0s linear 280ms;
+  }
+}
+
+/* == i11 · system · L5 · STUDIO ON THE RULES (DESIGN-i11 T1–T10) ==================================================
+   Every Studio text is a kit role (kit/yarn.css "i11 · system · L2"): Display 36 (the editor's title, Home's hello) ·
+   Heading 22 (a sheet's or a pane's heading, a tier's letter) · Title 17 / 16 in a card or row (a section card's name,
+   a row's title, a toggle's name, an option's name) · Body 15 / 14 · Meta 13 / 12 (hints, counts, file names, times:
+   Nunito Sans, tabular) · Label 14 / 13 (field labels, tabs, menu items) · Micro 12 (the woven tags). Weights 400 / 500
+   only. Maple Mono stays only where you type raw markdown or code (.st-md__ta, .st-bk__raw, .st-bk__rawta, code).
+   T10: section cards, rows, the preview pane and the sheets hold their content one inset from every edge; what sits
+   in them takes radius = outer − inset. The card context (16 / 14 / 12 / 13) is on .st-seccard, .st-prevcard,
+   .st-tagcard, .st-livecard and every kit .ycard / .yrow Studio uses. */
+:where(.st-drow, .st-li, .st-mtile, .st-ltile, .st-coll, .st-newopt, .st-check, .st-rev, .st-plrow, .st-track) {
+  --fs-title: 16px; --fs-body: 14px; --fs-meta: 12px; --fs-label: 13px; --fs-num: 12px;
+  --t-title: var(--fw-title) var(--fs-title)/var(--lh-title) var(--ff-head); --t-body: var(--fw-body) var(--fs-body)/var(--lh-body) var(--ff-body);
+  --t-meta: var(--fw-meta) var(--fs-meta)/var(--lh-meta) var(--ff-body); --t-label: var(--fw-label) var(--fs-label)/var(--lh-label) var(--ff-body);
+  --t-num: var(--fw-num) var(--fs-num)/var(--lh-num) var(--ff-num);
+}
+/* Display */
+.st-titlein, .st-hello { font: var(--t-display); letter-spacing: var(--tr-display); text-wrap: balance; }
+/* Heading */
+.st-sheet__head h2, .st-cmp__h h2, .st-tl__add h2, .st-bk__fh h2, .st-bk__doc h1.yb { font: var(--t-heading); letter-spacing: var(--tr-heading); text-wrap: balance; }
+.st-tier__lab { font: var(--t-heading); letter-spacing: var(--tr-heading); }
+@media (max-width: 959px) { .st-tier__lab { font-size: var(--fs-heading); } }
+.st-tiers[data-named] .st-tier__lab { font: var(--t-title); letter-spacing: var(--tr-title); }
+.st-thumb--text { font: var(--t-title); letter-spacing: var(--tr-title); }
+.st-pin input { font: var(--fw-heading) var(--fs-heading)/1 var(--ff-num); font-variant-numeric: tabular-nums; letter-spacing: var(--tr-heading); }
+/* Title */
+.st-seccard__name, .st-drow__t b, .st-row__title, .st-newopt b, .st-audio__name b, .st-audio__empty b, .st-coll b, .st-check > div > b,
+.st-rev__t b, .st-bulk p, .st-derived dd > b, .st-artfor > span:not(.yxart), .st-bk__ot b, .st-bk__pick > b, .st-track b, .st-plrow b,
+.st-pln, .st-plin--t, .st-imgopt b, .st-tcp__own, .yb-yarn__empty, .st-bk__doc :is(h5, h6).yb, .st-gate__brand b { font: var(--t-title); letter-spacing: var(--tr-title); text-wrap: balance; }
+@media (max-width: 959px) { .st-seccard__name { font-size: var(--fs-title); } }
+.st-orphnote b, .st-gate__denied b { font-family: var(--ff-head); font-weight: var(--fw-title); }
+/* Body */
+.st-note, .st-act, .st-dek, .st-diff__v, .st-tagcard > p, .st-bio, .st-gate__denied, .st-plin--b, .st-bk__none, .st-seccard__last, .st-fan__words, textarea.st-lkadd__in { font: var(--t-body); letter-spacing: var(--tr-body); text-wrap: pretty; }
+.st-bio { line-height: var(--lh-body); }
+/* Meta (Nunito Sans; numbers tabular) */
+.st-hint, .st-row__title small, .st-order, .st-poster, .st-upmsg, .st-add small, .st-frame span, .st-insts .yrow small, .st-motif,
+.st-tray .st-zone:empty::before, .st-sugs .ychip small, .st-imgopt small, .st-rev__time, .st-diff .st-diff__legend, .st-ltile__name,
+.st-facts dd, .st-or, .st-gate__foot, .st-instmix__t small, .st-lk__kind, .st-lk__u, .st-lk__err, .yb-raw__tag, .yb-code__lang,
+.st-bk__grp, .st-bk__ot small, .st-bk__libc, .st-bk__picks .st-plrow b small, .st-toggle__txt span, .st-check > div > span,
+.st-tsub, .st-field > label .meta, .st-lab .meta, .st-tcp__own .meta { font: var(--t-meta); letter-spacing: var(--tr-meta); font-variant-numeric: tabular-nums; }
+.st-lk__kind { text-transform: none; }
+.st-mono { font-family: var(--ff-body); font-size: var(--fs-body); font-variant-numeric: tabular-nums; }
+.st-bk__hint kbd, .st-bk__okbd, .st-bk__mi kbd { font: var(--fw-meta) var(--fs-micro)/1 var(--ff-body); }
+/* Label (field labels, tabs, menu items, tiles' words) */
+.st-field > label, .st-field > .st-lab, .st-lab, .st-tab__btn, .st-add, .st-bk__tb, .st-bk__mi, .st-strip__live, .st-toggle__txt b,
+.st-insts .yrow, .st-instmix__t .yfact, .st-facts dt, .st-derived dt, .st-color { font: var(--t-label); letter-spacing: var(--tr-label); }
+.st-toggle__txt b, .st-field > label, .st-lab { line-height: 1.25; }
+/* Micro (the woven tags, a tier item's name, small caps heads) */
+.st-label, .st-cover, .st-titem__name, .st-diff__f, .st-sec--sub .st-sec__h .eyebrow, .st-ited__key.ytierkey { font: var(--t-micro); }
+.st-label, .st-diff__f { letter-spacing: var(--tr-caps); }
+.st-cover { letter-spacing: var(--tr-micro); }
+/* weights: nothing above 500 */
+.st-hint b, .st-seccard__last b, .st-act b, .st-diff ins, .st-lk__t, .st-bio .yscribble, .st-bk__hint [data-chars].is-over { font-weight: var(--fw-label); }
+/* T10 · insets + radii */
+.st-seccard { padding: var(--inset); }
+.st-drow { padding: 12px; }
+.st-prevbox { padding: var(--inset-pane); border-radius: var(--r-pane); }
+@media (max-width: 959px) { .st-prevbox { padding: var(--inset-pane); } }
+.st-sheet { border-radius: var(--r-sheet); }
+.st-sheet__head { padding: var(--inset-sheet) var(--inset-sheet) 8px; }
+.st-sheet__body { padding: 8px var(--inset-sheet) var(--inset-sheet); }
+.st-sheet__foot { padding: 12px var(--inset-sheet) var(--inset-sheet); }
+.st-sheet .yfield:not(.yfield--sm), .st-prevbox .yfield:not(.yfield--sm) { border-radius: var(--r-sheet-inner); }
+.st-shows { padding: 8px; border-radius: var(--r-row); }
+.st-orderbar { padding: 8px; }
+.st-orderbar > :first-child:not(.btn) { margin-left: 8px; }
+/* T1 rule 2 + T8: Studio's small-caps labels were headings in disguise. The dashboard's sections (Sections · On the
+   needles · Recently) are Headings (22: the section cards' names, 16, sit under them); an editor's form sections and
+   the sheets' groups are Titles; the preview's labels ("Preview as on blaqat.net", "On the card", "In the library")
+   are Meta words. No uppercase. */
+.st-eyebrow-row .eyebrow { font: var(--t-heading); letter-spacing: var(--tr-heading); text-transform: none; color: var(--ink); }
+.st-sec__h .eyebrow, .st-newgrp > .eyebrow, .st-ed h3.eyebrow, .st-sheet h3.eyebrow, .st-trks > .eyebrow { font: var(--t-title); letter-spacing: var(--tr-title); text-transform: none; color: var(--ink); }
+.st-sec--sub .st-sec__h .eyebrow { font: var(--t-label); letter-spacing: var(--tr-label); }
+.st-prevhead .eyebrow, .st-shows > .eyebrow, .st-prevcard > .eyebrow { font: var(--t-meta); letter-spacing: var(--tr-meta); text-transform: none; color: var(--ink-3); }
+:is(.st-eyebrow-row, .st-sec__h, .st-trks, .st-newgrp) .eyebrow .meta { font: var(--t-meta); letter-spacing: var(--tr-meta); margin-left: .4em; }
+.st-eyebrow-row { margin: var(--section-gap) 0 var(--sp-4); }
+.st-dash { row-gap: 0; }
+/* a status choice is a chip whose words are a fact: they read as its label (rule 6: body − 1, 500); 44 tall, so its
+   glyph and words sit (44 − 1em) / 2 ≈ 15 from its ends */
+.st-opt .yfact, .st-opt .yfact .yfact__s { font: var(--t-label); letter-spacing: var(--tr-label); }
+.st-opt.ychip { padding: 0 calc((44px - 1em) / 2); }
+/* T10: the fanned thumbnails start one inset in (their −8px overlap is paid by the row's own 8) and take the card's inner radius */
+.st-fan { padding-left: 10px; } /* (8 for the overlap + the first print's −4° tilt) */
+.st-fan .yswatch { --sw-r: var(--r-inner); }
+/* T10 in a row of section cards: a shorter card stretches to its row, so its last line ("Last touched …") sits on the
+   bottom inset instead of leaving the slack under it; the fanned prints keep 4px for their tilt on the right too */
+.st-seccard { display: flex; flex-direction: column; }
+.st-seccard > .st-seccard__last { margin-top: auto; }
+.st-fan { padding-right: 4px; }

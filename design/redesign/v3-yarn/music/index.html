@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en" data-section="music">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Music · blaqat.net</title>
+<link rel="stylesheet" href="../kit/yarn.css">
+<link rel="stylesheet" href="music.css">
+<script src="../kit/data.js"></script>
+<script src="../kit/yarn.js" defer></script>
+<script src="../kit/notes.js" defer onerror="this.remove()"></script>
+<script src="../kit/player.js" defer></script>
+<script src="music.js" defer></script>
+</head>
+<body class="frame">
+<main class="sheet">
+  <yarn-nav active="music"></yarn-nav>
+  <div class="mu" id="mu">
+    <header class="mu-head">
+      <h1 class="h1">Music</h1>
+      <p class="mu-lede">Piano pieces, DAW sketches and BeepBox chiptunes, 2017 to now.<span class="lede-more"> Collections are sewn together; singles are loose threads.</span></p>
+      <p class="meta mu-stats" id="mu-stats"></p>
+      <div class="mu-cta">
+        <button class="btn btn--red" type="button" id="play-all"><i class="ph-fill ph-play" aria-hidden="true"></i><span>Play all</span></button>
+        <button class="btn" type="button" id="shuffle-all" aria-label="Shuffle all"><i class="ph-bold ph-shuffle" aria-hidden="true"></i><span class="cta-l">Shuffle</span></button>
+      </div>
+    </header>
+
+    <div class="mu-filters" id="mu-filters"></div>
+
+    <div class="lib" id="lib" aria-live="off"></div>
+    <p class="mu-empty" id="mu-empty" hidden>Nothing matches those filters. <button type="button" class="linkish" data-reset>Show all</button></p>
+  </div>
+</main>
+<yarn-player></yarn-player>
+</body>
+</html>

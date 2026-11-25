@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en" data-section="home">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>blaqat.net · home (yarn)</title>
+<link rel="stylesheet" href="../kit/yarn.css">
+<link rel="stylesheet" href="home.css">
+<script>
+  // decide the intro before first paint so the end state never flashes
+  (() => {
+    const q = new URLSearchParams(location.search);
+    const mode = ["drop", "cursor", "simple"].includes(q.get("intro")) ? q.get("intro") : "drop";
+    let seen = false;
+    try { seen = sessionStorage.getItem("blaqat.intro." + mode) === "1"; } catch (e) {}
+    const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches || q.has("reduced");
+    const play = !reduced && !q.has("skip") && !q.has("demo") && location.hash !== "#contact" && (q.has("t") || q.has("replay") || !seen);
+    document.documentElement.dataset.intro = mode;
+    document.documentElement.classList.add(play ? "intro-on" : "intro-off");
+  })();
+</script>
+<script src="../kit/data.js"></script>
+<script src="../kit/thoughts-data.js"></script>
+<script src="../kit/yarn.js" defer></script>
+<script src="../kit/notes.js" defer></script>
+<script src="cat.js" defer></script>
+<script src="intro.js" defer></script>
+<script src="cursor.js" defer></script>
+<script src="home.js" defer></script>
+</head>
+<body class="frame home">
+<main class="sheet home-sheet" id="main">
+  <yarn-nav active="" base="../"></yarn-nav>
+
+  <button class="skip" id="skip" type="button">Skip intro <i class="ph-bold ph-fast-forward" aria-hidden="true"></i></button>
+
+  <div class="hero" id="hero">
+    <h1 class="lockup" id="lockup-h">
+      <span class="sr-only">blaqat.net</span>
+      <svg id="lockup" class="lockup__svg" aria-hidden="true" focusable="false"></svg>
+    </h1>
+    <p class="tagline reveal" data-reveal="lockup">that’s “black cat”</p>
+
+    <div class="bio reveal" data-reveal="1">
+      <p>hi, i’m <strong>aiden</strong>! a
+        <a class="thread" data-section="projects" data-open="projects" href="../projects/index.html?from=home">software engineer<span class="cap" aria-hidden="true">nerrrrrddd</span></a>
+        with a soft spot for ui design</p>
+      <p>recent
+        <a class="thread thread--plain" href="https://www.rit.edu" target="_blank" rel="noopener">RIT<span class="cap" aria-hidden="true">go tigers!</span></a>
+        grad, fluent in <span class="nw"><span class="lang">Java</span>,</span> <span class="nw"><span class="lang">Python</span>,</span> <span class="nw"><span class="lang">Rust</span> and more</span></p>
+      <p>away from screens, i’m
+        <a class="thread" data-section="music" data-open="music" href="../music/index.html?from=home">composing<span class="cap" aria-hidden="true">♫⋆｡♪ ₊˚♬ ﾟ.</span></a>
+        for piano, film, and games</p>
+    </div>
+
+    <nav class="hnav reveal" data-reveal="2" aria-label="Sections">
+      <a class="hbtn rope" data-section="projects" data-open="projects" data-burst="projects" href="../projects/index.html?from=home">
+        <span class="hbtn__swatch m-cord" aria-hidden="true"><i class="ph-bold ph-folder-simple"></i></span>
+        <span class="hbtn__text"><b>Projects</b><span class="meta" data-count="projects">12 builds</span></span>
+      </a>
+      <a class="hbtn rope" data-section="music" data-open="music" data-burst="music" href="../music/index.html?from=home">
+        <span class="hbtn__swatch m-cord" aria-hidden="true"><i class="ph-bold ph-music-notes"></i></span>
+        <span class="hbtn__text"><b>Music</b><span class="meta" data-count="music">26 pieces</span></span>
+      </a>
+      <a class="hbtn rope" data-section="thoughts" data-open="thoughts" data-burst="thoughts" href="../thoughts/stitched.html?from=home">
+        <span class="hbtn__swatch m-cord" aria-hidden="true"><i class="ph-bold ph-cloud"></i></span>
+        <span class="hbtn__text"><b>Thoughts</b><span class="meta" data-count="thoughts">14 posts</span></span>
+      </a>
+      <button class="hbtn hbtn--small rope" type="button" id="contact-btn" aria-expanded="false" aria-controls="contact">
+        <i class="ph-bold ph-envelope-simple" aria-hidden="true"></i><span>Contact</span>
+      </button>
+    </nav>
+
+    <div class="contact" id="contact" role="region" aria-label="Contact links">
+      <div class="contact__inner">
+        <a class="clink" href="https://github.com/blaqat" target="_blank" rel="noopener"><i class="ph-bold ph-github-logo" aria-hidden="true"></i>blaqat</a>
+        <a class="clink" href="https://instagram.com/blaqat_ag" target="_blank" rel="noopener"><i class="ph-bold ph-instagram-logo" aria-hidden="true"></i>@blaqat_ag</a>
+        <a class="clink" href="https://x.com/blaqat_ag" target="_blank" rel="noopener"><i class="ph-bold ph-x-logo" aria-hidden="true"></i>@blaqat_ag</a>
+        <a class="clink" href="https://discordapp.com/users/383851442341019658" target="_blank" rel="noopener"><i class="ph-bold ph-discord-logo" aria-hidden="true"></i>blaqat</a>
+      </div>
+    </div>
+  </div>
+</main>
+</body>
+</html>

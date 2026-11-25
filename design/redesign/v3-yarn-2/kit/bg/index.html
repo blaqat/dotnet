@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="en" data-section="thoughts">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sheet backgrounds</title>
+<link rel="stylesheet" href="../yarn.css">
+<style>
+  body { background: var(--cotton-2); }
+  .bgx { max-width: 1440px; margin: 0 auto; padding: 28px 24px 64px; }
+  .bgx-head { display: grid; gap: 10px; margin-bottom: 22px; }
+  .bgx-head p { margin: 0; max-width: 72ch; color: var(--ink-2); }
+  .bgx-ctl { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 6px 0 0; }
+  .bgx-ctl .eyebrow { margin-right: 4px; }
+  .bgx-diag { display: grid; grid-template-columns: minmax(0, 1fr) 420px; gap: 20px; align-items: start; padding: 20px 22px; margin-bottom: 30px; }
+  .bgx-diag h2, .bgx-opt h2 { margin: 0 0 8px; }
+  .bgx-diag ol { margin: 0; padding-left: 1.2em; display: grid; gap: 6px; color: var(--ink-2); }
+  .bgx-diag b { color: var(--ink); }
+  .bgx-diag figure { margin: 0; }
+  .bgx-diag figcaption { margin-top: 6px; }
+  .bgx-opt { margin: 0 0 40px; }
+  .bgx-opt__top { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 14px; margin-bottom: 4px; }
+  .bgx-opt__top code { font: 600 .82rem/1 var(--font-mono); padding: .35em .55em; border-radius: 8px; background: var(--white); box-shadow: inset 0 0 0 1px rgba(31,30,30,.1); }
+  .bgx-opt__desc { margin: 0 0 4px; max-width: 86ch; color: var(--ink-2); }
+  .bgx-opt__meta { margin: 0 0 12px; }
+  .bgx-opt__meta a { color: var(--red-deep); font-weight: 600; }
+  .bgx-rec { display: inline-flex; align-items: center; gap: .35em; padding: .3em .7em; border-radius: 999px; background: var(--tex-twill), var(--red); color: #fff; font: 800 .74rem/1 var(--font-display); letter-spacing: .02em; }
+  .bgx-frames { display: grid; grid-template-columns: 980px 390px; gap: 20px; overflow-x: auto; padding: 4px 2px 10px; }
+  .bgx-frames > div { display: grid; gap: 6px; align-content: start; }
+  .bgx-frames iframe { display: block; border: 0; border-radius: 14px; background: var(--white); box-shadow: 0 1px 0 rgba(31,30,30,.08), 0 6px 18px -6px rgba(31,30,30,.3); }
+  .bgx-zoom { grid-column: 1 / -1; }
+  /* close-ups: the desktop excerpt scaled up and cropped (keeps the desktop layout; Chrome re-rasters it crisp) */
+  .bgx-lens { position: relative; overflow: hidden; border-radius: 14px; background: var(--white); box-shadow: 0 1px 0 rgba(31,30,30,.08), 0 6px 18px -6px rgba(31,30,30,.3); }
+  .bgx-lens iframe { position: absolute; left: 0; top: 0; transform-origin: 0 0; border-radius: 0; box-shadow: none; pointer-events: none; }
+  .bgx-label { font: 500 .74rem/1 var(--font-mono); color: var(--ink-3); }
+  @media (max-width: 959px) {
+    .bgx { padding: 18px 16px 48px; }
+    .bgx-diag { grid-template-columns: minmax(0, 1fr); padding: 16px; }
+    .bgx-diag iframe { width: 100%; }
+  }
+</style>
+</head>
+<body>
+<main class="bgx">
+  <header class="bgx-head">
+    <h1 class="yhead__title">Sheet backgrounds<span class="yhead__dot">.</span></h1>
+    <p>Four alternatives to the current diamond-over-knit sheet, each on the same slice of a real page (title, chips, an ink tag, white stitched cards, text straight on the sheet) inside the rolled-cord frame. Desktop at 980&nbsp;px and a 390&nbsp;px phone, plus a 2× close-up. Every option is a <code>?bg=</code> value for any page that loads <code>kit/yarn.js</code>.</p>
+    <div class="bgx-ctl" role="group" aria-label="Frame colour">
+      <span class="eyebrow">Frame</span>
+      <button type="button" class="ychip ysel" data-sec="home" aria-pressed="false"><span class="ychip__l">Home · red</span></button>
+      <button type="button" class="ychip ysel" data-sec="projects" aria-pressed="false"><span class="ychip__l">Projects · blue</span></button>
+      <button type="button" class="ychip ysel" data-sec="music" aria-pressed="false"><span class="ychip__l">Music · purple</span></button>
+      <button type="button" class="ychip ysel" data-sec="thoughts" aria-pressed="true"><span class="ychip__l">Thoughts · gold</span></button>
+    </div>
+  </header>
+
+  <section class="patch bgx-diag" aria-labelledby="diag-h">
+    <div>
+      <h2 class="h2" id="diag-h">Why the current sheet reads as two fabrics</h2>
+      <ol>
+        <li><b>Two grids that never agree.</b> The knit repeats every 14×16&nbsp;px and the diamond every 36×36&nbsp;px. 36 isn't a multiple of 14 or 16, so every diamond edge cuts the V's at a different spot: it looks like a print laid over a knit, not one cloth.</li>
+        <li><b>Three diagonals.</b> The V legs lean about 62°, the diamond lines run at 45° and the cord frame twists at about 58°. Nothing lines up, so the eye reads noise.</li>
+        <li><b>No hierarchy.</b> The diamond and the knit have about the same faint contrast, so neither one reads as the ground.</li>
+        <li><b>The dashes are used twice.</b> The diamond is drawn with the same dashed line that means "sewn edge" on cards, chips and the sheet border, so the stitched edges stop standing out.</li>
+        <li><b>Scale fights the text.</b> A 36&nbsp;px diamond is about 1.5 lines of body text, so it beats against the line rhythm.</li>
+        <li><b>Cards blend in.</b> Cards use the same knit at the same scale, just whiter and out of phase at their edges, so they look misprinted instead of sewn on.</li>
+        <li><b>Contrast.</b> At its darkest pixels the current sheet drops <code>--ink-3</code> meta text to 4.0:1, and about 2% of the sheet is under AA. The diamond and the knit spend the contrast budget on each other instead of on one clear motif.</li>
+      </ol>
+    </div>
+    <figure>
+      <div class="bgx-lens" style="width:420px;max-width:100%;height:300px"><iframe title="Current sheet, 3× close-up" width="980" height="600" tabindex="-1" style="transform:scale(3) translate(-322px,-262px)" data-src="excerpt.html?bg=current"></iframe></div>
+      <figcaption class="bgx-label">current · 3× · the lattice cuts through the V's at a different spot each time; the card knit is the sheet knit out of phase</figcaption>
+    </figure>
+  </section>
+
+  <div id="opts"></div>
+</main>
+
+<script>
+  // name, title, recommended, description, contrast note (measured by temp/r3i2-bg/measure.js on the bare sheet, 1x and 2x)
+  const OPTS = [
+    ["intarsia", "Intarsia", true,
+      "The diamonds are knitted into the fabric: single stitches in a second, camel (undyed-wool) yarn, stepping one stitch per row on the same 14×12 grid as the knit. Diamonds and V's become one cloth. The ground knit is quieter than Jersey's, so the lattice is the figure and the V's are the ground. The repeat grows to 112×96 px, so it sits behind several lines of text instead of beating against them. Cards become smooth felt patches: the play stays in the background and text sits on a calm surface.",
+      "ink-3 meta ≥ 4.48:1 on every pixel (≥ 4.5:1 on 99.7%) · ink-2 body ≥ 7.6:1 · red link ≥ 5.4:1"],
+    ["jersey", "Jersey", false,
+      "Plain stockinette: one stitch, one direction, no motif, with a little hand-knit unevenness so it doesn't look printed. This is the shared ground the other knit options build on. It's the calmest and most minimal option, and every text colour passes even on the darkest pixel. Cards are felt.",
+      "ink-3 meta ≥ 4.6:1 on every pixel · ink-2 body ≥ 7.9:1 · red link ≥ 5.6:1"],
+    ["quilt", "Quilt", false,
+      "No knit on the sheet. The diamonds become sunken quilting seams (112×80 px) with a soft puff in each cell and a fine cotton grain. There are no dashes, so running stitches stay reserved for edges. The knit moves onto the cards and chips: knit patches sewn onto quilted cotton.",
+      "ink-3 meta ≥ 4.5:1 on 99% of pixels (4.3:1 on the seam lines) · ink-2 body ≥ 7.3:1 · red link ≥ 5.2:1"],
+    ["speckle", "Speckle", false,
+      "Speckled yarn: the plain knit with sparse red and ink dye flecks worked into single legs, sitting under the stitch shading. It adds the brand red with no second geometry, on an odd 19×17-stitch repeat that never lines up with the layout. Cards are felt.",
+      "ink-3 meta ≥ 4.7:1 on 99% of pixels, but on a fleck itself it drops to 3.5:1 (0.6% of pixels; red links 4.2:1 there) · ink-2 body ≥ 5.9:1"],
+    ["current", "Current", false,
+      "Iteration 1 and 2 as they stand, for comparison: a 36 px dashed diamond lattice over the 14×16 knit on cotton, with the same knit on the cards.",
+      "ink-3 meta 4.0:1 at the darkest, with 1.6–2% of pixels under AA · ink-2 body ≥ 6.8:1 · red link ≥ 4.8:1"],
+  ];
+  const opts = document.getElementById("opts");
+  opts.innerHTML = OPTS.map(([v, t, rec, d, c]) => `
+    <section class="bgx-opt" aria-labelledby="h-${v}">
+      <div class="bgx-opt__top">
+        <h2 class="h2" id="h-${v}">${t}</h2>
+        <code>?bg=${v}</code>
+        ${rec ? '<span class="bgx-rec">★ Recommended</span>' : ""}
+      </div>
+      <p class="bgx-opt__desc">${d}</p>
+      <p class="bgx-opt__meta meta">${c} · <a href="excerpt.html?bg=${v}">open alone</a> · <a href="../components.html?bg=${v}">kit components</a> · <a href="../kit.html?bg=${v}">materials</a></p>
+      <div class="bgx-frames">
+        <div><iframe title="${t}, desktop" width="980" height="600" loading="lazy" data-src="excerpt.html?bg=${v}"></iframe><span class="bgx-label">desktop · 980 px</span></div>
+        <div><iframe title="${t}, phone" width="390" height="600" loading="lazy" data-src="excerpt.html?bg=${v}"></iframe><span class="bgx-label">phone · 390 px</span></div>
+        <div class="bgx-zoom"><div class="bgx-lens" style="width:1390px;height:420px"><iframe title="${t}, 2× close-up" width="980" height="600" tabindex="-1" style="transform:scale(2) translate(-280px,-196px)" data-src="excerpt.html?bg=${v}"></iframe></div><span class="bgx-label">2× close-up of the desktop frame · chips, ink tag, ink card edge, the sheet between cards, white card corners</span></div>
+      </div>
+    </section>`).join("");
+
+  // frame colour switch: re-point every iframe at ?section=
+  const frames = [...document.querySelectorAll("iframe[data-src]")];
+  function setSection(sec) {
+    for (const f of frames) {
+      const u = new URL(f.dataset.src, location.href);
+      u.searchParams.set("section", sec);
+      f.src = u.href;
+    }
+    document.querySelectorAll("[data-sec]").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.sec === sec)));
+    document.documentElement.dataset.section = sec;
+  }
+  document.querySelectorAll("[data-sec]").forEach((b) => b.addEventListener("click", () => setSection(b.dataset.sec)));
+  setSection(new URLSearchParams(location.search).get("section") || "thoughts");
+</script>
+</body>
+</html>

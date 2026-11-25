@@ -1,0 +1,182 @@
+/* i10 · system · L4: Phosphor duotone (@phosphor-icons/web@2.1.1, MIT), trimmed to the link discs' glyphs.
+   Source: https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.1/src/duotone/style.css (+ Phosphor-Duotone.woff2).
+   Add a glyph here when Yarn.LINK_ICONS gains one. */
+@font-face {
+  font-family: "Phosphor-Duotone";
+  src: url("./Phosphor-Duotone.woff2") format("woff2");
+  font-weight: normal;
+  font-style: normal;
+  font-display: block;
+}
+.ph-duotone {
+  font-family: "Phosphor-Duotone" !important;
+  speak: never;
+  font-style: normal;
+  font-weight: normal;
+  font-variant: normal;
+  text-transform: none;
+  line-height: 1;
+  letter-spacing: 0;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+.ph-duotone.ph-github-logo:before {
+  content: "\e576";
+  opacity: 0.2;
+}
+.ph-duotone.ph-github-logo:after {
+  content: "\e577";
+  margin-left: -1em;
+}
+.ph-duotone.ph-soundcloud-logo:before {
+  content: "\e8de";
+  opacity: 0.2;
+}
+.ph-duotone.ph-soundcloud-logo:after {
+  content: "\e8df";
+  margin-left: -1em;
+}
+.ph-duotone.ph-youtube-logo:before {
+  content: "\e4fc";
+  opacity: 0.2;
+}
+.ph-duotone.ph-youtube-logo:after {
+  content: "\e4fd";
+  margin-left: -1em;
+}
+.ph-duotone.ph-circle:before {
+  content: "\e18a";
+  opacity: 0.2;
+}
+.ph-duotone.ph-circle:after {
+  content: "\e18b";
+  margin-left: -1em;
+}
+.ph-duotone.ph-spotify-logo:before {
+  content: "\e66e";
+  opacity: 0.2;
+}
+.ph-duotone.ph-spotify-logo:after {
+  content: "\e66f";
+  margin-left: -1em;
+}
+.ph-duotone.ph-instagram-logo:before {
+  content: "\e2d0";
+  opacity: 0.2;
+}
+.ph-duotone.ph-instagram-logo:after {
+  content: "\e2d1";
+  margin-left: -1em;
+}
+.ph-duotone.ph-x-logo:before {
+  content: "\e4bc";
+  opacity: 0.2;
+}
+.ph-duotone.ph-x-logo:after {
+  content: "\e4bd";
+  margin-left: -1em;
+}
+.ph-duotone.ph-discord-logo:before {
+  content: "\e61a";
+  opacity: 0.2;
+}
+.ph-duotone.ph-discord-logo:after {
+  content: "\e61b";
+  margin-left: -1em;
+}
+.ph-duotone.ph-linkedin-logo:before {
+  content: "\e2ee";
+  opacity: 0.2;
+}
+.ph-duotone.ph-linkedin-logo:after {
+  content: "\e2ef";
+  margin-left: -1em;
+}
+.ph-duotone.ph-twitch-logo:before {
+  content: "\e5ce";
+  opacity: 0.2;
+}
+.ph-duotone.ph-twitch-logo:after {
+  content: "\e5cf";
+  margin-left: -1em;
+}
+.ph-duotone.ph-envelope-simple:before {
+  content: "\e218";
+  opacity: 0.2;
+}
+.ph-duotone.ph-envelope-simple:after {
+  content: "\e219";
+  margin-left: -1em;
+}
+.ph-duotone.ph-arrow-up-right:before {
+  content: "\e092";
+  opacity: 0.2;
+}
+.ph-duotone.ph-arrow-up-right:after {
+  content: "\e093";
+  margin-left: -1em;
+}
+.ph-duotone.ph-link:before {
+  content: "\e2e2";
+  opacity: 0.2;
+}
+.ph-duotone.ph-link:after {
+  content: "\e2e3";
+  margin-left: -1em;
+}
+.ph-duotone.ph-link-simple:before {
+  content: "\e2e6";
+  opacity: 0.2;
+}
+.ph-duotone.ph-link-simple:after {
+  content: "\e2e7";
+  margin-left: -1em;
+}
+.ph-duotone.ph-link-break:before {
+  content: "\e2e4";
+  opacity: 0.2;
+}
+.ph-duotone.ph-link-break:after {
+  content: "\e2e5";
+  margin-left: -1em;
+}
+.ph-duotone.ph-check:before {
+  content: "\e182";
+  opacity: 0.2;
+}
+.ph-duotone.ph-check:after {
+  content: "\e183";
+  margin-left: -1em;
+}
+.ph-duotone.ph-apple-logo:before {
+  content: "\e516";
+  opacity: 0.2;
+}
+.ph-duotone.ph-apple-logo:after {
+  content: "\e517";
+  margin-left: -1em;
+}
+.ph-duotone.ph-arrow-square-out:before {
+  content: "\e5de";
+  opacity: 0.2;
+}
+.ph-duotone.ph-arrow-square-out:after {
+  content: "\e5df";
+  margin-left: -1em;
+}
+.ph-duotone.ph-globe:before {
+  content: "\e288";
+  opacity: 0.2;
+}
+.ph-duotone.ph-globe:after {
+  content: "\e289";
+  margin-left: -1em;
+}
+.ph-duotone.ph-share-network:before {
+  content: "\e408";
+  opacity: 0.2;
+}
+.ph-duotone.ph-share-network:after {
+  content: "\e40b";
+  margin-left: -1em;
+}

@@ -1,0 +1,211 @@
+/* ============================================================
+   home · round 3 "yarn"
+   ============================================================ */
+@property --sew { syntax: "<percentage>"; inherits: false; initial-value: 0%; }
+
+/* the home sheet clips the intro (ball enters from under the top frame,
+   cat walks in from behind the left frame). Never transform .sheet:
+   it would capture the fixed mobile bar. */
+.home-sheet { overflow: clip; display: flex; flex-direction: column; }
+.home .ynav { display: none; } /* the hero lockup is the brand here */
+
+.hero {
+  flex: 1;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  padding: clamp(40px, 7vh, 88px) 24px clamp(48px, 8vh, 96px);
+  text-align: center;
+  transform-origin: 50% 40%;
+}
+
+/* ---------- lockup ---------- */
+.lockup { width: min(700px, 100%); margin: 0; line-height: 0; }
+.lockup__svg { width: 100%; height: auto; overflow: visible; display: block; }
+html[data-intro="cursor"].fine .lockup { width: min(620px, 100%); }
+.lockup__svg .lk-letters { filter: drop-shadow(0 1.6px 0 rgba(31, 30, 30, .16)); }
+.lockup__svg .ply-hi { fill: none; stroke: rgba(255, 255, 255, .075); stroke-linecap: round; stroke-linejoin: round; }
+.lockup__svg .lk-letters .ply-twist { stroke: rgba(255, 255, 255, .17); stroke-dasharray: 2.6 3.4; }
+.lockup__svg .lk-strand .ply-twist { stroke: rgba(255, 255, 255, .38); stroke-dasharray: 1.5 2.1; }
+.lockup__svg .strand-shadow { fill: none; stroke: rgba(31, 30, 30, .14); stroke-linecap: round; transform: translateY(2.2px); }
+.lockup__svg .yball { filter: drop-shadow(0 1.2px 0 rgba(90, 10, 16, .28)); }
+.lockup { cursor: default; }
+
+.tagline {
+  margin: .9rem 0 0;
+  font: italic 700 clamp(.9rem, 1.1vw, 1rem)/1.2 var(--font-display);
+  color: var(--ink-3); letter-spacing: 0;
+}
+
+/* ---------- bio ---------- */
+.bio, .tagline { position: relative; z-index: 3; }
+.bio { margin-top: clamp(1.4rem, 3.4vh, 2.2rem); max-width: 40rem; color: var(--ink-2); font-size: clamp(1rem, 1.25vw, 1.125rem); line-height: 1.6; }
+.bio p { margin: 0 0 .35em; text-wrap: balance; }
+.bio strong { color: var(--ink); font-weight: 750; }
+
+/* stitched link: a dashed running stitch in the section colour; on hover a
+   red twisted thread gets sewn across it, left to right */
+.thread {
+  --st: var(--sec);
+  position: relative; display: inline-block;
+  color: var(--ink); font-weight: 700; text-decoration: none;
+  padding: 0 .06em 3px;
+  background:
+    linear-gradient(90deg, transparent, transparent) no-repeat,
+    repeating-linear-gradient(115deg, rgba(255,255,255,.45) 0 1px, transparent 1px 3px) 0 100% / var(--sew) 3px no-repeat,
+    linear-gradient(var(--red), var(--red)) 0 100% / var(--sew) 3px no-repeat,
+    repeating-linear-gradient(90deg, var(--st) 0 6px, transparent 6px 10px) 0 100% / 100% 2.5px no-repeat;
+  transition: --sew 340ms var(--ease-out), color 160ms;
+}
+.thread--plain { --st: var(--ink-3); }
+.thread:hover, .thread:focus-visible, .thread.is-hover { --sew: 100%; }
+.thread:focus-visible { outline: 3px solid var(--red); outline-offset: 2px; border-radius: 4px; }
+.thread .cap {
+  position: absolute; left: 50%; bottom: calc(100% - .1em);
+  font: italic 800 .74rem/1 var(--font-display); white-space: nowrap; letter-spacing: .01em;
+  color: var(--sec-deep, var(--red-deep));
+  opacity: 0; transform: translate(-50%, 4px) rotate(-4deg);
+  transition: opacity 140ms, transform 260ms var(--ease-spring);
+  pointer-events: none;
+}
+.thread--plain .cap { color: var(--red-deep); transform: translate(-50%, 4px) rotate(5deg); }
+.thread:hover .cap, .thread:focus-visible .cap, .thread.is-hover .cap { opacity: 1; transform: translate(-50%, 0) rotate(-4deg); }
+.thread--plain:hover .cap, .thread--plain:focus-visible .cap { transform: translate(-50%, 0) rotate(5deg); }
+
+.nw { white-space: nowrap; }
+.lang {
+  display: inline-block; padding: .12em .5em .14em; margin: 0 .05em;
+  font: 600 .8em/1.2 var(--font-mono); color: var(--ink);
+  background: var(--tex-knit), var(--white); border-radius: 7px;
+  box-shadow: var(--shadow-patch);
+  outline: 1.5px dashed rgba(31, 30, 30, .25); outline-offset: -3.5px;
+  vertical-align: .06em;
+}
+
+/* ---------- nav buttons ---------- */
+.hnav {
+  margin-top: clamp(1.6rem, 4vh, 2.6rem);
+  display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 16px;
+}
+.hbtn {
+  --rope-w: 5px; --rope-gap: 5px;
+  position: relative; z-index: 3;
+  display: inline-flex; align-items: center; gap: .8rem;
+  min-height: 68px; padding: 10px 26px 10px 10px;
+  border: 0; border-radius: 999px;
+  background: var(--tex-knit), var(--white);
+  color: var(--ink); text-decoration: none; text-align: left; cursor: pointer;
+  box-shadow: var(--shadow-patch);
+  outline: 2px dashed rgba(31, 30, 30, .22); outline-offset: -6px;
+  transition: transform 260ms var(--ease-out), box-shadow 260ms var(--ease-out);
+  -webkit-tap-highlight-color: transparent;
+}
+.hbtn:hover, .hbtn.is-hover { transform: translateY(-3px); box-shadow: var(--shadow-lift); }
+.hbtn:active { transform: translateY(-1px) scale(.97); transition-duration: var(--press); }
+.hbtn__swatch {
+  width: 48px; height: 48px; flex: none; border-radius: 50%;
+  display: grid; place-items: center; color: #fff; font-size: 1.35rem;
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, .12), inset 0 -4px 8px rgba(0, 0, 0, .22), inset 0 3px 5px rgba(255, 255, 255, .22), 0 1px 2px rgba(31, 30, 30, .2);
+  transition: transform 420ms var(--ease-spring);
+}
+.hbtn__swatch i { filter: drop-shadow(0 1px 0 rgba(0, 0, 0, .3)); }
+.hbtn:hover .hbtn__swatch, .hbtn:focus-visible .hbtn__swatch, .hbtn.is-hover .hbtn__swatch { transform: rotate(-22deg); }
+.hbtn__text { display: grid; gap: 3px; }
+.hbtn__text b { font: 850 1.12rem/1 var(--font-display); letter-spacing: -0.015em; }
+.hbtn__text .meta { color: var(--ink-3); }
+.hbtn--small {
+  min-height: 48px; padding: 0 18px; gap: .5rem;
+  font: 800 .95rem/1 var(--font-display); color: var(--ink-2);
+  background: transparent; box-shadow: none; outline-color: rgba(31, 30, 30, .28);
+}
+.hbtn--small:hover { background: var(--tex-knit), var(--white); color: var(--ink); }
+.hbtn--small[aria-expanded="true"] { background: var(--tex-twill), var(--ink); color: #fff; outline-color: rgba(255, 255, 255, .4); }
+.hbtn--small i { font-size: 1.1em; }
+
+/* contact: opens in place under the buttons. Its row is reserved, so
+   opening it never shifts the (vertically centred) hero. */
+.contact { width: 100%; visibility: hidden; transition: visibility 0s linear 320ms; }
+.contact.open { visibility: visible; transition: none; }
+.contact__inner { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; padding: 16px 4px 4px; }
+.clink {
+  --rope-w: 3px; --rope-gap: 3px;
+  display: inline-flex; align-items: center; gap: .45em; min-height: 40px; padding: 0 14px;
+  border-radius: 999px; background: var(--tex-knit), var(--white); box-shadow: var(--shadow-patch);
+  font: 700 .85rem/1 var(--font-mono); color: var(--ink); text-decoration: none;
+  outline: 1.5px dashed rgba(31, 30, 30, .22); outline-offset: -4px;
+  opacity: 0; transform: translateY(-10px) scale(.96); transition: opacity 160ms, transform 300ms var(--ease-out);
+}
+.contact.open .clink { opacity: 1; transform: none; }
+.contact.open .clink:nth-child(2) { transition-delay: 40ms; }
+.contact.open .clink:nth-child(3) { transition-delay: 80ms; }
+.contact.open .clink:nth-child(4) { transition-delay: 120ms; }
+.clink:hover { color: var(--red-deep); }
+.clink:focus-visible { outline: 3px solid var(--red); outline-offset: 2px; }
+.clink i { font-size: 1.1em; }
+
+/* ---------- skip ---------- */
+/* hidden for the first ~600 ms so it doesn't compete with the drop, but always
+   focusable: keyboard focus reveals it immediately */
+.skip {
+  position: absolute; z-index: 20; right: 26px; bottom: 22px;
+  display: inline-flex; align-items: center; gap: .45em; min-height: 44px; padding: 0 18px;
+  border: 0; border-radius: 999px; cursor: pointer;
+  font: 800 .88rem/1 var(--font-display); letter-spacing: .005em; color: var(--ink-2);
+  background: var(--tex-knit), var(--white); outline: 1.5px dashed rgba(31, 30, 30, .28); outline-offset: -5px;
+  box-shadow: var(--shadow-patch);
+  opacity: 0; transform: translateY(8px); pointer-events: none;
+  transition: opacity 280ms var(--ease-out), transform 360ms var(--ease-out);
+}
+.skip.shown, .skip:focus-visible { opacity: 1; transform: none; pointer-events: auto; }
+.skip:active { transform: scale(.96); transition-duration: var(--press); }
+.skip:hover { color: var(--ink); }
+html.intro-off .skip, .skip[hidden] { display: none; }
+
+/* ---------- reveals during the intro (JS drives opacity/transform) ---------- */
+html.intro-on .reveal { opacity: 0; }
+.reveal:focus-within { opacity: 1 !important; transform: none !important; }
+
+/* ---------- "button opens up to become the background" ---------- */
+.unroll { position: fixed; inset: 0; z-index: 300; pointer-events: none; filter: drop-shadow(0 10px 24px rgba(31, 30, 30, .3)); }
+.unroll__cloth { position: absolute; inset: 0; background: var(--tex-cord), var(--sec); will-change: clip-path; }
+.unroll__cloth::after { /* rolled edge highlight hugging the clip */
+  content: ""; position: absolute; inset: 0;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .15), inset 0 -10px 18px rgba(0, 0, 0, .18), inset 0 10px 14px rgba(255, 255, 255, .12);
+}
+
+/* ---------- cursor mode: floor lane + ball ---------- */
+.lane { position: fixed; inset: 0; z-index: 40; pointer-events: none; overflow: hidden; }
+.lane svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+
+/* ---------- mobile ---------- */
+@media (max-width: 959px) {
+  /* the three tiles ARE the nav on home: they sit in the thumb zone, so the
+     duplicate bottom bar is hidden here (page-local) and its space reclaimed */
+  .home .ybar { display: none; }
+  .home-sheet { --bottom-ui: 0px; }
+  /* brand at the top, tiles in the thumb zone, the bio floats centred between
+     them (free height is shared, not dumped in one hole) */
+  .hero { justify-content: flex-start; padding: 52px 11px 18px; }
+  .bio { margin-block: auto; padding-block: 1.5rem; }
+  .hnav { margin-top: 0; }
+  /* contact grows in flow; the tiles slide up to make room (the lockup never moves) */
+  .contact { display: grid; grid-template-rows: 0fr; transition: grid-template-rows 320ms var(--ease-out), visibility 0s linear 320ms; }
+  .contact.open { grid-template-rows: 1fr; transition: grid-template-rows 320ms var(--ease-out); }
+  .contact__inner { overflow: hidden; min-height: 0; padding: 0 4px; }
+  .contact.open .contact__inner { padding: 12px 4px 6px; }
+  .lockup { width: 100%; }
+  .bio { font-size: 1rem; line-height: 1.55; }
+  .bio p { margin-bottom: .5em; }
+  .hnav { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; width: 100%; max-width: 420px; }
+  .hbtn { flex-direction: column; justify-content: center; text-align: center; gap: 8px; min-height: 108px; padding: 14px 4px 12px; border-radius: 24px; --rope-radius: 30px; }
+  .hbtn__text { justify-items: center; }
+  .hbtn__text b { font-size: 1rem; }
+  .hbtn__text .meta { font-size: .68rem; }
+  .hbtn--small { grid-column: 1 / -1; flex-direction: row; min-height: 48px; border-radius: 999px; --rope-radius: 999px; padding: 0 18px; }
+  .skip { top: 14px; left: 14px; right: auto; bottom: auto; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .thread { transition: none; }
+  .hbtn, .hbtn__swatch { transition: none; }
+  .hbtn:hover { transform: none; }
+}
+html.reduced .hbtn:hover { transform: none; }

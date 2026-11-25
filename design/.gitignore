@@ -1,0 +1,4 @@
+# Screenshots are ~1.4 GB; only the latest iteration's gallery images are kept
+redesign/*/_shots/
+!redesign/v3-yarn-11/_shots/
+.DS_Store

@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Tier list moved · Thoughts</title>
+<!-- iteration 1's tier list maker is retired: only the owner makes tier lists (in Studio);
+     visitors add their ranking on the list's own page. Old links land there. -->
+<meta http-equiv="refresh" content="0; url=tier.html?id=tl1">
+<script>
+  (function () {
+    var p = new URLSearchParams(location.search);
+    var from = p.get("from");
+    var id = from && from !== "draft" ? from : "tl1";
+    var tab = p.get("tab");
+    // "Make your own" (no ?from) → add your ranking; old tabs map to the new modes
+    var mode = tab === "everyone" ? "everyone" : tab === "diff" ? "you" : tab === "mine" ? "" : from ? "" : "add";
+    location.replace("tier.html?id=" + encodeURIComponent(id) + (mode ? "&mode=" + mode : ""));
+  })();
+</script>
+</head>
+<body>
+<p><a href="tier.html?id=tl1">The tier list moved to its own page.</a></p>
+</body>
+</html>

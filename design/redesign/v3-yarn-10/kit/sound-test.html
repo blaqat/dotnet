@@ -1,0 +1,279 @@
+<!doctype html>
+<html lang="en" data-section="home">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Yarn Sounds</title>
+<link rel="stylesheet" href="yarn.css">
+<style>
+  :root { --ok: #2f7d4a; }
+  body { margin: 0; }
+  .wrap { padding: 28px clamp(16px, 4vw, 44px) 64px; display: grid; gap: 28px; max-width: 1240px; margin: 0 auto; }
+  .head { display: flex; flex-wrap: wrap; gap: 14px 24px; align-items: end; justify-content: space-between; }
+  .head h1 { margin: 0; font: 900 clamp(2rem, 5vw, 3rem)/1 var(--font-display, system-ui); letter-spacing: -.03em; color: var(--ink, #1f1e1e); }
+  .head h1 i { color: var(--red, #d62f38); font-style: normal; }
+  .lede { max-width: 64ch; margin: 8px 0 0; color: var(--ink-2, #4a4646); font: 500 .95rem/1.5 var(--font-body, system-ui); }
+  .controls { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+  .b { appearance: none; border: 0; cursor: pointer; min-height: 44px; padding: 0 18px; border-radius: 999px;
+       font: 800 .9rem/1 var(--font-display, system-ui); display: inline-flex; align-items: center; gap: 8px;
+       background: var(--cotton-2, #f3eee6); color: var(--ink, #1f1e1e); box-shadow: var(--shadow-patch);
+       transition: transform 100ms, box-shadow 160ms; }
+  .b:hover { transform: translateY(-1px); box-shadow: var(--shadow-lift); }
+  .b:active { transform: scale(.97); }
+  .b:focus-visible { outline: 3px solid var(--red, #d62f38); outline-offset: 2px; }
+  .b--ink { background: var(--ink, #1f1e1e); color: #fff; }
+  .b--red { background: var(--red, #d62f38); color: #fff; }
+  .b[aria-pressed="true"] { background: var(--ink, #1f1e1e); color: #fff; }
+  .b i { font-size: 1.2em; }
+  .vol { display: inline-flex; gap: 8px; align-items: center; font: 700 .8rem/1 var(--font-mono, monospace); color: var(--ink-3, #6e6868); }
+  .vol input { accent-color: var(--red, #d62f38); width: 120px; }
+  .status { font: 600 .78rem/1.4 var(--font-mono, monospace); color: var(--ink-3, #6e6868); }
+  .status b { color: var(--ink, #1f1e1e); }
+  .intro { padding: 18px; border-radius: 18px; background: var(--white, #fff); box-shadow: var(--shadow-patch); display: grid; gap: 12px; }
+  .intro h2, .grp h2 { margin: 0; font: 900 1.15rem/1.1 var(--font-display, system-ui); color: var(--ink, #1f1e1e); }
+  .intro .row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; justify-content: space-between; }
+  .groups { display: grid; gap: 28px; }
+  .grp { display: grid; gap: 12px; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 14px; }
+  .card { position: relative; padding: 14px 14px 12px; border-radius: 16px; background: var(--white, #fff); box-shadow: var(--shadow-patch); display: grid; gap: 8px; align-content: start; }
+  .card header { display: flex; gap: 10px; align-items: start; justify-content: space-between; }
+  .card h3 { margin: 0; font: 800 1rem/1.15 var(--font-mono, monospace); color: var(--ink, #1f1e1e); }
+  .card .for { margin: 2px 0 0; font: 700 .8rem/1.35 var(--font-body, system-ui); color: var(--ink-2, #4a4646); }
+  .card .desc { margin: 0; font: 500 .78rem/1.4 var(--font-body, system-ui); color: var(--ink-3, #6e6868); }
+  .card .pb { flex: none; width: 44px; height: 44px; padding: 0; justify-content: center; }
+  .card .badges { display: flex; gap: 6px; flex-wrap: wrap; }
+  .badge { font: 700 .66rem/1 var(--font-mono, monospace); padding: 4px 7px; border-radius: 999px; background: var(--cotton-2, #f3eee6); color: var(--ink-2, #4a4646); }
+  .badge.warn { background: var(--red-soft, #f7d9d6); color: var(--red-deep, #b4202b); }
+  .badge.good { background: #dcefe2; color: var(--ok); }
+  canvas { width: 100%; display: block; border-radius: 10px; background: #fbf8f3; }
+  canvas.spec { background: #1f1e1e; }
+  .meter { font: 600 .7rem/1.3 var(--font-mono, monospace); color: var(--ink-3, #6e6868); display: flex; gap: 10px; flex-wrap: wrap; }
+  .meter b { color: var(--ink, #1f1e1e); }
+  .meter .clip { color: var(--red-deep, #b4202b); }
+  .legend { font: 600 .74rem/1.45 var(--font-mono, monospace); color: var(--ink-3, #6e6868); margin: 0; }
+  .intro canvas { height: 120px; }
+  .intro .marks { position: relative; height: 34px; font: 600 .62rem/1 var(--font-mono, monospace); color: var(--ink-3, #6e6868); }
+  .intro .marks span:nth-child(even) { top: 16px; }
+  .intro .marks span { position: absolute; top: 0; transform: translateX(-2px); white-space: nowrap; border-left: 1px solid var(--red, #d62f38); padding-left: 3px; }
+  @media (max-width: 700px) { .intro .marks { display: none; } .wrap { padding-bottom: 140px; } }
+  .card.playing { box-shadow: 0 0 0 3px var(--red, #d62f38), var(--shadow-lift); }
+</style>
+<script src="yarn.js" defer></script>
+<script src="sound.js"></script>
+</head>
+<body class="frame">
+<main class="sheet">
+  <yarn-nav active=""></yarn-nav>
+  <div class="wrap">
+    <div class="head">
+      <div>
+        <h1>Sounds<i>.</i></h1>
+        <p class="lede">Every sound on the site, synthesized live in WebAudio (no files). Off by default for visitors; this page turns them on with the toggle. Waveforms and spectrograms are rendered offline with a fixed seed so they can be checked by eye.</p>
+      </div>
+      <div class="controls">
+        <button class="b b--ink" type="button" data-sound-toggle hidden><i class="ph ph-speaker-simple-slash" aria-hidden="true"></i><span data-sound-label>Sound off</span></button>
+        <label class="vol">master <input id="vol" type="range" min="0" max="1" step="0.05" value="0.8" aria-label="Master volume"></label>
+      </div>
+    </div>
+    <p class="status" id="status" aria-live="polite"></p>
+
+    <section class="intro" aria-labelledby="intro-h">
+      <div class="row">
+        <h2 id="intro-h">Home intro sequence</h2>
+        <button class="b b--red" type="button" id="play-intro"><i class="ph-fill ph-play" aria-hidden="true"></i>Play the intro</button>
+      </div>
+      <p class="legend">Typical desktop "drop" timeline (YarnSound.INTRO): ball lands, bounces lower, rolls into the dot, letters stitch out, strand settles, the cat pads in, swats twice and sits.</p>
+      <canvas id="intro-wave" width="1200" height="120" aria-label="Waveform of the intro sequence"></canvas>
+      <div class="marks" id="intro-marks"></div>
+    </section>
+
+    <section class="grp" aria-labelledby="bounce-h">
+      <h2 id="bounce-h">Intensity: ball-bounce at 1 · .55 · .3 · .12</h2>
+      <canvas id="bounce-wave" width="1200" height="90" aria-label="Waveform of four bounces of decreasing intensity"></canvas>
+    </section>
+
+    <div id="groups" class="groups"></div>
+    <p class="legend">Waveform: min/max per pixel, red line = 10 ms RMS envelope, dashed lines = -6 dBFS, red samples = clipping; quiet sounds are drawn zoomed (×N, labelled). Spectrogram: 0–8 kHz, 46 ms window, gained by the same zoom. Peak/RMS are measured after the master limiter at master volume 0.8.</p>
+  </div>
+</main>
+<script>
+(() => {
+  const S = window.YarnSound;
+  const $ = (s, r = document) => r.querySelector(s);
+  const groupsEl = $("#groups");
+  const stats = (window.__soundStats = {});
+
+  // ---------- drawing ----------
+  function mono(buf) {
+    const a = buf.getChannelData(0), b = buf.numberOfChannels > 1 ? buf.getChannelData(1) : a;
+    const m = new Float32Array(a.length);
+    for (let i = 0; i < a.length; i++) m[i] = Math.abs(a[i]) > Math.abs(b[i]) ? a[i] : b[i];
+    return m;
+  }
+  function measure(buf) {
+    let pk = 0, sum = 0, n = 0, clipped = 0;
+    for (let c = 0; c < buf.numberOfChannels; c++) {
+      const d = buf.getChannelData(c);
+      for (let i = 0; i < d.length; i++) { const v = Math.abs(d[i]); if (v > pk) pk = v; if (v >= 0.999) clipped++; sum += d[i] * d[i]; n++; }
+    }
+    // RMS over the loudest 50 ms window (what the ear hears as "level")
+    const d = mono(buf), w = Math.round(buf.sampleRate * 0.05);
+    let acc = 0, best = 0;
+    for (let i = 0; i < d.length; i++) { acc += d[i] * d[i]; if (i >= w) acc -= d[i - w] * d[i - w]; if (acc > best) best = acc; }
+    const db = (x) => (x > 0 ? 20 * Math.log10(x) : -120);
+    return { peak: db(pk), rms: db(Math.sqrt(best / w)), clipped, len: buf.length / buf.sampleRate };
+  }
+  function drawWave(cv, buf, { color = "#1f1e1e", marks = [], zoom = 1 } = {}) {
+    const ctx = cv.getContext("2d"), W = cv.width, H = cv.height, d = mono(buf), mid = H / 2, Z = zoom;
+    ctx.clearRect(0, 0, W, H);
+    ctx.fillStyle = "#f3eee6"; ctx.fillRect(0, 0, W, H);
+    ctx.strokeStyle = "rgba(31,30,30,.25)"; ctx.setLineDash([4, 4]); ctx.lineWidth = 1;
+    for (const y of [mid - mid * 0.5 * Z, mid + mid * 0.5 * Z]) if (y > 0 && y < H) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke(); }
+    ctx.setLineDash([]);
+    ctx.strokeStyle = "rgba(31,30,30,.12)"; ctx.beginPath(); ctx.moveTo(0, mid); ctx.lineTo(W, mid); ctx.stroke();
+    const per = d.length / W;
+    ctx.fillStyle = color;
+    for (let x = 0; x < W; x++) {
+      let lo = 0, hi = 0;
+      const s = Math.floor(x * per), e = Math.min(d.length, Math.floor((x + 1) * per) + 1);
+      for (let i = s; i < e; i++) { if (d[i] < lo) lo = d[i]; if (d[i] > hi) hi = d[i]; }
+      const y0 = Math.max(0, mid - hi * mid * Z), y1 = Math.min(H, mid - lo * mid * Z);
+      ctx.fillStyle = hi >= 0.999 || lo <= -0.999 ? "#d62f38" : color;
+      ctx.fillRect(x, y0, 1, Math.max(1, y1 - y0));
+    }
+    // RMS envelope (red line)
+    const w = Math.max(1, Math.round(buf.sampleRate * 0.01));
+    ctx.strokeStyle = "#d62f38"; ctx.lineWidth = 1.5; ctx.beginPath();
+    for (let x = 0; x < W; x++) {
+      const c = Math.floor(x * per); let acc = 0, n = 0;
+      for (let i = Math.max(0, c - w); i < Math.min(d.length, c + w); i++) { acc += d[i] * d[i]; n++; }
+      const y = Math.max(0, mid - Math.sqrt(acc / (n || 1)) * mid * Z);
+      x ? ctx.lineTo(x, y) : ctx.moveTo(x, y);
+    }
+    ctx.stroke();
+    if (Z !== 1) { ctx.fillStyle = "rgba(31,30,30,.55)"; ctx.font = "600 11px monospace"; ctx.fillText(`×${Z} zoom`, W - 64, 13); }
+    for (const m of marks) { ctx.fillStyle = "rgba(214,47,56,.6)"; ctx.fillRect(Math.round((m / (buf.length / buf.sampleRate)) * W), 0, 1, 6); }
+  }
+  function fft(re, im) {
+    const n = re.length;
+    for (let i = 1, j = 0; i < n; i++) {
+      let bit = n >> 1;
+      for (; j & bit; bit >>= 1) j ^= bit;
+      j ^= bit;
+      if (i < j) { [re[i], re[j]] = [re[j], re[i]]; [im[i], im[j]] = [im[j], im[i]]; }
+    }
+    for (let len = 2; len <= n; len <<= 1) {
+      const a = (-2 * Math.PI) / len, wr = Math.cos(a), wi = Math.sin(a);
+      for (let i = 0; i < n; i += len) {
+        let cr = 1, ci = 0;
+        for (let j = 0; j < len / 2; j++) {
+          const ur = re[i + j], ui = im[i + j];
+          const vr = re[i + j + len / 2] * cr - im[i + j + len / 2] * ci, vi = re[i + j + len / 2] * ci + im[i + j + len / 2] * cr;
+          re[i + j] = ur + vr; im[i + j] = ui + vi; re[i + j + len / 2] = ur - vr; im[i + j + len / 2] = ui - vi;
+          const t = cr * wr - ci * wi; ci = cr * wi + ci * wr; cr = t;
+        }
+      }
+    }
+  }
+  function drawSpec(cv, buf, zoom = 1) {
+    const ctx = cv.getContext("2d"), W = cv.width, H = cv.height, d = mono(buf), sr = buf.sampleRate;
+    const N = 2048, maxBin = Math.floor((8000 / sr) * N);
+    const img = ctx.createImageData(W, H);
+    const win = new Float32Array(N).map((_, i) => 0.5 - 0.5 * Math.cos((2 * Math.PI * i) / (N - 1)));
+    const cols = Math.min(W, 160), colW = W / cols;
+    for (let c = 0; c < cols; c++) {
+      const center = Math.floor((c / cols) * d.length);
+      const re = new Float32Array(N), im = new Float32Array(N);
+      for (let i = 0; i < N; i++) { const k = center - N / 2 + i; re[i] = k >= 0 && k < d.length ? d[k] * win[i] : 0; }
+      fft(re, im);
+      for (let y = 0; y < H; y++) {
+        const bin = Math.max(1, Math.floor(((H - 1 - y) / H) * maxBin));
+        const mag = Math.hypot(re[bin], im[bin]) / (N / 4);
+        const db = 20 * Math.log10(mag * zoom + 1e-9);
+        const v = Math.max(0, Math.min(1, (db + 80) / 70));
+        const r = Math.round(255 * Math.min(1, v * 1.6)), g = Math.round(255 * Math.max(0, v * 1.8 - 0.8)), b = Math.round(255 * Math.max(0, v * 2.5 - 1.5)) ;
+        for (let x = Math.floor(c * colW); x < Math.floor((c + 1) * colW); x++) {
+          const p = (y * W + x) * 4;
+          img.data[p] = 31 + (r * 224) / 255; img.data[p + 1] = 30 + (g * 225) / 255; img.data[p + 2] = 30 + (b * 225) / 255; img.data[p + 3] = 255;
+        }
+      }
+    }
+    ctx.putImageData(img, 0, 0);
+    ctx.fillStyle = "rgba(255,255,255,.55)"; ctx.font = "10px monospace";
+    for (const f of [1000, 4000]) { const y = H - (f / 8000) * H; ctx.fillRect(0, y, 6, 1); ctx.fillText(f / 1000 + "k", 8, y + 3); }
+  }
+
+  // ---------- cards ----------
+  const groups = {};
+  for (const name of S.names) { const i = S.info(name); (groups[i.group] ||= []).push(i); }
+  for (const [g, items] of Object.entries(groups)) {
+    const sec = document.createElement("section");
+    sec.className = "grp";
+    const id = "g-" + g.toLowerCase().replace(/\W+/g, "-");
+    sec.setAttribute("aria-labelledby", id);
+    sec.innerHTML = `<h2 id="${id}">${g}</h2><div class="grid"></div>`;
+    for (const it of items) {
+      const c = document.createElement("article");
+      c.className = "card"; c.dataset.name = it.name;
+      c.innerHTML = `
+        <header><div><h3>${it.name}</h3><p class="for">${it.for}</p></div>
+          <button class="b b--ink pb" type="button" aria-label="Play ${it.name}"><i class="ph-fill ph-play" aria-hidden="true"></i></button></header>
+        <p class="desc">${it.desc}</p>
+        <div class="badges">${it.hover ? '<span class="badge">fine-pointer hover only</span>' : ""}${it.intensity ? '<span class="badge">intensity</span>' : ""}<span class="badge">rate limit ${it.gap} ms</span></div>
+        <canvas class="wave" width="560" height="70" aria-hidden="true"></canvas>
+        <canvas class="spec" width="560" height="54" aria-hidden="true"></canvas>
+        <div class="meter"></div>`;
+      c.querySelector(".pb").addEventListener("click", () => {
+        if (!S.enabled) { $("#status").innerHTML = "<b>Sound is off.</b> Turn it on with the toggle above to listen."; return; }
+        S.play(it.name, { el: c });
+        c.classList.add("playing"); setTimeout(() => c.classList.remove("playing"), (it.dur || 0.3) * 1000);
+      });
+      sec.querySelector(".grid").appendChild(c);
+    }
+    groupsEl.appendChild(sec);
+  }
+
+  // ---------- offline renders ----------
+  // quiet UI sounds would be flat lines at true scale: zoom to the peak (shown on the canvas)
+  const zoomFor = (peakDb) => Math.max(1, Math.min(8, Math.floor(0.95 / Math.pow(10, peakDb / 20))));
+  async function renderAll() {
+    const jobs = [];
+    for (const c of document.querySelectorAll(".card")) {
+      const name = c.dataset.name;
+      jobs.push(S.render(name).then((buf) => {
+        const m = measure(buf); stats[name] = m;
+        drawWave(c.querySelector(".wave"), buf, { zoom: zoomFor(m.peak) });
+        drawSpec(c.querySelector(".spec"), buf, zoomFor(m.peak));
+        const warn = m.peak > -1 ? "clip" : "";
+        c.querySelector(".meter").innerHTML = `<span>peak <b class="${warn}">${m.peak.toFixed(1)} dBFS</b></span><span>rms50 <b>${m.rms.toFixed(1)}</b></span><span>len <b>${(m.len * 1000) | 0} ms</b></span>`;
+      }));
+    }
+    const introLen = Math.max(...S.INTRO.map((e) => e.at)) / 1000 + 0.6;
+    jobs.push(S.renderSequence(S.INTRO, introLen).then((buf) => {
+      stats["intro"] = measure(buf);
+      drawWave($("#intro-wave"), buf, { marks: S.INTRO.map((e) => e.at / 1000), zoom: zoomFor(stats.intro.peak) });
+      $("#intro-marks").innerHTML = S.INTRO.filter((e) => e.label).map((e) => `<span style="left:${(e.at / 1000 / introLen) * 100}%">${e.label}</span>`).join("");
+    }));
+    const B = [[0, 1], [0.32, 0.55], [0.55, 0.3], [0.72, 0.12]].map(([t, i]) => ({ name: "ball-bounce", at: t * 1000, opts: { intensity: i } }));
+    jobs.push(S.renderSequence(B, 1.05).then((buf) => { drawWave($("#bounce-wave"), buf, { marks: B.map((e) => e.at / 1000) }); stats["bounces"] = measure(buf); }));
+    await Promise.all(jobs);
+    document.documentElement.dataset.rendered = "1";
+  }
+
+  // ---------- controls ----------
+  const status = () => {
+    $("#status").innerHTML = `sound <b>${S.enabled ? "on" : "off"}</b> (source: ${S.source}) · audio context <b>${S.state}</b> · ${S.supported ? "WebAudio supported" : "<b>no WebAudio</b>"} · ${S.names.length} sounds`;
+  };
+  S.on(status);
+  addEventListener("pointerdown", () => setTimeout(status, 120));
+  $("#vol").addEventListener("input", (e) => { S.volume = +e.target.value; });
+  $("#play-intro").addEventListener("click", () => {
+    if (!S.enabled) S.setEnabled(true);
+    setTimeout(() => S.schedule(S.INTRO), 450); // after the "sound-on" chime
+  });
+  status();
+  renderAll().catch((e) => { console.error(e); $("#status").textContent = "Offline render failed: " + e.message; });
+})();
+</script>
+</body>
+</html>

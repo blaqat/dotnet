@@ -1,0 +1,155 @@
+<title>blaqat.net Yarn Redesign</title>
+<link rel="stylesheet" href="kit/yarn.css">
+<style>
+  .g { padding: clamp(20px, 4vw, 48px) clamp(16px, 4vw, 52px) 64px; max-width: 1320px; margin: 0 auto; }
+  .g header { display: grid; gap: 10px; margin-bottom: 34px; }
+  .g header p { margin: 0; max-width: 64ch; }
+  .lede { font-size: 1.05rem; color: var(--ink-2); }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 360px), 1fr)); gap: 22px; }
+  .card { display: grid; grid-template-rows: auto 1fr; overflow: hidden; }
+  .card .shot { aspect-ratio: 16 / 10; background: var(--cotton-2); border-radius: var(--radius-card) var(--radius-card) 0 0; overflow: hidden; }
+  .card .shot img { width: 100%; height: 100%; object-fit: cover; object-position: top center; }
+  .card .shot.phone { display: grid; grid-template-columns: 1fr 1fr; gap: 0; }
+  .card .body { padding: 16px 18px 18px; display: grid; gap: 8px; align-content: start; }
+  .card h2 { margin: 0; }
+  .card p { margin: 0; color: var(--ink-2); font-size: .94rem; }
+  .links { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; }
+  .links a { font: 750 .8rem/1 var(--font-display); color: var(--ink); text-decoration: none; padding: 8px 11px; border-radius: 999px; background: var(--cotton-2); }
+  .links a:hover { background: var(--ink); color: #fff; }
+  .links a.primary { background: var(--tex-twill), var(--red); color: #fff; }
+  .sec-dot { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 6px; vertical-align: 1px; background: var(--tex-cord), var(--sec); }
+  h3.group { margin: 40px 0 14px; }
+  .notes { margin-top: 40px; padding: 22px 24px; }
+  .notes h2 { margin: 0 0 8px; }
+  .notes ul { margin: 0; padding-left: 1.2em; color: var(--ink-2); display: grid; gap: 6px; }
+</style>
+<script src="kit/yarn.js" defer></script>
+<div class="frame" data-section="home">
+<main class="sheet">
+  <div class="g">
+    <header>
+      <p class="eyebrow">blaqat.net redesign · round 3</p>
+      <h1 class="h1">Yarn, in black, red &amp; white.</h1>
+      <p class="lede">Every page is a white diamond-knit sheet inside a rolled cord frame in its section color. Red is the accent everywhere. Every mock opens with a <b>⚙ options</b> panel for switching variants; each variant also has its own URL.</p>
+    </header>
+
+    <div class="grid">
+      <article class="patch card" data-section="home">
+        <div class="shot"><img src="_shots/home-desktop.png" alt="Home: cat and yarn wordmark lockup, bio, and section buttons" loading="lazy"></div>
+        <div class="body">
+          <h2 class="h3"><span class="sec-dot"></span>Home &amp; intro</h2>
+          <p>Three intros: the yarn ball drops, rolls into the dot and the cat plays; a cursor ball the cat chases and swats; and a short one with rope hovers. Notes burst from the Music button in felt, paper or crayon. Section buttons grow into the next page's frame.</p>
+          <div class="links">
+            <a class="primary" href="home/index.html?intro=drop&replay">Yarn drop</a>
+            <a href="home/index.html?intro=cursor&replay">Cursor cat</a>
+            <a href="home/index.html?intro=simple&replay">Simple</a>
+            <a href="home/index.html?skip&notes=paper">End state</a>
+          </div>
+        </div>
+      </article>
+
+      <article class="patch card" data-section="projects">
+        <div class="shot"><img src="_shots/projects-stage.png" alt="Projects: dense list on the left, sticky stage on the right" loading="lazy"></div>
+        <div class="body">
+          <h2 class="h3"><span class="sec-dot"></span>Projects</h2>
+          <p>Round 2's list and stage, denser: all 12 fit on one screen. A 6-column grid is the alternative. There are three mobile options; rows are recommended.</p>
+          <div class="links">
+            <a class="primary" href="projects/index.html">List + stage</a>
+            <a href="projects/index.html?view=grid">Grid</a>
+            <a href="projects/index.html?m=rows">Mobile: rows</a>
+            <a href="projects/index.html?m=grid">grid</a>
+            <a href="projects/index.html?m=deck">deck</a>
+          </div>
+        </div>
+      </article>
+
+      <article class="patch card" data-section="music">
+        <div class="shot"><img src="_shots/music-player-expanded-desktop.png" alt="Music: the player expanded over the library, with the queue" loading="lazy"></div>
+        <div class="body">
+          <h2 class="h3"><span class="sec-dot"></span>Music &amp; the player</h2>
+          <p>The site-wide player has two states, mini and expanded. Each track gets a knit swatch instead of cover art, plus a stitched waveform, volume, and a reorderable queue. Two library layouts.</p>
+          <div class="links">
+            <a class="primary" href="music/index.html?demo&player=expanded">Player expanded</a>
+            <a href="music/index.html?demo">Swatch library</a>
+            <a href="music/index.html?demo&lib=ledger">Ledger library</a>
+            <a href="music/index.html?demo&pmode=dock">Docked player</a>
+          </div>
+        </div>
+      </article>
+
+      <article class="patch card" data-section="thoughts">
+        <div class="shot"><img src="_shots/thoughts-stitched-feed-desktop.png" alt="Thoughts, stitched: masonry feed of scraps, articles, picks and a tier list" loading="lazy"></div>
+        <div class="body">
+          <h2 class="h3"><span class="sec-dot"></span>Thoughts · Stitched</h2>
+          <p>The Thoughts section in the site's own language: felt scraps for scratch thoughts, articles with markdown, picks gathered into collections, a playlist, image posts with a lightbox, and a tier list board.</p>
+          <div class="links">
+            <a class="primary" href="thoughts/stitched.html">Feed</a>
+            <a href="thoughts/stitched.html?layout=thread">Thread layout</a>
+            <a href="thoughts/stitched.html?view=article&id=a1">Article</a>
+            <a href="thoughts/stitched.html?view=collection&c=tools">Tools collection</a>
+            <a href="thoughts/stitched.html?lightbox=e1:0">Lightbox</a>
+          </div>
+        </div>
+      </article>
+
+      <article class="patch card" data-section="thoughts">
+        <div class="shot"><img src="_shots/final-ethereal-d.png" alt="Thoughts, ethereal: dark night feed with a glowing red thread timeline" loading="lazy"></div>
+        <div class="body">
+          <h2 class="h3"><span class="sec-dot" style="background:#14121c"></span>Thoughts · Ethereal</h2>
+          <p>The same content on a dark night field, where thoughts form out of haze. The red yarn continues as a glowing thread, the cat appears as a constellation, and posts that share a tag are joined by filaments.</p>
+          <div class="links">
+            <a class="primary" href="thoughts/ethereal.html">Feed</a>
+            <a href="thoughts/ethereal.html?view=article&id=a1">Article</a>
+            <a href="thoughts/ethereal.html?view=collection&c=tools">Collection</a>
+            <a href="thoughts/ethereal.html?lightbox=e1:0">Lightbox</a>
+          </div>
+        </div>
+      </article>
+
+      <article class="patch card" data-section="thoughts">
+        <div class="shot"><img src="_shots/tierlist-yarn-drag-desktop.png" alt="Tier list maker mid-drag, with S through D tiers and an unranked tray" loading="lazy"></div>
+        <div class="body">
+          <h2 class="h3"><span class="sec-dot"></span>Tier list maker</h2>
+          <p>Type a name to get image choices, or keep it text only. Drag and drop works with mouse, touch or keyboard. Each list has Mine, Everyone, and You vs everyone views. Both skins.</p>
+          <div class="links">
+            <a class="primary" href="thoughts/tierlist.html?skin=yarn&q=arc">Make one</a>
+            <a href="thoughts/tierlist.html?skin=yarn&from=tl1&tab=everyone">Everyone</a>
+            <a href="thoughts/tierlist.html?skin=yarn&from=tl1&tab=diff">You vs everyone</a>
+            <a href="thoughts/tierlist.html?skin=ethereal&from=tl1">Ethereal skin</a>
+          </div>
+        </div>
+      </article>
+    </div>
+
+    <h3 class="h3 group">The kit</h3>
+    <div class="links">
+      <a class="primary" href="kit/kit.html">Materials, stitches &amp; rope</a>
+      <a href="projects/index.html?m=rows&nav=suede">Nav in suede</a>
+      <a href="projects/index.html?m=rows&nav=cork">cork</a>
+      <a href="projects/index.html?m=rows&nav=burlap">burlap</a>
+      <a href="BRIEF.md">Brief</a>
+      <a href="REVIEW-fable.md">Full review notes</a>
+    </div>
+
+    <section class="patch notes" id="review">
+      <h2 class="h3">Independent review: what to keep</h2>
+      <p class="muted" style="margin:0 0 12px;max-width:70ch">A separate reviewer rendered every page at 390, 768, 1024 and 1440 px, tabbed through each one, measured contrast, and tested reduced motion. Verdict: the yarn direction works and still reads as minimal. Desktop Projects and the player are the strongest pieces. Every variant is still here; these are recommendations, not cuts.</p>
+      <div class="keep">
+        <p><b>Keep</b>: the Drop intro (first visit), the Simple intro (returning visits) · Projects list + stage, the grid toggle, rows on mobile · the Swatch library on desktop, Ledger on mobile, the player panel over its bar · Stitched Thoughts, masonry plus the thread layout · the yarn tier list · corduroy for the mobile nav.</p>
+        <p><b>Consider cutting</b>: the Cursor intro, which takes the cat out of the lockup · the Deck on mobile (one project per screen) · the Dock player, which squeezes the library · Ethereal as a whole site section (keep its red-thread timeline and italic scratch quotes as ideas) · the suede and burlap nav.</p>
+      </div>
+      <h2 class="h3" style="margin-top:18px">Fixed after review</h2>
+      <ul id="review-list">
+        <li>Contact in the nav now opens Home's contact links; it used to be a dead link on section pages.</li>
+        <li>Kit: yarn red darkened to #d62f38 so white text passes AA; burlap darkened; focus rings restored on stitched buttons and chips; chips are 44 px tall on touch; mobile nav labels enlarged.</li>
+        <li>Tier list: now includes the global player (night theme on the ethereal skin); the selected tab no longer flashes white-on-cream.</li>
+        <li>Ethereal: the night stitch frame is now the default (the gold cord read as mud).</li>
+        <li>Player: on mobile the mini player is merged into the brown nav dock, cutting the bottom chrome from 161 to 121 px. The play button's keyboard focus is visible again. The mobile sheet is a proper modal while open. There's a night theme for dark pages. Music defaults to the Ledger library on mobile.</li>
+        <li>Home: the stalking cat no longer covers the "b", and its tail stays inside the frame on mobile. Skip is 44 px and appears after 600 ms but is keyboard-reachable from the start. Notes fly lower and wider, behind the bio text. The duplicate bottom bar is hidden on home, where the tiles already are the nav.</li>
+        <li>Thoughts · Stitched: every tag, date and chip has a 44 px tap area on touch screens. The mobile header is one row, with collections moved into a Browse sheet, so the first post starts at 216 px. Deep-linked lightboxes now close back into their thumbnail.</li>
+        <li>Projects: no more black "video" boxes. Projects without images get an initials badge on blue cord. Rows flow into two columns between 640 and 959 px. The stuck filter strip gets an edge. Every control is 44 px on touch screens.</li>
+      </ul>
+    </section>
+  </div>
+</main>
+</div>

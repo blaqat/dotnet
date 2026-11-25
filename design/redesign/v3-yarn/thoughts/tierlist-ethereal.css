@@ -1,0 +1,141 @@
+/* ============================================================
+   Tier list maker · ETHEREAL skin (?skin=ethereal)
+   The dark Thoughts world: night sky, soft glows, glass tiles.
+   Same markup as yarn; only tokens + a few component overrides.
+   Tiers stay black / red / white: S red glow · A white glow ·
+   B pewter · C smoke · D outline.
+   ============================================================ */
+
+html[data-skin="ethereal"] {
+  color-scheme: dark;
+  --eth-bg: #0d0b15;
+  --eth-glass: #17131f;
+  --tl-fg: #f4efe9;
+  --tl-fg-2: #cbc3cf;     /* 11.6:1 on bg */
+  --tl-fg-3: #a59cab;     /* 7.3:1 on bg, 6.1:1 on glass */
+  --tl-accent: #ff4d58;
+  --tl-accent-deep: #ff8a91; /* red text on dark: 7.6:1 */
+  --tl-accent-soft: rgba(255, 77, 88, .16);
+  --tl-panel: linear-gradient(180deg, rgba(255, 255, 255, .06), rgba(255, 255, 255, .025)), var(--eth-glass);
+  --tl-panel-shadow: 0 0 0 1px rgba(255, 255, 255, .08), 0 24px 48px rgba(0, 0, 0, .38);
+  --tl-panel-ring: var(--eth-glass);
+  --tl-stitch: rgba(255, 255, 255, .1);
+  --tl-row: linear-gradient(90deg, rgba(255, 255, 255, .05), rgba(255, 255, 255, .018)), #120f1a;
+  --tl-row-shadow: 0 0 0 1px rgba(255, 255, 255, .07), 0 12px 30px rgba(0, 0, 0, .28);
+  --tl-item: linear-gradient(180deg, rgba(255, 255, 255, .1), rgba(255, 255, 255, .035)), #1c1727;
+  --tl-item-shadow: 0 0 0 1px rgba(255, 255, 255, .1), 0 6px 14px rgba(0, 0, 0, .4);
+  --tl-item-stitch: transparent;
+  --tl-lift: 0 0 0 1px rgba(255, 255, 255, .22), 0 0 30px rgba(255, 77, 88, .38), 0 22px 44px rgba(0, 0, 0, .65);
+  --tl-pocket: rgba(255, 255, 255, .045);
+  --tl-pocket-shadow: inset 0 0 0 1px rgba(255, 255, 255, .08);
+  --tl-field: rgba(0, 0, 0, .32);
+  --tl-slot: rgba(255, 77, 88, .1);
+  --tl-track: rgba(255, 255, 255, .09);
+  --bar-S: #ff4d58;
+  --bar-A: #f4efe9;
+  --bar-B: #a39aa9;
+  --bar-C: #6f6777;
+  --bar-D: #4c4555;
+  --rope-a: #ff5a64;
+  --rope-b: #b51d2a;
+  --stars: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='320' height='320'%3E%3Cg fill='%23fff'%3E%3Ccircle cx='22' cy='38' r='.9' opacity='.7'/%3E%3Ccircle cx='96' cy='12' r='.6' opacity='.5'/%3E%3Ccircle cx='150' cy='70' r='1.2' opacity='.8'/%3E%3Ccircle cx='210' cy='28' r='.7' opacity='.45'/%3E%3Ccircle cx='288' cy='60' r='.9' opacity='.6'/%3E%3Ccircle cx='40' cy='140' r='.6' opacity='.4'/%3E%3Ccircle cx='120' cy='180' r='.8' opacity='.55'/%3E%3Ccircle cx='250' cy='150' r='1.3' opacity='.75'/%3E%3Ccircle cx='300' cy='220' r='.6' opacity='.4'/%3E%3Ccircle cx='60' cy='250' r='1' opacity='.6'/%3E%3Ccircle cx='170' cy='262' r='.6' opacity='.45'/%3E%3Ccircle cx='230' cy='300' r='.9' opacity='.55'/%3E%3Ccircle cx='12' cy='300' r='.6' opacity='.35'/%3E%3Ccircle cx='190' cy='120' r='.5' opacity='.35'/%3E%3C/g%3E%3C/svg%3E");
+}
+
+html[data-skin="ethereal"] [data-tier="S"] { --tier-bg: radial-gradient(120% 100% at 30% 15%, #f0505a, #c01d2a 72%); --tier-fg: #fff; --tier-stitch: transparent; --tier-glow: 0 0 30px rgba(255, 77, 88, .5); }
+html[data-skin="ethereal"] [data-tier="A"] { --tier-bg: radial-gradient(120% 100% at 30% 15%, #fff, #ddd5cf 78%); --tier-fg: #15121c; --tier-stitch: transparent; --tier-glow: 0 0 26px rgba(255, 255, 255, .22); }
+html[data-skin="ethereal"] [data-tier="B"] { --tier-bg: radial-gradient(120% 100% at 30% 15%, #857c8c, #625a6a 78%); --tier-fg: #fff; --tier-stitch: transparent; --tier-glow: none; }
+html[data-skin="ethereal"] [data-tier="C"] { --tier-bg: radial-gradient(120% 100% at 30% 15%, #3c3546, #2a2432 78%); --tier-fg: #eee8f1; --tier-stitch: rgba(255, 255, 255, .14); --tier-glow: none; }
+html[data-skin="ethereal"] [data-tier="D"] { --tier-bg: rgba(255, 255, 255, .02); --tier-fg: #cbc3cf; --tier-stitch: rgba(255, 255, 255, .26); --tier-glow: none; }
+html[data-skin="ethereal"] [data-tier="tray"] { --tier-bg: rgba(255, 255, 255, .06); --tier-fg: #f4efe9; --tier-stitch: rgba(255, 255, 255, .2); }
+
+/* ------------------------------------------------------------ the night */
+html[data-skin="ethereal"] body.frame {
+  color: var(--tl-fg);
+  background:
+    radial-gradient(1100px 620px at 12% -12%, rgba(224, 53, 63, .17), transparent 62%),
+    radial-gradient(900px 640px at 105% 28%, rgba(217, 162, 27, .07), transparent 60%),
+    radial-gradient(1100px 820px at 50% 118%, rgba(104, 74, 170, .2), transparent 62%),
+    var(--stars) 0 0 / 320px 320px,
+    var(--eth-bg);
+}
+html[data-skin="ethereal"] .sheet {
+  background: transparent;
+  box-shadow: inset 0 0 0 1px rgba(217, 162, 27, .2), 0 0 40px rgba(217, 162, 27, .05) inset;
+  outline: 1px dashed rgba(255, 255, 255, .05);
+}
+html[data-skin="ethereal"] .tl-title { font-family: "Fraunces", Georgia, serif; font-weight: 600; letter-spacing: -.02em; }
+html[data-skin="ethereal"] .tl-title--input { font-weight: 600; }
+html[data-skin="ethereal"] .tl-tier__letter { font-family: "Fraunces", Georgia, serif; font-weight: 700; letter-spacing: -.02em; text-shadow: none; }
+
+/* nav on dark */
+html[data-skin="ethereal"] .ynav { --ink: #f4efe9; --ink-2: #cbc3cf; }
+html[data-skin="ethereal"] .ynav__link[aria-current="page"] {
+  background: rgba(255, 255, 255, .1); color: #fff;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .16), 0 0 20px rgba(255, 77, 88, .22);
+}
+html[data-skin="ethereal"] .ybar.m-velvet {
+  background: radial-gradient(140% 120% at 30% 0%, rgba(255, 255, 255, .1), transparent 55%), linear-gradient(180deg, #241d31, #17121f);
+  color: #f4efe9;
+  outline-color: rgba(255, 255, 255, .16);
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, .08), 0 12px 30px rgba(0, 0, 0, .55);
+}
+
+/* kit controls on dark */
+html[data-skin="ethereal"] .tl .btn {
+  background: rgba(255, 255, 255, .08); color: var(--tl-fg);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .14); outline-color: transparent;
+}
+html[data-skin="ethereal"] .tl .btn--red {
+  background: linear-gradient(180deg, #cf2d38, #a11b26); color: #fff;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .25), 0 0 24px rgba(255, 77, 88, .38);
+}
+html[data-skin="ethereal"] .tl .btn--ink { background: #f4efe9; color: #15121c; box-shadow: 0 0 20px rgba(255, 255, 255, .14); }
+html[data-skin="ethereal"] .tl .btn--ghost { background: transparent; box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .16); }
+html[data-skin="ethereal"] .tl .chip { background: rgba(255, 255, 255, .07); color: var(--tl-fg-2); }
+html[data-skin="ethereal"] .tl .chip[aria-pressed="true"] { background: #f4efe9; color: #15121c; outline-color: transparent; }
+
+/* glows instead of stitches */
+html[data-skin="ethereal"] .tl-tier__label { box-shadow: var(--tier-glow, none); z-index: 1; }
+html[data-skin="ethereal"] .tl-tier[data-tier="D"] .tl-tier__label { outline-style: dashed; outline-offset: -5px; }
+html[data-skin="ethereal"] .tl-zone { outline-color: transparent; }
+html[data-skin="ethereal"] .tl-tier.is-over { box-shadow: var(--tl-row-shadow), 0 0 0 1.5px var(--tl-accent), 0 0 34px rgba(255, 77, 88, .25); }
+html[data-skin="ethereal"] .tl-panel-card,
+html[data-skin="ethereal"] .tl-insp { outline-color: transparent; }
+html[data-skin="ethereal"] .tl-field { outline: 1px solid rgba(255, 255, 255, .1); outline-offset: -1px; box-shadow: inset 0 2px 6px rgba(0, 0, 0, .35); }
+html[data-skin="ethereal"] .tl-field:focus-within { outline: 1.5px solid var(--tl-accent); box-shadow: inset 0 2px 6px rgba(0, 0, 0, .35), 0 0 18px rgba(255, 77, 88, .25); }
+html[data-skin="ethereal"] .tl-tray { outline: 1px dashed rgba(255, 255, 255, .14); outline-offset: -6px; }
+html[data-skin="ethereal"] .tl-item__img,
+html[data-skin="ethereal"] .tl-cand__img { box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .08); }
+html[data-skin="ethereal"] .tl-item.is-slot::before { border-style: solid; border-width: 1.5px; box-shadow: 0 0 22px rgba(255, 77, 88, .3) inset; }
+html[data-skin="ethereal"] .tl-count,
+html[data-skin="ethereal"] .tl-cand__key { background: #f4efe9; color: #15121c; }
+html[data-skin="ethereal"] .tl-tabs__thumb {
+  background: linear-gradient(180deg, #cf2d38, #a11b26); outline-color: transparent;
+  box-shadow: 0 0 22px rgba(255, 77, 88, .4);
+}
+html[data-skin="ethereal"] .tl-tab__n { background: rgba(255, 255, 255, .1); }
+html[data-skin="ethereal"] .tl-progress__fill { background: linear-gradient(90deg, #d42633, #ff5a64); box-shadow: 0 0 14px rgba(255, 77, 88, .5); }
+html[data-skin="ethereal"] .tl-go { background: linear-gradient(180deg, #cf2d38, #a11b26); box-shadow: 0 0 16px rgba(255, 77, 88, .35); }
+html[data-skin="ethereal"] .tl-delta.is-down { background: #f4efe9; color: #15121c; }
+html[data-skin="ethereal"] .tl-joined { background: linear-gradient(180deg, #cf2d38, #a11b26); outline-color: transparent; box-shadow: 0 0 28px rgba(255, 77, 88, .3); }
+html[data-skin="ethereal"] .tl-hist { border-bottom-color: rgba(255, 255, 255, .14); }
+html[data-skin="ethereal"] .tl-hist i:nth-child(1) { box-shadow: 0 0 8px rgba(255, 77, 88, .55); }
+html[data-skin="ethereal"] .tl-hist i.is-you::after { box-shadow: 0 0 0 1.5px var(--eth-glass), 0 0 8px rgba(255, 77, 88, .8); }
+html[data-skin="ethereal"] .tl-bar__fill { box-shadow: var(--tier-glow, none); }
+html[data-skin="ethereal"] .tl-ring .ply-twist { stroke: rgba(255, 255, 255, .3); }
+html[data-skin="ethereal"] .tl-ring { filter: drop-shadow(0 0 8px rgba(255, 77, 88, .45)); }
+html[data-skin="ethereal"] .tl-cmp__row { outline-color: transparent; }
+html[data-skin="ethereal"] .tl-help kbd { background: rgba(255, 255, 255, .08); box-shadow: none; }
+html[data-skin="ethereal"] .tl-who { background: rgba(255, 255, 255, .08); }
+
+@media (max-width: 959px) {
+  html[data-skin="ethereal"] .tl[data-mode="edit"] .tl-tray {
+    background: linear-gradient(180deg, rgba(255, 255, 255, .07), rgba(255, 255, 255, .03)), #1a1524;
+    box-shadow: 0 0 0 1px rgba(255, 255, 255, .1), 0 -8px 40px rgba(0, 0, 0, .5), 0 0 30px rgba(104, 74, 170, .16);
+    outline-color: transparent;
+  }
+}
+
+@media (prefers-contrast: more) {
+  html[data-skin="ethereal"] { --tl-stitch: rgba(255, 255, 255, .45); --tl-item-stitch: rgba(255, 255, 255, .4); --tl-fg-3: #cbc3cf; }
+}

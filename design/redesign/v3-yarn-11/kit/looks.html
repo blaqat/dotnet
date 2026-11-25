@@ -1,0 +1,178 @@
+<!doctype html>
+<html lang="en" data-section="kit">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Looks · i10 vs i11</title>
+<link rel="stylesheet" href="yarn.css">
+<link rel="stylesheet" href="vendor/phosphor/bold/style.css">
+<style>
+  /* kit/looks.html · i11 · system · L6: the same screen before (i10 round 2, the frozen ../v3-yarn-10) and after (i11,
+     this folder: the owner's 13 type + spacing rules), side by side as live frames. Also i11 at both heading weights
+     (?hw=500 · 400) and in both looks. Every frame passes ?embed (no ⚙ panel, saved ⚙ picks don't leak in) and
+     ?reduced (live pages stay calm). The owner's screen is the default: Music grid at 1000px, "shadow" searched, glooming
+     shadows of alphabet city playing. */
+  body { background: var(--cotton-2); }
+  .lkx { max-width: 1840px; margin: 0 auto; padding: 32px 24px 64px; }
+  .lkx-head { display: grid; gap: 16px; margin-bottom: var(--section-gap); }
+  .lkx-head p { margin: 0; max-width: 84ch; font: var(--t-body); color: var(--ink-2); text-wrap: pretty; }
+  .lkx-head code, .lkx-col code { font: var(--t-meta); font-variant-numeric: tabular-nums; padding: .2em .45em; border-radius: 6px; background: var(--white); box-shadow: inset 0 0 0 1px rgba(31,30,30,.1); white-space: nowrap; }
+  .lkx-ctl { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 24px; }
+  .lkx-ctl > div { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+  .lkx-ctl__k { margin-right: 4px; font: var(--t-meta); color: var(--ink-3); }
+
+  .lkx-grid { --cols: 2; display: grid; grid-template-columns: repeat(var(--cols), minmax(0, 1fr)); gap: var(--sp-5); align-items: start; }
+  .lkx-col { display: grid; gap: 12px; min-width: 0; }
+  .lkx-col__top { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 12px; min-height: 28px; }
+  .lkx-col h2 { margin: 0; font: var(--t-title); letter-spacing: var(--tr-title); }
+  .lkx-col__note { margin: 0; font: var(--t-meta); color: var(--ink-3); }
+  .lkx-col__go { margin-left: auto; font: var(--t-label); color: var(--c-link); text-decoration: underline; text-underline-offset: 3px; }
+  .lkx-col__go:hover { color: var(--c-link-hover); }
+
+  /* a frame: the real page at its real size, scaled to the column (--s) */
+  .lkx-frame { --w: 1440; --h: 900; position: relative; overflow: hidden; width: calc(var(--w) * var(--s, .3) * 1px); height: calc(var(--h) * var(--s, .3) * 1px);
+    border-radius: 12px; background: var(--white); box-shadow: 0 0 0 1px rgba(31,30,30,.14), 0 10px 26px -12px rgba(31,30,30,.45); }
+  .lkx-frame[data-phone] { border-radius: calc(26px * var(--s, .5) + 6px); box-shadow: 0 0 0 calc(5px * var(--s, .5) + 2px) var(--ink), 0 10px 26px -10px rgba(31,30,30,.5); }
+  .lkx-frame iframe { position: absolute; left: 0; top: 0; width: calc(var(--w) * 1px); height: calc(var(--h) * 1px); border: 0; background: var(--cotton);
+    transform-origin: 0 0; transform: scale(var(--s, .3)); }
+  @media (max-width: 959px) { .lkx { padding: 16px 16px 48px; } .lkx-head { margin-bottom: 32px; } .lkx-grid { --cols: 1 !important; } }
+</style>
+</head>
+<body>
+<main class="lkx">
+  <header class="lkx-head">
+    <h1 class="yhead__title">Looks<span class="yhead__dot">.</span></h1>
+    <p>The same screen before and after the 13 type and spacing rules, live. <b>i10</b> is round 2 as you last saw it (the frozen <code>v3-yarn-10</code>); <b>i11</b> is this folder: one small type scale, card text 1px smaller, button text 1px smaller than the text beside it, weights 400 / 500, nothing slanted, Nunito for headings and Nunito Sans for the rest, more room between sections, balanced headings, and every card holding its content the same distance from all four edges. Music frames start with glooming shadows of alphabet city playing. Each frame is the real page: scroll and click inside it.</p>
+    <div class="lkx-ctl">
+      <div role="radiogroup" aria-label="Screen">
+        <span class="lkx-ctl__k" aria-hidden="true">Screen</span>
+        <button type="button" class="ychip ysel" role="radio" data-screen="mgrid" aria-checked="false"><span class="ychip__l">Music grid · “shadow” ▶</span></button>
+        <button type="button" class="ychip ysel" role="radio" data-screen="mtl" aria-checked="false"><span class="ychip__l">Music timeline ▶</span></button>
+        <button type="button" class="ychip ysel" role="radio" data-screen="projects" aria-checked="false"><span class="ychip__l">Projects</span></button>
+        <button type="button" class="ychip ysel" role="radio" data-screen="thoughts" aria-checked="false"><span class="ychip__l">Thoughts</span></button>
+        <button type="button" class="ychip ysel" role="radio" data-screen="article" aria-checked="false"><span class="ychip__l">An article</span></button>
+        <button type="button" class="ychip ysel" role="radio" data-screen="home" aria-checked="false"><span class="ychip__l">Home</span></button>
+        <button type="button" class="ychip ysel" role="radio" data-screen="studio" aria-checked="false"><span class="ychip__l">Studio</span></button>
+      </div>
+      <div role="radiogroup" aria-label="Width">
+        <span class="lkx-ctl__k" aria-hidden="true">Width</span>
+        <button type="button" class="ychip ysel" role="radio" data-w="1440" aria-checked="false"><span class="ychip__l">1440</span></button>
+        <button type="button" class="ychip ysel" role="radio" data-w="1000" aria-checked="false"><span class="ychip__l">1000</span></button>
+        <button type="button" class="ychip ysel" role="radio" data-w="390" aria-checked="false"><span class="ychip__l">390</span></button>
+      </div>
+      <div role="radiogroup" aria-label="Compare">
+        <span class="lkx-ctl__k" aria-hidden="true">Compare</span>
+        <button type="button" class="ychip ysel" role="radio" data-cmp="new" aria-checked="false"><span class="ychip__l">i10 · i11</span></button>
+        <button type="button" class="ychip ysel" role="radio" data-cmp="all" aria-checked="false"><span class="ychip__l">i10 · i11, both looks</span></button>
+        <button type="button" class="ychip ysel" role="radio" data-cmp="hw" aria-checked="false"><span class="ychip__l">i11 headings 500 · 400</span></button>
+        <button type="button" class="ychip ysel" role="radio" data-cmp="looks" aria-checked="false"><span class="ychip__l">i11 Section · Ink</span></button>
+      </div>
+      <div role="radiogroup" aria-label="Look">
+        <span class="lkx-ctl__k" aria-hidden="true">Look</span>
+        <button type="button" class="ychip ysel" role="radio" data-look="section" aria-checked="false"><span class="ychip__l">Section</span></button>
+        <button type="button" class="ychip ysel" role="radio" data-look="ink" aria-checked="false"><span class="ychip__l">Ink</span></button>
+      </div>
+      <div role="radiogroup" aria-label="Font">
+        <span class="lkx-ctl__k" aria-hidden="true">Font</span>
+        <button type="button" class="ychip ysel" role="radio" data-font="nunito" aria-checked="false"><span class="ychip__l">Nunito</span></button>
+        <button type="button" class="ychip ysel" role="radio" data-font="allo" aria-checked="false"><span class="ychip__l">Allo</span></button>
+        <button type="button" class="ychip ysel" role="radio" data-font="allo-round" aria-checked="false"><span class="ychip__l">Allo round</span></button>
+      </div>
+    </div>
+  </header>
+  <section class="lkx-grid" id="grid" aria-label="Before and after"></section>
+</main>
+<script>
+(() => {
+  "use strict";
+  const PLAY = "glooming%20shadows%20of%20alphabet%20city";
+  const SCREENS = {
+    mgrid: { label: "Music grid", url: `music/index.html?view=grid&q=shadow&demo=${PLAY}` },
+    mtl: { label: "Music timeline", url: `music/index.html?demo=${PLAY}` },
+    projects: { label: "Projects", url: "projects/index.html?view=grid" },
+    thoughts: { label: "Thoughts", url: "thoughts/stitched.html" },
+    article: { label: "An article", url: "thoughts/stitched.html?view=article&id=a1" },
+    home: { label: "Home", url: "home/index.html?skip" },
+    studio: { label: "Studio", url: "studio/index.html" },
+  };
+  // a frame = an iteration (base folder) + its params; {look} is the Look picker's value
+  const FRAMES = {
+    i10: { name: "i10", note: "before · round 2", base: "../../v3-yarn-10/", extra: "look={look}" },
+    i11: { name: "i11", note: "after · the 13 rules", base: "../", extra: "look={look}" },
+    "i10-section": { name: "i10 · Section", note: "before", base: "../../v3-yarn-10/", extra: "look=section" },
+    "i11-section": { name: "i11 · Section", note: "after", base: "../", extra: "look=section" },
+    "i10-ink": { name: "i10 · Ink", note: "before", base: "../../v3-yarn-10/", extra: "look=ink" },
+    "i11-ink": { name: "i11 · Ink", note: "after", base: "../", extra: "look=ink" },
+    "hw-500": { name: "i11 · headings 500", note: "?hw=500 · as built", base: "../", extra: "look={look}&hw=500" },
+    "hw-400": { name: "i11 · headings 400", note: "?hw=400", base: "../", extra: "look={look}&hw=400" },
+  };
+  const CMP = { new: ["i10", "i11"], all: ["i10-section", "i11-section", "i10-ink", "i11-ink"], hw: ["hw-500", "hw-400"], looks: ["i11-section", "i11-ink"] };
+  const H = { 1440: 900, 1000: 800, 390: 844 };
+  const q = new URLSearchParams(location.search);
+  const one = (v, ok, d) => (ok.includes(v) ? v : d);
+  const st = {
+    screen: one(q.get("screen"), Object.keys(SCREENS), "mgrid"),
+    w: +one(q.get("w"), ["1440", "1000", "390"], "1000"),
+    cmp: one(q.get("cmp"), Object.keys(CMP), "new"),
+    look: one(q.get("look"), ["section", "ink"], "section"),
+    font: one(q.get("font"), ["nunito", "allo", "allo-round"], "nunito"),
+  };
+  const KEYS = ["screen", "w", "cmp", "look", "font"];
+  const grid = document.getElementById("grid");
+  const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
+  const src = (k, embed = true) => {
+    const F = FRAMES[k], u = SCREENS[st.screen].url;
+    const add = [F.extra.replace("{look}", st.look), st.font !== "nunito" ? `font=${st.font}` : "", embed ? "embed=1" : "", "reduced=1"].filter(Boolean).join("&");
+    return F.base + u + (u.includes("?") ? "&" : "?") + add;
+  };
+  function render() {
+    const cols = CMP[st.cmp];
+    grid.style.setProperty("--cols", Math.min(2, cols.length));
+    grid.innerHTML = cols.map((k) => `
+      <article class="lkx-col" aria-labelledby="lk-${k}">
+        <div class="lkx-col__top"><h2 id="lk-${k}">${esc(FRAMES[k].name)}</h2><span class="lkx-col__note">${esc(FRAMES[k].note)}</span>
+          <a class="lkx-col__go" href="${esc(src(k, false))}" target="_blank" rel="noopener">Open<span class="sr-only"> ${esc(FRAMES[k].name)} in a new tab</span></a></div>
+        <div class="lkx-frame"${st.w === 390 ? " data-phone" : ""}><iframe title="${esc(FRAMES[k].name)}: ${esc(SCREENS[st.screen].label)} at ${st.w}" src="${esc(src(k))}"></iframe></div>
+      </article>`).join("");
+    paint(); fit();
+  }
+  // the scale that fits a frame into its column (one custom property; no layout work per frame)
+  function fit() {
+    const col = grid.querySelector(".lkx-col");
+    if (!col) return;
+    const s = Math.min(1, col.clientWidth / st.w);
+    grid.style.setProperty("--s", s.toFixed(4));
+    grid.querySelectorAll(".lkx-frame").forEach((el) => { el.style.setProperty("--w", st.w); el.style.setProperty("--h", H[st.w]); });
+  }
+  function paint() {
+    const on = (k) => document.querySelectorAll(`[data-${k}]`).forEach((b) => { if (!b.matches("button")) return; const y = b.dataset[k] === String(st[k]); b.setAttribute("aria-checked", String(y)); b.classList.toggle("is-selected", y); b.tabIndex = y ? 0 : -1; });
+    KEYS.forEach(on);
+    // the look picker means nothing when the compare already shows both looks
+    document.querySelector('[aria-label="Look"]').hidden = st.cmp === "all" || st.cmp === "looks";
+    const u = new URL(location.href);
+    for (const k of KEYS) u.searchParams.set(k, st[k]);
+    history.replaceState(null, "", u);
+  }
+  const ctl = document.querySelector(".lkx-ctl");
+  ctl.addEventListener("click", (e) => {
+    const b = e.target.closest("button");
+    if (!b) return;
+    const k = KEYS.find((x) => x in b.dataset);
+    const v = k === "w" ? +b.dataset.w : b.dataset[k];
+    if (st[k] === v) return;
+    st[k] = v; render();
+  });
+  // arrows move within a radio group (single choices: the pick rope)
+  ctl.addEventListener("keydown", (e) => {
+    if (!["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown"].includes(e.key)) return;
+    const b = e.target.closest("[role=radio]"); if (!b) return;
+    const all = [...b.parentElement.querySelectorAll("[role=radio]")], i = all.indexOf(b);
+    const n = all[(i + (/Right|Down/.test(e.key) ? 1 : -1) + all.length) % all.length];
+    e.preventDefault(); n.focus(); n.click();
+  });
+  new ResizeObserver(fit).observe(grid);
+  render();
+})();
+</script>
+</body>
+</html>

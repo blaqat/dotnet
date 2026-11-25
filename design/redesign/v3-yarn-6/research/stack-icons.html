@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en" data-section="projects">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Stack icons · colour vs mono (i5 · H3.1)</title>
+<link rel="stylesheet" href="../kit/yarn.css">
+<script src="../kit/data.js"></script>
+<script src="../kit/yarn.js"></script>
+<style>
+  /* research sheet: every stack name the mocks use, in both ?stkicon modes, at rest and on a red (selected) chip */
+  .si-wrap { max-width: 1040px; margin: 0 auto; padding: 28px 24px 64px; }
+  .si-note { color: var(--ink-2); max-width: 62ch; margin: 6px 0 22px; line-height: 1.55; }
+  .si-note a { color: var(--red-deep); }
+  .si-table { width: 100%; border-collapse: collapse; font-size: .9rem; }
+  .si-table th { text-align: left; font: 800 .7rem/1 var(--font-mono); letter-spacing: .06em; text-transform: uppercase; color: var(--ink-3); padding: 0 8px 10px; }
+  .si-table td { padding: 6px 8px; border-top: 1px dashed rgba(31, 30, 30, .14); vertical-align: middle; }
+  .si-table td.si-src { font: 600 .68rem/1.35 var(--font-mono); color: var(--ink-3); width: 13rem; }
+  .si-table td.si-src b { font: 800 .9rem/1.3 var(--font-display); color: var(--ink); }
+  .si-table .ychip { max-width: 11rem; }
+  .si-table .ychip__l { overflow: hidden; text-overflow: ellipsis; }
+  .si-table .ychip { pointer-events: none; }
+  .si-big { display: flex; gap: 10px; align-items: center; }
+  .si-big .ystk-ic, .si-big img { width: 28px; height: 28px; }
+  .si-big .si-red { display: grid; place-items: center; width: 44px; height: 44px; border-radius: 50%; background: var(--tex-twill), var(--tog-red); color: #fff; --ystk-on: #fff; }
+  /* phones: each name becomes a block, its four chips wrap under it */
+  @media (max-width: 760px) {
+    .si-wrap { padding: 20px 16px 48px; }
+    .si-table, .si-table tbody { display: block; }
+    .si-table thead, .si-table .si-hide { display: none; }
+    .si-table tr { display: flex; flex-wrap: wrap; gap: 6px; padding: 10px 0; border-top: 1px dashed rgba(31, 30, 30, .14); }
+    .si-table td { border: 0; padding: 0; }
+    .si-table td.si-src { width: 100%; }
+  }
+</style>
+</head>
+<body class="frame">
+<main class="sheet" id="main">
+  <yarn-nav active="projects" base="../"></yarn-nav>
+  <div class="si-wrap">
+    <h1 class="yhead__title">Stack icons<span class="yhead__dot" aria-hidden="true">.</span></h1>
+    <p class="si-note">Every stack name the mocks use (Projects, Home, Thoughts' "Built with", Studio's picker), in both <code>?stkicon</code> modes. <b>Colour</b> = today's devicon logos. <b>Mono</b> = one glyph drawn with a CSS mask: its brand tint at rest, white on a red (selected) chip. Findings, licences and the rendering method: <a href="STACK-ICONS.md">STACK-ICONS.md</a>. Try it on a real page: <a href="../projects/index.html?stkicon=mono&amp;stack=Python&amp;browse=open">Projects, mono, Python selected</a>.</p>
+    <table class="si-table">
+      <thead><tr><th>Name · mono glyph source</th><th>Colour · rest</th><th>Colour · selected</th><th>Mono · rest</th><th>Mono · selected</th><th class="si-hide">Mono · 28px</th></tr></thead>
+      <tbody id="rows"></tbody>
+    </table>
+  </div>
+</main>
+<script>
+  (() => {
+    const Y = window.Yarn;
+    const names = new Set();
+    (window.BLAQAT?.projects || []).forEach((p) => (p.stack || []).forEach((s) => names.add(s)));
+    Object.keys(Y.DEVICONS).forEach((s) => names.add(s));
+    const chip = (n, mode, on) => `<button type="button" class="ychip ysel ytog" aria-pressed="${on}" tabindex="-1">${Y.stackIcon(n, { mode })}<span class="ychip__l">${Y.esc(n)}</span></button>`;
+    const src = (html) => {
+      const m = /url\(([^)]+)\)/.exec(html);
+      if (!m) return /<img/.test(html) ? "devicon -original (no mono glyph)" : `Phosphor ${(/ph-[a-z-]+(?=")/.exec(html.replace("ph-bold ", "")) || [""])[0]}`;
+      const u = m[1];
+      const si = /simple-icons@([\d.]+)\/icons\/([a-z0-9]+)\.svg/.exec(u);
+      if (si) return `Simple Icons ${si[1]} · ${si[2]}`;
+      const dv = /devicon@([^/]+)\/icons\/[^/]+\/([a-z0-9-]+)\.svg/.exec(u);
+      return dv ? `devicon ${dv[1]} · ${dv[2]}` : u;
+    };
+    document.getElementById("rows").innerHTML = [...names].sort((a, b) => a.localeCompare(b)).map((n) => {
+      const mono = Y.stackIcon(n, { mode: "mono" });
+      return `<tr><td class="si-src"><b>${Y.esc(n)}</b><br>${Y.esc(src(mono))}</td><td>${chip(n, "color", false)}</td><td>${chip(n, "color", true)}</td><td>${chip(n, "mono", false)}</td><td>${chip(n, "mono", true)}</td><td class="si-hide"><span class="si-big">${mono}<span class="si-red">${mono}</span></span></td></tr>`;
+    }).join("");
+    Y.mockPanel([], { title: "Stack icons" });
+  })();
+</script>
+</body>
+</html>

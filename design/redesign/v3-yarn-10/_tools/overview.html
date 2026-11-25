@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><title>Round 3 overview</title>
+<style>
+  .ov { display: grid; gap: 14px; font-family: var(--font-sans); color: var(--foreground); }
+  .ov-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+  .ov-phones { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)) 2fr; gap: 12px; align-items: start; }
+  figure { margin: 0; display: grid; gap: 6px; min-width: 0; }
+  figure img { width: 100%; height: auto; border-radius: calc(var(--radius) * .75); border: 1px solid var(--border); display: block; }
+  figcaption { font-size: 12px; line-height: 1.35; color: var(--muted-foreground); }
+  figcaption b { color: var(--foreground); font-weight: 600; }
+  .ov-note { font-size: 12.5px; line-height: 1.45; color: var(--muted-foreground); padding: 12px 14px; border-radius: var(--radius); background: var(--card); border: 1px solid var(--border); }
+  .ov-note b { color: var(--foreground); }
+  @media (max-width: 520px) { .ov-grid, .ov-phones { grid-template-columns: 1fr 1fr; } .ov-phones .ov-note { grid-column: 1 / -1; } }
+</style></head>
+<body>
+<div class="ov">
+  <div class="ov-grid">
+    <figure><img src="/Users/blaqat/dev/projects/my-litterbox/design/redesign/v3-yarn/_shots/thumbs/home-desktop.jpg" alt="Home end state: cat and yarn wordmark lockup with section buttons"><figcaption><b>Home</b> · after the yarn-drop intro</figcaption></figure>
+    <figure><img src="/Users/blaqat/dev/projects/my-litterbox/design/redesign/v3-yarn/_shots/thumbs/projects-stage.jpg" alt="Projects: dense list and sticky stage"><figcaption><b>Projects</b> · list + stage, all 12 on one screen</figcaption></figure>
+    <figure><img src="/Users/blaqat/dev/projects/my-litterbox/design/redesign/v3-yarn/_shots/thumbs/music-player-expanded-desktop.jpg" alt="Music with the player expanded and queue"><figcaption><b>Music</b> · player expanded over its bar</figcaption></figure>
+    <figure><img src="/Users/blaqat/dev/projects/my-litterbox/design/redesign/v3-yarn/_shots/thumbs/thoughts-stitched-feed-desktop.jpg" alt="Thoughts stitched feed"><figcaption><b>Thoughts · Stitched</b> · mixed feed by month</figcaption></figure>
+    <figure><img src="/Users/blaqat/dev/projects/my-litterbox/design/redesign/v3-yarn/_shots/thumbs/final-ethereal-d.jpg" alt="Thoughts ethereal dark feed"><figcaption><b>Thoughts · Ethereal</b> · the dark alternative</figcaption></figure>
+    <figure><img src="/Users/blaqat/dev/projects/my-litterbox/design/redesign/v3-yarn/_shots/thumbs/tierlist-yarn-drag-desktop.jpg" alt="Tier list maker mid-drag"><figcaption><b>Tier list maker</b> · mid-drag</figcaption></figure>
+  </div>
+  <div class="ov-phones">
+    <figure><img src="/Users/blaqat/dev/projects/my-litterbox/design/redesign/v3-yarn/_shots/thumbs/final-projects-m.jpg" alt="Projects on mobile as compact rows"><figcaption><b>Mobile projects</b> · rows</figcaption></figure>
+    <figure><img src="/Users/blaqat/dev/projects/my-litterbox/design/redesign/v3-yarn/_shots/thumbs/final-music-m.jpg" alt="Music on mobile with the player merged into the corduroy nav dock"><figcaption><b>Mobile music</b> · player merged into the corduroy dock</figcaption></figure>
+    <div class="ov-note"><b>Every mock is interactive.</b> Open <b>index.html</b> in the v3-yarn folder and use the ⚙ panel on each page to switch variants: three intros, three note textures, three mobile project layouts, two music libraries, two player modes, and four nav materials.</div>
+  </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en" data-section="music">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Yarn Kit</title>
+<link rel="stylesheet" href="yarn.css">
+<style>
+  .wrap { padding: 28px clamp(16px, 4vw, 44px) 48px; display: grid; gap: 34px; }
+  .row { display: flex; flex-wrap: wrap; gap: 34px 18px; align-items: center; }
+  .sw { width: 168px; height: 112px; border-radius: 16px; position: relative; box-shadow: var(--shadow-patch); }
+  .sw span { position: absolute; left: 10px; bottom: -22px; font: 600 11px/1 var(--font-mono); color: var(--ink-3); }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 16px; }
+  .card { padding: 18px 18px 16px; }
+  .ribbon { padding: 14px 22px; transform: rotate(-2deg); width: max-content; border-radius: 4px; outline: 2px dashed rgba(255,255,255,.55); outline-offset: -6px; font: 900 1.4rem/1 var(--font-display); letter-spacing: -.02em; }
+  .barsample { position: relative !important; inset: auto !important; display: grid !important; grid-auto-flow: column; grid-auto-columns: 1fr; width: 340px; height: 62px; padding: 6px; border-radius: 22px; outline: 2px dashed rgba(255,248,238,.55); outline-offset: -6px; box-shadow: 0 8px 22px rgba(31,30,30,.28); }
+  .barsample a { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; font: 800 .68rem/1 var(--font-display); color: inherit; text-decoration: none; border-radius: 16px; }
+  .barsample a i { font-size: 1.35rem; }
+  .barsample a.on { background: rgba(255,255,255,.16); box-shadow: inset 0 0 0 1.5px rgba(255,255,255,.35); }
+  svg.yarnword { width: 340px; height: 90px; }
+</style>
+<script src="yarn.js" defer></script>
+</head>
+<body class="frame">
+<main class="sheet">
+  <yarn-nav active="music"></yarn-nav>
+  <div class="wrap">
+    <header>
+      <p class="eyebrow">Round 3 · kit</p>
+      <h1 class="h1">Yarn, black, red, white.</h1>
+      <p class="muted" style="max-width:56ch">Section color lives only in the rolled-cord frame. Everything inside is white knit with black thread and a red accent.</p>
+    </header>
+
+    <section>
+      <h2 class="h3" style="margin-bottom:14px">Materials</h2>
+      <div class="row">
+        <div class="sw m-knit"><span>m-knit</span></div>
+        <div class="sw m-diamond"><span>m-diamond</span></div>
+        <div class="sw m-cord" data-section="projects"><span>m-cord · projects</span></div>
+        <div class="sw m-cord" data-section="music"><span>m-cord · music</span></div>
+        <div class="sw m-cord" data-section="thoughts"><span>m-cord · thoughts</span></div>
+        <div class="sw m-ribbon"><span>m-ribbon</span></div>
+        <div class="sw m-felt" style="--felt:#1f1e1e"><span>m-felt · ink</span></div>
+        <div class="sw m-corduroy"><span>m-corduroy</span></div>
+        <div class="sw m-suede"><span>m-suede</span></div>
+        <div class="sw m-cork"><span>m-cork</span></div>
+        <div class="sw m-burlap"><span>m-burlap</span></div>
+      </div>
+    </section>
+
+    <section>
+      <h2 class="h3" style="margin-bottom:14px">Controls</h2>
+      <div class="row">
+        <button class="btn">Patch button</button>
+        <button class="btn btn--red">Red twill</button>
+        <button class="btn btn--ink">Ink twill</button>
+        <button class="btn btn--sec">Section</button>
+        <button class="btn rope">Rope on hover</button>
+        <button class="btn rope is-roped">Roped</button>
+        <button class="chip" aria-pressed="true">Piano</button>
+        <button class="chip" aria-pressed="false">Beepbox</button>
+        <span class="tag tag--red">ongoing</span>
+        <span class="tag tag--sec">collection</span>
+      </div>
+    </section>
+
+    <section>
+      <div class="m-ribbon ribbon">Ribbon heading</div>
+    </section>
+
+    <section>
+      <h2 class="h3" style="margin-bottom:14px">Patches</h2>
+      <div class="grid">
+        <article class="patch card"><p class="eyebrow">2025 · ongoing</p><h3 class="h3" style="margin:.3em 0">blaqat.net</h3><p class="muted" style="margin:0">Running stitch inset follows the radius.</p></article>
+        <article class="patch card"><p class="eyebrow">2024</p><h3 class="h3" style="margin:.3em 0">Sonata</h3><p class="muted" style="margin:0">Cards read as sewn-on patches.</p></article>
+        <article class="patch card rope is-roped" style="--rope-radius:22px"><p class="eyebrow">selected</p><h3 class="h3" style="margin:.3em 0">Roped patch</h3><p class="muted" style="margin:0">Selection = red rope sewn around.</p></article>
+      </div>
+    </section>
+
+    <section>
+      <h2 class="h3" style="margin-bottom:14px">Mobile bar materials</h2>
+      <div class="row">
+        <nav class="barsample m-corduroy"><a class="on"><i class="ph-fill ph-house"></i>Home</a><a><i class="ph ph-folder-simple"></i>Projects</a><a><i class="ph ph-music-notes"></i>Music</a><a><i class="ph ph-cloud"></i>Thoughts</a></nav>
+        <nav class="barsample m-suede"><a class="on"><i class="ph-fill ph-house"></i>Home</a><a><i class="ph ph-folder-simple"></i>Projects</a><a><i class="ph ph-music-notes"></i>Music</a><a><i class="ph ph-cloud"></i>Thoughts</a></nav>
+        <nav class="barsample m-cork"><a class="on"><i class="ph-fill ph-house"></i>Home</a><a><i class="ph ph-folder-simple"></i>Projects</a><a><i class="ph ph-music-notes"></i>Music</a><a><i class="ph ph-cloud"></i>Thoughts</a></nav>
+        <nav class="barsample m-burlap"><a class="on"><i class="ph-fill ph-house"></i>Home</a><a><i class="ph ph-folder-simple"></i>Projects</a><a><i class="ph ph-music-notes"></i>Music</a><a><i class="ph ph-cloud"></i>Thoughts</a></nav>
+      </div>
+    </section>
+
+    <section>
+      <h2 class="h3" style="margin-bottom:14px">Yarn stroke (SVG ply-base + ply-twist)</h2>
+      <svg class="yarnword" viewBox="0 0 340 90" aria-hidden="true">
+        <path class="ply-base" style="--ply:var(--ink)" stroke-width="9" d="M20 60 C60 10, 100 90, 140 40 S 220 20, 250 55 S 300 80, 320 30"/>
+        <path class="ply-twist" stroke-width="9" d="M20 60 C60 10, 100 90, 140 40 S 220 20, 250 55 S 300 80, 320 30"/>
+        <circle cx="320" cy="30" r="0"/>
+      </svg>
+    </section>
+  </div>
+</main>
+</body>
+</html>

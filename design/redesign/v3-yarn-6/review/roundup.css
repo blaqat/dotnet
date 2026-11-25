@@ -1,0 +1,125 @@
+/* review.html · the i5 round-up (R3). Page layout only: the parts are kit parts (header, cards, chips, rope,
+   buttons) plus the review tools' note fields (.yrv-ta, kit/yarn.css "i5 · review tools"). */
+.mockpanel { display: none !important; } /* the hub has nothing to try; picks live in the cards below */
+.sheet > .ypage { padding-top: 36px; padding-bottom: 64px; }
+#ru { --ru-gap: 14px; }
+#ru code { font: 500 .78em/1 var(--font-mono); }
+
+/* how it works: three numbered stitches */
+.ru-how { counter-reset: ru; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin: 4px 0 18px; padding: 0; list-style: none; }
+.ru-how li { counter-increment: ru; position: relative; padding: 12px 14px 12px 46px; border-radius: 14px; background: var(--cotton-2); color: var(--ink-2); font-size: .92rem; line-height: 1.45; }
+.ru-how li::before {
+  content: counter(ru); position: absolute; left: 12px; top: 11px; display: grid; place-items: center; width: 24px; height: 24px; border-radius: 50%;
+  background: var(--tex-twill, none), var(--red); color: #fff; font: 900 .8rem/1 var(--font-display);
+}
+.ru-how b { color: var(--ink); }
+.ru-toc { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 8px; }
+.ru-toc .ychip__c:empty { display: none; }
+
+.ru-sec { margin-top: 40px; scroll-margin-top: 20px; }
+.ru-sec__head { display: flex; align-items: baseline; flex-wrap: wrap; gap: 4px 14px; margin-bottom: 6px; }
+.ru-sec__head .meta { margin: 0; }
+.ru-lede, .ru-sub { margin: 0 0 16px; max-width: 72ch; color: var(--ink-2); line-height: 1.5; }
+.ru-sub { margin: -4px 0 12px; font-size: .92rem; }
+.ru-def-eg { padding: 1px 6px; border-radius: 6px; background: var(--cotton-2); font: 600 .78rem/1.2 var(--font-mono); color: var(--ink-3); }
+.ru-empty { margin: 0; padding: 18px 20px; border-radius: 14px; background: var(--cotton-2); color: var(--ink-2); }
+.ru-grp + .ru-grp { margin-top: 26px; }
+.ru-h3 { display: flex; align-items: baseline; gap: 10px; margin: 0 0 12px; font: 850 1.12rem/1.2 var(--font-display); letter-spacing: -.01em; }
+.ru-h3 small { font: 500 .78rem/1 var(--font-mono); color: var(--ink-3); }
+.ru-h3 a { display: inline-flex; align-items: center; gap: 4px; color: inherit; text-decoration: none; }
+.ru-h3 a:hover { color: var(--red-deep); }
+.ru-h3 a i { font-size: .8em; color: var(--red-deep); }
+
+/* decisions: one card per option, two columns on wide screens */
+.ru-opts, .ru-qs { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 460px), 1fr)); gap: var(--ru-gap); margin: 0; padding: 0; list-style: none; }
+.ru-opt, .ru-q { display: grid; grid-template-columns: minmax(0, 1fr); gap: 9px; align-content: start; padding: 14px 16px 15px; }
+.ru-opt.has-pick, .ru-q.has-answer { box-shadow: var(--shadow-patch), inset 3px 0 0 var(--red); }
+.ru-opt__head { display: flex; align-items: flex-start; gap: 8px; }
+.ru-opt h4 { flex: 1; margin: 0; font: 850 1rem/1.25 var(--font-display); }
+.ru-where { margin: -5px 0 0; color: var(--ink-3); font: 500 .76rem/1.35 var(--font-mono); }
+.ru-where code { color: var(--ink-2); font-weight: 600; }
+.ru-vals { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 6px; }
+.ru-val { display: inline-flex; align-items: center; gap: 1px; }
+.ru-vals .ychip { min-height: 36px; white-space: normal; text-align: left; line-height: 1.15; padding-block: 6px; flex: 0 1 auto; max-width: 100%; min-width: 0; } /* long labels wrap inside the card (overflow check) */
+.ru-def, .ru-rec, .ru-cut {
+  margin-left: .45em; padding: 2px 5px; border-radius: 5px; font: 600 .66rem/1 var(--font-mono); letter-spacing: 0;
+  background: var(--cotton-2); color: var(--ink-3);
+}
+.ru-rec { background: var(--gold-soft); color: var(--gold-deep); }
+.ru-cut { background: var(--red-soft); color: var(--red-deep); }
+.ru-val.is-cut .ychip__l { text-decoration: line-through 2px var(--red-deep); color: var(--ink-3); }
+.ru-try {
+  display: grid; place-items: center; width: 28px; height: 28px; border-radius: 50%; color: var(--ink-3); text-decoration: none;
+  transition: transform 200ms var(--ease-crit), color 150ms, background 150ms;
+}
+.ru-try:hover { color: var(--red-deep); background: var(--cotton-2); transform: translateY(-1px); }
+.ru-try:focus-visible, .ru-tlink:focus-visible, .ru-pen:focus-visible, .ru-link:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+.ru-status { margin: 0; color: var(--ink-2); font-size: .88rem; line-height: 1.4; }
+.ru-status b { color: var(--ink); }
+.ru-none { color: var(--ink-3); }
+.ru-hint { color: var(--gold-deep); }
+.ru-pen {
+  flex: none; display: inline-flex; align-items: center; gap: 5px; min-height: 28px; padding: 0 8px; border: 0; border-radius: 9px;
+  background: transparent; color: var(--ink-3); font: 700 .78rem/1 var(--font-body); cursor: pointer;
+}
+.ru-pen:hover { background: var(--cotton-2); color: var(--ink); }
+.ru-pen.has-note { background: var(--red-soft); color: var(--red-deep); }
+.ru-ta { font-size: .9rem; }
+.ru-link {
+  padding: 2px 0; border: 0; background: none; color: var(--red-deep); cursor: pointer;
+  font: 700 .8rem/1.2 var(--font-body); text-decoration: underline dashed; text-underline-offset: 3px;
+}
+.ru-extra { display: grid; gap: 6px; margin: 0; padding: 0; list-style: none; }
+.ru-extra li { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; align-items: baseline; gap: 4px 14px; padding: 10px 14px; border-radius: 12px; background: var(--cotton-2); }
+.ru-extra .meta { font-size: .74rem; }
+
+/* questions */
+.ru-q__meta { margin: 0; font-size: .74rem; }
+.ru-area { display: inline-block; margin-right: 6px; padding: 2px 7px; border-radius: 6px; background: var(--ink); color: #fff; font: 700 .7rem/1.2 var(--font-display); letter-spacing: .02em; }
+.ru-q__t { margin: 0; font: 700 .98rem/1.45 var(--font-body); color: var(--ink); }
+.ru-q__t.is-cut { text-decoration: line-through 2px var(--red-deep); color: var(--ink-3); }
+.ru-q--cut:has(.ru-keep[aria-pressed="true"]) { box-shadow: var(--shadow-patch), inset 3px 0 0 var(--red); }
+.ru-cutstate { color: var(--ink-3); font-size: .84rem; font-weight: 600; }
+.ru-q__foot { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 14px; }
+.ru-q__foot .ru-pen { margin-left: auto; }
+.ru-tlink { display: inline-flex; align-items: center; gap: 3px; color: var(--red-deep); font-weight: 700; font-size: .84rem; text-decoration: none; }
+.ru-tlink:hover { text-decoration: underline dashed; text-underline-offset: 3px; }
+.ru-tlink i { font-size: .85em; }
+
+/* notes, by page */
+.ru-npages { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 460px), 1fr)); gap: var(--ru-gap); align-items: start; }
+.ru-npage { padding: 14px 16px 16px; }
+.ru-npage .ru-h3 { flex-wrap: wrap; margin-bottom: 10px; }
+.ru-notes { display: grid; gap: 12px; margin: 0; padding: 0; list-style: none; }
+.ru-note { display: grid; gap: 5px; }
+.ru-note + .ru-note { padding-top: 12px; border-top: 1.5px dashed rgba(31,30,30,.12); }
+.ru-note__on { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; margin: 0; color: var(--ink-2); font-size: .86rem; }
+.ru-note__on b { color: var(--ink); font: 600 .8rem/1.2 var(--font-mono); }
+.ru-note__on .ru-link { margin-left: auto; }
+.ru-note__sel { margin: 0; color: var(--ink-3); font-size: .74rem; overflow-wrap: anywhere; }
+.ru-pinno {
+  display: inline-grid; place-items: center; width: 20px; height: 20px; border-radius: 50% 50% 50% 3px;
+  background: var(--cotton); box-shadow: 0 0 0 1.5px var(--red); color: var(--red-deep); font: 800 .7rem/1 var(--font-display);
+}
+
+/* copy */
+.ru-copy__card { display: grid; gap: 14px; padding: 18px 20px; }
+.ru-copy__card > p { margin: 0; max-width: 72ch; color: var(--ink-2); line-height: 1.5; }
+.ru-copy__acts { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 14px; }
+.ru-copy__status { color: var(--ink-2); font-weight: 700; }
+.ru-clear { margin-left: auto; }
+.ru-md-box summary { cursor: pointer; color: var(--ink-2); font-weight: 700; }
+.ru-md { box-sizing: border-box; width: 100%; margin-top: 8px; padding: 12px; border: 0; border-radius: 12px; background: var(--cotton-2); color: var(--ink); font: 500 .8rem/1.5 var(--font-mono); resize: vertical; }
+.ru-store { margin: 0; }
+
+@media (max-width: 959px) {
+  .sheet > .ypage { padding-top: 22px; }
+  .ru-how { grid-template-columns: minmax(0, 1fr); gap: 8px; }
+  .ru-sec { margin-top: 32px; }
+}
+@media (max-width: 519px) {
+  .ru-opt, .ru-q, .ru-npage { padding: 12px 13px 14px; }
+  .ru-extra li { grid-template-columns: minmax(0, 1fr) auto; }
+  .ru-extra li > span:first-child { grid-column: 1 / -1; }
+  .ru-clear { margin-left: 0; }
+}

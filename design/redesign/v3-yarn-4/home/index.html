@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="en" data-section="home">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>blaqat.net · home (yarn)</title>
+<link rel="stylesheet" href="../kit/yarn.css">
+<link rel="stylesheet" href="home.css">
+<script>
+  /* Decide the intro before first paint, so the end state never flashes.
+     Schedule: first visit ever → Drop · back within an hour of the last visit → Simple ·
+     otherwise → Drop. Any non-first visit rolls 1–500; a 1 gives Cursor (fine pointer only,
+     otherwise the scheduled mode stays). ?intro= forces a mode; ?visit=first|recent|later and
+     ?roll=<1-500> simulate the schedule without touching the stored last-visit time. */
+  (() => {
+    const q = new URLSearchParams(location.search);
+    const html = document.documentElement;
+    const HOUR = 36e5, KEY = "blaqat.home.lastVisit";
+    const fine = q.get("pointer") === "coarse" ? false : q.get("pointer") === "fine" ? true : matchMedia("(hover: hover) and (pointer: fine)").matches;
+    const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches || (q.has("reduced") && q.get("reduced") !== "0");
+    let last = null;
+    try { last = Number(localStorage.getItem(KEY)) || null; } catch (e) {}
+    const now = Date.now();
+    const sim = ["first", "recent", "later"].includes(q.get("visit")) ? q.get("visit") : null;
+    const visit = sim || (last == null ? "first" : now - last < HOUR ? "recent" : "later");
+    const rq = parseInt(q.get("roll"), 10);
+    const roll = visit === "first" ? null : rq >= 1 && rq <= 500 ? rq : 1 + Math.floor(Math.random() * 500);
+    let mode = visit === "recent" ? "simple" : "drop";
+    let why = { first: "first visit", recent: "back within the hour", later: "back after more than an hour" }[visit];
+    if (roll === 1) {
+      if (fine && !reduced) { mode = "cursor"; why += " · rolled the 1-in-500"; }
+      else why += " · rolled the 1-in-500, but no fine pointer";
+    }
+    if (["drop", "simple", "cursor"].includes(q.get("intro"))) { mode = q.get("intro"); why = "forced by ?intro"; }
+    if (!sim) try { localStorage.setItem(KEY, String(now)); } catch (e) {}
+    window.HOME_SCHEDULE = { visit, roll, mode, why, simulated: !!sim, last };
+    html.dataset.intro = mode;
+    const play = !reduced && !q.has("skip") && !q.has("demo") && location.hash !== "#contact";
+    html.classList.add(play ? "intro-on" : "intro-off");
+    // i4: keyword underline colour + stack-tag cloth, set before paint (home.js registers the ⚙ options)
+    html.dataset.kwline = q.get("kwline") === "blue" ? "blue" : "section";
+    html.dataset.stk = q.get("stk") === "cotton" ? "cotton" : "white";
+  })();
+</script>
+<script src="../kit/data.js"></script>
+<script src="../kit/thoughts-data.js"></script>
+<script src="../kit/yarn.js"></script>
+<script src="../kit/notes.js" defer></script>
+<script src="cat.js" defer></script>
+<script src="intro.js" defer></script>
+<script src="cursor.js" defer></script>
+<script src="home.js" defer></script>
+</head>
+<body class="frame home">
+<main class="sheet home-sheet" id="main">
+  <!-- desktop: only the kit's sound toggle shows from the nav (the lockup is the brand, the section buttons are the nav);
+       mobile: the normal kit bottom bar, Home current -->
+  <yarn-nav active="home" base="../"></yarn-nav>
+
+  <button class="skip" id="skip" type="button">Skip intro <i class="ph-bold ph-fast-forward" aria-hidden="true"></i></button>
+
+  <div class="hero" id="hero">
+    <h1 class="lockup" id="lockup-h">
+      <span class="sr-only">blaqat.net</span>
+      <svg id="lockup" class="lockup__svg" aria-hidden="true" focusable="false"></svg>
+    </h1>
+    <p class="tagline ent">that’s “black cat”</p>
+
+    <!-- keywords: every one gets the same wave underline (kit .yscribble, colour = where it leads; ?kwline=blue = all
+         like "software engineer"). Hover: the letters ripple; only "composing" keeps a caption + notes + its sound. -->
+    <div class="bio">
+      <p class="ent">hi, i’m <strong>aiden</strong>! a
+        <a class="kw yscribble" data-kw="engineer" data-go="projects" data-draw href="../projects/index.html" style="--scribble: var(--blue)">software engineer</a>
+        with a soft spot for ui design</p>
+      <p class="ent">recent
+        <a class="kw yscribble" data-kw="rit" data-draw href="https://www.rit.edu" target="_blank" rel="noopener" style="--scribble: var(--orange)">RIT<span class="sr-only"> (opens in a new tab)</span></a>
+        grad, fluent in
+        <span class="stk-run"><a class="kw ystk" data-kw="stack" data-go="projects" data-stack="Java" href="../projects/index.html?stack=Java" title="Projects built with Java"><span>Java</span></a>,
+        <a class="kw ystk" data-kw="stack" data-go="projects" data-stack="Python" href="../projects/index.html?stack=Python" title="Projects built with Python"><span>Python</span></a>,
+        <a class="kw ystk" data-kw="stack" data-go="projects" data-stack="Rust" href="../projects/index.html?stack=Rust" title="Projects built with Rust"><span>Rust</span></a> and more</span></p>
+      <p class="ent">away from screens, i’m
+        <a class="kw yscribble" data-kw="composing" data-go="music" data-draw href="../music/index.html" style="--scribble: var(--purple); --cap: var(--purple-deep)">composing<span class="kw__cap" aria-hidden="true">♫⋆♪ ₊˚♬</span></a>
+        for piano, film, and games</p>
+    </div>
+
+    <nav class="hnav ent" aria-label="Sections">
+      <a class="ysecbtn ylift ysel hbtn" data-section="projects" data-go="projects" href="../projects/index.html">
+        <span class="ydot" aria-hidden="true"><i class="ph-bold ph-folder-simple"></i></span>
+        <span><b>Projects</b><small data-count="projects">12 builds</small></span>
+      </a>
+      <a class="ysecbtn ylift ysel hbtn" data-section="music" data-go="music" href="../music/index.html">
+        <span class="ydot" aria-hidden="true"><i class="ph-bold ph-music-notes"></i></span>
+        <span><b>Music</b><small data-count="music">58 pieces</small></span>
+      </a>
+      <a class="ysecbtn ylift ysel hbtn" data-section="thoughts" data-go="thoughts" href="../thoughts/stitched.html">
+        <span class="ydot" aria-hidden="true"><i class="ph-bold ph-cloud"></i></span>
+        <span><b>Thoughts</b><small data-count="thoughts">14 posts</small></span>
+      </a>
+      <button class="btn btn--ghost contact-btn" type="button" id="contact-btn" aria-expanded="false" aria-controls="contact">
+        <i class="ph-bold ph-envelope-simple" aria-hidden="true"></i>Contact
+      </button>
+    </nav>
+
+    <!-- contact: icon + username (the original site's contact page; i1 Home). Kit link buttons, so each fades to its
+         site's colour on hover (data-brand: discordapp.com isn't in the kit's host list). -->
+    <div class="contact ent" id="contact" role="group" aria-label="Contact">
+      <a class="btn btn--sm hcontact" href="https://github.com/blaqat" target="_blank" rel="noopener" data-brand="github" aria-label="GitHub: blaqat (opens in a new tab)"><i class="ph-bold ph-github-logo" aria-hidden="true"></i><span>blaqat</span></a>
+      <a class="btn btn--sm hcontact" href="https://instagram.com/blaqat_ag" target="_blank" rel="noopener" data-brand="instagram" aria-label="Instagram: @blaqat_ag (opens in a new tab)"><i class="ph-bold ph-instagram-logo" aria-hidden="true"></i><span>@blaqat_ag</span></a>
+      <a class="btn btn--sm hcontact" href="https://x.com/blaqat_ag" target="_blank" rel="noopener" data-brand="x" aria-label="X: @blaqat_ag (opens in a new tab)"><i class="ph-bold ph-x-logo" aria-hidden="true"></i><span>@blaqat_ag</span></a>
+      <a class="btn btn--sm hcontact" href="https://discordapp.com/users/383851442341019658" target="_blank" rel="noopener" data-brand="discord" aria-label="Discord: blaqat (opens in a new tab)"><i class="ph-bold ph-discord-logo" aria-hidden="true"></i><span>blaqat</span></a>
+    </div>
+  </div>
+</main>
+</body>
+</html>

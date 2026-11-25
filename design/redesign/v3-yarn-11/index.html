@@ -1,0 +1,185 @@
+<!doctype html>
+<html lang="en" data-section="studio">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Yarn Iteration 11</title>
+<link rel="stylesheet" href="kit/yarn.css">
+<style>
+  /* gallery layout only: every part on this page is a kit part (header, cards, felt dots, buttons, rows, badges) */
+  .sheet > .ypage { padding-top: 36px; } /* no nav on this page: the header gets the room the nav would take */
+  .g-lede { margin: 0 0 30px; max-width: 72ch; color: var(--ink-2); font-size: 1.05rem; line-height: 1.55; }
+  .g-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 420px), 1fr)); gap: 22px; }
+  .g-card { display: grid; grid-template-rows: auto 1fr; padding: 0; overflow: clip; }
+  .g-shots { display: grid; grid-template-columns: minmax(0, 1fr) 27%; gap: 10px; align-items: start; padding: 10px 10px 0; }
+  .g-shots img { width: 100%; height: auto; border-radius: 10px; box-shadow: 0 1px 0 rgba(31,30,30,.1), 0 2px 6px rgba(31,30,30,.14); background: var(--cotton-2); }
+  .g-body { display: grid; gap: 10px; align-content: start; padding: 14px 18px 18px; }
+  .g-title { display: flex; align-items: center; gap: 10px; margin: 0; font: 900 1.3rem/1.1 var(--font-display); letter-spacing: -.02em; }
+  .g-title .ydot { --d: 32px; }
+  .g-body p { margin: 0; color: var(--ink-2); font-size: .94rem; line-height: 1.5; }
+  .g-links { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 2px; }
+  .g-links .meta { align-self: center; margin: 0 2px 0 6px; }
+  .g-sec { margin-top: 44px; }
+  .g-sec > h2 { margin: 0 0 14px; }
+  .g-two { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 28px; align-items: start; }
+  .g-changes { margin: 0; padding: 16px 20px 18px; list-style: none; display: grid; gap: 12px; }
+  .g-changes li { display: grid; gap: 4px; padding-bottom: 12px; border-bottom: 1.5px dashed rgba(31,30,30,.12); }
+  .g-changes li:last-child { border-bottom: 0; padding-bottom: 0; }
+  .g-changes q { font: 700 italic .92rem/1.4 var(--font-display); color: var(--ink-2); quotes: "“" "”"; }
+  .g-changes span { font-size: .95rem; line-height: 1.5; }
+  .g-rows { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+  .g-rows .yrow { gap: 12px; }
+  .g-rows .ydot { --d: 34px; }
+  .g-rows b { display: block; font: 850 .98rem/1.2 var(--font-display); }
+  .g-rows small { display: block; margin-top: 2px; font: 500 .74rem/1.3 var(--font-mono); color: var(--ink-3); }
+  .g-rows .yrow > i:last-child { margin-left: auto; color: var(--ink-3); }
+  .g-foot { margin-top: 36px; color: var(--ink-3); }
+  /* i5 · review tools (R3): the round-up card, first thing under the title */
+  .g-roundup { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 8px 18px; margin: 0 0 28px; padding: 16px 18px 16px 16px; box-shadow: var(--shadow-patch), inset 4px 0 0 var(--red); }
+  .g-roundup .ydot { --d: 46px; --sec: var(--red); }
+  .g-roundup b { display: block; font: 900 1.2rem/1.15 var(--font-display); letter-spacing: -.015em; }
+  .g-roundup small { display: block; margin-top: 4px; color: var(--ink-2); font-size: .92rem; line-height: 1.45; }
+  .g-roundup .g-roundup__n { margin-top: 6px; font: 600 .76rem/1.3 var(--font-mono); color: var(--red-deep); }
+  .g-roundup__n:empty { display: none; }
+  @media (max-width: 959px) {
+    .g-roundup { grid-template-columns: auto minmax(0, 1fr); }
+    .g-roundup > .btn { grid-column: 1 / -1; justify-self: start; }
+  }
+  @media (max-width: 959px) {
+    .sheet > .ypage { padding-top: 22px; }
+    .g-two { grid-template-columns: minmax(0, 1fr); }
+    .g-shots { grid-template-columns: minmax(0, 1fr) 30%; }
+  }
+</style>
+<script src="kit/yarn.js" defer></script>
+</head>
+<body class="frame">
+<main class="sheet">
+  <style>
+    .g-hero { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; margin: 0; }
+    .g-hero figure { margin: 0; display: grid; gap: 8px; }
+    .g-hero img { width: 100%; height: auto; border-radius: 8px; box-shadow: 0 1px 0 rgba(31,30,30,.1), 0 2px 6px rgba(31,30,30,.14); }
+    .g-hero figcaption { font: var(--t-meta); color: var(--ink-2); }
+    .g-hero figcaption b { color: var(--ink); font: var(--t-label); }
+    .g-nums { width: 100%; border-collapse: collapse; font: var(--t-meta); color: var(--ink-2); font-variant-numeric: tabular-nums; }
+    .g-nums th, .g-nums td { padding: 8px 12px; border-bottom: 1px solid var(--y-line); text-align: left; vertical-align: top; }
+    .g-nums th { font: var(--t-label); color: var(--ink); }
+    .g-nums td:first-child { color: var(--ink); }
+    .g-sec { display: grid; gap: 16px; margin-bottom: var(--section-gap, 48px); }
+    .g-cards q { font-style: normal; }
+    @media (max-width: 760px) { .g-hero { grid-template-columns: minmax(0, 1fr); } .g-nums th, .g-nums td { padding: 8px 6px; } }
+  </style>
+  <div class="ypage">
+    <header class="yhead">
+      <div class="yhead__text">
+        <h1 class="yhead__title">Yarn, iteration 11: thirteen rules<span class="yhead__dot" aria-hidden="true">.</span></h1>
+        <p class="yhead__meta meta">blaqat.net redesign · round 3 · Nov 23, 2026</p>
+      </div>
+      <div class="yhead__actions"><a class="btn btn--sm btn--primary" href="kit/looks.html">i10 next to i11</a><a class="btn btn--sm btn--ghost" href="home/index.html">The site</a><a class="btn btn--sm btn--ghost" href="studio/index.html">Studio</a></div>
+    </header>
+    <a class="ycard ylift g-roundup g-sec" href="review.html">
+      <span class="ydot" aria-hidden="true"><i class="ph-fill ph-list-checks"></i></span>
+      <span><b>Round-up: your picks, the open questions, your notes</b><small>Pick in ⚙ (saved, follows you), note anything with ✎ or “Note on something”, then copy everything from the round-up.</small><small class="g-roundup__n" data-ru-count></small></span>
+      <span class="btn btn--primary btn--sm">Open the round-up<i class="ph-bold ph-arrow-right" aria-hidden="true"></i></span>
+    </a>
+    <script>
+      addEventListener("load", () => setTimeout(() => {
+        const R = window.YarnReview, el = document.querySelector("[data-ru-count]");
+        if (!R || !el) return;
+        const d = R.load(), s = (n, w) => `${n} ${w}${n === 1 ? "" : "s"}`;
+        const picks = R.countChoices(d), notes = Object.keys(d.notes.page).length + Object.keys(d.notes.opt).length + d.notes.el.length;
+        const answers = Object.values(d.answers).filter((a) => a && a.v).length;
+        el.textContent = picks + notes + answers ? `So far: ${s(picks, "pick")} · ${s(answers, "answer")} · ${s(notes, "note")}` : "";
+      }, 60));
+    </script>
+    <section class="g-sec" aria-label="Your screen">
+      <p class="g-lede">Your screen, before and after: the Music grid at your window's width, searching “shadow”, glooming shadows playing. Same colours, cards and queue as i10; only the 13 rules changed.</p>
+      <div class="g-hero">
+        <figure><img src="_shots/i11-hero-i10.png" alt="i10: heavy 800–900 titles, a 40px page title, mono counts"><figcaption><b>i10</b> · before</figcaption></figure>
+        <figure><img src="_shots/i11-hero-i11.png" alt="i11: 500-weight titles, 16px card titles under a 22px year heading, 24px card corners"><figcaption><b>i11</b> · the 13 rules</figcaption></figure>
+      </div>
+    </section>
+    <section class="g-sec" aria-label="Measured">
+      <table class="g-nums">
+        <thead><tr><th>Measured (audit, 1000 wide)</th><th>i10</th><th>i11</th></tr></thead>
+        <tbody><tr><td>Sizes on your screen (Music grid, 1000)</td><td>12 · 13.5 · 15 · 17 · 40</td><td>12 · 13 · 14 · 16 · 17 · 22 · 36</td></tr><tr><td>Text off the scale, all 12 screens</td><td>1850</td><td>0</td></tr><tr><td>Text heavier than 500</td><td>2213</td><td>0</td></tr><tr><td>Italic text</td><td>2</td><td>0</td></tr><tr><td>Mono outside code</td><td>382</td><td>0</td></tr><tr><td>Tracking or line height against the size</td><td>75</td><td>0</td></tr><tr><td>Unbalanced headings · lone last words</td><td>247 · 5</td><td>0 · 0</td></tr><tr><td>Buttons 1px under the text beside them</td><td>4 of 559</td><td>566 of 566</td></tr><tr><td>Nested corners = outer − inset</td><td>0 of 128</td><td>127 of 128</td></tr><tr><td>Cards with equal insets on 4 sides</td><td>28 of 132</td><td>76 of 132</td></tr></tbody>
+      </table>
+      <p class="g-lede">Your screen shows more sizes than before (12 · 13 · 14 · 16 · 17 · 22 · 36). Rules 5 and 6 need a 1px step for card text and button text, so each role has a page size and a card size. They're all on one scale, and none is off it.</p>
+    </section>
+    <section class="g-cards" aria-label="What changed">
+      <article class="ycard ylift g-card">
+        <div class="g-shots"><img src="_shots/i11-g-scale-d.png" alt="One small type scale, desktop" loading="lazy"><img src="_shots/i11-g-scale-m.png" alt="One small type scale, phone" loading="lazy"></div>
+        <div class="g-body">
+          <h2 class="g-title"><span class="ydot" aria-hidden="true" style="--sec: var(--ink)"><i class="ph-fill ph-text-aa"></i></span>One small type scale</h2>
+          <p class="meta">rules 1 · 2 · 5 · 6 · T1</p>
+          <p><q>Use a small, consistent type scale … Make card titles smaller than section headings … card text 1px smaller … button text 1px smaller</q></p>
+          <p>Every size is a whole pixel on one scale: <b>12 · 13 · 14 · 15 · 16 · 17 · 22 · 36</b>. Inside a card each role steps down 1px on its own (title 16, body 14, meta 12, buttons 13), and a button is always 1px under the text beside it. Card titles (16) sit under every section heading (22: years, months, Home's blocks, Studio's panes). The 1px steps are why there are more sizes than i10 had on one screen. That's the cost of rules 5 and 6 (see the table).</p>
+          <div class="g-links"><a class="btn btn--sm btn--primary" href="music/index.html?view=grid">Music grid</a><a class="btn btn--sm btn--ghost" href="kit/components.html#type">The scale</a><a class="btn btn--sm btn--ghost" href="kit/looks.html">i10 next to i11</a></div>
+        </div>
+      </article>
+      <article class="ycard ylift g-card">
+        <div class="g-shots"><img src="_shots/i11-g-weight-d.png" alt="400 and 500, upright, two families, desktop" loading="lazy"><img src="_shots/i11-g-weight-m.png" alt="400 and 500, upright, two families, phone" loading="lazy"></div>
+        <div class="g-body">
+          <h2 class="g-title"><span class="ydot" aria-hidden="true" style="--sec: var(--ink)"><i class="ph-fill ph-text-b"></i></span>400 and 500, upright, two families</h2>
+          <p class="meta">rules 3 · 4 · 12 · T2 · T3 · T9</p>
+          <p><q>Use 400 for body text and 400 or 500 for headings … Skip italics … one sans serif for body text and one family for all headings</q></p>
+          <p>Body and meta are 400; headings, titles and buttons are 500 (they were 600–900). Nothing is italic, including the quote, Home's line and empty states (an author's <i>emphasis</i> in an article stays). Nunito is every heading; Nunito Sans is everything else, numbers included (tabular), so Maple Mono only shows code. Allo still works and is then both. ⚙ Heading weight: 500 (default) or 400.</p>
+          <div class="g-links"><a class="btn btn--sm btn--primary" href="projects/index.html?view=grid">500 headings</a><a class="btn btn--sm btn--ghost" href="projects/index.html?view=grid&amp;hw=400">400 headings (⚙)</a><a class="btn btn--sm btn--ghost" href="thoughts/stitched.html?view=article&amp;id=a1&amp;font=allo">Allo</a></div>
+        </div>
+      </article>
+      <article class="ycard ylift g-card">
+        <div class="g-shots"><img src="_shots/i11-g-rhythm-d.png" alt="Tracking, leading, balanced lines, desktop" loading="lazy"><img src="_shots/i11-g-rhythm-m.png" alt="Tracking, leading, balanced lines, phone" loading="lazy"></div>
+        <div class="g-body">
+          <h2 class="g-title"><span class="ydot" aria-hidden="true" style="--sec: var(--ink)"><i class="ph-fill ph-text-align-center"></i></span>Tracking, leading, balanced lines</h2>
+          <p class="meta">rules 7 · 8 · 10 · T4 · T5 · T7</p>
+          <p><q>Tighten letter spacing as type gets bigger … tight line height for large headings … Balance wrapped headings</q></p>
+          <p>Tracking tightens step by step: +0.01em at 12, 0 at 13–15, −0.006em at 16–17, −0.015em at 22, −0.025em at 36. Line height is 1.05 on the page title and 1.15 on headings (body 1.5). Every heading and title balances its lines and descriptions avoid a lone last word; a check runs at 18 widths.</p>
+          <div class="g-links"><a class="btn btn--sm btn--primary" href="thoughts/stitched.html?view=article&amp;id=a1">Article</a><a class="btn btn--sm btn--ghost" href="music/index.html">Timeline titles</a><a class="btn btn--sm btn--ghost" href="thoughts/tier.html?id=tl1">Ranking</a></div>
+        </div>
+      </article>
+      <article class="ycard ylift g-card">
+        <div class="g-shots"><img src="_shots/i11-g-space-d.png" alt="Room between sections, desktop" loading="lazy"><img src="_shots/i11-g-space-m.png" alt="Room between sections, phone" loading="lazy"></div>
+        <div class="g-body">
+          <h2 class="g-title"><span class="ydot" aria-hidden="true" style="--sec: var(--ink)"><i class="ph-fill ph-arrows-out-line-vertical"></i></span>Room between sections</h2>
+          <p class="meta">rule 9 · T6</p>
+          <p><q>Leave breathing room between sections</q></p>
+          <p>48 between a page's sections (32 on phones): the header, the tools, the list, each year or month, Home's blocks, an item page's blocks. Gaps inside a section are 8–24, so groups read as groups. Cards stay 24 / 24 apart. The results line (Play / Shuffle) counts as the head of its list, so it sits 24 above it.</p>
+          <div class="g-links"><a class="btn btn--sm btn--primary" href="projects/index.html">Projects</a><a class="btn btn--sm btn--ghost" href="home/index.html?skip">Home</a><a class="btn btn--sm btn--ghost" href="music/item.html">A release page</a></div>
+        </div>
+      </article>
+      <article class="ycard ylift g-card">
+        <div class="g-shots"><img src="_shots/i11-g-inset-d.png" alt="Insets and nested corners, desktop" loading="lazy"><img src="_shots/i11-g-inset-m.png" alt="Insets and nested corners, phone" loading="lazy"></div>
+        <div class="g-body">
+          <h2 class="g-title"><span class="ydot" aria-hidden="true" style="--sec: var(--ink)"><i class="ph-fill ph-square"></i></span>Insets and nested corners</h2>
+          <p class="meta">rule 13 · T10</p>
+          <p><q>an isometric inset-and-corner-radius system … consistent on all sides</q></p>
+          <p>Every card holds its content the same distance from all four edges (16, phones 12), and a corner inside it is the card's corner minus that distance. Cards are now 24 round (16 + 8), so art, a playing row's tint and fields inside are 8. ▶ sits one inset from the card's corner. The same pairs run through rows (8 + 8), the player bar (12 + 8), menus and Studio's panes, and the rope, focus ring and shadow follow each corner.</p>
+          <div class="g-links"><a class="btn btn--sm btn--primary" href="kit/components.html#insets">The system</a><a class="btn btn--sm btn--ghost" href="music/index.html?view=grid&amp;demo=glooming%20shadows%20of%20alphabet%20city">Music cards</a><a class="btn btn--sm btn--ghost" href="thoughts/stitched.html">Post cards</a></div>
+        </div>
+      </article>
+      <article class="ycard ylift g-card">
+        <div class="g-shots"><img src="_shots/i11-g-cuts-d.png" alt="Cut what only decorates, desktop" loading="lazy"><img src="_shots/i11-g-cuts-m.png" alt="Cut what only decorates, phone" loading="lazy"></div>
+        <div class="g-body">
+          <h2 class="g-title"><span class="ydot" aria-hidden="true" style="--sec: var(--ink)"><i class="ph-fill ph-scissors"></i></span>Cut what only decorates</h2>
+          <p class="meta">rule 11 · T8</p>
+          <p><q>Cut decorative labels, badges, and redundant buttons</q></p>
+          <p>Gone: “Read →” on article cards and article picks (the card is the link), Music's “more” (the card opens the same place), the “Tracks” label over a track list, the rail's “Type / Tags / Year” labels, “Posted” and “Reading time” in an article's rail, the timeline's “has a write-up” badge and a “default” badge. Each one is in a table in FEEDBACK-i11.md so you can bring any back. The caps type word on Thoughts cards (ARTICLE, PICK) you asked for in i3, so it's a question instead.</p>
+          <div class="g-links"><a class="btn btn--sm btn--primary" href="thoughts/stitched.html">Thoughts</a><a class="btn btn--sm btn--ghost" href="../v3-yarn-10/thoughts/stitched.html">i10 (before)</a><a class="btn btn--sm btn--ghost" href="review.html">The kicker question</a></div>
+        </div>
+      </article>
+      <article class="ycard ylift g-card">
+        <div class="g-shots"><img src="_shots/i11-g-player-d.png" alt="The player and Studio, desktop" loading="lazy"><img src="_shots/i11-g-player-m.png" alt="The player and Studio, phone" loading="lazy"></div>
+        <div class="g-body">
+          <h2 class="g-title"><span class="ydot" aria-hidden="true" style="--sec: var(--ink)"><i class="ph-fill ph-play-circle"></i></span>The player and Studio</h2>
+          <p class="meta">L4 · L5</p>
+          
+          <p>The player bar and panel follow the same scale, weights and insets (bar 20 round, 12 in; the disc 52). Studio's small-caps labels became real headings, its panes and sheets have equal insets, and everything is 400 / 500. Purple still means music in the section look.</p>
+          <div class="g-links"><a class="btn btn--sm btn--primary" href="music/index.html?player=panel&amp;demo=1">Player panel</a><a class="btn btn--sm btn--ghost" href="studio/index.html?view=collection">Studio</a><a class="btn btn--sm btn--ghost" href="studio/index.html?view=article">An article</a></div>
+        </div>
+      </article>
+    </section>
+    <p class="g-foot meta">Your rules <code>_feedback/rules-i11.md</code> · the spec <code>DESIGN-i11.md</code> · build list <code>FEEDBACK-i11.md</code> (the cut tables are in it) · i10 (before) <a href="../v3-yarn-10/index.html">v3-yarn-10</a></p>
+  </div>
+</main>
+</body>
+</html>

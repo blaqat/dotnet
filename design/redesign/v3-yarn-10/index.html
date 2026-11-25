@@ -1,0 +1,206 @@
+<!doctype html>
+<html lang="en" data-section="studio">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Yarn Iteration 10</title>
+<link rel="stylesheet" href="kit/yarn.css">
+<style>
+  /* gallery layout only: every part on this page is a kit part (header, cards, felt dots, buttons, rows, badges) */
+  .sheet > .ypage { padding-top: 36px; } /* no nav on this page: the header gets the room the nav would take */
+  .g-lede { margin: 0 0 30px; max-width: 72ch; color: var(--ink-2); font-size: 1.05rem; line-height: 1.55; }
+  .g-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 420px), 1fr)); gap: 22px; }
+  .g-card { display: grid; grid-template-rows: auto 1fr; padding: 0; overflow: clip; }
+  .g-shots { display: grid; grid-template-columns: minmax(0, 1fr) 27%; gap: 10px; align-items: start; padding: 10px 10px 0; }
+  .g-shots img { width: 100%; height: auto; border-radius: 10px; box-shadow: 0 1px 0 rgba(31,30,30,.1), 0 2px 6px rgba(31,30,30,.14); background: var(--cotton-2); }
+  .g-body { display: grid; gap: 10px; align-content: start; padding: 14px 18px 18px; }
+  .g-title { display: flex; align-items: center; gap: 10px; margin: 0; font: 900 1.3rem/1.1 var(--font-display); letter-spacing: -.02em; }
+  .g-title .ydot { --d: 32px; }
+  .g-body p { margin: 0; color: var(--ink-2); font-size: .94rem; line-height: 1.5; }
+  .g-links { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 2px; }
+  .g-links .meta { align-self: center; margin: 0 2px 0 6px; }
+  .g-sec { margin-top: 44px; }
+  .g-sec > h2 { margin: 0 0 14px; }
+  .g-two { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 28px; align-items: start; }
+  .g-changes { margin: 0; padding: 16px 20px 18px; list-style: none; display: grid; gap: 12px; }
+  .g-changes li { display: grid; gap: 4px; padding-bottom: 12px; border-bottom: 1.5px dashed rgba(31,30,30,.12); }
+  .g-changes li:last-child { border-bottom: 0; padding-bottom: 0; }
+  .g-changes q { font: 700 italic .92rem/1.4 var(--font-display); color: var(--ink-2); quotes: "“" "”"; }
+  .g-changes span { font-size: .95rem; line-height: 1.5; }
+  .g-rows { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+  .g-rows .yrow { gap: 12px; }
+  .g-rows .ydot { --d: 34px; }
+  .g-rows b { display: block; font: 850 .98rem/1.2 var(--font-display); }
+  .g-rows small { display: block; margin-top: 2px; font: 500 .74rem/1.3 var(--font-mono); color: var(--ink-3); }
+  .g-rows .yrow > i:last-child { margin-left: auto; color: var(--ink-3); }
+  .g-foot { margin-top: 36px; color: var(--ink-3); }
+  /* i5 · review tools (R3): the round-up card, first thing under the title */
+  .g-roundup { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 8px 18px; margin: 0 0 28px; padding: 16px 18px 16px 16px; box-shadow: var(--shadow-patch), inset 4px 0 0 var(--red); }
+  .g-roundup .ydot { --d: 46px; --sec: var(--red); }
+  .g-roundup b { display: block; font: 900 1.2rem/1.15 var(--font-display); letter-spacing: -.015em; }
+  .g-roundup small { display: block; margin-top: 4px; color: var(--ink-2); font-size: .92rem; line-height: 1.45; }
+  .g-roundup .g-roundup__n { margin-top: 6px; font: 600 .76rem/1.3 var(--font-mono); color: var(--red-deep); }
+  .g-roundup__n:empty { display: none; }
+  @media (max-width: 959px) {
+    .g-roundup { grid-template-columns: auto minmax(0, 1fr); }
+    .g-roundup > .btn { grid-column: 1 / -1; justify-self: start; }
+  }
+  @media (max-width: 959px) {
+    .sheet > .ypage { padding-top: 22px; }
+    .g-two { grid-template-columns: minmax(0, 1fr); }
+    .g-shots { grid-template-columns: minmax(0, 1fr) 30%; }
+  }
+</style>
+<script src="kit/yarn.js" defer></script>
+</head>
+<body class="frame">
+<main class="sheet">
+  <style>
+    .g-hero { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; margin: 6px 0 4px; }
+    .g-hero figure { margin: 0; display: grid; gap: 6px; }
+    .g-hero img { width: 100%; height: auto; border-radius: 10px; box-shadow: 0 1px 0 rgba(31,30,30,.1), 0 2px 6px rgba(31,30,30,.14); }
+    .g-hero figcaption { font: 600 .84rem/1.35 var(--font-body); color: var(--ink-2); }
+    .g-hero figcaption b { color: var(--ink); font-family: var(--font-display); font-weight: 800; }
+    .g-nums { width: 100%; border-collapse: collapse; font: 500 .88rem/1.4 var(--font-body); color: var(--ink-2); }
+    .g-nums th, .g-nums td { padding: 6px 10px; border-bottom: 1px solid var(--y-line); text-align: left; }
+    .g-nums th { font: 800 .8rem/1.2 var(--font-display); color: var(--ink); }
+    .g-nums td:first-child { color: var(--ink); font-weight: 600; }
+    .g-nums .mono { font-variant-numeric: tabular-nums; }
+    @media (max-width: 760px) { .g-hero { grid-template-columns: minmax(0, 1fr); } .g-nums { font-size: .8rem; } .g-nums th, .g-nums td { padding: 5px 6px; } }
+  </style>
+  <div class="ypage">
+    <header class="yhead">
+      <div class="yhead__text">
+        <h1 class="yhead__title">Yarn, iteration 10: clearer<span class="yhead__dot" aria-hidden="true">.</span></h1>
+        <p class="yhead__meta meta">blaqat.net redesign · round 3 · Nov 18, 2026</p>
+      </div>
+      <div class="yhead__actions"><a class="btn btn--sm btn--primary" href="kit/looks.html">Compare the looks</a><a class="btn btn--sm btn--ghost" href="home/index.html">The site</a><a class="btn btn--sm btn--ghost" href="studio/index.html">Studio</a></div>
+    </header>
+    <a class="ycard ylift g-roundup" href="review.html">
+      <span class="ydot" aria-hidden="true"><i class="ph-fill ph-list-checks"></i></span>
+      <span><b>Round-up: your picks, the open questions, your notes</b><small>Pick in ⚙ (saved, follows you), note anything with ✎ or “Note on something”, then copy everything from the round-up.</small><small class="g-roundup__n" data-ru-count></small></span>
+      <span class="btn btn--primary btn--sm">Open the round-up<i class="ph-bold ph-arrow-right" aria-hidden="true"></i></span>
+    </a>
+    <script>
+      addEventListener("load", () => setTimeout(() => {
+        const R = window.YarnReview, el = document.querySelector("[data-ru-count]");
+        if (!R || !el) return;
+        const d = R.load(), s = (n, w) => `${n} ${w}${n === 1 ? "" : "s"}`;
+        const picks = R.countChoices(d), notes = Object.keys(d.notes.page).length + Object.keys(d.notes.opt).length + d.notes.el.length;
+        const answers = Object.values(d.answers).filter((a) => a && a.v).length;
+        el.textContent = picks + notes + answers ? `So far: ${s(picks, "pick")} · ${s(answers, "answer")} · ${s(notes, "note")}` : "";
+      }, 60));
+    </script>
+    <p class="g-lede"><b>Your screen, three ways.</b> Music grid at your window's width, searching “shadow”, glooming shadows playing. On your old site you could tell at once what mattered; on i8 red did seven jobs. i10 gives each colour one meaning, so the playing card is the one thing that stands out.</p>
+    <div class="g-hero">
+      <figure><img src="_shots/i10-hero-i8.png" alt="i8: red on the nav, the title, the filters, every play button and the player"><figcaption><b>i8</b> · red for seven jobs</figcaption></figure>
+      <figure><img src="_shots/i10-hero-section.png" alt="i10 section: only the playing card, its tab and the player are purple"><figcaption><b>Section</b> (default) · purple means music, and playing</figcaption></figure>
+      <figure><img src="_shots/i10-hero-ink.png" alt="i10 ink: black structure, only the playing card and the player are red"><figcaption><b>Ink</b> · black thread, red only for what's playing</figcaption></figure>
+    </div>
+    <table class="g-nums">
+      <thead><tr><th>Measured on that screen</th><th>Old site</th><th>i8</th><th>i10</th></tr></thead>
+      <tbody>
+        <tr><td>Accent marks / red ones</td><td class="mono">13 / 2</td><td class="mono">25 / 14</td><td class="mono">10 / 1 (the logo's dot)</td></tr>
+        <tr><td>Text styles</td><td class="mono">15</td><td class="mono">31</td><td class="mono">18</td></tr>
+        <tr><td>Font sizes</td><td class="mono">5</td><td class="mono">13</td><td class="mono">5</td></tr>
+        <tr><td>Gap between cards, across / down (to the tabs)</td><td class="mono">24 / 24</td><td class="mono">20 / 42</td><td class="mono">24 / 24</td></tr>
+              </tbody>
+    </table>
+    <p class="g-lede">The thinking is in <code>DESIGN-i10.md</code>: what we measured, why it read as too much, the nine rules, the colour roles and the type scale. <b>Round 2</b> (your notes): i8's card is back with ▶ the biggest button and the tabs joined to the card; purple means music on every page; Thoughts drops its gold for black (or red) and keeps red bookmarks. Open in ⚙: the look (section · ink), stitches on controls, the font (Nunito · Allo · Allo Round), Thoughts' accent (black · red) and where Shuffle lives.</p>
+    <section class="g-cards" aria-label="What changed">
+      <article class="ycard ylift g-card">
+        <div class="g-shots"><img src="_shots/i10-g-colour-d.png" alt="A colour means one thing, desktop" loading="lazy"><img src="_shots/i10-g-colour-m.png" alt="A colour means one thing, phone" loading="lazy"></div>
+        <div class="g-body">
+          <h2 class="g-title"><span class="ydot" aria-hidden="true" style="--sec: var(--ink)"><i class="ph-fill ph-palette"></i></span>A colour means one thing</h2>
+          <p class="meta">L1 · L5 · M5</p>
+          <p><q>if i were to take my glassess of id barely be able to tell whats playing</q></p>
+          <p>Red had seven jobs. Now nothing at rest is a solid accent: a chosen option wears the rope, a filter that's on gets a soft fill, and <b>only what's playing is filled</b>. <b>Section</b> (default): purple is music, so the player and anything playing are purple on every page, and each page's own hue only marks where you are. <b>Ink</b>: black thread does the structure, red only means “playing”. Controls are flat at rest; the sheet and cards keep their stitches.</p>
+          <div class="g-links"><a class="btn btn--sm btn--primary" href="music/index.html?view=grid&amp;q=shadow&amp;demo=glooming%20shadows%20of%20alphabet%20city">Section</a><a class="btn btn--sm btn--ghost" href="music/index.html?view=grid&amp;q=shadow&amp;demo=glooming%20shadows%20of%20alphabet%20city&amp;look=ink">Ink</a><a class="btn btn--sm btn--ghost" href="kit/looks.html">i8 · Section · Ink side by side</a></div>
+        </div>
+      </article>
+      <article class="ycard ylift g-card">
+        <div class="g-shots"><img src="_shots/i10-g-queue-d.png" alt="Play and Shuffle play what you found, desktop" loading="lazy"><img src="_shots/i10-g-queue-m.png" alt="Play and Shuffle play what you found, phone" loading="lazy"></div>
+        <div class="g-body">
+          <h2 class="g-title"><span class="ydot" aria-hidden="true" style="--sec: var(--ink)"><i class="ph-fill ph-shuffle"></i></span>Play and Shuffle play what you found</h2>
+          <p class="meta">M1 · M2</p>
+          <p><q>when u search like shadows the queue should play the found items not everything unless it matched the collection itself</q></p>
+          <p>A results line under the search names what's shown (“3 releases · 6 tracks for “shadow””), with ▶ Play and ⤮ Shuffle beside it. Everything plays exactly that set: a collection shown for some of its songs plays only those, unless its own name or notes matched. ▶ on a card, a tab, next and previous stay inside it. Or try Shuffle as a mode in the player bar.</p>
+          <div class="g-links"><a class="btn btn--sm btn--primary" href="music/index.html?view=grid&amp;q=shadow">Results line</a><a class="btn btn--sm btn--ghost" href="music/index.html?view=grid&amp;q=alphabet">“alphabet” (the collection matched)</a><a class="btn btn--sm btn--ghost" href="music/index.html?view=grid&amp;q=shadow&amp;shuffle=player&amp;demo=glooming%20shadows%20of%20alphabet%20city">Shuffle in the player (⚙)</a></div>
+        </div>
+      </article>
+      <article class="ycard ylift g-card">
+        <div class="g-shots"><img src="_shots/i10-g-cards-d.png" alt="i8's card, ▶ the biggest, equal gaps, desktop" loading="lazy"><img src="_shots/i10-g-cards-m.png" alt="i8's card, ▶ the biggest, equal gaps, phone" loading="lazy"></div>
+        <div class="g-body">
+          <h2 class="g-title"><span class="ydot" aria-hidden="true" style="--sec: var(--ink)"><i class="ph-fill ph-squares-four"></i></span>i8's card, ▶ the biggest, equal gaps</h2>
+          <p class="meta">M3 · M4 · round 2: C1–C3</p>
+          <p><q>lets revert the general card design to i9/i8 … make play the biggest button again … make sure the tabs on collection stays connected</q></p>
+          <p>Round 2: the card is i8's again (art top-left, the title and one quiet meta line beside it, the notes and buttons across the card), with ▶ the biggest button (44; + and the links 32). The song tabs hang above a collection's card, joined to it like folder tabs; a single never gets extra space inside its card, and card tops line up across a row. Every outside link is the same grey duotone disc, and the gap is 24 across and 24 down to the tabs (it was 20 and 42).</p>
+          <div class="g-links"><a class="btn btn--sm btn--primary" href="music/index.html?view=grid">Music grid</a><a class="btn btn--sm btn--ghost" href="../v3-yarn-8/music/index.html?view=grid">i8's grid</a><a class="btn btn--sm btn--ghost" href="projects/index.html?view=grid">Projects grid</a></div>
+        </div>
+      </article>
+      <article class="ycard ylift g-card">
+        <div class="g-shots"><img src="_shots/i10-g-timeline-d.png" alt="Timeline, stage and release page, desktop" loading="lazy"><img src="_shots/i10-g-timeline-m.png" alt="Timeline, stage and release page, phone" loading="lazy"></div>
+        <div class="g-body">
+          <h2 class="g-title"><span class="ydot" aria-hidden="true" style="--sec: var(--ink)"><i class="ph-fill ph-rows"></i></span>Timeline, stage and release page</h2>
+          <p class="meta">M6 · M9</p>
+          <p><q>titles feel like titles, subtext feel like subtext</q></p>
+          <p>Six text sizes, four weights. Titles are titles, dates and counts are plain grey text (mono only for times), and the playing row and its track are the only filled things. The list follows the Music order from Studio (WIP on top, then newest finished).</p>
+          <div class="g-links"><a class="btn btn--sm btn--primary" href="music/index.html?demo=glooming%20shadows%20of%20alphabet%20city">Timeline, playing</a><a class="btn btn--sm btn--ghost" href="music/item.html">Release page</a><a class="btn btn--sm btn--ghost" href="music/index.html?player=panel&amp;demo=1">Player panel</a></div>
+        </div>
+      </article>
+      <article class="ycard ylift g-card">
+        <div class="g-shots"><img src="_shots/i10-g-projects-d.png" alt="Projects, desktop" loading="lazy"><img src="_shots/i10-g-projects-m.png" alt="Projects, phone" loading="lazy"></div>
+        <div class="g-body">
+          <h2 class="g-title"><span class="ydot" aria-hidden="true" style="--sec: var(--ink)"><i class="ph-fill ph-folder"></i></span>Projects</h2>
+          <p class="meta">P1</p>
+          <p><q>the button icon styling is consistent</q></p>
+          <p>i8's card (the stack on the left; “Write-up →”, GitHub and ↗ on the right), now with the shared grey link discs, the six text sizes and quiet facts. “Visit site” is the one ink button on an opened project, and the player is purple here too.</p>
+          <div class="g-links"><a class="btn btn--sm btn--primary" href="projects/index.html?view=grid">Grid</a><a class="btn btn--sm btn--ghost" href="projects/index.html?p=sonata">Timeline + stage</a><a class="btn btn--sm btn--ghost" href="projects/item.html?p=sonata">Project page</a></div>
+        </div>
+      </article>
+      <article class="ycard ylift g-card">
+        <div class="g-shots"><img src="_shots/i10-g-thoughts-d.png" alt="Thoughts, desktop" loading="lazy"><img src="_shots/i10-g-thoughts-m.png" alt="Thoughts, phone" loading="lazy"></div>
+        <div class="g-body">
+          <h2 class="g-title"><span class="ydot" aria-hidden="true" style="--sec: var(--ink)"><i class="ph-fill ph-chat-circle-dots"></i></span>Thoughts</h2>
+          <p class="meta">P2</p>
+          <p><q>you can immediately know exactly whats important</q></p>
+          <p>41 text styles → 18, with i8's post layout. Round 2: Thoughts has no section colour; its accent (the chosen row, the nav rope, filters) is black, or red to compare in ⚙. Bookmarks stay red. “Read →” is a plain link and the masonry gaps are equal across and down. Notes, stubs and tier colours stay the ones you picked.</p>
+          <div class="g-links"><a class="btn btn--sm btn--primary" href="thoughts/stitched.html">Feed (black accent)</a><a class="btn btn--sm btn--ghost" href="thoughts/stitched.html?taccent=red">Red accent (⚙)</a><a class="btn btn--sm btn--ghost" href="thoughts/stitched.html?view=article&amp;id=a1">Article</a></div>
+        </div>
+      </article>
+      <article class="ycard ylift g-card">
+        <div class="g-shots"><img src="_shots/i10-g-allo-d.png" alt="Allo, with its spacing fixed, desktop" loading="lazy"><img src="_shots/i10-g-allo-m.png" alt="Allo, with its spacing fixed, phone" loading="lazy"></div>
+        <div class="g-body">
+          <h2 class="g-title"><span class="ydot" aria-hidden="true" style="--sec: var(--ink)"><i class="ph-fill ph-text-aa"></i></span>Allo, with its spacing fixed</h2>
+          <p class="meta">L6</p>
+          <p><q>keep the option for the font change in this iteration as well and make sure spacing is good</q></p>
+          <p>Allo's word space is about 60% of Nunito's at heavy weights; that's what closed the gaps in the first preview. Each text role now has its own tracking and word spacing for Allo (word gaps within 2% of Nunito's), and its size is matched to Nunito Sans's x-height. Pick Allo or Allo Round in ⚙.</p>
+          <div class="g-links"><a class="btn btn--sm btn--primary" href="thoughts/stitched.html?view=article&amp;id=a1&amp;font=allo">Allo</a><a class="btn btn--sm btn--ghost" href="thoughts/stitched.html?view=article&amp;id=a1&amp;font=allo-round">Allo Round</a><a class="btn btn--sm btn--ghost" href="kit/components.html?font=allo-round#type">The type ramp</a></div>
+        </div>
+      </article>
+      <article class="ycard ylift g-card">
+        <div class="g-shots"><img src="_shots/i10-g-home-d.png" alt="Home, desktop" loading="lazy"><img src="_shots/i10-g-home-m.png" alt="Home, phone" loading="lazy"></div>
+        <div class="g-body">
+          <h2 class="g-title"><span class="ydot" aria-hidden="true" style="--sec: var(--ink)"><i class="ph-fill ph-house"></i></span>Home</h2>
+          <p class="meta">P3</p>
+          
+          <p>Home's section colour is red, so it stays red in both looks: the wordmark, the scribbles and the section buttons' rope on hover. Text moved onto the same six sizes.</p>
+          <div class="g-links"><a class="btn btn--sm btn--primary" href="home/index.html">With the intro</a><a class="btn btn--sm btn--ghost" href="home/index.html?skip">Skip the intro</a></div>
+        </div>
+      </article>
+      <article class="ycard ylift g-card">
+        <div class="g-shots"><img src="_shots/i10-g-studio-d.png" alt="Studio follows, desktop" loading="lazy"><img src="_shots/i10-g-studio-m.png" alt="Studio follows, phone" loading="lazy"></div>
+        <div class="g-body">
+          <h2 class="g-title"><span class="ydot" aria-hidden="true" style="--sec: var(--ink)"><i class="ph-fill ph-lock-simple"></i></span>Studio follows</h2>
+          <p class="meta">L8</p>
+          
+          <p>Studio uses the same roles (ink, no section colour of its own); its remaining reds all mean an error. Its previews are built from the site's parts, so they show the new cards. i9's Studio questions are still open in the round-up.</p>
+          <div class="g-links"><a class="btn btn--sm btn--primary" href="studio/index.html?view=collection">A collection</a><a class="btn btn--sm btn--ghost" href="studio/index.html?view=project">A project</a><a class="btn btn--sm btn--ghost" href="studio/index.html?view=article">An article</a></div>
+        </div>
+      </article>
+    </section>
+    <p class="g-foot meta">Design brief <code>DESIGN-i10.md</code> · build list <code>FEEDBACK-i10.md</code> · walkthrough <code>WALKTHROUGH-i10-results.md</code> · your words <code>_feedback/roundup-i9-site.md</code> · i8 (before) <a href="../v3-yarn-8/index.html">v3-yarn-8</a></p>
+  </div>
+</main>
+</body>
+</html>

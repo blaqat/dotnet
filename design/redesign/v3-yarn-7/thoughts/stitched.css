@@ -1,0 +1,381 @@
+/* ============================================================
+   Thoughts · iteration 3 · page CSS (mock-only)
+   Kit parts (header, search, filter row + Browse links, chips + toggles, tags, badges, year pills (+ rule), detail
+   shell + pager + side rail, strand, lightbox, post cards (Yarn.post), disc, prose) come from ../kit/yarn.css and
+   are only positioned here. Page-local: the feed layout (split rail / stacked + masonry), the reader's
+   code/table/figure wrappers, its meta rail + table of contents, the collection grid.
+   ============================================================ */
+
+:root {
+  --gap: 16px;
+  --hair: rgba(31, 30, 30, .14);
+}
+html { scrollbar-gutter: stable; }
+body { overflow-x: clip; }
+
+.t-app { outline: none; } /* + .ypage (kit gutters) */
+
+/* ============================================================
+   FEED: rail + main column.
+   split (default, i1): the rail holds the title, intro, search and every filter; the feed starts on the title's line.
+   stacked (i2): the page header spans the top; the rail sits under it beside search + feed.
+   ============================================================ */
+.t-mhead { display: none; }
+@media (min-width: 960px) { .t-mhead:has(+ .t-feed--stacked) { display: block; } }
+/* i4: rail 250 + gap 36 → the feed column starts on the same x as the detail pages' reading column (article,
+   write-up, ranking: kit .ydpage) — 340px at 1440, so the feed and the views it opens share one left line */
+.t-feed { display: grid; grid-template-columns: 250px minmax(0, 1fr); gap: 36px; align-items: start; }
+
+.t-rail {
+  position: sticky; top: 12px; align-self: start;
+  max-height: calc(100dvh - 24px - var(--bottom-ui, 0px)); overflow: auto; overscroll-behavior: contain;
+  /* room for lift shadows and the focus ring. i5 (G7): the scroll box clips, so it reaches past every lift shadow
+     (--shadow-lift spreads 18px sideways, 26px down, 10px up with the 2px rise); it used to cut the collection
+     links' shadow flat on both sides */
+  padding: 12px 20px 30px 20px; margin: -12px -20px 0 -20px;
+  scrollbar-width: thin; scrollbar-color: rgba(31,30,30,.2) transparent;
+}
+/* the intro: the kit page title + i1's one line + the count */
+.t-intro { margin: 0 0 18px; }
+.t-intro .yhead { min-height: 0; margin: 0 0 10px; }
+.t-blurb { margin: 0 0 6px; color: var(--ink-2); font-size: .92rem; line-height: 1.45; text-wrap: pretty; }
+.t-count { margin: 0; }
+/* the search line in the rail (?tsearch=rail): same kit search, rail width */
+.t-slot[data-slot="rail"] .t-tools { margin: 0 0 20px; }
+.t-slot[data-slot="rail"] .ysearch { min-height: 48px; padding-left: 42px; }
+.t-slot[data-slot="rail"] .ysearch__icon { left: 15px; }
+.t-slot:empty { display: none; }
+
+.t-rail__sec + .t-rail__sec { margin-top: 20px; }
+.t-rail__h { margin: 0 0 9px; display: flex; align-items: center; gap: .55em; }
+.t-rail__h::after { content: ""; flex: 1; border-top: 1.5px dashed var(--hair); }
+.t-rail__types { display: grid; gap: 3px; }
+.t-rail__tags { display: flex; flex-wrap: wrap; gap: 6px 5px; }
+
+/* collection + write-up links (kit rows) */
+.t-links { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.t-link.yrow { min-height: 54px; padding: 7px 12px 7px 7px; }
+.t-link__ic {
+  flex: none; width: 38px; height: 38px; border-radius: 11px; display: grid; place-items: center; font-size: 1.1rem;
+  background: var(--sec-soft); color: var(--sec-deep); box-shadow: inset 0 0 0 1px rgba(138, 95, 12, .18);
+}
+.t-link__ic--ink { background: var(--tex-felt), #2b2828; background-size: 90px, auto; color: #fff; box-shadow: none; }
+.t-link__t { display: grid; gap: 3px; min-width: 0; }
+.t-link__t b { font: 800 .92rem/1.15 var(--font-display); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.t-link__t .meta { font-size: .72rem; }
+.t-link__go { margin-left: auto; color: var(--ink-3); transition: translate 220ms var(--ease-crit); }
+@media (hover: hover) { .t-link:hover .t-link__go { translate: 3px 0; color: var(--ink); } }
+
+.t-main { min-width: 0; }
+.t-row { display: none; } /* the rail is the filter row on desktop (the sanctioned exception) */
+.t-slot[data-slot="main"] .t-tools { margin-bottom: 14px; }
+/* status line (i1): "4 of 16 · articles + picks, tagged #tools · Clear filters", only while filtering.
+   i4 (owner): no idle line ("16 posts, newest first" repeated the rail's count), so unfiltered the first month
+   mark is the feed's first line, on the title's top line; the live region stays in place, empty. */
+.t-status { display: flex; align-items: center; gap: .7rem; flex-wrap: wrap; min-height: 24px; margin: 0 0 12px; }
+.t-status.is-idle { min-height: 0; margin: 0; }
+.t-status .meta { color: var(--ink-3); }
+.t-feed--split .t-status:not(.is-idle) { margin-top: 2px; }
+
+/* month groups: the kit year pill (+ rule, ?yearline), same look as every other page's year separator */
+.t-stream { --gap: 16px; position: relative; }
+.t-month { position: relative; margin-bottom: 14px; }
+
+/* masonry: 4px grid rows, each cell spans its own height (DOM order = reading order) */
+.t-grid { --cols: 1; display: grid; grid-template-columns: repeat(var(--cols), minmax(0, 1fr)); grid-auto-rows: 4px; column-gap: var(--gap); align-items: start; }
+.t-cell { min-width: 0; margin-bottom: var(--gap); }
+@media (min-width: 640px)  { .t-grid { --cols: 2; } } /* 640–959: two columns, not one 700px column */
+@media (min-width: 1280px) { .t-grid { --cols: 3; } }
+@media (min-width: 1800px) { .t-grid { --cols: 4; } }
+
+/* (nothing matches: the kit's Yarn.empty, i7 · C1) */
+
+/* post cards are the kit's (Yarn.post). The feed tilts its notes a little (flatter in i3): */
+.t-cell:nth-child(odd)  .ypost--scratch { rotate: -.45deg; }
+.t-cell:nth-child(even) .ypost--scratch { rotate: .4deg; }
+.t-cell:nth-child(3n) .ypost--sticky { rotate: -.7deg; }
+
+/* ============================================================
+   ARTICLE READER: i1's three columns on the kit skeleton (Yarn.detailPage({ side, rail })).
+   side = back · posted · reading time · tags · share │ column = caps kicker → title → dek → cover → prose → pager
+   │ rail = On this page. Each column's first row is 40px tall, so the three start on one top line.
+   ============================================================ */
+.t-progress { position: fixed; z-index: var(--z-chrome); left: 0; right: 0; top: 0; height: 5px; pointer-events: none; }
+.t-progress span {
+  display: block; height: 100%; transform-origin: 0 50%; transform: scaleX(var(--p, 0));
+  background: linear-gradient(180deg, rgba(255,255,255,.35), transparent 50%, rgba(0,0,0,.2)),
+    repeating-linear-gradient(-62deg, var(--red) 0 4px, var(--red-deep) 4px 6.5px, var(--red) 6.5px 9px);
+}
+.r-side { display: grid; justify-items: start; }
+/* (i6, L7: Back lives in the top bar, not the side rail) */
+.r-facts { margin: 14px 0 0; display: grid; gap: 14px; width: 100%; }
+.r-fact { display: grid; gap: 5px; }
+.r-fact dt { font: 800 .72rem/1 var(--font-display); letter-spacing: .12em; text-transform: uppercase; color: var(--ink-3); }
+.r-fact dd { margin: 0; font: 700 .9rem/1.3 var(--font-display); color: var(--ink); }
+.r-fact dd .ydate { font: 700 .9rem/1.3 var(--font-display); color: var(--ink); }
+.r-fact .ytags { margin-left: -.6em; }
+.r-fact .ytags--stk { margin-left: -.46em; } /* the stack tag's icon starts on the label's line */
+.r-fact .ymeta { gap: 6px; }
+.r-links { display: inline-flex; gap: 6px; }
+.r-sep { color: var(--ink-3); opacity: .7; }
+.r-main .ydetail__meta { margin-top: 12px; }
+.r-dek { margin: 0; font: 600 1.2rem/1.45 var(--font-display); color: var(--ink-2); letter-spacing: -.005em; text-wrap: pretty; }
+.r-main .ydetail__body { padding-top: 22px; }
+.r-summary { margin: 0 0 22px; padding: 14px 18px; border-radius: 14px; background: var(--tex-knit), var(--white); box-shadow: var(--shadow-patch); outline: 1.5px dashed rgba(31,30,30,.18); outline-offset: -6px; }
+.r-summary p { margin: 0; }
+.r-none { padding: 18px 0 8px; }
+.r-none .h3 { margin-bottom: .3rem; }
+.r-cover .r-imgbtn { aspect-ratio: 2.2 / 1; }
+.r-cover .r-imgbtn img { height: 100%; object-fit: cover; }
+.r-imgbtn { position: relative; display: block; width: 100%; padding: 0; border: 0; border-radius: 14px; overflow: hidden; background: var(--cotton-2); cursor: zoom-in; box-shadow: var(--shadow-patch); }
+.r-imgbtn img { width: 100%; height: auto; }
+.r-imgbtn::after { content: ""; position: absolute; inset: 7px; border-radius: 9px; border: 1.5px dashed rgba(255,255,255,.7); pointer-events: none; }
+.r-imgbtn.is-lb-source { visibility: hidden; }
+.r-cover { margin: 0; }
+.r-sign { display: flex; align-items: center; gap: 10px; margin: 2.2em 0 0; padding-top: 18px; border-top: 2px dashed var(--hair); color: var(--ink-2); font: 700 .95rem/1.3 var(--font-display); }
+.r-sign a { color: var(--red-deep); }
+.r-sign svg { width: 26px; height: 26px; flex: none; }
+/* ?dfoot=float (i2): the floating bar's Older / Newer buttons */
+.r-pn { display: grid; gap: 3px; text-align: left; max-width: 26ch; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.r-pn small { font: 600 .66rem/1 var(--font-mono); letter-spacing: .06em; text-transform: uppercase; color: var(--ink-3); }
+
+/* prose is the kit's .yprose; the reader adds heading anchors + code/table/figure wrappers */
+.yprose .h-anchor { position: absolute; left: -1.15em; top: 0; padding-right: .3em; color: var(--ink-3); text-decoration: none; opacity: 0; transition: opacity 140ms; font-weight: 700; }
+.yprose h2:hover .h-anchor, .yprose h3:hover .h-anchor, .yprose .h-anchor:focus-visible { opacity: 1; }
+.r-code pre, .r-table table, .r-imgbtn img { margin: 0; outline: 0; border-radius: 0; background: none; box-shadow: none; }
+
+.r-code { margin: 1.4em 0 1.6em; border-radius: 14px; overflow: hidden; background: var(--tex-felt), #232121; background-size: 160px, auto; color: #f4efe8;
+  box-shadow: 0 2px 0 rgba(31,30,30,.12), 0 8px 20px rgba(31,30,30,.16); outline: 1.5px dashed rgba(255,255,255,.18); outline-offset: -6px; }
+.r-code__bar { display: flex; align-items: center; gap: 8px; padding: 10px 12px 0 18px; }
+.r-code__lang { font: 600 .72rem/1 var(--font-mono); letter-spacing: .08em; text-transform: uppercase; color: rgba(244,239,232,.7); }
+.r-code__dots { display: flex; gap: 5px; margin-right: 4px; }
+.r-code__dots b { width: 9px; height: 9px; border-radius: 50%; background: rgba(255,255,255,.18); }
+.r-code__dots b:first-child { background: var(--red); }
+.r-copy { margin-left: auto; display: inline-flex; align-items: center; gap: .35em; min-height: 32px; padding: 0 .75em; border: 0; border-radius: 999px;
+  background: rgba(255,255,255,.1); color: #f4efe8; font: 700 .74rem/1 var(--font-display); cursor: pointer; transition: background 140ms, transform var(--press) var(--ease-out); }
+.r-copy:hover { background: rgba(255,255,255,.18); }
+.r-copy:active { transform: scale(.95); }
+.r-copy:focus-visible { outline: 3px solid var(--red-hi); outline-offset: 2px; }
+.r-code pre { margin: 0; padding: 12px 20px 18px; overflow-x: auto; font: 500 .86rem/1.65 var(--font-mono); tab-size: 2; }
+.r-code pre:focus-visible { outline: 3px solid var(--red-hi); outline-offset: -3px; }
+.r-code code { font: inherit; }
+.tok-c { color: #a39c93; font-style: italic; } .tok-k { color: #ff8f8f; } .tok-s { color: #f2cf7a; } .tok-f { color: #9fd3c7; } .tok-t { color: #c9b6f2; }
+.r-table { margin: 1.4em 0 1.6em; overflow-x: auto; border-radius: 14px; background: var(--tex-knit), var(--white); box-shadow: var(--shadow-patch); outline: 1.5px dashed rgba(31,30,30,.2); outline-offset: -6px; }
+.r-table table { width: 100%; border-collapse: collapse; font-size: .95rem; line-height: 1.35; }
+.r-table th, .r-table td { padding: 11px 18px; text-align: left; border-bottom: 1.5px dashed rgba(31,30,30,.12); }
+.r-table th { font: 800 .72rem/1 var(--font-display); letter-spacing: .1em; text-transform: uppercase; color: var(--ink-3); padding-top: 16px; }
+.r-table tr:last-child td { border-bottom: 0; padding-bottom: 16px; }
+.r-table td:first-child { font: 750 .95rem/1.3 var(--font-display); }
+.r-fig { margin: 1.6em 0 1.8em; }
+.r-fig figcaption { margin-top: 10px; font: 500 .78rem/1.4 var(--font-mono); color: var(--ink-3); text-align: center; }
+.r-fig figcaption::before { content: "↑ "; color: var(--red-deep); }
+
+/* On this page: its eyebrow row is 40px like the back link and the kicker (one top line) */
+.r-toc.is-empty { visibility: hidden; }
+.r-toc__h.eyebrow { display: flex; align-items: center; min-height: 40px; margin: 0 0 6px; }
+.r-toc ol { list-style: none; margin: 0; padding: 0 0 0 2px; position: relative; }
+.r-toc ol::before { content: ""; position: absolute; left: 6px; top: 8px; bottom: 8px; border-left: 2px dashed rgba(31,30,30,.16); }
+.r-toc li { position: relative; }
+.r-toc a { display: flex; align-items: flex-start; gap: 10px; padding: 6px 8px 6px 0; min-height: 32px; color: var(--ink-2); text-decoration: none; font: 700 .86rem/1.3 var(--font-display); border-radius: 8px; }
+.r-toc a::before { content: ""; flex: none; width: 10px; height: 10px; margin-top: 3px; border-radius: 50%; background: var(--cotton); box-shadow: inset 0 0 0 2px rgba(31,30,30,.28); transition: background 160ms, box-shadow 160ms; }
+.r-toc li.lvl3 a { padding-left: 16px; font-weight: 650; font-size: .82rem; }
+.r-toc a:hover { color: var(--ink); }
+.r-toc a[aria-current="location"] { color: var(--red-deep); }
+.r-toc a[aria-current="location"]::before { background: var(--red); box-shadow: 0 0 0 3px var(--red-soft); }
+.r-toc-m { display: none; }
+
+/* ============================================================
+   COLLECTION: kit detail shell (back · title · subtext · blurb), the kit strand, the feed's pick cards in a grid
+   that reflows with the width (?cview=grid) or masonry. (i5: nothing under it; other collections live in the rail)
+   ============================================================ */
+/* .c-page: full page width: same left/right edges as the feed (rail → content) */
+.c-sub { gap: 6px 10px; }
+.c-blurb { margin: 12px 0 0; color: var(--ink-2); font-size: 1.04rem; line-height: 1.5; }
+.c-page .ydetail__meta { flex-direction: column; align-items: flex-start; gap: 0; }
+.c-page .ydetail__body { padding-top: 22px; gap: 4px; }
+.c-strand .ystrand { margin: 0; }
+/* the pick's red yarn loops up and left of the card: the grid leaves it room */
+.c-grid { list-style: none; margin: 0; padding: 20px 0 0 14px; display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 290px), 1fr)); gap: 26px 20px; align-items: stretch; }
+/* i6 · fix · P2-9: a post focused on landing (Back, a #post- link) is a place, not a control: no ring, the rope marks it */
+.ypost[tabindex="-1"]:focus { outline: none; }
+.c-cell { display: flex; min-width: 0; }
+.c-cell > .ypost { flex: 1; display: flex; flex-direction: column; }
+.c-cell > .ypost .ypost__dek { flex: 1; }
+/* i6 · fix · P2-4 (review: Ghostty's foot sat 2px higher than its neighbours'): a pick's last row is its tags (6px
+   above, 28px) or, with a write-up, the read row (4px above, 32px). The dek fills what's left, so the link row above
+   moved by the difference; the tags row now takes the read row's box (4px above, 32px, tags centred) */
+.c-cell > .ypost--pick > .ypost__tags { display: flex; align-items: center; min-height: 32px; margin-top: 4px; }
+.c-grid[data-cview="masonry"] { --gap: 22px; grid-auto-rows: 4px; row-gap: 0; align-items: start; }
+.c-grid[data-cview="masonry"] .c-cell { margin-bottom: 22px; }
+.c-grid[data-cview="masonry"] .c-cell > .ypost .ypost__dek { flex: none; }
+/* (i5, T2.2: no "Other collections" / "From projects" under a collection) */
+
+/* ============================================================
+   i5 · ABOUT (T1, CONCEPTS.md): under an article's dek, the thing it's about, as a small patch that opens it.
+   Art: the project's first image · tier stripes · the ranked item's art + its tier key · the pick's stub
+   ============================================================ */
+.r-about {
+  display: grid; grid-template-columns: 52px minmax(0, 1fr) auto; align-items: center; gap: 14px;
+  width: min(100%, 460px); margin-top: 16px; padding: 9px 16px 9px 9px; border-radius: 16px;
+  background: var(--tex-knit), var(--white); color: var(--ink); text-decoration: none;
+  box-shadow: var(--shadow-patch); outline: 1.5px dashed rgba(31,30,30,.2); outline-offset: -5px;
+}
+.r-about:focus-visible { outline: 3px solid var(--focus); outline-offset: 3px; }
+.r-about__art { display: grid; place-items: center; width: 52px; height: 52px; border-radius: 11px; overflow: hidden; background: var(--sec-soft); color: var(--sec-deep); font-size: 1.4rem; }
+.r-about__art img, .r-about__art svg { width: 100%; height: 100%; object-fit: cover; }
+.r-about__art .ytsw { width: 30px; height: 30px; border-radius: 7px; }
+.r-about[data-kind="item"] .r-about__art, .r-about[data-kind="project"] .r-about__art:has(img) { background: var(--cotton-2); box-shadow: 0 1px 2px rgba(31,30,30,.22); }
+.r-about__stub { position: relative; width: 100%; height: 100%; background: var(--stub-tex, var(--tex-knit)), var(--stub, #e4d5ba); }
+.r-about__stub::after { content: ""; position: absolute; left: 50%; top: 14px; width: 12px; height: 12px; translate: -50% 0; border-radius: 50%; background: var(--cotton); box-shadow: inset 0 1px 2px rgba(0,0,0,.35), 0 0 0 2.5px #fff; }
+.r-about__stub[data-stub="red"]   { --stub: var(--red); --stub-tex: var(--tex-twill); }
+.r-about__stub[data-stub="ink"]   { --stub: #2b2828; --stub-tex: var(--tex-twill); }
+.r-about__stub[data-stub="blue"]  { --stub: var(--blue); --stub-tex: var(--tex-twill); }
+.r-about__stub[data-stub="green"] { --stub: #5e9a5b; --stub-tex: var(--tex-twill); }
+.r-about__stub[data-stub="gold"]  { --stub: var(--gold); --stub-tex: var(--tex-twill); }
+.r-about__t { display: grid; gap: 3px; min-width: 0; }
+.r-about__k { font: 850 .66rem/1 var(--font-display); letter-spacing: .11em; text-transform: uppercase; color: var(--ink-3); }
+.r-about__t b { font: 850 1.05rem/1.15 var(--font-display); letter-spacing: -.01em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.r-about__m { display: flex; align-items: center; gap: .45em; min-width: 0; font: 500 .74rem/1.25 var(--font-mono); color: var(--ink-3); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ytierkey.r-about__tier { flex: none; min-height: 0; width: 20px; height: 20px; border-radius: 6px; font-size: .72rem; outline-offset: -2.5px; }
+.r-about__go { color: var(--ink-3); transition: translate 220ms var(--ease-crit), color 160ms; }
+@media (hover: hover) { .r-about:hover .r-about__go { translate: 3px 0; color: var(--ink); } }
+/* ?pickart=article: the pick card itself is the article's cover (it opens its shelf and its site) */
+.r-pickcard { max-width: 460px; padding: 12px 0 0 14px; margin-bottom: 10px; }
+
+.t-notfound { padding: 60px 0; text-align: center; display: grid; justify-items: center; gap: 10px; }
+.t-notfound p { margin: 0; }
+
+/* ============================================================
+   MOBILE (< 960px): split and stacked both collapse to i2's mobile list (header, search, sticky filter row)
+   ============================================================ */
+@media (max-width: 959px) {
+  :root { --gap: 12px; }
+  .t-mhead { display: block; }
+  .t-feed { display: block; }
+  .t-rail { display: none; }
+  /* contents: the sticky filter row sticks for the whole feed, not just inside the tools wrapper */
+  .t-slot[data-slot="main"], .t-tools { display: contents; }
+  .t-search { margin-bottom: 10px; } /* i5 · chrome (MO2): no display:block, so it stays the kit's flex search line like Projects' */
+  .t-row { display: flex; margin-bottom: 4px; }
+  .t-stream { --gap: 12px; }
+  .t-status:not(.is-idle) { margin: 4px 0 10px; }
+  /* i5 · chrome (MO6, owner: "wasteful that we are showing the filtered items at the top again"): with the search FAB
+     the active filters live in its chip row (kit ?mactive) and the count is read out, so the line doesn't repeat them */
+  html[data-msearch="fab"]:not([data-mactive="top"]) .t-status { display: none; }
+  .t-cell:nth-child(n) .ypost--scratch.m-felt { rotate: none; }
+
+  /* the Browse sheet's link groups: two compact columns */
+  .ybrowse__links { grid-template-columns: 1fr 1fr; gap: 6px; }
+  .ybrowse__links .t-link.yrow { min-height: 50px; padding: 6px 10px 6px 6px; gap: 9px; }
+  .ybrowse__links .t-link__go { display: none; }
+  .ybrowse__links .t-link__ic { width: 34px; height: 34px; }
+
+  /* article: the meta rail becomes one row (back · tags · share); posted + reading time are in the kicker */
+  .r-side { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 10px; margin-bottom: 8px; }
+  .r-facts { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; margin: 0; width: auto; }
+  .r-fact--when { display: none; }
+  .r-fact dt { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  .r-toc { display: none; }
+  .r-dek { font-size: 1.06rem; }
+  .r-toc-m:not([hidden]) { display: block; margin: 0 0 20px; border-radius: 14px; background: var(--tex-knit), var(--white); box-shadow: var(--shadow-patch); outline: 1.5px dashed rgba(31,30,30,.2); outline-offset: -5px; }
+  .r-toc-m summary { display: flex; align-items: center; gap: .5em; min-height: 48px; padding: 0 16px; cursor: pointer; list-style: none; font: 800 .9rem/1 var(--font-display); }
+  .r-toc-m summary::-webkit-details-marker { display: none; }
+  .r-toc-m summary i:last-child { margin-left: auto; transition: rotate 200ms var(--ease-out); }
+  .r-toc-m[open] summary i:last-child { rotate: 180deg; }
+  .r-toc-m ol { list-style: none; margin: 0; padding: 0 12px 10px; }
+  .r-toc-m a { display: flex; min-height: 44px; align-items: center; padding: 0 6px; color: var(--ink-2); text-decoration: none; font: 700 .9rem/1.2 var(--font-display); border-top: 1.5px dashed rgba(31,30,30,.08); }
+  .r-toc-m li.lvl3 a { padding-left: 20px; font-weight: 650; }
+  .yprose .h-anchor { display: none; }
+  .r-code { margin-inline: -4px; }
+  .r-pn { max-width: 13ch; }
+
+  /* collection */
+  .c-grid { padding-left: 12px; gap: 22px 14px; }
+}
+
+/* ---------- mobile thread variant (?mfeed=thread): kit timeline thread, no ball ---------- */
+@media (min-width: 960px) {
+  .t-feed--thread .t-stream { --ytl-gutter: 0px; }
+  .t-feed--thread .t-stream::before, .t-feed--thread .ytl__knot { display: none; }
+  .t-feed--thread .ytl__group > .yyear { margin-left: 0; }
+}
+
+/* == i6 · thoughts ===========================================================================================
+   T3 · rail tags: the most used tags + "n more" (opens the tag browser); a Year row. The browser is a popover on the
+   top layer (it floats over the feed beside the rail; light dismiss, Esc closes).
+   T5 · On this page: the heading you jumped to flashes a red highlighter under its words.
+   T6 · ?aboutgo=split: the about pill finds its thing; the ↗ beside it opens it.
+   T7 · collection rows wear ?collicon's mark. */
+.t-more { gap: .3em; color: var(--ink-2); background: transparent; outline: 1.5px dashed rgba(31,30,30,.24); outline-offset: -4px; }
+.t-more > i { font-size: .8em; transition: translate 220ms var(--ease-crit); }
+@media (hover: hover) { .t-more:hover { background: var(--cotton-2); color: var(--ink); } .t-more:hover > i { translate: 2px 0; } }
+.t-more[aria-expanded="true"] { background: var(--cotton-2); color: var(--ink); }
+.t-more:active { transform: scale(.95); }
+
+.t-tagpop {
+  position: fixed; inset: auto; margin: 0; width: min(340px, calc(100vw - 32px)); max-height: min(440px, calc(100dvh - 32px));
+  padding: 14px 14px 16px; border: 0; overflow: visible; color: var(--ink);
+  box-shadow: var(--shadow-pop, 0 18px 40px rgba(31,30,30,.22)), 0 0 0 1px rgba(31,30,30,.06);
+}
+/* i7 · B2 (owner: "cant even close the more tags button"): .ycard's display: block beat the browser's own
+   [popover]:not(:popover-open) { display: none }, so a closed browser stayed drawn in the page, under the feed (its
+   top, ✕ included, covered by a card) with nothing left to close. Closed = gone; open = a column whose list scrolls,
+   so the head and its ✕ never scroll or clip away (nothing clips the ✕'s lift shadow either) */
+.t-tagpop:not(:popover-open) { display: none; }
+.t-tagpop:popover-open { display: flex; flex-direction: column; }
+.t-tagpop::backdrop { background: transparent; }
+.t-tagpop__head { flex: none; display: flex; align-items: center; gap: 8px; margin: 0 0 10px; }
+.t-tagpop__x { margin-right: 4px; } /* i6 · fix: its lift shadow reaches 18px; the popover's padding gave 14 (4px were clipped) */
+.t-tagpop__find { flex: none; }
+.t-tagpop__h { display: flex; align-items: baseline; gap: .5em; margin: 0 auto 0 2px; }
+.t-tagpop__find { position: relative; margin: 0 0 12px; }
+.t-tagpop__find > i { position: absolute; left: 13px; top: 50%; translate: 0 -50%; color: var(--ink-3); pointer-events: none; }
+.t-tagpop__q { padding-left: 36px; } /* the kit's .yfield.yfield--sm; room for the magnifier (i7 · C1) */
+.t-tagpop__list {
+  display: flex; flex-wrap: wrap; align-content: flex-start; gap: 6px 5px; min-height: 0; overflow: auto; overscroll-behavior: contain;
+  /* (i7: the scroll box reaches the popover's edges, so a chip's focus ring and lift aren't cut at the list's edge) */
+  margin: -6px -14px -16px; padding: 6px 14px 16px; scrollbar-width: thin; scrollbar-color: rgba(31,30,30,.2) transparent;
+}
+.t-tagpop__none { margin: 4px 2px 0; }
+
+/* T5 · the jump flash: a red highlighter sweeps on under the heading's words, holds, then fades (interruptible:
+   a second jump fades this one while the next sweeps on) */
+.yprose .h-text {
+  background: linear-gradient(var(--red-soft), var(--red-soft)) no-repeat 0 88% / 0% 46%;
+  -webkit-box-decoration-break: clone; box-decoration-break: clone; border-radius: 3px;
+  transition: background-size 380ms var(--ease-out), background-color 0s;
+}
+.yprose .is-lit > .h-text { background-size: 100% 46%; }
+.yprose :is(h2, h3).is-lit > .h-anchor { opacity: 1; color: var(--red-deep); }
+.yprose :is(h2, h3) { scroll-margin-top: 96px; }
+
+/* T6 · ?aboutgo=split */
+.yabout-split { display: inline-flex; align-items: center; gap: 4px; max-width: 100%; min-width: 0; }
+.yabout-split > .yabout { min-width: 0; }
+.yabout__open {
+  position: relative; z-index: 2; flex: none; display: grid; place-items: center; width: 32px; height: 32px; border-radius: 50%;
+  background: var(--y-chip); color: var(--y-fg); text-decoration: none; outline: 1.5px dashed var(--y-line); outline-offset: -4px;
+}
+.yabout__open:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+.yabout__open:active { transform: scale(.94); }
+@media (pointer: coarse) { .yabout__open { width: 44px; height: 44px; } }
+
+/* T7 · collection rows: the mark sits where the gold tile was (none: the title starts the row) */
+.t-link:is(.t-link--circle, .t-link--stubs) { gap: 11px; padding-left: 9px; }
+.t-link--none { padding-left: 14px; }
+.c-kind.ybadge--type { gap: .5em; }
+
+/* T4 · ?apager=top: ‹ n / N › joins Back + copy in the article's top bar (L7: the bar is always there; the kit lines the
+   side rail and the contents column up with the title under it) */
+.r-side > .r-facts:first-child { margin-top: 0; } /* (its 14px was the gap under the side rail's Back link) */
+/* i7 (apager=top decided): at 360 a project write-up's Back ("← Bank Simulation") + ‹ 6 / 7 › + copy pushed copy 31px
+   out of the bar; the label shrinks (ellipsis) instead, so the pager and copy keep their places */
+.r-page--topnav .ydetail__top > .ydetail__back { flex: 0 1 auto; min-width: 0; }
+.r-backl { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; line-height: 1.25; }
+/* L7 on phones: Back leads (first in the top bar), so the side rail steps away and its facts (tags, stack, links) sit
+   in the column under the dek (.r-facts--m); on desktop they stay in the side rail */
+.r-facts--m { display: none; }
+@media (max-width: 959px) {
+  .ydpage--side > .ydpage__side { display: none; }
+  .r-facts.r-facts--m { display: flex; margin: 12px 0 0; }
+}

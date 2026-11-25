@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="en" data-section="thoughts">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sheet excerpt</title>
+<!--
+  A realistic slice of a page on the sheet, used by kit/bg/index.html.
+  ?bg=<name>      sheet background option (loaded by yarn.js from kit/bg/<name>.css)
+  ?section=home|projects|music|thoughts   frame colour (default thoughts)
+  ?blank          hide the content (texture-only, used for contrast sampling)
+-->
+<script>
+  (function () {
+    var p = new URLSearchParams(location.search), h = document.documentElement;
+    var s = p.get("section");
+    if (/^(home|projects|music|thoughts)$/.test(s || "")) h.dataset.section = s;
+    if (p.has("blank")) h.classList.add("ex-blank");
+  })();
+</script>
+<link rel="stylesheet" href="../yarn.css">
+<script src="../yarn.js"></script>
+<script>
+  // fallback if the kit script isn't there: load the option ourselves
+  if (!window.Yarn) {
+    var b = new URLSearchParams(location.search).get("bg");
+    if (b && /^[a-z0-9-]{1,40}$/.test(b)) { document.documentElement.dataset.bg = b; document.write('<link rel="stylesheet" href="' + b + '.css">'); }
+  }
+</script>
+<style>
+  .mockpanel { display: none !important; }
+  .ex { padding: 22px clamp(16px, 4vw, 40px) 40px; }
+  .ex-lede { max-width: 54ch; margin: 2px 0 14px; color: var(--ink-2); }
+  .ex-filter { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 6px; margin: 0 0 22px; }
+  .ex-filter .yfilter__div { flex: none; width: 0; height: 24px; margin: 0 4px; border-left: 2px dashed rgba(31,30,30,.2); }
+  .ex-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; align-items: start; }
+  .ex-card { padding: 16px 18px 14px; }
+  .ex-card h3 { margin: 8px 0 6px; font: 850 1.18rem/1.15 var(--font-display); letter-spacing: -.015em; }
+  .ex-card p { margin: 0 0 10px; color: var(--y-fg-2); font-size: .95rem; line-height: 1.5; }
+  .ex-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+  .ex-kind { display: inline-flex; align-items: center; gap: .45em; font: 800 .72rem/1 var(--font-display); letter-spacing: .12em; text-transform: uppercase; color: var(--y-fg-3); }
+  .ex-kind i { font-size: 1.1em; }
+  .ex-ink { background: var(--tex-twill), var(--ink); color: #fff; outline-color: rgba(255,255,255,.35); }
+  .ex-ink q { display: block; font: 800 1.08rem/1.35 var(--font-display); letter-spacing: -.01em; quotes: "\201C" "\201D"; }
+  .ex-ink q::before { color: var(--red-hi); }
+  .ex-ink .ytag { color: rgba(255,255,255,.74); }
+  .ex-col { display: grid; gap: 16px; }
+  .ex-onsheet { margin: 26px 0 0; display: grid; gap: 6px; }
+  .ex-onsheet p { margin: 0; }
+  .ex-onsheet .meta { font-size: .78rem; }
+  .ex-link { color: var(--red-deep); font: 800 .9rem/1 var(--font-display); text-decoration: none; display: inline-flex; gap: .3em; align-items: center; }
+  @media (max-width: 959px) {
+    .ex { padding: 16px 16px 28px; }
+    .ex-grid { grid-template-columns: 1fr; gap: 14px; }
+    .ex-filter { flex-wrap: nowrap; overflow: hidden; margin-right: -16px; }
+    .ex-filter .btn { display: none; }
+  }
+  .ex-blank .ex, .ex-blank yarn-nav, .ex-blank .ybar, .ex-blank yarn-player { visibility: hidden; }
+</style>
+</head>
+<body class="frame">
+<main class="sheet">
+  <yarn-nav active="thoughts"></yarn-nav>
+  <div class="ex">
+    <header class="yhead">
+      <div class="yhead__text">
+        <h1 class="yhead__title">Thoughts<span class="yhead__dot">.</span></h1>
+        <p class="yhead__meta meta">15 posts · since Sep 2026</p>
+      </div>
+    </header>
+    <p class="ex-lede">Scratch notes posted to the void, longer write-ups, picks and rankings. Newest first.</p>
+
+    <div class="ex-filter" role="group" aria-label="Type">
+      <button type="button" class="ychip ysel" aria-pressed="true" data-all><span class="ychip__l">Everything</span><span class="ychip__c">15</span></button>
+      <button type="button" class="ychip ysel" aria-pressed="false"><i class="ph-bold ph-scribble" aria-hidden="true"></i><span class="ychip__l">Scratch</span></button>
+      <button type="button" class="ychip ysel" aria-pressed="false"><i class="ph-bold ph-article" aria-hidden="true"></i><span class="ychip__l">Articles</span></button>
+      <button type="button" class="ychip ysel" aria-pressed="false"><i class="ph-bold ph-push-pin" aria-hidden="true"></i><span class="ychip__l">Picks</span></button>
+      <span class="yfilter__div" aria-hidden="true"></span>
+      <button type="button" class="ychip ysel" aria-pressed="false"><i class="ph-bold ph-ranking" aria-hidden="true"></i><span class="ychip__l">Tier lists</span></button>
+      <button type="button" class="btn btn--ink btn--sm"><i class="ph-bold ph-sliders-horizontal" aria-hidden="true"></i>Browse</button>
+    </div>
+
+    <div class="yyear">November 2026 <span class="meta">5 posts</span></div>
+
+    <div class="ex-grid">
+      <div class="ex-col">
+        <article class="patch ex-card ex-ink on-ink">
+          <div class="ex-row"><span class="ex-kind"><i class="ph-bold ph-scribble" aria-hidden="true"></i>Scratch</span><time class="ydate">Nov 7 · 11:41 pm</time></div>
+          <q>what if every website had a little cat that judged your scroll speed</q>
+          <ul class="ytags" style="margin-top:8px"><li><a class="ytag" href="#"><span class="ychip__l"><span class="ytag__h" aria-hidden="true">#</span>shower</span></a></li></ul>
+        </article>
+        <article class="patch ex-card">
+          <div class="ex-row"><span class="ex-kind"><i class="ph-bold ph-push-pin" aria-hidden="true"></i>Pick</span><time class="ydate">Nov 4</time></div>
+          <h3>Zed ↗</h3>
+          <p>Fast editor. I write my own themes for it.</p>
+          <span class="meta">zed.dev</span>
+        </article>
+      </div>
+      <article class="patch ex-card">
+        <div class="ex-row"><span class="ex-kind"><i class="ph-bold ph-article" aria-hidden="true"></i>Article · 7 min</span><time class="ydate">Nov 5</time></div>
+        <h3>Moving a site from Astro to SvelteKit without losing the music</h3>
+        <p>One &lt;audio&gt; element, a root layout, and why the player kept restarting every time the page changed.</p>
+        <div class="ex-row">
+          <ul class="ytags"><li><a class="ytag" href="#"><span class="ychip__l"><span class="ytag__h" aria-hidden="true">#</span>svelte</span></a></li><li><a class="ytag" href="#"><span class="ychip__l"><span class="ytag__h" aria-hidden="true">#</span>learnings</span></a></li></ul>
+          <a class="ex-link" href="#">Read <i class="ph-bold ph-arrow-right" aria-hidden="true"></i></a>
+        </div>
+      </article>
+      <article class="ycard ex-card">
+        <div class="ex-row"><span class="ex-kind"><i class="ph-bold ph-folder-simple" aria-hidden="true"></i>Project</span></div>
+        <h3>blaqat.net (this site)</h3>
+        <div class="ymeta"><span class="ybadge ybadge--ongoing" data-status="ongoing"><i class="ph-bold ph-needle" aria-hidden="true"></i><span>Ongoing</span></span><span class="ybadge ybadge--type" data-type="personal"><i class="ph-bold ph-user" aria-hidden="true"></i><span>Personal</span></span><time class="ydate">Sep 2025 – now</time></div>
+        <p style="margin-top:10px">My personal website, built with Astro and Svelte, showcasing my programming and music projects.</p>
+        <div class="ex-row"><span class="tag">Astro</span><span class="tag">Svelte</span><span class="tag">Cloudflare</span><span style="flex:1"></span></div>
+      </article>
+    </div>
+
+    <div class="ex-onsheet">
+      <p class="muted">Body text straight on the sheet, in --ink-2. Most reading happens on the cards; this line checks the sheet itself.</p>
+      <p class="meta">meta on the sheet · --ink-3 · Oct 30 · 4:11</p>
+    </div>
+  </div>
+</main>
+</body>
+</html>

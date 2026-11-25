@@ -1,0 +1,199 @@
+<!doctype html>
+<html lang="en" data-section="studio">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Yarn Iteration 9</title>
+<link rel="stylesheet" href="kit/yarn.css">
+<style>
+  /* gallery layout only: every part on this page is a kit part (header, cards, felt dots, buttons, rows, badges) */
+  .sheet > .ypage { padding-top: 36px; } /* no nav on this page: the header gets the room the nav would take */
+  .g-lede { margin: 0 0 30px; max-width: 72ch; color: var(--ink-2); font-size: 1.05rem; line-height: 1.55; }
+  .g-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 420px), 1fr)); gap: 22px; }
+  .g-card { display: grid; grid-template-rows: auto 1fr; padding: 0; overflow: clip; }
+  .g-shots { display: grid; grid-template-columns: minmax(0, 1fr) 27%; gap: 10px; align-items: start; padding: 10px 10px 0; }
+  .g-shots img { width: 100%; height: auto; border-radius: 10px; box-shadow: 0 1px 0 rgba(31,30,30,.1), 0 2px 6px rgba(31,30,30,.14); background: var(--cotton-2); }
+  .g-body { display: grid; gap: 10px; align-content: start; padding: 14px 18px 18px; }
+  .g-title { display: flex; align-items: center; gap: 10px; margin: 0; font: 900 1.3rem/1.1 var(--font-display); letter-spacing: -.02em; }
+  .g-title .ydot { --d: 32px; }
+  .g-body p { margin: 0; color: var(--ink-2); font-size: .94rem; line-height: 1.5; }
+  .g-links { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 2px; }
+  .g-links .meta { align-self: center; margin: 0 2px 0 6px; }
+  .g-sec { margin-top: 44px; }
+  .g-sec > h2 { margin: 0 0 14px; }
+  .g-two { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 28px; align-items: start; }
+  .g-changes { margin: 0; padding: 16px 20px 18px; list-style: none; display: grid; gap: 12px; }
+  .g-changes li { display: grid; gap: 4px; padding-bottom: 12px; border-bottom: 1.5px dashed rgba(31,30,30,.12); }
+  .g-changes li:last-child { border-bottom: 0; padding-bottom: 0; }
+  .g-changes q { font: 700 italic .92rem/1.4 var(--font-display); color: var(--ink-2); quotes: "“" "”"; }
+  .g-changes span { font-size: .95rem; line-height: 1.5; }
+  .g-rows { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+  .g-rows .yrow { gap: 12px; }
+  .g-rows .ydot { --d: 34px; }
+  .g-rows b { display: block; font: 850 .98rem/1.2 var(--font-display); }
+  .g-rows small { display: block; margin-top: 2px; font: 500 .74rem/1.3 var(--font-mono); color: var(--ink-3); }
+  .g-rows .yrow > i:last-child { margin-left: auto; color: var(--ink-3); }
+  .g-foot { margin-top: 36px; color: var(--ink-3); }
+  /* i5 · review tools (R3): the round-up card, first thing under the title */
+  .g-roundup { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 8px 18px; margin: 0 0 28px; padding: 16px 18px 16px 16px; box-shadow: var(--shadow-patch), inset 4px 0 0 var(--red); }
+  .g-roundup .ydot { --d: 46px; --sec: var(--red); }
+  .g-roundup b { display: block; font: 900 1.2rem/1.15 var(--font-display); letter-spacing: -.015em; }
+  .g-roundup small { display: block; margin-top: 4px; color: var(--ink-2); font-size: .92rem; line-height: 1.45; }
+  .g-roundup .g-roundup__n { margin-top: 6px; font: 600 .76rem/1.3 var(--font-mono); color: var(--red-deep); }
+  .g-roundup__n:empty { display: none; }
+  @media (max-width: 959px) {
+    .g-roundup { grid-template-columns: auto minmax(0, 1fr); }
+    .g-roundup > .btn { grid-column: 1 / -1; justify-self: start; }
+  }
+  @media (max-width: 959px) {
+    .sheet > .ypage { padding-top: 22px; }
+    .g-two { grid-template-columns: minmax(0, 1fr); }
+    .g-shots { grid-template-columns: minmax(0, 1fr) 30%; }
+  }
+</style>
+<script src="kit/yarn.js" defer></script>
+</head>
+<body class="frame">
+<main class="sheet">
+  <div class="ypage">
+    <header class="yhead">
+      <div class="yhead__text">
+        <h1 class="yhead__title">Yarn, iteration 9: Studio<span class="yhead__dot" aria-hidden="true">.</span></h1>
+        <p class="yhead__meta meta">blaqat.net redesign · round 3 · Nov 16, 2026</p>
+      </div>
+      <div class="yhead__actions"><a class="btn btn--sm btn--red" href="studio/index.html"><i class="ph-fill ph-lock-simple" aria-hidden="true"></i>Open Studio</a><a class="btn btn--sm btn--ghost" href="../v3-yarn-8/index.html">The site (i8, final)</a></div>
+    </header>
+    <a class="ycard ylift g-roundup" href="review.html">
+      <span class="ydot" aria-hidden="true"><i class="ph-fill ph-list-checks"></i></span>
+      <span><b>Round-up: your picks, the open questions, your notes</b><small>Pick in ⚙ (saved, follows you), note anything with ✎ or “Note on something”, then copy everything from the round-up.</small><small class="g-roundup__n" data-ru-count></small></span>
+      <span class="btn btn--red btn--sm">Open the round-up<i class="ph-bold ph-arrow-right" aria-hidden="true"></i></span>
+    </a>
+    <script>
+      addEventListener("load", () => setTimeout(() => {
+        const R = window.YarnReview, el = document.querySelector("[data-ru-count]");
+        if (!R || !el) return;
+        const d = R.load(), s = (n, w) => `${n} ${w}${n === 1 ? "" : "s"}`;
+        const picks = R.countChoices(d), notes = Object.keys(d.notes.page).length + Object.keys(d.notes.opt).length + d.notes.el.length;
+        const answers = Object.values(d.answers).filter((a) => a && a.v).length;
+        el.textContent = picks + notes + answers ? `So far: ${s(picks, "pick")} · ${s(answers, "answer")} · ${s(notes, "note")}` : "";
+      }, 60));
+    </script>
+    <p class="g-lede"><b>Iteration 9 is Studio only.</b> Your 21 pins, built. The site is decided and stays in iteration 8 (Studio's “View site” goes there); anything here the site will need is built in the kit and listed in <code>FEEDBACK-i9.md</code> under “Carry to the site”. Light only: the dark mock stays in i8.</p>
+    <p class="g-lede">Also fixed: <b>“New post” opened a pile of sheets</b> (pin 1). Every visit to a screen added another click handler; now each screen starts clean, and four smaller leaks of the same kind are gone.</p>
+    <section class="g-cards" aria-label="What changed">
+      <article class="ycard ylift g-card" data-section="studio">
+        <div class="g-shots"><img src="_shots/i9-blocks-d.png" alt="The write-up editor, desktop" loading="lazy"><img src="_shots/i9-blocks-m.png" alt="The write-up editor, phone" loading="lazy"></div>
+        <div class="g-body">
+          <h2 class="g-title"><span class="ydot" aria-hidden="true" style="--sec: var(--ink)"><i class="ph-fill ph-squares-four"></i></span>The write-up editor</h2>
+          <p class="meta">S3 · pins 3, 14</p>
+          <p><q>id like it to just be a live markdown editor like notion with blocks … tho u can have button to view raw markdown</q></p>
+          <p>Every markdown field is a block editor in the site's own look. Markdown shortcuts as you type; <b>/</b> or <b>+</b> inserts yarn blocks: your link component, images, a song or playlist, a mention, a sticky note, a post card. Each one is edited in place. <b>Blocks | Markdown</b> shows the exact text it saves.</p>
+          <div class="g-links"><a class="btn btn--sm btn--red" href="studio/index.html?view=article">Article</a><a class="btn btn--sm btn--ghost" href="studio/index.html?screen=project&amp;id=studio">A project's write-up</a><a class="btn btn--sm btn--ghost" href="kit/components.html#md">The kit renderer</a></div>
+        </div>
+      </article>
+      <article class="ycard ylift g-card" data-section="studio">
+        <div class="g-shots"><img src="_shots/i9-links-d.png" alt="Links: any link, your own text, desktop" loading="lazy"><img src="_shots/i9-links-m.png" alt="Links: any link, your own text, phone" loading="lazy"></div>
+        <div class="g-body">
+          <h2 class="g-title"><span class="ydot" aria-hidden="true" style="--sec: var(--ink)"><i class="ph-fill ph-link"></i></span>Links: any link, your own text</h2>
+          <p class="meta">S5 · pins 5, 11, 15, 18</p>
+          <p><q>i should be able to give a list any of arbitrary links and the ones we recognize we convert</q></p>
+          <p>One links field everywhere a link lives: songs, collection tracks, the collection itself (its album or playlist), projects, image posts, picks, Home. Paste one or several; SoundCloud, Spotify, Bandcamp, YouTube, Apple Music, GitHub, itch.io and BeepBox get their mark and a clean address. Each link takes your own text, reorders and removes with Undo. Previews show them as the site would.</p>
+          <div class="g-links"><a class="btn btn--sm btn--red" href="studio/index.html?screen=project&amp;id=studio">Project</a><a class="btn btn--sm btn--ghost" href="studio/index.html?view=images">Images post</a><a class="btn btn--sm btn--ghost" href="studio/index.html?view=collection">Collection</a></div>
+        </div>
+      </article>
+      <article class="ycard ylift g-card" data-section="studio">
+        <div class="g-shots"><img src="_shots/i9-roundup-d.png" alt="Playlists from anywhere, desktop" loading="lazy"><img src="_shots/i9-roundup-m.png" alt="Playlists from anywhere, phone" loading="lazy"></div>
+        <div class="g-body">
+          <h2 class="g-title"><span class="ydot" aria-hidden="true" style="--sec: var(--ink)"><i class="ph-fill ph-playlist"></i></span>Playlists from anywhere</h2>
+          <p class="meta">S2 · pin 2</p>
+          <p><q>playlists to support not just my music but soundcloud bandcamp spotify and youtube so i can post my yearly music roundups</q></p>
+          <p>Paste SoundCloud, Spotify, Bandcamp or YouTube links into a playlist, next to your own songs. Title and artist are guessed from the address and editable. On the post, ▶ plays an outside track in its row with that service's player (Bandcamp opens its page); your own songs play in the site's player.</p>
+          <div class="g-links"><a class="btn btn--sm btn--red" href="studio/index.html?view=roundup">“2025, on repeat”</a><a class="btn btn--sm btn--ghost" href="studio/index.html?view=roundup&amp;exttrack=open">▶ opens the service instead (⚙)</a></div>
+        </div>
+      </article>
+      <article class="ycard ylift g-card" data-section="studio">
+        <div class="g-shots"><img src="_shots/i9-collection-d.png" alt="Tracks are songs · mixed instruments, desktop" loading="lazy"><img src="_shots/i9-collection-m.png" alt="Tracks are songs · mixed instruments, phone" loading="lazy"></div>
+        <div class="g-body">
+          <h2 class="g-title"><span class="ydot" aria-hidden="true" style="--sec: var(--ink)"><i class="ph-fill ph-music-notes"></i></span>Tracks are songs · mixed instruments</h2>
+          <p class="meta">S6, S9 · pins 6, 10</p>
+          <p><q>collection items can show up as singles and also have the same metadata a normal song does</q></p>
+          <p>A collection track has every field a single has: audio, instrument, status, started, finished, links, notes (one song form for both). The collection's status and dates come from its tracks and say which. A mixed collection's yarn is striped by instrument and its facts say “DAW + Piano”.</p>
+          <div class="g-links"><a class="btn btn--sm btn--red" href="studio/index.html?view=collection">VGM Class (mixed)</a><a class="btn btn--sm btn--ghost" href="studio/index.html?screen=music&amp;id=revealed&amp;track=2">Revealed</a></div>
+        </div>
+      </article>
+      <article class="ycard ylift g-card" data-section="studio">
+        <div class="g-shots"><img src="_shots/i9-status-d.png" alt="Status fills Finished · the tabs, desktop" loading="lazy"><img src="_shots/i9-status-m.png" alt="Status fills Finished · the tabs, phone" loading="lazy"></div>
+        <div class="g-body">
+          <h2 class="g-title"><span class="ydot" aria-hidden="true" style="--sec: var(--ink)"><i class="ph-fill ph-calendar-check"></i></span>Status fills Finished · the tabs</h2>
+          <p class="meta">S7, S8 · pins 7, 8, 9</p>
+          <p><q>switching to complete or dropped to auto fill finished · finished should be disabled for wip</q></p>
+          <p>Complete or Dropped fills an empty Finished with this month (Undo in the toast). WIP turns Finished off and keeps the month for later. Projects work the same. The chosen track tab's rope is whole now and scrolls into view.</p>
+          <div class="g-links"><a class="btn btn--sm btn--red" href="studio/index.html?screen=music&amp;id=revealed&amp;track=2">A WIP track</a><a class="btn btn--sm btn--ghost" href="studio/index.html?view=project">A project</a></div>
+        </div>
+      </article>
+      <article class="ycard ylift g-card" data-section="studio">
+        <div class="g-shots"><img src="_shots/i9-order-d.png" alt="The Music order on the site, desktop" loading="lazy"><img src="_shots/i9-order-m.png" alt="The Music order on the site, phone" loading="lazy"></div>
+        <div class="g-body">
+          <h2 class="g-title"><span class="ydot" aria-hidden="true" style="--sec: var(--ink)"><i class="ph-fill ph-sort-descending"></i></span>The Music order on the site</h2>
+          <p class="meta">S10 · pin 12</p>
+          <p><q>how do i set the order of how it shows on the site … or by end date which i think is what my old site did</q></p>
+          <p>“Order on the site” on the Music list: Newest finished (your old site's rule: WIP on top, Complete by its finish, Dropped by its finish or else its start), Newest started, A–Z, or By hand. The list is the site's order, with its year pills; a change shows in History.</p>
+          <div class="g-links"><a class="btn btn--sm btn--red" href="studio/index.html?view=list-music">Music list</a><a class="btn btn--sm btn--ghost" href="studio/index.html?view=list-music&amp;mcomplete=start">Complete by its start (⚙)</a></div>
+        </div>
+      </article>
+      <article class="ycard ylift g-card" data-section="studio">
+        <div class="g-shots"><img src="_shots/i9-stack-d.png" alt="Stack finds logos, desktop" loading="lazy"><img src="_shots/i9-stack-m.png" alt="Stack finds logos, phone" loading="lazy"></div>
+        <div class="g-body">
+          <h2 class="g-title"><span class="ydot" aria-hidden="true" style="--sec: var(--ink)"><i class="ph-fill ph-stack"></i></span>Stack finds logos</h2>
+          <p class="meta">S11 · pin 13</p>
+          <p><q>if i add an item that we dont have yet it should automatically find the logo</q></p>
+          <p>A tool the kit doesn't know is looked up in Simple Icons the moment you add it, in its brand colour. Nothing found or offline: an ink monogram, with Upload / Link to set one by hand.</p>
+          <div class="g-links"><a class="btn btn--sm btn--red" href="studio/index.html?screen=project&amp;id=studio">Project › Stack</a></div>
+        </div>
+      </article>
+      <article class="ycard ylift g-card" data-section="studio">
+        <div class="g-shots"><img src="_shots/i9-checks-d.png" alt="Publish checks, desktop" loading="lazy"><img src="_shots/i9-checks-m.png" alt="Publish checks, phone" loading="lazy"></div>
+        <div class="g-body">
+          <h2 class="g-title"><span class="ydot" aria-hidden="true" style="--sec: var(--ink)"><i class="ph-fill ph-warning"></i></span>Publish checks</h2>
+          <p class="meta">S4, S12 · pins 4, 16</p>
+          <p><q>pin icon makes no sense here should be a warning icon also dark red on medium dark grey looks bad · the published loading had a like tan loading color make it black</q></p>
+          <p>Ready is ✓ on ink, a warning is ⚠ on WIP gold, blocking is ✕ on red; every colour passes AA, and “1 word” reads right. The publishing rope and every upload bar are ink.</p>
+          <div class="g-links"><a class="btn btn--sm btn--red" href="studio/index.html?view=publish">Publish check</a><a class="btn btn--sm btn--ghost" href="studio/index.html?view=publishing">Publishing</a></div>
+        </div>
+      </article>
+      <article class="ycard ylift g-card" data-section="studio">
+        <div class="g-shots"><img src="_shots/i9-swatches-d.png" alt="Colour swatches look like the real thing, desktop" loading="lazy"><img src="_shots/i9-swatches-m.png" alt="Colour swatches look like the real thing, phone" loading="lazy"></div>
+        <div class="g-body">
+          <h2 class="g-title"><span class="ydot" aria-hidden="true" style="--sec: var(--ink)"><i class="ph-fill ph-palette"></i></span>Colour swatches look like the real thing</h2>
+          <p class="meta">S13 · pin 17</p>
+          <p><q>why do these not use the x pattern that it does on the actual item</q></p>
+          <p>The stub colours are little stubs (twill, seam, eyelet) and the note colours little sticky notes, built from the same kit parts as the post, so they can't drift apart.</p>
+          <div class="g-links"><a class="btn btn--sm btn--red" href="studio/index.html?view=pick">Pick</a><a class="btn btn--sm btn--ghost" href="studio/index.html?view=scratch">Scratch</a></div>
+        </div>
+      </article>
+      <article class="ycard ylift g-card" data-section="studio">
+        <div class="g-shots"><img src="_shots/i9-images-d.png" alt="Image sets: two rows at most, desktop" loading="lazy"><img src="_shots/i9-images-m.png" alt="Image sets: two rows at most, phone" loading="lazy"></div>
+        <div class="g-body">
+          <h2 class="g-title"><span class="ydot" aria-hidden="true" style="--sec: var(--ink)"><i class="ph-fill ph-images"></i></span>Image sets: two rows at most</h2>
+          <p class="meta">S14 · pin 19</p>
+          <p><q>limit to 2 rows 1 big 3 small or maybe turn the 2nd row into a carousel idk</q></p>
+          <p>1 big + 3 small; past four the last says “+N” and opens the viewer right there. The carousel strip is in ⚙ to compare. Built in the kit, so the site's post gets it too.</p>
+          <div class="g-links"><a class="btn btn--sm btn--red" href="studio/index.html?view=images-9">9 images (+N)</a><a class="btn btn--sm btn--ghost" href="studio/index.html?view=images-9&amp;imgset=strip">Carousel strip (⚙)</a></div>
+        </div>
+      </article>
+      <article class="ycard ylift g-card" data-section="studio">
+        <div class="g-shots"><img src="_shots/i9-tiers-d.png" alt="Rankings: colour picker · edit items, desktop" loading="lazy"><img src="_shots/i9-tiers-m.png" alt="Rankings: colour picker · edit items, phone" loading="lazy"></div>
+        <div class="g-body">
+          <h2 class="g-title"><span class="ydot" aria-hidden="true" style="--sec: var(--ink)"><i class="ph-fill ph-ranking"></i></span>Rankings: colour picker · edit items</h2>
+          <p class="meta">S15, S16 · pins 20, 21</p>
+          <p><q>make this open a color picker rather than having me cycle for years · how do i edit already made things</q></p>
+          <p>A tier's colour opens a picker of real felt keys plus your own colour. Click or Enter on an item opens its editor: name, image, note, tier, remove. Dragging still moves items.</p>
+          <div class="g-links"><a class="btn btn--sm btn--red" href="studio/index.html?view=tierlist">Ranking</a></div>
+        </div>
+      </article>
+    </section>
+    <p class="g-foot meta">Spec <code>FEEDBACK-i9.md</code> · walkthrough <code>WALKTHROUGH-i9-results.md</code> · your words <code>_feedback/roundup-i8.md</code></p>
+  </div>
+</main>
+</body>
+</html>

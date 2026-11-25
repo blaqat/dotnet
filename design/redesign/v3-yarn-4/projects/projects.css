@@ -1,0 +1,150 @@
+/* ============================================================
+   projects/projects.css · Projects page + item page (iteration 4)
+   Layout only: kit parts (.yrow .ycard .ytl .ygroups .yyear .ydetail .ypanel
+   .ycar .ysearch .yfilter .btn) are positioned and laid out here. Page-owned
+   pieces: .pj-thumb, .pj-card, .pj-mk (match wrapper), .pj-stage.
+   How the layouts fit together: projects/LAYOUT.md
+   ============================================================ */
+/* .pj sits on .ypage (kit gutters, same on every page) */
+.pj-top:empty { display: none; } /* .ytools when it holds the search line + filter row */
+.pj-body { position: relative; outline: none; }
+.pj-lead { margin: 0 0 .7em; font: 800 1.08rem/1.4 var(--font-display); color: var(--ink); letter-spacing: -.005em; }
+.pj-tags { display: flex; align-items: center; flex-wrap: wrap; gap: 6px 10px; margin-top: 1.3em; padding-top: 14px; border-top: 1.5px dashed rgba(31,30,30,.14); }
+.pj-tags .eyebrow { margin-right: 2px; }
+.pj-empty { display: grid; justify-items: center; gap: 12px; padding: 40px 20px; text-align: center; color: var(--ink-2); }
+.pj-empty p { margin: 0; }
+.pj-wu { display: inline-flex; align-items: center; gap: .4em; color: var(--y-fg-3); white-space: nowrap; }
+.pj-wu i { font-size: 1rem; }
+
+/* ============================================================
+   TOOLS: search + filters on ONE line on desktop (owner, Projects 3)
+   What gives way as the line gets short, in order: the search hint ("try python", JS, < 1280px),
+   then the chips' icons and Browse's word (< 1280px), then the search narrows to 220px;
+   past that the chip strip scrolls sideways (kit .yfilter__scroll). The chips never wrap.
+   ============================================================ */
+@media (min-width: 960px) {
+  .pj-top.ytools { display: flex; align-items: center; gap: 16px; }
+  .pj-top > .ysearch { flex: 1 1 240px; min-width: 220px; }
+  .pj-top > .yfilter { flex: 0 1 auto; min-width: 0; }
+}
+@media (min-width: 960px) and (max-width: 1279px) {
+  /* KIT-CANDIDATE (site · filter row): a compact row: chips drop their icons (labels stay), Browse is icon-only
+     (it keeps its aria-label "Browse all filters"). */
+  .pj-top .yfilter__scroll .ychip > :is(i, img, .ychip__ic) { display: none; }
+  .pj-top .yfilter__browse > span:not(.ychip__n) { display: none; }
+  .pj-top .yfilter__browse { padding-inline: .85em; }
+}
+
+/* ============================================================
+   IN-ITEM MATCH MARKS (owner, Projects 4) · the kit's in-card match look (.is-match = --y-fg on --y-chip)
+   .pj-mk wraps a status / type badge: matched, it shows the chip around the badge (the badge never
+   changes, so the ongoing ribbon stays a ribbon). Stack chips in a list are plain like Thoughts' in-card
+   tags; a matching one gets the chip (.ystk.is-match). Padding is always there, so marking never moves text.
+   ============================================================ */
+.pj-mk { display: inline-flex; align-items: center; padding: 3px 4px; margin: -3px -4px; border-radius: 999px; transition: background-color 160ms var(--ease-out); }
+.pj-body .ystack:not(.ystack--icons) .ystk:not(.is-match):not(:hover) { background: transparent; }
+.pj-body .ystk { transition: background-color 160ms var(--ease-out), transform 240ms var(--ease-crit), box-shadow 240ms var(--ease-crit); }
+.pj-hits { display: flex; flex-wrap: wrap; gap: 4px; }
+.pj-hits[hidden] { display: none; }
+.pj-hits .ystk { height: 24px; font-size: .72rem; }
+
+/* ---------- preview thumbnail: the closed state only (opened items use the kit carousel) ---------- */
+.pj-thumb {
+  position: relative; flex: none; display: block; width: 96px; height: 64px; border-radius: 10px; overflow: hidden;
+  background: var(--tex-felt), var(--cotton-2); background-size: 120px, auto;
+  box-shadow: 0 1px 0 rgba(31,30,30,.1), 0 1px 4px rgba(31,30,30,.12);
+}
+.pj-thumb > img, .pj-thumb > video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 50% 12%; pointer-events: none; }
+.pj-thumb::after { content: ""; position: absolute; inset: 4px; border-radius: 7px; border: 1.5px dashed rgba(255,255,255,.72); box-shadow: 0 0 0 .5px rgba(31,30,30,.06); pointer-events: none; }
+.pj-thumb--none { display: grid; place-items: center; background: var(--tex-knit), var(--blue-soft); }
+.pj-thumb--none::after { border-color: rgba(36,81,143,.32); box-shadow: none; }
+.pj-thumb--none b { font: 900 1.2rem/1 var(--font-display); letter-spacing: -.03em; color: var(--blue-deep); }
+
+/* ============================================================
+   DESKTOP TIMELINE: ruled year pills, yarn ball on the selected project + the stage
+   ============================================================ */
+.pj-list { display: grid; grid-template-columns: minmax(340px, 2fr) minmax(0, 3fr); gap: clamp(24px, 3vw, 44px); align-items: start; } /* 1024: the stage keeps ~60% */
+.pj-tl .ytl { --ytl-knot: 43px; --ytl-gap: 14px; }
+.pj-tl .ytl__group { padding-bottom: 26px; }
+.pj-tl .ytl__group > .yyear { margin-bottom: 16px; }
+.pj-row { min-height: 86px; gap: 16px; padding: 11px 16px 11px 11px; }
+.pj-row__txt { flex: 1; min-width: 0; display: grid; gap: 8px; }
+.pj-row__name { font: 850 1.08rem/1.2 var(--font-display); letter-spacing: -.012em; color: var(--y-fg); }
+.pj-row__wu { flex: none; display: grid; place-items: center; width: 30px; height: 30px; border-radius: 50%; font-size: 1rem; color: var(--y-fg-3); background: var(--y-chip); }
+
+/* the stage: an opened item on the white card material (kit .ypanel); its own scroll, sized by CSS only
+   (i4: no per-scroll max-height writes: that was a layout every frame) */
+.pj-stagewrap { position: sticky; top: 18px; }
+.pj-stage {
+  --bottom-ui: 0px;
+  max-height: calc(100dvh - 36px - var(--pj-ui, 0px)); overflow: auto; overscroll-behavior: contain; scrollbar-width: thin; outline: none;
+  --ypanel-pad: 30px;
+}
+.pj-stagewrap { --pj-ui: var(--bottom-ui); }
+.pj-stage .ydetail__top { padding-top: 14px; }
+.pj-stage__none { padding: 40px 0; }
+
+/* ============================================================
+   DESKTOP GRID: year groups (kit .ygroups, ruled pill = a clear separator) of 2-column cards
+   The pill sits on the cards' left edge and its rule runs to the right edge (same as Thoughts' month marks).
+   ============================================================ */
+.pj-grid .ygroups { --ygroup-gap: 34px; --ygroup-row: 20px; --ygroup-col: 20px; }
+.pj-card {
+  display: grid; gap: 14px 20px; padding: 20px 22px 16px; min-height: 100%;
+  grid-template-columns: minmax(0, 1fr) auto; grid-template-rows: 1fr auto; grid-template-areas: "main media" "foot foot";
+}
+.pj-card.is-text { grid-template-columns: minmax(0, 1fr); grid-template-areas: "main" "foot"; }
+.pj-card__main { grid-area: main; min-width: 0; display: grid; gap: 10px; align-content: start; }
+.pj-card__title { margin: 0; font: 900 1.28rem/1.15 var(--font-display); letter-spacing: -.02em; color: var(--y-fg); text-wrap: balance; }
+.pj-card__open { padding: 0; border: 0; background: none; font: inherit; color: inherit; text-align: left; text-decoration: none; cursor: pointer; }
+.pj-card__open::after { content: ""; position: absolute; inset: 0; z-index: 0; border-radius: var(--radius-card); }
+.pj-card__open:focus-visible { outline: none; }
+.pj-card:has(.pj-card__open:focus-visible) { outline: 3px solid var(--focus); outline-offset: 3px; }
+.pj-card__desc { margin: 0; color: var(--y-fg-2); font-size: .95rem; line-height: 1.55; display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; }
+.pj-card.is-text .pj-card__desc { -webkit-line-clamp: 6; }
+.pj-card__media { grid-area: media; }
+.pj-thumb--card { width: clamp(150px, 15vw, 212px); height: auto; aspect-ratio: 212 / 146; border-radius: 12px; } /* 1024: the text column keeps room */
+.pj-card__foot { grid-area: foot; display: flex; align-items: center; flex-wrap: wrap; gap: 10px; min-width: 0; }
+.pj-card__stack { min-width: 0; }
+.pj-card__stack .ystk { position: relative; z-index: 1; }
+.pj-card__links { margin-left: auto; display: flex; align-items: center; gap: 8px; position: relative; z-index: 1; }
+.pj-card__links:empty { display: none; }
+.pj-card .pj-wu { position: relative; z-index: 1; }
+/* ?gimg=top: the image leads the card */
+.pj-grid--top .pj-card.has-media { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto 1fr auto; grid-template-areas: "media" "main" "foot"; }
+.pj-grid--top .pj-thumb--card { width: 100%; height: auto; aspect-ratio: 16 / 5.6; }
+
+/* the opened card (Yarn.openInPlace): the detail shell on the white card material, its text column centred
+   (900px). The pad is measured on the open cell (container units), so the sticky bar inside, which bleeds by the
+   same pad, gets the panel's number and not its own width's. */
+.pj-grid .ygroup__item.is-open { container-type: inline-size; }
+.pj-panel { --ypanel-pad: max(28px, calc((100cqw - 900px) / 2)); --ycar-w: 188px; }
+/* while an opened item's bar is stuck at the top, it stands in for its year's pill (they'd overlap) */
+.ygroup > .yyear { transition: opacity 160ms var(--ease-out); }
+.ygroup:has(.pj-panel .ydetail__top.is-stuck) > .yyear { opacity: 0; pointer-events: none; }
+
+/* ============================================================
+   PHONES: a plain vertical list grouped by year (ruled pills); a tap opens the project's page
+   ============================================================ */
+@media (max-width: 959px) {
+  /* contents: a sticky filter row (msearch=bar) then sticks for the whole list, not just inside this wrapper */
+  .pj-top { display: contents; }
+  .pj-top > * { margin-bottom: 12px; }
+  .pj-top > .yfilter--sticky { margin-bottom: 14px; }
+  .pj-mlist .ygroups { --ygroup-gap: 22px; --ygroup-row: 10px; }
+  .pj-mrow { min-height: 78px; gap: 12px; padding: 9px 12px 9px 9px; }
+  .pj-thumb--m { width: 60px; height: 60px; border-radius: 12px; }
+  .pj-thumb--m.pj-thumb--none b { font-size: 1.05rem; }
+  .pj-mrow .pj-row__txt { gap: 7px; }
+  .pj-mrow .pj-row__name { font-size: 1.02rem; }
+  .pj-mrow .ymeta { gap: 5px 6px; }
+  .pj-mrow__go { flex: none; margin-left: auto; font-size: 1.05rem; color: var(--y-fg-3); }
+}
+/* 640–959: two columns of rows */
+@media (min-width: 640px) and (max-width: 959px) {
+  .pj-mlist .ygroup__list { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px 12px; }
+}
+
+/* ============================================================
+   ITEM PAGE (item.html?p=<slug>): the kit's Yarn.detailPage on the sheet (normal page background)
+   ============================================================ */
