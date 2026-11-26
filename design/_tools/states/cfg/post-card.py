@@ -1,0 +1,18 @@
+parts = ["postKicker", "postAbout", "postWriteup", "postGo", "postRibbon", "postTags"]
+CONFIG = {"file": "components/organisms/post-card.elyx",
+  "sections": [{"rows": [parts, ["postArticle", "postArticleCover", "postArticleI11", "postArticleCoverI11"],
+     ["postNote", "postNotePink", "postNoteMint", "postNoteSky"], ["postPick", "postPickI10", "postTrack", "postPlaylist"],
+     ["postImages", "postImages2", "postImages3", "postImages3I10"], ["postRanking", "postTier", "postTierNamed", "postTierItem", "postGif"]]}],
+  "notes": {"postKicker": "the kicker", "postAbout": "the about pill", "postWriteup": "the write-up pill", "postGo": "a go-link",
+    "postRibbon": "the bookmark", "postTags": "a card's tags", "postArticle": "an article", "postArticleCover": "with a cover",
+    "postArticleI11": "i11 · “Read →” cut", "postArticleCoverI11": "i11 · cover, “Read →” cut", "postNote": "a scratch (canary)",
+    "postNotePink": "pink", "postNoteMint": "mint", "postNoteSky": "sky", "postPick": "a pick", "postPickI10": "i10 · a link button",
+    "postTrack": "a playlist's track row", "postPlaylist": "a playlist", "postImages": "images · 1 + 3", "postImages2": "2 side by side",
+    "postImages3": "1 + 2", "postImages3I10": "i10 · 1 + 2", "postRanking": "a ranking", "postTier": "a tier row",
+    "postTierNamed": "a named tier", "postTierItem": "a tier item", "postGif": "the GIF mark"},
+  "boards": [{"key": "postCard", "caption": "Post cards",
+     "rows": [parts, ["postArticle", "postArticleCover", "postNote", "postNotePink", "postNoteMint", "postNoteSky"],
+              ["postPick", "postPlaylist", "postTrack"], ["postImages", "postImages2", "postImages3"],
+              ["postRanking", "postTier", "postTierNamed", "postTierItem", "postGif"]],
+     "i10": {"postPick": "postPickI10", "postImages3": "postImages3I10"},
+     "i11": {"postArticle": "postArticleI11", "postArticleCover": "postArticleCoverI11"}}]}

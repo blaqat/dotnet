@@ -1,0 +1,233 @@
+import "tokens/color/roles.elyx" as col
+import "tokens/color/palette.elyx" as pal
+import "tokens/color/sections.elyx" as sec
+import "tokens/type/type.elyx" as typ
+import "tokens/space/space.elyx" as spc
+import "components/atoms/text.elyx" as txt
+import "assets/home/scribble-wave-long.svg" as waveLong
+import "assets/home/scribble-wave.svg" as waveMid
+import "assets/home/scribble-wave-short.svg" as waveShort
+import "components/atoms/doc.elyx" as doc
+
+// A keyword in Home's bio (`a.kw.yscribble`): the word in the lead's bold
+// (ink on the bio's ink-2; i9 750, i11 T2 500) over the kit's hand-drawn
+// wave scribble in the colour of where it leads (Projects blue, Music
+// purple, an outside link orange). The scribble hangs 2px past each end,
+// .62em tall, its foot just under the line (spc.layout.scribble-*).
+// Children: `word`, `scribble`. Override `word {contents: …}`; a variant
+// sets the colour and the wave (long · mid · short, stretched to the word).
+@variants(keywordRit, keywordMusic)
+export keyword = frame {
+  title: "Keyword · to Projects",
+  left: 0px,
+  top: 40px,
+  layout: {stack: {}},
+  children: [word, scribble],
+
+  word = text : txt.body {
+    contents: "software engineer",
+    font-size: typ.sizes.lead,
+    font-family: typ.faces.lead,
+    font-style: typ.faces.lead-bold,
+    line-height: typ.leading.lead,
+    fill[0].color: col.roles.fg
+  }
+
+  scribble = asset {
+    left: spc.layout.scribble-out,
+    right: spc.layout.scribble-out,
+    bottom: spc.layout.scribble-drop,
+    height: spc.controls.scribble-h,
+    ignore-stack: .true,
+    fill: sec.section.hue-projects,
+    contents: waveLong,
+    sizing: .stretch
+  }
+}
+
+// An outside link (RIT): orange.
+export keywordRit = frame : keyword {
+  title: "Keyword · outside (RIT)",
+  left: 218px,
+  top: 40px,
+
+  scribble {
+    fill[0].color: pal.palette.orange,
+    contents: waveShort
+  }
+
+  word {
+    contents: "RIT"
+  }
+}
+
+// To Music: purple.
+export keywordMusic = frame : keyword {
+  title: "Keyword · to Music",
+  left: 348px,
+  top: 40px,
+
+  scribble {
+    fill[0].color: sec.section.hue-music,
+    contents: waveMid
+  }
+
+  word {
+    contents: "composing"
+  }
+}
+
+// ==== states page (labels over the definitions, then the states boards: i9 · i10 · i11) ====
+lbl-keyword = text : doc.specLabel {
+  left: 0px,
+  top: 0px,
+  contents: "keyword"
+}
+
+note-keyword = text : doc.specNote {
+  left: 0px,
+  top: 16px,
+  contents: "Home's scribbled keyword"
+}
+
+lbl-keywordRit = text : doc.specLabel {
+  left: 218px,
+  top: 0px,
+  contents: "keywordRit"
+}
+
+note-keywordRit = text : doc.specNote {
+  left: 218px,
+  top: 16px,
+  contents: "RIT"
+}
+
+lbl-keywordMusic = text : doc.specLabel {
+  left: 348px,
+  top: 0px,
+  contents: "keywordMusic"
+}
+
+note-keywordMusic = text : doc.specNote {
+  left: 348px,
+  top: 16px,
+  contents: "music"
+}
+
+@variants(keywordStatesI10)
+keywordStates = frame : doc.docBoard {
+  title: "Keyword · states · i9",
+  left: 0px,
+  top: 231px,
+
+  body {
+    layout.stack.item-gap: 48px,
+    overrides: [insert(row-1, after = .nil)]
+  }
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i9"
+      }
+    }
+
+    boardCaption {
+      contents: "Keyword · every state"
+    }
+  }
+
+  row-1 = frame : doc.specRow {
+    layout.stack.item-gap: 48px,
+    overrides: [
+      insert(st-keyword, after = .nil),
+      insert(st-keywordRit, after = st-keyword),
+      insert(st-keywordMusic, after = st-keywordRit)
+    ]
+  }
+
+  st-keyword = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "keyword"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "Home's scribbled keyword"
+    }
+
+    it = frame : keyword {}
+  }
+
+  st-keywordRit = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "keywordRit"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "RIT"
+    }
+
+    it = frame : keywordRit {}
+  }
+
+  st-keywordMusic = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "keywordMusic"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "music"
+    }
+
+    it = frame : keywordMusic {}
+  }
+}
+
+@variants(keywordStatesI11)
+@context(i10="on")
+keywordStatesI10 = frame : keywordStates {
+  title: "Keyword · states · i10",
+  left: 626px,
+  top: 231px,
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i10"
+      }
+    }
+  }
+}
+
+@context(i10="on", i11="on")
+keywordStatesI11 = frame : keywordStatesI10 {
+  title: "Keyword · states · i11",
+  left: 1252px,
+  top: 231px,
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i11"
+      }
+    }
+  }
+}

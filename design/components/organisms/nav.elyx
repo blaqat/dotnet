@@ -1,0 +1,485 @@
+import "tokens/color/sections.elyx" as sec
+import "tokens/space/space.elyx" as spc
+import "components/atoms/logo.elyx" as brandLogo
+import "components/atoms/doc.elyx" as doc
+import "components/molecules/nav-tab.elyx" as tab
+import "assets/icons/bold/music-notes.svg" as musicIcon
+import "assets/icons/fill/music-notes.svg" as musicIconFill
+import "assets/icons/bold/cloud.svg" as thoughtsIcon
+import "assets/icons/fill/cloud.svg" as thoughtsIconFill
+
+// <yarn-nav> on desktop: the brand on the page column's left edge, the
+// section tabs on its right edge (18 above, 8 below, 40 in from the sheet).
+// Home is the brand, so with no section (or section=home) no tab is here.
+// The tab of the page's section wears the HERE rope: each section has a
+// contextual variant (`section=projects|music|thoughts`), so a top-level
+// instance picks it from the canvas. Inside another component, pick it
+// with `@with-variant(nav.navMusic)`. i9 → i10 is all tokens: the rope
+// turns the section's hue and the other tabs' dots go grey until hover.
+@variants(navProjects, navMusic, navThoughts, navPhone)
+export nav = frame {
+  title: "Nav · Home (no tab here)",
+  left: 0px,
+  top: 40px,
+  width: 1412px,
+  layout: {stack: {justify-content: .space-between, align-items: .center}},
+  padding: [spc.layout.nav-top, spc.layout.page-x, spc.layout.nav-bottom],
+  children: [brand, tabs],
+
+  brand = frame : brandLogo.logo {}
+
+  tabs = frame {
+    layout: {stack: {align-items: .center, item-gap: spc.layout.nav-gap}},
+    children: [projectsTab, musicTab, thoughtsTab],
+
+    projectsTab = frame : tab.navTab {}
+
+    musicTab = frame : tab.navTab {
+      dot {
+        fill[0].color: sec.section.hue-music,
+
+        glyph {
+          contents: musicIcon
+        }
+      }
+
+      label {
+        contents: "Music"
+      }
+    }
+
+    thoughtsTab = frame : tab.navTab {
+      dot {
+        fill[0].color: sec.section.hue-thoughts,
+
+        glyph {
+          contents: thoughtsIcon
+        }
+      }
+
+      label {
+        contents: "Thoughts"
+      }
+    }
+  }
+}
+
+@context(section="projects")
+export navProjects = frame : nav {
+  title: "Nav · Projects",
+  left: 0px,
+  top: 232px,
+
+  tabs {
+    @with-variant(tab.navTabHere)
+    projectsTab {}
+  }
+}
+
+@context(section="music")
+export navMusic = frame : nav {
+  title: "Nav · Music",
+  left: 0px,
+  top: 424px,
+
+  tabs {
+    @with-variant(tab.navTabHere)
+    musicTab {
+      dot {
+        glyph {
+          contents: musicIconFill
+        }
+      }
+    }
+  }
+}
+
+@context(section="thoughts")
+export navThoughts = frame : nav {
+  title: "Nav · Thoughts",
+  left: 0px,
+  top: 616px,
+
+  tabs {
+    @with-variant(tab.navTabHere)
+    thoughtsTab {
+      dot {
+        glyph {
+          contents: thoughtsIconFill
+        }
+      }
+    }
+  }
+}
+
+// Phones (< 960): the brand alone on the page column's left edge (14
+// above, 4 below, 14 in); the tabs give way to the floating layer's
+// sections pill (organisms/phone-nav.elyx), so no section variant is needed.
+export navPhone = frame : nav {
+  title: "Nav · phone (the brand)",
+  left: 1692px,
+  top: 40px,
+  width: spc.controls.phone-w,
+  padding-top: spc.layout.nav-top-phone,
+  padding-left: spc.layout.page-x-phone,
+  padding-bottom: spc.layout.nav-bottom-phone,
+  padding-right: spc.layout.page-x-phone,
+
+  tabs {
+    display: .none
+  }
+}
+
+// ==== states page (labels over the definitions, then the states boards: i9 · i10 · i11) ====
+lbl-nav = text : doc.specLabel {
+  left: 0px,
+  top: 0px,
+  contents: "nav"
+}
+
+note-nav = text : doc.specNote {
+  left: 0px,
+  top: 16px,
+  contents: "desktop · Home here"
+}
+
+lbl-navPhone = text : doc.specLabel {
+  left: 1692px,
+  top: 0px,
+  contents: "navPhone"
+}
+
+note-navPhone = text : doc.specNote {
+  left: 1692px,
+  top: 16px,
+  contents: "phones: the top line (sections pill on the floating row)"
+}
+
+lbl-navProjects = text : doc.specLabel {
+  left: 0px,
+  top: 192px,
+  contents: "navProjects"
+}
+
+note-navProjects = text : doc.specNote {
+  left: 0px,
+  top: 208px,
+  contents: "section = projects"
+}
+
+lbl-navMusic = text : doc.specLabel {
+  left: 0px,
+  top: 384px,
+  contents: "navMusic"
+}
+
+note-navMusic = text : doc.specNote {
+  left: 0px,
+  top: 400px,
+  contents: "section = music"
+}
+
+lbl-navThoughts = text : doc.specLabel {
+  left: 0px,
+  top: 576px,
+  contents: "navThoughts"
+}
+
+note-navThoughts = text : doc.specNote {
+  left: 0px,
+  top: 592px,
+  contents: "section = thoughts"
+}
+
+@variants(navStatesI10, navStatesProjects, navStatesMusic, navStatesThoughts)
+navStates = frame : doc.docBoard {
+  title: "Nav · states · i9",
+  left: 0px,
+  top: 832px,
+
+  body {
+    layout.stack.item-gap: 48px,
+    overrides: [insert(row-1, after = .nil), insert(row-2, after = row-1)]
+  }
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i9"
+      }
+    }
+
+    boardCaption {
+      contents: "Nav · every state"
+    }
+  }
+
+  row-1 = frame : doc.specRow {
+    layout.stack.item-gap: 48px,
+    overrides: [insert(st-nav, after = .nil)]
+  }
+
+  row-2 = frame : doc.specRow {
+    layout.stack.item-gap: 48px,
+    overrides: [insert(st-navPhone, after = .nil)]
+  }
+
+  st-nav = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "nav"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "desktop · Home here"
+    }
+
+    it = frame : nav {}
+  }
+
+  st-navPhone = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "navPhone"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "phones: the top line (sections pill on the floating row)"
+    }
+
+    it = frame : navPhone {}
+  }
+}
+
+@variants(navStatesI11)
+@context(i10="on")
+navStatesI10 = frame : navStates {
+  title: "Nav · states · i10",
+  left: 1772px,
+  top: 832px,
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i10"
+      }
+    }
+  }
+}
+
+@context(i10="on", i11="on")
+navStatesI11 = frame : navStatesI10 {
+  title: "Nav · states · i11",
+  left: 3544px,
+  top: 832px,
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i11"
+      }
+    }
+  }
+}
+
+@variants(navStatesProjectsI10)
+@context(section="projects")
+navStatesProjects = frame : navStates {
+  title: "Nav · projects · states · i9",
+  left: 0px,
+  top: 1384px,
+
+  body {
+    row-1 {
+      st-nav {
+        slot {
+          @with-variant(navProjects)
+          it {}
+        }
+
+        note {
+          contents: "section = projects"
+        }
+
+        label {
+          contents: "navProjects"
+        }
+      }
+    }
+  }
+
+  boardHead {
+    boardCaption {
+      contents: "Nav · section = projects"
+    }
+  }
+}
+
+@variants(navStatesProjectsI11)
+@context(i10="on", section="projects")
+navStatesProjectsI10 = frame : navStatesProjects {
+  title: "Nav · projects · states · i10",
+  left: 1772px,
+  top: 1384px,
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i10"
+      }
+    }
+  }
+}
+
+@context(i10="on", i11="on", section="projects")
+navStatesProjectsI11 = frame : navStatesProjectsI10 {
+  title: "Nav · projects · states · i11",
+  left: 3544px,
+  top: 1384px,
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i11"
+      }
+    }
+  }
+}
+
+@variants(navStatesMusicI10)
+@context(section="music")
+navStatesMusic = frame : navStates {
+  title: "Nav · music · states · i9",
+  left: 0px,
+  top: 1896px,
+
+  body {
+    row-1 {
+      st-nav {
+        slot {
+          @with-variant(navMusic)
+          it {}
+        }
+
+        note {
+          contents: "section = music"
+        }
+
+        label {
+          contents: "navMusic"
+        }
+      }
+    }
+  }
+
+  boardHead {
+    boardCaption {
+      contents: "Nav · section = music"
+    }
+  }
+}
+
+@variants(navStatesMusicI11)
+@context(i10="on", section="music")
+navStatesMusicI10 = frame : navStatesMusic {
+  title: "Nav · music · states · i10",
+  left: 1772px,
+  top: 1896px,
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i10"
+      }
+    }
+  }
+}
+
+@context(i10="on", i11="on", section="music")
+navStatesMusicI11 = frame : navStatesMusicI10 {
+  title: "Nav · music · states · i11",
+  left: 3544px,
+  top: 1896px,
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i11"
+      }
+    }
+  }
+}
+
+@variants(navStatesThoughtsI10)
+@context(section="thoughts")
+navStatesThoughts = frame : navStates {
+  title: "Nav · thoughts · states · i9",
+  left: 0px,
+  top: 2408px,
+
+  body {
+    row-1 {
+      st-nav {
+        slot {
+          @with-variant(navThoughts)
+          it {}
+        }
+
+        note {
+          contents: "section = thoughts"
+        }
+
+        label {
+          contents: "navThoughts"
+        }
+      }
+    }
+  }
+
+  boardHead {
+    boardCaption {
+      contents: "Nav · section = thoughts"
+    }
+  }
+}
+
+@variants(navStatesThoughtsI11)
+@context(i10="on", section="thoughts")
+navStatesThoughtsI10 = frame : navStatesThoughts {
+  title: "Nav · thoughts · states · i10",
+  left: 1772px,
+  top: 2408px,
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i10"
+      }
+    }
+  }
+}
+
+@context(i10="on", i11="on", section="thoughts")
+navStatesThoughtsI11 = frame : navStatesThoughtsI10 {
+  title: "Nav · thoughts · states · i11",
+  left: 3544px,
+  top: 2408px,
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i11"
+      }
+    }
+  }
+}

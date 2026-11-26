@@ -1,0 +1,794 @@
+import "tokens/color/roles.elyx" as col
+import "tokens/space/space.elyx" as spc
+import "tokens/type/type.elyx" as typ
+import "components/atoms/text.elyx" as txt
+import "assets/icons/bold/check.svg" as doneIcon
+import "assets/icons/bold/hammer.svg" as wipIcon
+import "assets/icons/bold/trash-simple.svg" as droppedIcon
+import "assets/icons/bold/pause.svg" as pausedIcon
+import "assets/icons/bold/user.svg" as personalIcon
+import "assets/icons/bold/briefcase.svg" as workIcon
+import "assets/icons/bold/graduation-cap.svg" as schoolIcon
+import "assets/icons/bold/broadcast.svg" as liveIcon
+import "assets/icons/bold/push-pin.svg" as editsIcon
+import "assets/icons/bold/pencil-simple-line.svg" as draftIcon
+import "assets/icons/bold/folder-simple.svg" as chipIcon
+import "components/atoms/doc.elyx" as doc
+
+// The kit's .yfact, the card meta's one face: a status glyph + Meta words
+// ("✓ Completed Aug 2025 · 4 tracks"). i9: an 18px felt disc per status
+// (Complete ink, Paused grey, Dropped red, WIP gold) + Nunito 750 words in
+// fg-2; i10 L3: a bare 15px glyph in fg-3, Meta words in fg-3, and WIP
+// keeps its small gold disc (col.roles.fact-*, spc.controls.fact*).
+// Children: `disc` (holds `glyph`), `label`, `sub` (the quiet second part).
+// Override `label {contents: …}`, `sub {contents: …}` or hide `sub`.
+@variants(
+  factWip,
+  factDropped,
+  factPaused,
+  factMatch,
+  factPersonal,
+  factWork,
+  factSchool,
+  factLive,
+  factEdits,
+  factDraft,
+  factChip
+)
+export fact = frame {
+  title: "Fact · complete",
+  left: 0px,
+  top: 40px,
+  height: spc.controls.tag,
+  layout: {stack: {align-items: .center, item-gap: spc.layout.fact-gap}},
+  corner-radius: spc.radii.pill,
+  children: [disc, label, sub],
+
+  disc = frame {
+    width: spc.controls.fact,
+    height: spc.controls.fact,
+    layout: {stack: {justify-content: .center, align-items: .center}},
+    fill: col.roles.fact-done,
+    corner-radius: spc.radii.pill,
+    children: glyph,
+
+    glyph = asset {
+      width: spc.controls.fact-glyph,
+      height: spc.controls.fact-glyph,
+      fill: col.roles.fact-ic,
+      contents: doneIcon
+    }
+  }
+
+  label = text : txt.metaCard {
+    contents: "Completed Aug 2025",
+    font-size: typ.sizes.fact,
+    font-family: typ.faces.fact,
+    font-style: typ.faces.fact-style,
+    fill[0].color: col.roles.fact-fg
+  }
+
+  sub = text : txt.metaCard {
+    contents: "· 4 tracks",
+    font-size: typ.sizes.fact,
+    font-family: typ.faces.fact,
+    font-style: typ.faces.fact-style
+  }
+}
+
+// WIP: the one status with a colour, a gold disc + an ink hammer, in
+// every iteration.
+export factWip = frame : fact {
+  title: "Fact · WIP",
+  left: 264px,
+  top: 40px,
+
+  disc {
+    fill[0].color: col.roles.wip,
+
+    glyph {
+      fill[0].color: col.roles.fg,
+      width: spc.controls.fact-wip-glyph,
+      height: spc.controls.fact-wip-glyph,
+      contents: wipIcon
+    }
+
+    width: spc.controls.fact-wip,
+    height: spc.controls.fact-wip
+  }
+
+  label {
+    contents: "WIP since Dec 2022"
+  }
+}
+
+// Dropped: i9 the red felt disc + a white trash can; i10 the bare glyph.
+export factDropped = frame : fact {
+  title: "Fact · dropped",
+  left: 748px,
+  top: 40px,
+
+  disc {
+    fill[0].color: col.roles.fact-dropped,
+
+    glyph {
+      contents: droppedIcon
+    }
+  }
+
+  sub {
+    display: .none
+  }
+
+  label {
+    contents: "Dropped, started Mar 2022"
+  }
+}
+
+export factPaused = frame : fact {
+  title: "Fact · paused",
+  left: 521px,
+  top: 40px,
+
+  disc {
+    fill[0].color: col.roles.fact-paused,
+
+    glyph {
+      contents: pausedIcon
+    }
+  }
+
+  sub {
+    display: .none
+  }
+
+  label {
+    contents: "Paused, started Jun 2024"
+  }
+}
+
+// Matched (.is-match): the in-card match chip grows out of the glyph;
+// the words go full strength.
+export factMatch = frame : fact {
+  title: "Fact · match",
+  left: 987px,
+  top: 40px,
+  padding-left: spc.layout.match-x,
+  padding-right: spc.layout.match-x,
+  fill[0].color: col.roles.chip,
+
+  label {
+    fill[0].color: col.roles.fg
+  }
+
+  sub {
+    display: .none
+  }
+}
+
+// ---- a project's type (Projects): i9 a felt disc in the type's colour
+// with an ink glyph; i10 L3 a bare glyph in the type's deep shade
+// (col.roles.fact-<type>). No second part.
+export factPersonal = frame : fact {
+  title: "Fact · personal",
+  left: 0px,
+  top: 204px,
+
+  disc {
+    fill[0].color: col.roles.fact-personal,
+
+    glyph {
+      fill[0].color: col.roles.fact-personal-ic,
+      contents: personalIcon
+    }
+  }
+
+  sub {
+    display: .none
+  }
+
+  label {
+    contents: "Personal"
+  }
+}
+
+export factWork = frame : fact {
+  title: "Fact · work",
+  left: 264px,
+  top: 204px,
+
+  disc {
+    fill[0].color: col.roles.fact-work,
+
+    glyph {
+      fill[0].color: col.roles.fact-work-ic,
+      contents: workIcon
+    }
+  }
+
+  sub {
+    display: .none
+  }
+
+  label {
+    contents: "Work"
+  }
+}
+
+export factSchool = frame : fact {
+  title: "Fact · school",
+  left: 521px,
+  top: 204px,
+
+  disc {
+    fill[0].color: col.roles.fact-school,
+
+    glyph {
+      fill[0].color: col.roles.fact-school-ic,
+      contents: schoolIcon
+    }
+  }
+
+  sub {
+    display: .none
+  }
+
+  label {
+    contents: "School"
+  }
+}
+
+// ---- the publish state (Yarn.fact.pub; Studio's lists, cards and the
+// editor's head): live = sewn on (i9 an ink disc), edits = pinned on (i9 a
+// red disc), draft = basted (a dashed ring on white). From i10 (L1 + L3)
+// bare glyphs: live in ink, edits in the WIP gold's deep shade, draft the
+// dashed ring alone (col.roles.pub-*). No second part.
+export factLive = frame : fact {
+  title: "Fact · live",
+  left: 0px,
+  top: 368px,
+
+  disc {
+    fill[0].color: col.roles.fact-done,
+
+    glyph {
+      fill[0].color: col.roles.pub-live-ic,
+      contents: liveIcon
+    }
+  }
+
+  sub {
+    display: .none
+  }
+
+  label {
+    contents: "Live"
+  }
+}
+
+export factEdits = frame : fact {
+  title: "Fact · edits",
+  left: 264px,
+  top: 368px,
+
+  disc {
+    fill[0].color: col.roles.pub-edits,
+
+    glyph {
+      fill[0].color: col.roles.pub-edits-ic,
+      contents: editsIcon
+    }
+  }
+
+  sub {
+    display: .none
+  }
+
+  label {
+    contents: "Edits"
+  }
+}
+
+export factDraft = frame : fact {
+  title: "Fact · draft",
+  left: 521px,
+  top: 368px,
+
+  disc {
+    border[0].color: col.roles.fg-3,
+    fill[0].color: col.roles.pub-draft,
+
+    glyph {
+      fill[0].color: col.roles.pub-draft-ic,
+      contents: draftIcon
+    }
+
+    border[0].width: 1.5px,
+    border[0].dash: [3px, 2px]
+  }
+
+  sub {
+    display: .none
+  }
+
+  label {
+    contents: "Draft"
+  }
+}
+
+// A quiet fact (.yfact--text / --date): a chip disc with a hairline and a
+// glyph in fg-2 (a type, a date, "Saved 4:44 pm"); i10 L3 the bare glyph in
+// fg-3. Swap the glyph with `disc { glyph {contents: …} }`.
+export factChip = frame : fact {
+  title: "Fact · chip (a type, a date)",
+  left: 748px,
+  top: 204px,
+
+  disc {
+    border[0].color: col.roles.fact-chip-line,
+    fill[0].color: col.roles.fact-chip,
+
+    glyph {
+      fill[0].color: col.roles.fact-chip-ic,
+      contents: chipIcon
+    }
+  }
+
+  sub {
+    display: .none
+  }
+
+  label {
+    contents: "Project"
+  }
+}
+
+// ==== states page (labels over the definitions, then the states boards: i9 · i10 · i11) ====
+lbl-fact = text : doc.specLabel {
+  left: 0px,
+  top: 0px,
+  contents: "fact"
+}
+
+note-fact = text : doc.specNote {
+  left: 0px,
+  top: 16px,
+  contents: "status · complete"
+}
+
+lbl-factWip = text : doc.specLabel {
+  left: 264px,
+  top: 0px,
+  contents: "factWip"
+}
+
+note-factWip = text : doc.specNote {
+  left: 264px,
+  top: 16px,
+  contents: "status · WIP"
+}
+
+lbl-factPaused = text : doc.specLabel {
+  left: 521px,
+  top: 0px,
+  contents: "factPaused"
+}
+
+note-factPaused = text : doc.specNote {
+  left: 521px,
+  top: 16px,
+  contents: "status · paused"
+}
+
+lbl-factDropped = text : doc.specLabel {
+  left: 748px,
+  top: 0px,
+  contents: "factDropped"
+}
+
+note-factDropped = text : doc.specNote {
+  left: 748px,
+  top: 16px,
+  contents: "status · dropped"
+}
+
+lbl-factMatch = text : doc.specLabel {
+  left: 987px,
+  top: 0px,
+  contents: "factMatch"
+}
+
+note-factMatch = text : doc.specNote {
+  left: 987px,
+  top: 16px,
+  contents: "matched (in-card chip)"
+}
+
+lbl-factPersonal = text : doc.specLabel {
+  left: 0px,
+  top: 164px,
+  contents: "factPersonal"
+}
+
+note-factPersonal = text : doc.specNote {
+  left: 0px,
+  top: 180px,
+  contents: "type · personal"
+}
+
+lbl-factWork = text : doc.specLabel {
+  left: 264px,
+  top: 164px,
+  contents: "factWork"
+}
+
+note-factWork = text : doc.specNote {
+  left: 264px,
+  top: 180px,
+  contents: "type · work"
+}
+
+lbl-factSchool = text : doc.specLabel {
+  left: 521px,
+  top: 164px,
+  contents: "factSchool"
+}
+
+note-factSchool = text : doc.specNote {
+  left: 521px,
+  top: 180px,
+  contents: "type · school"
+}
+
+lbl-factChip = text : doc.specLabel {
+  left: 748px,
+  top: 164px,
+  contents: "factChip"
+}
+
+note-factChip = text : doc.specNote {
+  left: 748px,
+  top: 180px,
+  contents: "a quiet fact (date, text)"
+}
+
+lbl-factLive = text : doc.specLabel {
+  left: 0px,
+  top: 328px,
+  contents: "factLive"
+}
+
+note-factLive = text : doc.specNote {
+  left: 0px,
+  top: 344px,
+  contents: "publish · live"
+}
+
+lbl-factEdits = text : doc.specLabel {
+  left: 264px,
+  top: 328px,
+  contents: "factEdits"
+}
+
+note-factEdits = text : doc.specNote {
+  left: 264px,
+  top: 344px,
+  contents: "publish · edits"
+}
+
+lbl-factDraft = text : doc.specLabel {
+  left: 521px,
+  top: 328px,
+  contents: "factDraft"
+}
+
+note-factDraft = text : doc.specNote {
+  left: 521px,
+  top: 344px,
+  contents: "publish · draft"
+}
+
+@variants(factStatesI10)
+factStates = frame : doc.docBoard {
+  title: "Fact · states · i9",
+  left: 0px,
+  top: 556px,
+
+  body {
+    layout.stack.item-gap: 48px,
+    overrides: [
+      insert(row-1, after = .nil),
+      insert(row-2, after = row-1),
+      insert(row-3, after = row-2)
+    ]
+  }
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i9"
+      }
+    }
+
+    boardCaption {
+      contents: "Fact · every state"
+    }
+  }
+
+  row-1 = frame : doc.specRow {
+    layout.stack.item-gap: 48px,
+    overrides: [
+      insert(st-fact, after = .nil),
+      insert(st-factWip, after = st-fact),
+      insert(st-factPaused, after = st-factWip),
+      insert(st-factDropped, after = st-factPaused),
+      insert(st-factMatch, after = st-factDropped)
+    ]
+  }
+
+  row-2 = frame : doc.specRow {
+    layout.stack.item-gap: 48px,
+    overrides: [
+      insert(st-factPersonal, after = .nil),
+      insert(st-factWork, after = st-factPersonal),
+      insert(st-factSchool, after = st-factWork),
+      insert(st-factChip, after = st-factSchool)
+    ]
+  }
+
+  row-3 = frame : doc.specRow {
+    layout.stack.item-gap: 48px,
+    overrides: [
+      insert(st-factLive, after = .nil),
+      insert(st-factEdits, after = st-factLive),
+      insert(st-factDraft, after = st-factEdits)
+    ]
+  }
+
+  st-fact = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "fact"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "status · complete"
+    }
+
+    it = frame : fact {}
+  }
+
+  st-factWip = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "factWip"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "status · WIP"
+    }
+
+    it = frame : factWip {}
+  }
+
+  st-factPaused = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "factPaused"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "status · paused"
+    }
+
+    it = frame : factPaused {}
+  }
+
+  st-factDropped = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "factDropped"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "status · dropped"
+    }
+
+    it = frame : factDropped {}
+  }
+
+  st-factMatch = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "factMatch"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "matched (in-card chip)"
+    }
+
+    it = frame : factMatch {}
+  }
+
+  st-factPersonal = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "factPersonal"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "type · personal"
+    }
+
+    it = frame : factPersonal {}
+  }
+
+  st-factWork = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "factWork"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "type · work"
+    }
+
+    it = frame : factWork {}
+  }
+
+  st-factSchool = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "factSchool"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "type · school"
+    }
+
+    it = frame : factSchool {}
+  }
+
+  st-factChip = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "factChip"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "a quiet fact (date, text)"
+    }
+
+    it = frame : factChip {}
+  }
+
+  st-factLive = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "factLive"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "publish · live"
+    }
+
+    it = frame : factLive {}
+  }
+
+  st-factEdits = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "factEdits"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "publish · edits"
+    }
+
+    it = frame : factEdits {}
+  }
+
+  st-factDraft = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "factDraft"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "publish · draft"
+    }
+
+    it = frame : factDraft {}
+  }
+}
+
+@variants(factStatesI11)
+@context(i10="on")
+factStatesI10 = frame : factStates {
+  title: "Fact · states · i10",
+  left: 1420px,
+  top: 556px,
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i10"
+      }
+    }
+  }
+}
+
+@context(i10="on", i11="on")
+factStatesI11 = frame : factStatesI10 {
+  title: "Fact · states · i11",
+  left: 2865px,
+  top: 556px,
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i11"
+      }
+    }
+  }
+}

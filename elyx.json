@@ -1,0 +1,12 @@
+{
+  "workspace": {
+    "members": [
+      "design",
+      "src",
+      "public"
+    ]
+  },
+  "git": {
+    "flow": "relaxed"
+  }
+}

@@ -1,0 +1,13 @@
+import "./sections.elyx" as base
+import "./palette.elyx" as p
+
+@context(section=home)
+file {}
+
+// Home's cord frame is red in every iteration (kit/yarn.css
+// [data-section="home"]: --sec: var(--red)); brown is only `hue-home`.
+export homeSection = tokens : base.section {
+  sec: p.palette.red,
+  sec-deep: p.palette.red-deep,
+  sec-soft: p.palette.red-soft
+}

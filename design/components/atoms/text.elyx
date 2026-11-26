@@ -1,0 +1,689 @@
+use "assets/fonts/Nunito[wght].ttf"
+use "assets/fonts/NunitoSans[YTLC,opsz,wdth,wght].ttf"
+
+import "tokens/type/type.elyx" as typ
+import "tokens/color/roles.elyx" as col
+import "components/atoms/doc.elyx" as doc
+
+@variants(displayPhone)
+export display = text {
+  left: 0px,
+  top: 40px,
+  fill: col.roles.fg,
+  subrange: {range: [5, 6], fill: col.roles.brand},
+  contents: "Music.",
+  font-size: typ.sizes.display,
+  font-family: typ.faces.display,
+  font-style: typ.faces.display-style,
+  line-height: typ.leading.display,
+  letter-spacing: typ.tracking.display
+}
+
+export heading = text {
+  left: 0px,
+  top: 218px,
+  fill: col.roles.fg,
+  contents: "2025",
+  font-size: typ.sizes.heading,
+  font-family: typ.faces.heading,
+  font-style: typ.faces.heading-style,
+  line-height: typ.leading.heading,
+  letter-spacing: typ.tracking.heading
+}
+
+@variants(titleCard)
+export title = text {
+  left: 0px,
+  top: 385px,
+  fill: col.roles.fg,
+  contents: "glooming shadows",
+  font-size: typ.sizes.title,
+  font-family: typ.faces.title,
+  font-style: typ.faces.title-style,
+  line-height: typ.leading.title,
+  letter-spacing: typ.tracking.title
+}
+
+export titleCard = text : title {
+  left: 265px,
+  top: 385px,
+  font-size: typ.sizes.title-card
+}
+
+@variants(bodyCard)
+export body = text {
+  left: 0px,
+  top: 541px,
+  fill: col.roles.fg-2,
+  contents: "A short description in Body.",
+  font-size: typ.sizes.body,
+  font-family: typ.faces.body,
+  font-style: typ.faces.body-style,
+  line-height: typ.leading.body,
+  letter-spacing: typ.tracking.body
+}
+
+export bodyCard = text : body {
+  left: 265px,
+  top: 541px,
+  font-size: typ.sizes.body-card
+}
+
+@variants(metaCard)
+export meta = text {
+  left: 0px,
+  top: 700px,
+  fill: col.roles.fg-3,
+  contents: "Completed Aug 2025 · 4 tracks",
+  font-size: typ.sizes.meta,
+  font-family: typ.faces.meta,
+  font-style: typ.faces.meta-style,
+  line-height: typ.leading.meta,
+  letter-spacing: typ.tracking.meta
+}
+
+export metaCard = text : meta {
+  left: 265px,
+  top: 700px,
+  font-size: typ.sizes.meta-card
+}
+
+@variants(labelCard)
+export label = text {
+  left: 0px,
+  top: 852px,
+  fill: col.roles.fg,
+  contents: "Shuffle",
+  font-size: typ.sizes.label,
+  font-family: typ.faces.label,
+  font-style: typ.faces.label-style,
+  line-height: typ.leading.label,
+  letter-spacing: typ.tracking.label
+}
+
+export labelCard = text : label {
+  left: 265px,
+  top: 852px,
+  font-size: typ.sizes.label-card
+}
+
+export micro = text {
+  left: 0px,
+  top: 1003px,
+  fill: col.roles.fg-2,
+  contents: "01 song",
+  font-size: typ.sizes.micro,
+  font-family: typ.faces.micro,
+  font-style: typ.faces.micro-style,
+  line-height: typ.leading.micro,
+  letter-spacing: typ.tracking.micro
+}
+
+@variants(numCard)
+export num = text {
+  left: 0px,
+  top: 1151px,
+  fill: col.roles.fg-3,
+  contents: "3:42",
+  font-size: typ.sizes.num,
+  font-family: typ.faces.num,
+  font-style: typ.faces.num-style,
+  line-height: typ.leading.num,
+  letter-spacing: typ.tracking.num
+}
+
+export numCard = text : num {
+  left: 265px,
+  top: 1151px,
+  font-size: typ.sizes.num-card
+}
+
+// Display on a phone (< 960; i9 2.1rem, i10 30, i11 28 under 720).
+export displayPhone = text : display {
+  left: 265px,
+  top: 40px,
+  font-size: typ.sizes.display-phone
+}
+
+// ==== states page (labels over the definitions, then the states boards: i9 · i10 · i11) ====
+lbl-display = text : doc.specLabel {
+  left: 0px,
+  top: 0px,
+  contents: "display"
+}
+
+note-display = text : doc.specNote {
+  left: 0px,
+  top: 16px,
+  contents: "Display · the page title"
+}
+
+lbl-displayPhone = text : doc.specLabel {
+  left: 265px,
+  top: 0px,
+  contents: "displayPhone"
+}
+
+note-displayPhone = text : doc.specNote {
+  left: 265px,
+  top: 16px,
+  contents: "Display · phones"
+}
+
+lbl-heading = text : doc.specLabel {
+  left: 0px,
+  top: 178px,
+  contents: "heading"
+}
+
+note-heading = text : doc.specNote {
+  left: 0px,
+  top: 194px,
+  contents: "Heading"
+}
+
+lbl-title = text : doc.specLabel {
+  left: 0px,
+  top: 345px,
+  contents: "title"
+}
+
+note-title = text : doc.specNote {
+  left: 0px,
+  top: 361px,
+  contents: "Title · on the page"
+}
+
+lbl-titleCard = text : doc.specLabel {
+  left: 265px,
+  top: 345px,
+  contents: "titleCard"
+}
+
+note-titleCard = text : doc.specNote {
+  left: 265px,
+  top: 361px,
+  contents: "Title · in a card or row"
+}
+
+lbl-body = text : doc.specLabel {
+  left: 0px,
+  top: 501px,
+  contents: "body"
+}
+
+note-body = text : doc.specNote {
+  left: 0px,
+  top: 517px,
+  contents: "Body · on the page"
+}
+
+lbl-bodyCard = text : doc.specLabel {
+  left: 265px,
+  top: 501px,
+  contents: "bodyCard"
+}
+
+note-bodyCard = text : doc.specNote {
+  left: 265px,
+  top: 517px,
+  contents: "Body · in a card"
+}
+
+lbl-meta = text : doc.specLabel {
+  left: 0px,
+  top: 660px,
+  contents: "meta"
+}
+
+note-meta = text : doc.specNote {
+  left: 0px,
+  top: 676px,
+  contents: "Meta · on the page"
+}
+
+lbl-metaCard = text : doc.specLabel {
+  left: 265px,
+  top: 660px,
+  contents: "metaCard"
+}
+
+note-metaCard = text : doc.specNote {
+  left: 265px,
+  top: 676px,
+  contents: "Meta · in a card"
+}
+
+lbl-label = text : doc.specLabel {
+  left: 0px,
+  top: 812px,
+  contents: "label"
+}
+
+note-label = text : doc.specNote {
+  left: 0px,
+  top: 828px,
+  contents: "Label · a button's words"
+}
+
+lbl-labelCard = text : doc.specLabel {
+  left: 265px,
+  top: 812px,
+  contents: "labelCard"
+}
+
+note-labelCard = text : doc.specNote {
+  left: 265px,
+  top: 828px,
+  contents: "Label · in a card"
+}
+
+lbl-micro = text : doc.specLabel {
+  left: 0px,
+  top: 963px,
+  contents: "micro"
+}
+
+note-micro = text : doc.specNote {
+  left: 0px,
+  top: 979px,
+  contents: "Micro"
+}
+
+lbl-num = text : doc.specLabel {
+  left: 0px,
+  top: 1111px,
+  contents: "num"
+}
+
+note-num = text : doc.specNote {
+  left: 0px,
+  top: 1127px,
+  contents: "Num · tabular figures"
+}
+
+lbl-numCard = text : doc.specLabel {
+  left: 265px,
+  top: 1111px,
+  contents: "numCard"
+}
+
+note-numCard = text : doc.specNote {
+  left: 265px,
+  top: 1127px,
+  contents: "Num · in a card"
+}
+
+@variants(textStatesI10)
+textStates = frame : doc.docBoard {
+  title: "Text roles · states · i9",
+  left: 0px,
+  top: 1327px,
+
+  body {
+    layout.stack.item-gap: 48px,
+    overrides: [
+      insert(row-1, after = .nil),
+      insert(row-2, after = row-1),
+      insert(row-3, after = row-2),
+      insert(row-4, after = row-3),
+      insert(row-5, after = row-4),
+      insert(row-6, after = row-5),
+      insert(row-7, after = row-6),
+      insert(row-8, after = row-7)
+    ]
+  }
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i9"
+      }
+    }
+
+    boardCaption {
+      contents: "Text roles · every state"
+    }
+  }
+
+  row-1 = frame : doc.specRow {
+    layout.stack.item-gap: 48px,
+    overrides: [
+      insert(st-display, after = .nil),
+      insert(st-displayPhone, after = st-display)
+    ]
+  }
+
+  row-2 = frame : doc.specRow {
+    layout.stack.item-gap: 48px,
+    overrides: [insert(st-heading, after = .nil)]
+  }
+
+  row-3 = frame : doc.specRow {
+    layout.stack.item-gap: 48px,
+    overrides: [
+      insert(st-title, after = .nil),
+      insert(st-titleCard, after = st-title)
+    ]
+  }
+
+  row-4 = frame : doc.specRow {
+    layout.stack.item-gap: 48px,
+    overrides: [
+      insert(st-body, after = .nil),
+      insert(st-bodyCard, after = st-body)
+    ]
+  }
+
+  row-5 = frame : doc.specRow {
+    layout.stack.item-gap: 48px,
+    overrides: [
+      insert(st-meta, after = .nil),
+      insert(st-metaCard, after = st-meta)
+    ]
+  }
+
+  row-6 = frame : doc.specRow {
+    layout.stack.item-gap: 48px,
+    overrides: [
+      insert(st-label, after = .nil),
+      insert(st-labelCard, after = st-label)
+    ]
+  }
+
+  row-7 = frame : doc.specRow {
+    layout.stack.item-gap: 48px,
+    overrides: [insert(st-micro, after = .nil)]
+  }
+
+  row-8 = frame : doc.specRow {
+    layout.stack.item-gap: 48px,
+    overrides: [
+      insert(st-num, after = .nil),
+      insert(st-numCard, after = st-num)
+    ]
+  }
+
+  st-display = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "display"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "Display · the page title"
+    }
+
+    it = text : display {}
+  }
+
+  st-displayPhone = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "displayPhone"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "Display · phones"
+    }
+
+    it = text : displayPhone {}
+  }
+
+  st-heading = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "heading"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "Heading"
+    }
+
+    it = text : heading {}
+  }
+
+  st-title = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "title"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "Title · on the page"
+    }
+
+    it = text : title {}
+  }
+
+  st-titleCard = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "titleCard"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "Title · in a card or row"
+    }
+
+    it = text : titleCard {}
+  }
+
+  st-body = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "body"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "Body · on the page"
+    }
+
+    it = text : body {}
+  }
+
+  st-bodyCard = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "bodyCard"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "Body · in a card"
+    }
+
+    it = text : bodyCard {}
+  }
+
+  st-meta = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "meta"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "Meta · on the page"
+    }
+
+    it = text : meta {}
+  }
+
+  st-metaCard = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "metaCard"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "Meta · in a card"
+    }
+
+    it = text : metaCard {}
+  }
+
+  st-label = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "label"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "Label · a button's words"
+    }
+
+    it = text : label {}
+  }
+
+  st-labelCard = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "labelCard"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "Label · in a card"
+    }
+
+    it = text : labelCard {}
+  }
+
+  st-micro = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "micro"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "Micro"
+    }
+
+    it = text : micro {}
+  }
+
+  st-num = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "num"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "Num · tabular figures"
+    }
+
+    it = text : num {}
+  }
+
+  st-numCard = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "numCard"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "Num · in a card"
+    }
+
+    it = text : numCard {}
+  }
+}
+
+@variants(textStatesI11)
+@context(i10="on")
+textStatesI10 = frame : textStates {
+  title: "Text roles · states · i10",
+  left: 690px,
+  top: 1327px,
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i10"
+      }
+    }
+  }
+}
+
+@context(i10="on", i11="on")
+textStatesI11 = frame : textStatesI10 {
+  title: "Text roles · states · i11",
+  left: 1346px,
+  top: 1327px,
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i11"
+      }
+    }
+  }
+}

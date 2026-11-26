@@ -1,0 +1,11 @@
+import "./sections.elyx" as base
+import "./palette.elyx" as p
+
+@context(section=music)
+file {}
+
+export musicSection = tokens : base.section {
+  sec: p.palette.purple,
+  sec-deep: p.palette.purple-deep,
+  sec-soft: p.palette.purple-soft
+}

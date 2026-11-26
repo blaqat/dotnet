@@ -1,0 +1,593 @@
+use "assets/fonts/Nunito-Italic[wght].ttf"
+
+import "tokens/color/roles.elyx" as col
+import "tokens/type/type.elyx" as typ
+import "tokens/space/space.elyx" as spc
+import "components/atoms/text.elyx" as txt
+import "components/atoms/doc.elyx" as doc
+import "components/molecules/keyword.elyx" as kw
+import "components/molecules/stack-badge.elyx" as stk
+import "assets/icons/stack/python.svg" as pythonLogo
+import "assets/icons/stack/rust.svg" as rustLogo
+import "assets/home/lockup.svg" as lockupArt
+
+// Home's intro: the lockup (the black cat sitting on "blaqat.net" knitted in
+// ink yarn, a red strand from its tail to the ball that dots the name: the
+// intro's settled pose, home/intro.js + cat.js), the tagline under it, and
+// the bio: three lines in the lead (Body's face at the bio's own size: i9 18
+// at 1.7, i11 T5 17 at 1.5, ink-2) with bold words in ink, keywords over
+// their scribble (kw.keyword*) and the stack badges inline (stk.stackBadge*).
+// Desktop sets each line on one row; phones wrap them (`bioPhone`).
+// the lockup: 700 wide on desktop (the svg's 1180 × 310)
+@variants(lockupPhone)
+export lockup = asset {
+  title: "Lockup · the cat + blaqat.net",
+  left: 0px,
+  top: 40px,
+  width: spc.controls.lockup-w,
+  height: spc.controls.lockup-h,
+  contents: lockupArt
+}
+
+// phones: the column's width (344 at 390)
+export lockupPhone = asset : lockup {
+  title: "Lockup · phone",
+  left: 844px,
+  top: 40px,
+  width: spc.controls.lockup-w-phone,
+  height: spc.controls.lockup-h-phone
+}
+
+// the bio's words: a run of the lead (one style; bold words are subranges)
+export leadText = text : txt.body {
+  title: "Lead (the bio's words)",
+  left: 0px,
+  top: 344px,
+  contents: "hi, i’m aiden! a",
+  font-size: typ.sizes.lead,
+  font-family: typ.faces.lead,
+  font-style: typ.faces.lead-style,
+  line-height: typ.leading.lead
+}
+
+// the lockup + the line under it ("that's “black cat”": i9 Nunito 700
+// italic in ink-3; i11 an upright Body). Children: `art`, `tagline`.
+@variants(introPhone)
+export intro = frame {
+  title: "Intro · lockup + tagline",
+  left: 0px,
+  top: 495px,
+  layout: {
+    stack: {
+      direction: .column,
+      align-items: .center,
+      item-gap: spc.layout.tagline-gap
+    }
+  },
+  children: [art, tagline],
+
+  art = asset : lockup {}
+
+  tagline = text : txt.body {
+    contents: "that’s “black cat”",
+    font-size: typ.sizes.tagline,
+    font-family: typ.faces.tagline,
+    font-style: typ.faces.tagline-style,
+    line-height: typ.leading.tagline,
+    fill[0].color: col.roles.fg-3
+  }
+}
+
+export introPhone = frame : intro {
+  title: "Intro · phone",
+  left: 844px,
+  top: 495px,
+  layout.stack.item-gap: spc.layout.tagline-gap-phone,
+
+  @with-variant(lockupPhone)
+  art {}
+}
+
+// The bio, one line per row (desktop). Rows: `aboutLine`, `stackLine`,
+// `musicLine`.
+export bio = frame {
+  title: "Bio · desktop",
+  left: 0px,
+  top: 832px,
+  layout: {
+    stack: {
+      direction: .column,
+      align-items: .center,
+      item-gap: spc.layout.lead-line-gap
+    }
+  },
+  children: [aboutLine, stackLine, musicLine],
+
+  // hi, i’m aiden! a [software engineer] with a soft spot for ui design
+  aboutLine = frame {
+    layout: {stack: {align-items: .center}},
+    children: [hi, engineer, softSpot],
+
+    hi = text : leadText {
+      contents: "hi, i’m aiden! a ",
+      subrange[0].fill[0].color: col.roles.fg,
+      subrange[0].font-style: typ.faces.lead-bold,
+      subrange[0].range: [8, 13]
+    }
+
+    engineer = frame : kw.keyword {}
+
+    softSpot = text : leadText {
+      contents: " with a soft spot for ui design"
+    }
+  }
+
+  // recent [RIT] grad, fluent in [Java], [Python], [Rust] and more
+  stackLine = frame {
+    layout: {stack: {align-items: .center}},
+    children: [recent, rit, grad, java, comma1, python, comma2, rust, andMore],
+
+    recent = text : leadText {
+      contents: "recent "
+    }
+
+    rit = frame : kw.keywordRit {}
+
+    grad = text : leadText {
+      contents: " grad, fluent in "
+    }
+
+    java = frame : stk.stackBadge {}
+
+    comma1 = text : leadText {
+      contents: ", "
+    }
+
+    python = frame : stk.stackBadgePython {}
+
+    comma2 = text : leadText {
+      contents: ", "
+    }
+
+    rust = frame : stk.stackBadgeRust {}
+
+    andMore = text : leadText {
+      contents: " and more"
+    }
+  }
+
+  // away from screens, i’m [composing] for piano, film, and games
+  musicLine = frame {
+    layout: {stack: {align-items: .center}},
+    children: [away, composing, forPiano],
+
+    away = text : leadText {
+      contents: "away from screens, i’m "
+    }
+
+    composing = frame : kw.keywordMusic {}
+
+    forPiano = text : leadText {
+      contents: " for piano, film, and games"
+    }
+  }
+}
+
+// Phones (390): each paragraph wraps in a 344 column, centred; a paragraph's
+// lines touch, the paragraphs sit lead-line-gap-phone apart; the stack
+// badges are their logos alone (stk.stackBadgeSm).
+export bioPhone = frame {
+  title: "Bio · phone",
+  left: 844px,
+  top: 832px,
+  layout: {
+    stack: {
+      direction: .column,
+      align-items: .center,
+      item-gap: spc.layout.lead-line-gap-phone
+    }
+  },
+  children: [about, stack, music],
+
+  about = frame {
+    layout: {stack: {direction: .column, align-items: .center}},
+    children: [aboutA, aboutB],
+
+    aboutA = frame {
+      layout: {stack: {align-items: .center}},
+      children: [hi, engineer, soft],
+
+      hi = text : leadText {
+        contents: "hi, i’m aiden! a ",
+        subrange[0].fill[0].color: col.roles.fg,
+        subrange[0].font-style: typ.faces.lead-bold,
+        subrange[0].range: [8, 13]
+      }
+
+      engineer = frame : kw.keyword {}
+
+      soft = text : leadText {
+        contents: " with a soft"
+      }
+    }
+
+    aboutB = text : leadText {
+      contents: "spot for ui design"
+    }
+  }
+
+  stack = frame {
+    layout: {stack: {direction: .column, align-items: .center}},
+    children: [stackA, stackB],
+
+    stackA = frame {
+      layout: {stack: {align-items: .center}},
+      children: [recent, rit, grad],
+
+      recent = text : leadText {
+        contents: "recent "
+      }
+
+      rit = frame : kw.keywordRit {}
+
+      grad = text : leadText {
+        contents: " grad, fluent in"
+      }
+    }
+
+    stackB = frame {
+      layout: {stack: {align-items: .center}},
+      children: [java, comma1, python, comma2, rust, andMore],
+
+      java = frame : stk.stackBadgeSm {}
+
+      comma1 = text : leadText {
+        contents: ", "
+      }
+
+      python = frame : stk.stackBadgeSm {
+        logo {
+          contents: pythonLogo
+        }
+      }
+
+      comma2 = text : leadText {
+        contents: ", "
+      }
+
+      rust = frame : stk.stackBadgeSm {
+        logo {
+          contents: rustLogo
+        }
+      }
+
+      andMore = text : leadText {
+        contents: " and more"
+      }
+    }
+  }
+
+  music = frame {
+    layout: {stack: {direction: .column, align-items: .center}},
+    children: [musicA, musicB],
+
+    musicA = frame {
+      layout: {stack: {align-items: .center}},
+      children: [away, composing, forPiano],
+
+      away = text : leadText {
+        contents: "away from screens, i’m "
+      }
+
+      composing = frame : kw.keywordMusic {}
+
+      forPiano = text : leadText {
+        contents: " for piano,"
+      }
+    }
+
+    musicB = text : leadText {
+      contents: "film, and games"
+    }
+  }
+}
+
+// ==== states page (labels over the definitions, then the states boards: i9 · i10 · i11) ====
+lbl-lockup = text : doc.specLabel {
+  left: 0px,
+  top: 0px,
+  contents: "lockup"
+}
+
+note-lockup = text : doc.specNote {
+  left: 0px,
+  top: 16px,
+  contents: "the name lockup"
+}
+
+lbl-lockupPhone = text : doc.specLabel {
+  left: 844px,
+  top: 0px,
+  contents: "lockupPhone"
+}
+
+note-lockupPhone = text : doc.specNote {
+  left: 844px,
+  top: 16px,
+  contents: "phones"
+}
+
+lbl-leadText = text : doc.specLabel {
+  left: 0px,
+  top: 304px,
+  contents: "leadText"
+}
+
+note-leadText = text : doc.specNote {
+  left: 0px,
+  top: 320px,
+  contents: "the lead line"
+}
+
+lbl-intro = text : doc.specLabel {
+  left: 0px,
+  top: 455px,
+  contents: "intro"
+}
+
+note-intro = text : doc.specNote {
+  left: 0px,
+  top: 471px,
+  contents: "the intro (lockup + lead)"
+}
+
+lbl-introPhone = text : doc.specLabel {
+  left: 844px,
+  top: 455px,
+  contents: "introPhone"
+}
+
+note-introPhone = text : doc.specNote {
+  left: 844px,
+  top: 471px,
+  contents: "phones"
+}
+
+lbl-bio = text : doc.specLabel {
+  left: 0px,
+  top: 792px,
+  contents: "bio"
+}
+
+note-bio = text : doc.specNote {
+  left: 0px,
+  top: 808px,
+  contents: "the bio"
+}
+
+lbl-bioPhone = text : doc.specLabel {
+  left: 844px,
+  top: 792px,
+  contents: "bioPhone"
+}
+
+note-bioPhone = text : doc.specNote {
+  left: 844px,
+  top: 808px,
+  contents: "phones"
+}
+
+@variants(homeIntroStatesI10)
+homeIntroStates = frame : doc.docBoard {
+  title: "Home intro · states · i9",
+  left: 0px,
+  top: 1194px,
+
+  body {
+    layout.stack.item-gap: 48px,
+    overrides: [
+      insert(row-1, after = .nil),
+      insert(row-2, after = row-1),
+      insert(row-3, after = row-2),
+      insert(row-4, after = row-3)
+    ]
+  }
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i9"
+      }
+    }
+
+    boardCaption {
+      contents: "Home intro · every state"
+    }
+  }
+
+  row-1 = frame : doc.specRow {
+    layout.stack.item-gap: 48px,
+    overrides: [
+      insert(st-lockup, after = .nil),
+      insert(st-lockupPhone, after = st-lockup)
+    ]
+  }
+
+  row-2 = frame : doc.specRow {
+    layout.stack.item-gap: 48px,
+    overrides: [insert(st-leadText, after = .nil)]
+  }
+
+  row-3 = frame : doc.specRow {
+    layout.stack.item-gap: 48px,
+    overrides: [
+      insert(st-intro, after = .nil),
+      insert(st-introPhone, after = st-intro)
+    ]
+  }
+
+  row-4 = frame : doc.specRow {
+    layout.stack.item-gap: 48px,
+    overrides: [
+      insert(st-bio, after = .nil),
+      insert(st-bioPhone, after = st-bio)
+    ]
+  }
+
+  st-lockup = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "lockup"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "the name lockup"
+    }
+
+    it = asset : lockup {}
+  }
+
+  st-lockupPhone = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "lockupPhone"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "phones"
+    }
+
+    it = asset : lockupPhone {}
+  }
+
+  st-leadText = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "leadText"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "the lead line"
+    }
+
+    it = text : leadText {}
+  }
+
+  st-intro = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "intro"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "the intro (lockup + lead)"
+    }
+
+    it = frame : intro {}
+  }
+
+  st-introPhone = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "introPhone"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "phones"
+    }
+
+    it = frame : introPhone {}
+  }
+
+  st-bio = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "bio"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "the bio"
+    }
+
+    it = frame : bio {}
+  }
+
+  st-bioPhone = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "bioPhone"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "phones"
+    }
+
+    it = frame : bioPhone {}
+  }
+}
+
+@variants(homeIntroStatesI11)
+@context(i10="on")
+homeIntroStatesI10 = frame : homeIntroStates {
+  title: "Home intro · states · i10",
+  left: 1380px,
+  top: 1194px,
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i10"
+      }
+    }
+  }
+}
+
+@context(i10="on", i11="on")
+homeIntroStatesI11 = frame : homeIntroStatesI10 {
+  title: "Home intro · states · i11",
+  left: 2760px,
+  top: 1194px,
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i11"
+      }
+    }
+  }
+}

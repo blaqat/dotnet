@@ -1,0 +1,409 @@
+import "tokens/space/space.elyx" as spc
+import "tokens/type/type.elyx" as typ
+import "components/atoms/doc.elyx" as doc
+import "components/molecules/prose.elyx" as pr
+import "components/organisms/post-card.elyx" as pc
+import "components/organisms/detail.elyx" as dt
+
+// An opened article (thoughts/stitched.html?view=article): the detail
+// shell (detail.elyx) at the article's size (`dt.detailLg`), with the
+// article's content (kit/thoughts-data.js, a1). The facts column (posted,
+// reading time, tags), the 760 column (the top bar: ← Thoughts, the pager,
+// the copy-link disc; the kicker; the title; the dek; the cover; the
+// prose), the contents rail ("On this page"). No closing row.
+// The prose is prose.elyx's blocks: the cover is a figure without its
+// caption; then an h2 + paragraph, a quote, an h3 + list items, a code
+// block, a table, a figure with its caption, a last paragraph. Deco is red in i9 and Thoughts' ink from i10.
+// Content inserted into the shell: `cover` before `column.body.prose`;
+// `problem` (`h2`, `p1`), `quote`, `moved` (`h3`, `li1`…`li3`), `code`,
+// `table`, `figure` (a figure with its caption), `outro` into the prose; `tags` into the aside's third fact. Override
+// them at their tree position: `column { body { prose { quote { … } } } }`.
+// The pager sits wider here (s3): an article's count is short ("3 / 7"),
+// which the kit centres in 5ch.
+// i10 (`articlePageI10`): the shell's I10 bar (the duotone copy disc); the
+// kicker's words in caps; the title in two lines at Display 40.
+// i11 (`articlePageI11`, T8): the posted / reading time facts are cut (the
+// kicker says them); T3: the quote is upright (tokens).
+@variants(articlePageI10)
+export articlePage = frame : dt.detailLg {
+  title: "Article · opened",
+  left: 0px,
+  top: 40px,
+
+  column {
+    foot {
+      display: .none
+    }
+
+    body {
+      overrides: [insert(cover, after = .nil)],
+
+      prose {
+        overrides: [
+          insert(problem, after = .nil),
+          insert(quote, after = problem),
+          insert(moved, after = quote),
+          insert(code, after = moved),
+          insert(table, after = code),
+          insert(figure, after = table),
+          insert(outro, after = figure)
+        ]
+      }
+    }
+
+    head {
+      facts {
+        display: .none
+      }
+
+      heading {
+        contents: "Moving a site from\nAstro to SvelteKit\nwithout losing the music"
+      }
+
+      dek {
+        display: .visible
+      }
+
+      kicker {
+        display: .visible
+      }
+    }
+
+    bar {
+      pager {
+        layout.stack.item-gap: spc.steps.s3,
+
+        count {
+          contents: "3 / 7"
+        }
+      }
+
+      back {
+        backWord {
+          contents: "Thoughts"
+        }
+      }
+    }
+  }
+
+  rail {
+    display: .visible
+  }
+
+  aside {
+    display: .visible,
+
+    f3 {
+      overrides: [
+        insert(tags, after = dt.asideFact.eyebrow),
+        remove(dt.asideFact.value)
+      ]
+    }
+  }
+
+  // the cover: a figure without its caption
+  cover = frame : pr.proseFigure {
+    width: 100%,
+
+    caption {
+      display: .none
+    }
+  }
+
+  problem = frame {
+    width: 100%,
+    layout: {stack: {direction: .column, item-gap: spc.steps.s3}},
+    children: [h2, p1],
+
+    h2 = frame : pr.proseH2 {}
+
+    // bold in SemiBold, inline code in mono
+    p1 = text : pr.proseP {
+      width: 100%,
+      subrange[0].font-style: typ.faces.body-bold,
+      subrange[0].range: [18, 38],
+      subrange[1].font-family: typ.faces.code,
+      subrange[1].font-size: typ.sizes.num,
+      subrange[1].range: [85, 92]
+    }
+  }
+
+  quote = frame : pr.proseQuote {
+    width: 100%
+  }
+
+  moved = frame {
+    width: 100%,
+    layout: {stack: {direction: .column, item-gap: spc.steps.s1}},
+    children: [h3, li1, li2, li3],
+
+    h3 = text : pr.proseH3 {}
+
+    li1 = frame : pr.proseItem {
+      width: 100%,
+
+      words {
+        subrange[0].range: [18, 33],
+        subrange[0].font-size: typ.sizes.num,
+        subrange[0].font-family: typ.faces.code,
+        contents: "Content went from src/data/*.json to D1"
+      }
+    }
+
+    li2 = frame : pr.proseItem {
+      width: 100%
+    }
+
+    li3 = frame : pr.proseItem {
+      width: 100%,
+
+      words {
+        contents: "The player became a store + one element"
+      }
+    }
+  }
+
+  code = frame : pr.proseCode {
+    width: 100%
+  }
+
+  table = frame : pr.proseTable {
+    width: 100%
+  }
+
+  // a picture in the text: the figure with its caption
+  figure = frame : pr.proseFigure {
+    width: 100%,
+
+    caption {
+      capWords {
+        contents: "Planning the site"
+      }
+    }
+  }
+
+  outro = text : pr.proseP {
+    width: 100%,
+    contents: "That's it. More on the Studio later."
+  }
+
+  tags = frame : pc.postTags {
+    t1 {
+      label {
+        contents: "svelte"
+      }
+    }
+
+    t2 {
+      label {
+        contents: "learnings"
+      }
+    }
+  }
+}
+
+// i10: the copy link is the duotone disc (R7); the kicker's words in caps;
+// the title is two lines at Display 40.
+@variants(articlePageI11)
+@context(i10="on")
+export articlePageI10 = frame : articlePage {
+  title: "Article · opened · i10",
+  left: 1453px,
+  top: 40px,
+
+  column {
+    head {
+      heading {
+        contents: "Moving a site from Astro to\nSvelteKit without losing the music"
+      }
+
+      kicker {
+        date {
+          contents: "· 7 MIN READ"
+        }
+
+        lead {
+          extra {
+            x {
+              contents: "NOV 5, 2026"
+            }
+          }
+        }
+      }
+    }
+
+    @with-variant(dt.detailBarI10)
+    bar {}
+  }
+}
+
+// i11 T8: the posted / reading-time facts are cut (the kicker says both).
+@context(i10="on", i11="on")
+export articlePageI11 = frame : articlePageI10 {
+  title: "Article · opened · i11",
+  left: 2906px,
+  top: 40px,
+
+  aside {
+    f1 {
+      display: .none
+    }
+
+    f2 {
+      display: .none
+    }
+  }
+}
+
+// ==== states page (labels over the definitions, then the states boards: i9 · i10 · i11) ====
+lbl-articlePage = text : doc.specLabel {
+  left: 0px,
+  top: 0px,
+  contents: "articlePage"
+}
+
+note-articlePage = text : doc.specNote {
+  left: 0px,
+  top: 16px,
+  contents: "the detail shell (lg) + an article (i9)"
+}
+
+lbl-articlePageI10 = text : doc.specLabel {
+  left: 1453px,
+  top: 0px,
+  contents: "articlePageI10"
+}
+
+note-articlePageI10 = text : doc.specNote {
+  left: 1453px,
+  top: 16px,
+  contents: "i10"
+}
+
+lbl-articlePageI11 = text : doc.specLabel {
+  left: 2906px,
+  top: 0px,
+  contents: "articlePageI11"
+}
+
+note-articlePageI11 = text : doc.specNote {
+  left: 2906px,
+  top: 16px,
+  contents: "i11 · the aside's facts cut"
+}
+
+@variants(articlePageStatesI10)
+articlePageStates = frame : doc.docBoard {
+  title: "Article page · states · i9",
+  left: 0px,
+  top: 2330px,
+
+  body {
+    layout.stack.item-gap: 48px,
+    overrides: [insert(row-1, after = .nil)]
+  }
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i9"
+      }
+    }
+
+    boardCaption {
+      contents: "Article page · every state"
+    }
+  }
+
+  row-1 = frame : doc.specRow {
+    layout.stack.item-gap: 48px,
+    overrides: [insert(st-articlePage, after = .nil)]
+  }
+
+  st-articlePage = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "articlePage"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "the detail shell (lg) + an article (i9)"
+    }
+
+    it = frame : articlePage {}
+  }
+}
+
+@variants(articlePageStatesI11)
+@context(i10="on")
+articlePageStatesI10 = frame : articlePageStates {
+  title: "Article page · states · i10",
+  left: 1533px,
+  top: 2330px,
+
+  body {
+    row-1 {
+      st-articlePage {
+        slot {
+          @with-variant(articlePageI10)
+          it {}
+        }
+
+        note {
+          contents: "i10"
+        }
+
+        label {
+          contents: "articlePageI10"
+        }
+      }
+    }
+  }
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i10"
+      }
+    }
+  }
+}
+
+@context(i10="on", i11="on")
+articlePageStatesI11 = frame : articlePageStatesI10 {
+  title: "Article page · states · i11",
+  left: 3066px,
+  top: 2330px,
+
+  body {
+    row-1 {
+      st-articlePage {
+        slot {
+          @with-variant(articlePageI11)
+          it {}
+        }
+
+        note {
+          contents: "i11 · the aside's facts cut"
+        }
+
+        label {
+          contents: "articlePageI11"
+        }
+      }
+    }
+  }
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i11"
+      }
+    }
+  }
+}

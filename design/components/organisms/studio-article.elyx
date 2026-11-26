@@ -1,0 +1,1074 @@
+import "tokens/color/roles.elyx" as col
+import "tokens/color/palette.elyx" as pal
+import "tokens/space/space.elyx" as spc
+import "tokens/type/type.elyx" as typ
+import "components/atoms/text.elyx" as txt
+import "components/atoms/doc.elyx" as doc
+import "components/atoms/surface.elyx" as surf
+import "assets/icons/bold/arrow-up-right.svg" as visitIcon
+import "assets/icons/bold/arrow-counter-clockwise.svg" as undoIcon
+import "assets/icons/bold/github-logo.svg" as githubIcon
+import "components/molecules/search.elyx" as srch
+import "components/molecules/segmented.elyx" as segs
+import "assets/icons/bold/squares-four.svg" as blocksIcon
+import "components/molecules/tag.elyx" as tg
+import "components/molecules/prose.elyx" as pr
+import "components/molecules/media-thumb.elyx" as mt
+import "components/organisms/post-card.elyx" as pc
+import "assets/icons/bold/plus.svg" as plusIcon
+import "components/organisms/detail.elyx" as dt
+import "assets/icons/bold/folder-simple.svg" as projectIcon
+import "components/organisms/studio-parts.elyx" as prt
+import "@public-assets/media/site-plan.png" as sitePlanImg
+import "@public-assets/media/beepsearch.png" as beepsearchImg
+import "@public-assets/media/sona.png" as sonaImg
+import "assets/art/studio/couch-demo-4.svg" as couchSw
+import "assets/icons/bold/plus-circle.svg" as addIcon
+import "assets/icons/bold/text-b.svg" as boldIcon
+import "assets/icons/bold/text-italic.svg" as italicIcon
+import "assets/icons/bold/code-simple.svg" as codeIcon
+import "assets/icons/bold/link-simple.svg" as linkIcon
+import "assets/icons/bold/arrow-clockwise.svg" as redoIcon
+import "assets/icons/bold/markdown-logo.svg" as markdownIcon
+
+// Studio's article editor (studio-blocks.js): the cover drop, the block
+// editor (its toolbar over a knit sheet of blocks, written in the site's
+// own article type), the tags; and the article's preview (the site's
+// opened article). The blocks are the kit's: Thoughts' prose (h2, words,
+// list items), the sticky note, an images strip, the about pill, a song
+// (the playlist's track row), the link buttons.
+// ---- a toolbar button (.st-bk__tb): a 38 square, the glyph in fg-2;
+// `tbBtnLabel`: white, glyph + Label (+ Block). Children: `glyph`, `label`.
+@variants(tbBtnLabel)
+export tbBtn = frame {
+  title: "Toolbar button",
+  left: 0px,
+  top: 40px,
+  width: spc.controls.st-tb,
+  height: spc.controls.st-tb,
+  layout: {
+    stack: {
+      justify-content: .center,
+      align-items: .center,
+      item-gap: spc.layout.fact-gap
+    }
+  },
+  corner-radius: spc.radii.st-tb,
+  children: [glyph, label],
+
+  glyph = asset {
+    width: spc.controls.btn-icon,
+    height: spc.controls.btn-icon,
+    fill: col.roles.fg-2,
+    contents: boldIcon
+  }
+
+  label = text : txt.labelCard {
+    display: .none,
+    contents: "Block"
+  }
+}
+
+export tbBtnLabel = frame : tbBtn {
+  title: "Toolbar button · + Block",
+  left: 814px,
+  top: 40px,
+  width: .auto,
+  padding-top: 0px,
+  padding-left: spc.layout.st-tab-x,
+  padding-bottom: 0px,
+  padding-right: spc.layout.st-opt-r,
+  fill[0].color: col.roles.surface,
+  shadow[0].drop-shadow.blur-radius: 2px,
+  shadow[0].drop-shadow.color: pal.palette.shadow-1,
+  shadow[0].drop-shadow.offset: [0px, 1px],
+
+  glyph {
+    fill[0].color: col.roles.fg,
+    contents: plusIcon
+  }
+
+  label {
+    display: .visible
+  }
+}
+
+// ---- the editor's toolbar (.st-bk__bar): + Block · B I <> link · undo
+// redo, then Blocks | Markdown (the kit seg). On the recess.
+// Children: `tools` (`block`, `sep1`, `bold`, `italic`, `code`, `link`,
+// `sep2`, `undo`, `redo`), `mode` (segs.seg).
+export mdBar = frame {
+  title: "Block editor · toolbar",
+  left: 0px,
+  top: 265px,
+  width: spc.controls.st-form-w,
+  layout: {stack: {justify-content: .space-between, align-items: .center}},
+  fill: col.roles.recess,
+  shadow: {
+    inner-shadow: {
+      color: pal.palette.hairline,
+      offset: point(0px, 1px),
+      blur-radius: 2px
+    }
+  },
+  corner-radius: spc.radii.st-bar,
+  padding: spc.steps.s1,
+  children: [tools, mode],
+
+  tools = frame {
+    layout: {stack: {align-items: .center, item-gap: 2px}},
+    children: [block, sep1, bold, italic, code, link, sep2, undo, redo],
+
+    block = frame : tbBtnLabel {}
+
+    sep1 = frame {
+      height: spc.controls.tag,
+      layout: {stack: {align-items: .center}},
+      padding: [0px, spc.layout.fact-gap],
+      children: sep1Line,
+
+      sep1Line = frame {
+        width: 2px,
+        height: spc.controls.st-fact,
+        border: {
+          color: col.roles.stitch,
+          width: spc.layout.stitch-w-sm,
+          dash: [3px, 3px],
+          sides: .left
+        }
+      }
+    }
+
+    bold = frame : tbBtn {}
+
+    italic = frame : tbBtn {
+      glyph {
+        contents: italicIcon
+      }
+    }
+
+    code = frame : tbBtn {
+      glyph {
+        contents: codeIcon
+      }
+    }
+
+    link = frame : tbBtn {
+      glyph {
+        contents: linkIcon
+      }
+    }
+
+    sep2 = frame {
+      height: spc.controls.tag,
+      layout: {stack: {align-items: .center}},
+      padding: [0px, spc.layout.fact-gap],
+      children: sep2Line,
+
+      sep2Line = frame {
+        width: 2px,
+        height: spc.controls.st-fact,
+        border: {
+          color: col.roles.stitch,
+          width: spc.layout.stitch-w-sm,
+          dash: [3px, 3px],
+          sides: .left
+        }
+      }
+    }
+
+    // nothing to undo yet: quiet
+    undo = frame : tbBtn {
+      opacity: 0.45,
+
+      glyph {
+        contents: undoIcon
+      }
+    }
+
+    redo = frame : tbBtn {
+      opacity: 0.45,
+
+      glyph {
+        contents: redoIcon
+      }
+    }
+  }
+
+  // Blocks (chosen) | Markdown
+  mode = frame : segs.seg {
+    overrides: [move(segs.seg.grid, after = .nil)],
+
+    grid {
+      glyph {
+        contents: blocksIcon
+      }
+
+      label {
+        contents: "Blocks"
+      }
+    }
+
+    timeline {
+      glyph {
+        contents: markdownIcon
+      }
+
+      label {
+        contents: "Markdown"
+      }
+    }
+  }
+}
+
+// ---- the cover drop (.st-add): an open pocket with a dashed seam, the
+// add glyph in the now colour, its words. Children: `seam`, `glyph`,
+// `words`, `how`.
+export coverAdd = frame {
+  title: "Cover · add",
+  left: 1628px,
+  top: 40px,
+  width: spc.controls.st-cover-w,
+  height: spc.controls.st-cover-h,
+  layout: {
+    stack: {
+      direction: .column,
+      justify-content: .center,
+      align-items: .center,
+      item-gap: spc.steps.s1
+    }
+  },
+  fill: col.roles.sheet,
+  corner-radius: spc.radii.thumb,
+  padding: spc.steps.s2,
+  children: [seam, glyph, words, how],
+
+  seam = frame : surf.stitch {
+    left: spc.steps.s1,
+    top: spc.steps.s1,
+    right: spc.steps.s1,
+    bottom: spc.steps.s1,
+    width: .nil,
+    height: .nil,
+    ignore-stack: .true,
+    corner-radius: spc.radii.inner,
+    border[0].color: col.roles.line
+  }
+
+  glyph = asset {
+    width: spc.controls.st-fact,
+    height: spc.controls.st-fact,
+    fill: col.roles.now,
+    contents: addIcon
+  }
+
+  words = text : txt.labelCard {
+    contents: "Add a cover",
+    fill[0].color: col.roles.fg-2
+  }
+
+  how = text : txt.metaCard {
+    width: 100%,
+    contents: "from your phone, or drop here",
+    font-size: typ.sizes.st-small,
+    align: .center
+  }
+}
+
+// ---- the article's blocks, as written (.st-bk__doc, the block editor) or
+// as the site shows them (`proseDocSite`: the article's prose size, the
+// h2s' dashed rule). The seed: "Building the Studio".
+// Children: `h2a` `p1` `note` `h2b` `li1` `li2` `images` (`imagesHead`,
+// `thumbs` (`th1` `th2` `th3`: mt.mediaThumb)) `about` `h2c` `song`
+// (`track`) `links` (dt.linkRow: `primary`, `secondary`). The blocks are
+// prose.elyx's parts and the detail's (detail.elyx) link row and thumbs.
+@variants(proseDocSite)
+export proseDoc = frame {
+  title: "Article blocks · in the editor",
+  left: 0px,
+  top: 439px,
+  width: 596px,
+  layout: {
+    stack: {direction: .column, align-items: .stretch, item-gap: spc.steps.s4}
+  },
+  children: [h2a, p1, noteRow, h2b, list, images, about, h2c, song, links],
+
+  h2a = frame : pr.proseH2 {
+    rule {
+      display: .none
+    }
+
+    words {
+      contents: "Why",
+      font-size: typ.sizes.st-doc-h2
+    }
+  }
+
+  p1 = text : pr.prosePSm {
+    width: 100%,
+    contents: "I wanted to post a thought without opening a laptop.",
+    subrange[0].font-style: typ.faces.body-bold,
+    subrange[0].range: [27, 51]
+  }
+
+  // the note block: the scratch's sticky note, the owner's words on it
+  noteRow = frame {
+    layout: {stack: {direction: .column, align-items: .stretch}},
+    padding-top: spc.steps.s4,
+    children: note,
+
+    note = frame : pc.postNotePink {
+      width: 100%,
+
+      quote {
+        subrange[0].fill[0].color: col.roles.fg,
+        subrange[0].range: [22, 29],
+        subrange[0].font-style: typ.faces.st-strong-style,
+        width: 100%,
+        contents: "Everything autosaves. Publish is the only button that touches the live site."
+      }
+
+      kicker {
+        display: .none
+      }
+
+      foot {
+        display: .none
+      }
+    }
+  }
+
+  h2b = frame : pr.proseH2 {
+    padding-top: spc.steps.s5,
+
+    rule {
+      display: .none
+    }
+
+    words {
+      contents: "How it works",
+      font-size: typ.sizes.st-doc-h2
+    }
+  }
+
+  list = frame {
+    layout: {
+      stack: {
+        direction: .column,
+        align-items: .stretch,
+        item-gap: spc.layout.fact-gap
+      }
+    },
+    children: [li1, li2],
+
+    li1 = frame : pr.proseItemSm {
+      width: 100%,
+
+      words {
+        contents: "Content in D1, media in R2"
+      }
+    }
+
+    li2 = frame : pr.proseItemSm {
+      width: 100%,
+
+      words {
+        contents: "The site reads at request time, so Publish is live in seconds"
+      }
+    }
+  }
+
+  // the images block (2+ = the media strip): its caption, the thumbs
+  images = frame {
+    layout: {stack: {direction: .column, item-gap: spc.steps.s2}},
+    padding-bottom: spc.steps.s3,
+    children: [imagesHead, thumbs],
+
+    imagesHead = frame : prt.eyebrow {
+      word {
+        contents: "PLANNING IT, ON PAPER FIRST"
+      }
+
+      meta {
+        display: .visible,
+        contents: "3"
+      }
+    }
+
+    thumbs = frame {
+      layout: {stack: {item-gap: spc.layout.st-list-gap}},
+      children: [th1, th2, th3],
+
+      th1 = frame : mt.mediaThumb {
+        width: spc.controls.pj-media-w,
+        height: spc.controls.pj-media-h,
+        corner-radius: spc.radii.pj-media,
+        fill[1].image.ref: sitePlanImg
+      }
+
+      th2 = frame : mt.mediaThumb {
+        width: spc.controls.pj-media-w,
+        height: spc.controls.pj-media-h,
+        corner-radius: spc.radii.pj-media,
+        fill[1].image.ref: beepsearchImg
+      }
+
+      th3 = frame : mt.mediaThumb {
+        width: spc.controls.pj-media-w,
+        height: spc.controls.pj-media-h,
+        corner-radius: spc.radii.pj-media,
+        fill[1].image.ref: sonaImg
+      }
+    }
+  }
+
+  // the mention block: the about pill
+  about = frame {
+    layout: {stack: {}},
+    children: pill,
+
+    pill = frame : pc.postAbout {
+      glyph {
+        contents: projectIcon
+      }
+
+      key {
+        contents: "project"
+      }
+
+      label {
+        contents: "Studio"
+      }
+    }
+  }
+
+  h2c = frame : pr.proseH2 {
+    padding-top: spc.steps.s5,
+
+    rule {
+      display: .none
+    }
+
+    words {
+      contents: "The first thing I posted with it",
+      font-size: typ.sizes.st-doc-h2
+    }
+  }
+
+  // the music block: a song, as the playlist's track row on a card
+  song = frame : surf.patch {
+    width: 100%,
+    min-height: 0px,
+    padding-top: spc.steps.s2,
+    padding-left: spc.steps.s2,
+    padding-bottom: spc.steps.s2,
+    padding-right: spc.steps.s2,
+    overrides: [insert(track, after = surf.patch.patchStitch)],
+
+    track = frame : pc.postTrack {
+      width: 100%,
+
+      lead {
+        swatch {
+          fill[1].image.ref: couchSw
+        }
+
+        names {
+          who {
+            display: .none
+          }
+
+          name {
+            contents: "couch demo 4"
+          }
+        }
+      }
+
+      dur {
+        contents: "2:32"
+      }
+    }
+  }
+
+  // the link block: the detail's link row (the first is the primary)
+  links = frame : dt.linkRow {
+    primary {
+      glyph {
+        contents: githubIcon
+      }
+
+      label {
+        contents: "Source on GitHub"
+      }
+    }
+
+    secondary {
+      glyph {
+        contents: visitIcon
+      }
+
+      label {
+        contents: "Visit blaqat.net"
+      }
+    }
+  }
+}
+
+// As the site shows it: the article's prose size; each h2 a section
+// above, its dashed rule under it.
+export proseDocSite = frame : proseDoc {
+  title: "Article blocks · on the site",
+  left: 814px,
+  top: 439px,
+  width: 582px,
+
+  h2c {
+    words {
+      font-size: typ.sizes.prose-h2
+    }
+
+    padding-top: spc.steps.s6,
+
+    rule {
+      display: .visible
+    }
+  }
+
+  list {
+    @with-variant(pr.proseItem)
+    li2 {}
+
+    @with-variant(pr.proseItem)
+    li1 {}
+  }
+
+  h2b {
+    words {
+      font-size: typ.sizes.prose-h2
+    }
+
+    padding-top: spc.steps.s6,
+
+    rule {
+      display: .visible
+    }
+  }
+
+  @with-variant(pr.proseP)
+  p1 {}
+
+  h2a {
+    words {
+      font-size: typ.sizes.prose-h2
+    }
+
+    rule {
+      display: .visible
+    }
+  }
+}
+
+// ---- the block editor's sheet (.st-bk__wrap): white knit, the blocks
+// 60 in from the left (room for each block's + and handle).
+// Children: `sheetStitch`, `doc` (proseDoc).
+export docSheet = frame : surf.patch {
+  title: "Block editor · the sheet",
+  left: 0px,
+  top: 1394px,
+  width: spc.controls.st-form-w,
+  padding-top: spc.layout.st-sec-y,
+  padding-left: spc.layout.st-doc-l,
+  padding-bottom: spc.layout.st-doc-b,
+  padding-right: spc.layout.pane-inset,
+  overrides: [insert(doc, after = surf.patch.patchStitch)],
+
+  doc = frame : proseDoc {
+    width: 100%
+  }
+}
+
+// ---- the tags field (.st-tagfield): the kit's search with the tags as
+// on tokens, then "Add a tag…". Children as srch.searchFilled.
+export tagField = frame : srch.searchFilled {
+  title: "Tags field",
+  left: 814px,
+  top: 265px,
+  width: spc.controls.st-form-w,
+
+  lead {
+    entry {
+      query {
+        fill[0].color: col.roles.fg-3,
+        contents: "Add a tag…"
+      }
+
+      firstToken {
+        glyph {
+          display: .none
+        }
+
+        label {
+          contents: "#studio"
+        }
+      }
+
+      secondToken {
+        glyph {
+          display: .none
+        }
+
+        label {
+          contents: "#learnings"
+        }
+      }
+    }
+  }
+}
+
+// ---- the article's preview (the site's opened article): ← Thoughts,
+// the kicker (ARTICLE · the date · its read time), the title, the dek and
+// its tags, the prose. Children: `bar` (`back`), `kicker`, `heading`,
+// `deck` (`dek`, `tags` (`t1`, `t2`)), `prose` (proseDocSite).
+export prevArticle = frame {
+  title: "Preview · an article",
+  left: 814px,
+  top: 1394px,
+  width: 582px,
+  layout: {stack: {direction: .column, align-items: .stretch}},
+  padding-bottom: spc.layout.pane-inset,
+  children: [bar, kicker, heading, deck, prose],
+
+  bar = frame {
+    layout: {stack: {align-items: .center}},
+    padding: [spc.steps.s2, 0px, spc.steps.s5],
+    children: back,
+
+    back = frame : dt.detailBack {
+      backWord {
+        contents: "Thoughts"
+      }
+    }
+  }
+
+  kicker = frame : pc.postKicker {
+    width: 100%,
+    padding-bottom: spc.steps.s4,
+    layout.stack.justify-content: .start,
+
+    lead {
+      extra {
+        x {
+          contents: "Nov 10, 2026"
+        }
+      }
+    }
+
+    date {
+      contents: "1 min read"
+    }
+  }
+
+  heading = text : dt.detailTitleLg {
+    width: 100%,
+    contents: "Building the Studio"
+  }
+
+  deck = frame {
+    layout: {stack: {align-items: .center, item-gap: spc.layout.facts-gap}},
+    padding: [spc.steps.s2, 0px, spc.steps.s5],
+    children: [dek, tags],
+
+    dek = text : dt.detailDek {
+      contents: "Publishing from my phone, in yarn.",
+      fill[0].color: col.roles.fg-2
+    }
+
+    tags = frame {
+      layout: {stack: {align-items: .center, item-gap: spc.steps.s1}},
+      children: [t1, t2],
+
+      t1 = frame : tg.tag {
+        label {
+          contents: "studio"
+        }
+      }
+
+      t2 = frame : tg.tag {
+        label {
+          contents: "learnings"
+        }
+      }
+    }
+  }
+
+  prose = frame : proseDocSite {
+    width: 100%
+  }
+}
+
+// ==== states page (labels over the definitions, then the states boards: i9 · i10 · i11) ====
+lbl-tbBtn = text : doc.specLabel {
+  left: 0px,
+  top: 0px,
+  contents: "tbBtn"
+}
+
+note-tbBtn = text : doc.specNote {
+  left: 0px,
+  top: 16px,
+  contents: "a toolbar button"
+}
+
+lbl-tbBtnLabel = text : doc.specLabel {
+  left: 814px,
+  top: 0px,
+  contents: "tbBtnLabel"
+}
+
+note-tbBtnLabel = text : doc.specNote {
+  left: 814px,
+  top: 16px,
+  contents: "with a label"
+}
+
+lbl-coverAdd = text : doc.specLabel {
+  left: 1628px,
+  top: 0px,
+  contents: "coverAdd"
+}
+
+note-coverAdd = text : doc.specNote {
+  left: 1628px,
+  top: 16px,
+  contents: "add a cover"
+}
+
+lbl-mdBar = text : doc.specLabel {
+  left: 0px,
+  top: 225px,
+  contents: "mdBar"
+}
+
+note-mdBar = text : doc.specNote {
+  left: 0px,
+  top: 241px,
+  contents: "the markdown toolbar"
+}
+
+lbl-tagField = text : doc.specLabel {
+  left: 814px,
+  top: 225px,
+  contents: "tagField"
+}
+
+note-tagField = text : doc.specNote {
+  left: 814px,
+  top: 241px,
+  contents: "the tag field (search, filled)"
+}
+
+lbl-proseDoc = text : doc.specLabel {
+  left: 0px,
+  top: 399px,
+  contents: "proseDoc"
+}
+
+note-proseDoc = text : doc.specNote {
+  left: 0px,
+  top: 415px,
+  contents: "the editor's prose (Studio face)"
+}
+
+lbl-proseDocSite = text : doc.specLabel {
+  left: 814px,
+  top: 399px,
+  contents: "proseDocSite"
+}
+
+note-proseDocSite = text : doc.specNote {
+  left: 814px,
+  top: 415px,
+  contents: "the prose as the site sets it"
+}
+
+lbl-docSheet = text : doc.specLabel {
+  left: 0px,
+  top: 1354px,
+  contents: "docSheet"
+}
+
+note-docSheet = text : doc.specNote {
+  left: 0px,
+  top: 1370px,
+  contents: "the document sheet"
+}
+
+lbl-prevArticle = text : doc.specLabel {
+  left: 814px,
+  top: 1354px,
+  contents: "prevArticle"
+}
+
+note-prevArticle = text : doc.specNote {
+  left: 814px,
+  top: 1370px,
+  contents: "the article preview"
+}
+
+@variants(studioArticleStatesI10)
+studioArticleStates = frame : doc.docBoard {
+  title: "Studio · article editor parts · states · i9",
+  left: 0px,
+  top: 2630px,
+
+  body {
+    layout.stack.item-gap: 48px,
+    overrides: [
+      insert(row-1, after = .nil),
+      insert(row-2, after = row-1),
+      insert(row-3, after = row-2),
+      insert(row-4, after = row-3),
+      insert(row-5, after = row-4)
+    ]
+  }
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i9"
+      }
+    }
+
+    boardCaption {
+      contents: "Studio · article editor parts · every state"
+    }
+  }
+
+  row-1 = frame : doc.specRow {
+    layout.stack.item-gap: 48px,
+    overrides: [
+      insert(st-tbBtn, after = .nil),
+      insert(st-tbBtnLabel, after = st-tbBtn),
+      insert(st-coverAdd, after = st-tbBtnLabel)
+    ]
+  }
+
+  row-2 = frame : doc.specRow {
+    layout.stack.item-gap: 48px,
+    overrides: [insert(st-mdBar, after = .nil)]
+  }
+
+  row-3 = frame : doc.specRow {
+    layout.stack.item-gap: 48px,
+    overrides: [insert(st-tagField, after = .nil)]
+  }
+
+  row-4 = frame : doc.specRow {
+    layout.stack.item-gap: 48px,
+    overrides: [
+      insert(st-proseDoc, after = .nil),
+      insert(st-proseDocSite, after = st-proseDoc)
+    ]
+  }
+
+  row-5 = frame : doc.specRow {
+    layout.stack.item-gap: 48px,
+    overrides: [
+      insert(st-docSheet, after = .nil),
+      insert(st-prevArticle, after = st-docSheet)
+    ]
+  }
+
+  st-tbBtn = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "tbBtn"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "a toolbar button"
+    }
+
+    it = frame : tbBtn {}
+  }
+
+  st-tbBtnLabel = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "tbBtnLabel"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "with a label"
+    }
+
+    it = frame : tbBtnLabel {}
+  }
+
+  st-coverAdd = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "coverAdd"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "add a cover"
+    }
+
+    it = frame : coverAdd {}
+  }
+
+  st-mdBar = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "mdBar"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "the markdown toolbar"
+    }
+
+    it = frame : mdBar {}
+  }
+
+  st-tagField = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "tagField"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "the tag field (search, filled)"
+    }
+
+    it = frame : tagField {}
+  }
+
+  st-proseDoc = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "proseDoc"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "the editor's prose (Studio face)"
+    }
+
+    it = frame : proseDoc {}
+  }
+
+  st-proseDocSite = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "proseDocSite"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "the prose as the site sets it"
+    }
+
+    it = frame : proseDocSite {}
+  }
+
+  st-docSheet = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "docSheet"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "the document sheet"
+    }
+
+    it = frame : docSheet {}
+  }
+
+  st-prevArticle = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "prevArticle"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "the article preview"
+    }
+
+    it = frame : prevArticle {}
+  }
+}
+
+@variants(studioArticleStatesI11)
+@context(i10="on")
+studioArticleStatesI10 = frame : studioArticleStates {
+  title: "Studio · article editor parts · states · i10",
+  left: 1644px,
+  top: 2630px,
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i10"
+      }
+    }
+  }
+}
+
+@context(i10="on", i11="on")
+studioArticleStatesI11 = frame : studioArticleStatesI10 {
+  title: "Studio · article editor parts · states · i11",
+  left: 3288px,
+  top: 2630px,
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i11"
+      }
+    }
+  }
+}

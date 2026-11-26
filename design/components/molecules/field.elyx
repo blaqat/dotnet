@@ -1,0 +1,529 @@
+import "tokens/color/roles.elyx" as col
+import "tokens/color/palette.elyx" as pal
+import "tokens/space/space.elyx" as spc
+import "tokens/type/type.elyx" as typ
+import "components/atoms/text.elyx" as txt
+import "components/atoms/surface.elyx" as surf
+import "assets/icons/bold/magnifying-glass.svg" as findIcon
+import "assets/icons/bold/caret-down.svg" as caretIcon
+import "components/atoms/doc.elyx" as doc
+
+// The kit's .yfield: one cloth for every text field (Studio's forms, the
+// tag finder). i9: white knit, inset, a dashed stitch 6px in; i10 R9
+// calm: flat white, a 1px ring, no stitch (col.roles.ctl-*). Focus = a
+// solid edge + a halo (i9 red, i10 ink: col.roles.field-focus/-halo),
+// never the rope; invalid = the deep red edge. i11 T10: 12 all round,
+// radius 4 + 8. Children: `fieldStitch`, `glyph` (hidden but on the
+// small finder), `value`. Override `value {contents: …}`.
+@variants(
+  fieldPlaceholder,
+  fieldFocus,
+  fieldInvalid,
+  fieldDisabled,
+  fieldSm,
+  fieldSelect,
+  fieldArea
+)
+export field = frame {
+  title: "Field · value",
+  left: 0px,
+  top: 40px,
+  width: spc.controls.field-w,
+  layout: {stack: {align-items: .center, item-gap: spc.steps.s2}},
+  fill: col.roles.surface,
+  border: col.roles.ctl-line,
+  shadow: [
+    {
+      inner-shadow: {
+        color: pal.palette.shadow-1,
+        offset: point(0px, 1px),
+        blur-radius: 3px
+      }
+    },
+    {
+      drop-shadow: {
+        color: col.roles.field-halo,
+        offset: point(0px, 0px),
+        blur-radius: 0px,
+        spread: spc.layout.stitch-in,
+        visible: .false
+      }
+    }
+  ],
+  corner-radius: spc.radii.field,
+  padding: [spc.steps.s3, spc.layout.field-x],
+  children: [fieldStitch, glyph, value],
+
+  fieldStitch = frame : surf.stitch {
+    left: spc.layout.stitch-in,
+    top: spc.layout.stitch-in,
+    right: spc.layout.stitch-in,
+    bottom: spc.layout.stitch-in,
+    width: .nil,
+    height: .nil,
+    ignore-stack: .true,
+    corner-radius: spc.radii.inner,
+    border[0].color: col.roles.ctl-stitch,
+    border[0].width: spc.layout.stitch-w-sm
+  }
+
+  glyph = asset {
+    width: spc.controls.icon-sm,
+    height: spc.controls.icon-sm,
+    display: .none,
+    fill: col.roles.fg-3,
+    contents: findIcon
+  }
+
+  value = text : txt.body {
+    contents: "Sonata",
+    font-size: typ.sizes.field,
+    font-style: typ.faces.field-style,
+    fill[0].color: col.roles.fg
+  }
+}
+
+export fieldPlaceholder = frame : field {
+  title: "Field · placeholder",
+  left: 344px,
+  top: 40px,
+
+  value {
+    fill[0].color: col.roles.fg-3,
+    contents: "Name your project"
+  }
+}
+
+// Focus: the solid edge + a soft halo; the stitch steps away.
+export fieldFocus = frame : field {
+  title: "Field · focus",
+  left: 688px,
+  top: 40px,
+  border[0].color: col.roles.field-focus,
+  border[0].position: .outside,
+  border[0].width: spc.layout.ring-w,
+  shadow[0].inner-shadow.visible: .false,
+  shadow[1].drop-shadow.visible: .true,
+
+  fieldStitch {
+    display: .none
+  }
+
+  value {
+    contents: "Sona"
+  }
+}
+
+export fieldInvalid = frame : field {
+  title: "Field · invalid",
+  left: 1032px,
+  top: 40px,
+  border[0].color: col.roles.invalid,
+  border[0].position: .outside,
+  border[0].width: spc.layout.ring-w,
+
+  value {
+    fill[0].color: col.roles.fg-3,
+    contents: "soundcloud"
+  }
+
+  fieldStitch {
+    display: .none
+  }
+}
+
+export fieldDisabled = frame : field {
+  title: "Field · disabled",
+  left: 1376px,
+  top: 40px,
+  opacity: 0.5,
+
+  value {
+    contents: "blaqat.net"
+  }
+}
+
+// The small finder (.yfield--sm): a 40px pill with a leading glyph.
+export fieldSm = frame : field {
+  title: "Field · sm",
+  left: 0px,
+  top: 224px,
+  height: spc.controls.field-sm,
+  corner-radius: spc.radii.pill,
+  padding-top: 0px,
+  padding-left: spc.layout.chip-x,
+  padding-bottom: 0px,
+  padding-right: spc.layout.chip-x,
+
+  value {
+    fill[0].color: col.roles.fg-3,
+    contents: "Find a tag",
+    font-size: typ.sizes.field-sm,
+    font-style: typ.faces.field-sm-style
+  }
+
+  fieldStitch {
+    left: spc.steps.s1,
+    top: spc.steps.s1,
+    right: spc.steps.s1,
+    bottom: spc.steps.s1,
+    corner-radius: spc.radii.pill
+  }
+
+  glyph {
+    display: .visible
+  }
+}
+
+// A select (Studio's month / year pickers): the value, then the caret on
+// the right edge. Child added: `caret`.
+export fieldSelect = frame : field {
+  title: "Field · select",
+  left: 344px,
+  top: 224px,
+  width: spc.controls.st-select-w,
+  layout.stack.justify-content: .space-between,
+  overrides: [insert(caret, after = field.value)],
+
+  value {
+    contents: "May"
+  }
+
+  caret = asset {
+    width: spc.controls.icon,
+    height: spc.controls.icon,
+    fill: col.roles.fg,
+    contents: caretIcon
+  }
+}
+
+// A textarea (notes, a pasted list): top-aligned, the words wrap.
+export fieldArea = frame : field {
+  title: "Field · textarea",
+  left: 688px,
+  top: 224px,
+  height: spc.controls.st-ta-h,
+  layout.stack.align-items: .start,
+
+  value {
+    fill[0].color: col.roles.fg-3,
+    width: 100%,
+    contents: "A line or two. Optional."
+  }
+}
+
+// ==== states page (labels over the definitions, then the states boards: i9 · i10 · i11) ====
+lbl-field = text : doc.specLabel {
+  left: 0px,
+  top: 0px,
+  contents: "field"
+}
+
+note-field = text : doc.specNote {
+  left: 0px,
+  top: 16px,
+  contents: "rest: a value"
+}
+
+lbl-fieldPlaceholder = text : doc.specLabel {
+  left: 344px,
+  top: 0px,
+  contents: "fieldPlaceholder"
+}
+
+note-fieldPlaceholder = text : doc.specNote {
+  left: 344px,
+  top: 16px,
+  contents: "empty: the placeholder"
+}
+
+lbl-fieldFocus = text : doc.specLabel {
+  left: 688px,
+  top: 0px,
+  contents: "fieldFocus"
+}
+
+note-fieldFocus = text : doc.specNote {
+  left: 688px,
+  top: 16px,
+  contents: "focus: the edge + halo"
+}
+
+lbl-fieldInvalid = text : doc.specLabel {
+  left: 1032px,
+  top: 0px,
+  contents: "fieldInvalid"
+}
+
+note-fieldInvalid = text : doc.specNote {
+  left: 1032px,
+  top: 16px,
+  contents: "invalid: the deep red edge"
+}
+
+lbl-fieldDisabled = text : doc.specLabel {
+  left: 1376px,
+  top: 0px,
+  contents: "fieldDisabled"
+}
+
+note-fieldDisabled = text : doc.specNote {
+  left: 1376px,
+  top: 16px,
+  contents: "disabled"
+}
+
+lbl-fieldSm = text : doc.specLabel {
+  left: 0px,
+  top: 184px,
+  contents: "fieldSm"
+}
+
+note-fieldSm = text : doc.specNote {
+  left: 0px,
+  top: 200px,
+  contents: "sm: the small finder"
+}
+
+lbl-fieldSelect = text : doc.specLabel {
+  left: 344px,
+  top: 184px,
+  contents: "fieldSelect"
+}
+
+note-fieldSelect = text : doc.specNote {
+  left: 344px,
+  top: 200px,
+  contents: "a select"
+}
+
+lbl-fieldArea = text : doc.specLabel {
+  left: 688px,
+  top: 184px,
+  contents: "fieldArea"
+}
+
+note-fieldArea = text : doc.specNote {
+  left: 688px,
+  top: 200px,
+  contents: "a textarea"
+}
+
+@variants(fieldStatesI10)
+fieldStates = frame : doc.docBoard {
+  title: "Field · states · i9",
+  left: 0px,
+  top: 504px,
+
+  body {
+    layout.stack.item-gap: 48px,
+    overrides: [insert(row-1, after = .nil), insert(row-2, after = row-1)]
+  }
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i9"
+      }
+    }
+
+    boardCaption {
+      contents: "Field · every state"
+    }
+  }
+
+  row-1 = frame : doc.specRow {
+    layout.stack.item-gap: 48px,
+    overrides: [
+      insert(st-field, after = .nil),
+      insert(st-fieldPlaceholder, after = st-field),
+      insert(st-fieldFocus, after = st-fieldPlaceholder),
+      insert(st-fieldInvalid, after = st-fieldFocus),
+      insert(st-fieldDisabled, after = st-fieldInvalid)
+    ]
+  }
+
+  row-2 = frame : doc.specRow {
+    layout.stack.item-gap: 48px,
+    overrides: [
+      insert(st-fieldSm, after = .nil),
+      insert(st-fieldSelect, after = st-fieldSm),
+      insert(st-fieldArea, after = st-fieldSelect)
+    ]
+  }
+
+  st-field = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "field"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "rest: a value"
+    }
+
+    it = frame : field {}
+  }
+
+  st-fieldPlaceholder = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "fieldPlaceholder"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "empty: the placeholder"
+    }
+
+    it = frame : fieldPlaceholder {}
+  }
+
+  st-fieldFocus = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "fieldFocus"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "focus: the edge + halo"
+    }
+
+    it = frame : fieldFocus {}
+  }
+
+  st-fieldInvalid = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "fieldInvalid"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "invalid: the deep red edge"
+    }
+
+    it = frame : fieldInvalid {}
+  }
+
+  st-fieldDisabled = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "fieldDisabled"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "disabled"
+    }
+
+    it = frame : fieldDisabled {}
+  }
+
+  st-fieldSm = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "fieldSm"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "sm: the small finder"
+    }
+
+    it = frame : fieldSm {}
+  }
+
+  st-fieldSelect = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "fieldSelect"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "a select"
+    }
+
+    it = frame : fieldSelect {}
+  }
+
+  st-fieldArea = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "fieldArea"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "a textarea"
+    }
+
+    it = frame : fieldArea {}
+  }
+}
+
+@variants(fieldStatesI11)
+@context(i10="on")
+fieldStatesI10 = frame : fieldStates {
+  title: "Field · states · i10",
+  left: 2032px,
+  top: 504px,
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i10"
+      }
+    }
+  }
+}
+
+@context(i10="on", i11="on")
+fieldStatesI11 = frame : fieldStatesI10 {
+  title: "Field · states · i11",
+  left: 4064px,
+  top: 504px,
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i11"
+      }
+    }
+  }
+}

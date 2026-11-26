@@ -1,0 +1,382 @@
+import "components/atoms/doc.elyx" as doc
+import "components/organisms/studio-chrome.elyx" as chrome
+import "blocks/studio-dashboard.elyx" as dsh
+import "blocks/studio-music-editor.elyx" as mus
+import "blocks/studio-article-editor.elyx" as arted
+import "blocks/phone-studio.elyx" as ps
+
+// Studio: every Studio screen on one page, every iteration side by side,
+// one row per screen (i9 | i10 | i11). Each board is a local wrapper; its
+// `…I10` / `…I11` contextual variants render in their iteration and pick
+// the blocks' iteration variants at their tree position (SYSTEM.md,
+// "Iterations side by side on one page"). The ink cord frame and Studio's
+// nav throughout.
+// Dashboard (studio/index.html): Studio's nav (no tab here), then the
+// dashboard. i10 is tokens (New the ink primary, the strip's dot and meter
+// ink, calm controls, bare fact glyphs, the text roles); i11 the body's
+// I11 (the panes' small caps become Headings: Sections · On the needles ·
+// Recently) on i11's tokens (400 / 500, 48 between panes, insets, 24 / 16).
+// Music editor (?view=collection): Music here. i10 the body's I10 (the
+// preview's library card is i10's folder card, the link discs duotone);
+// i11 the body's I11 (the small caps become a Title, a Label and Meta).
+// Article editor (?view=article): Thoughts here. i10 is tokens (Publish the
+// ink primary, the rope in Thoughts' gold, calm controls, a dashed draft
+// fact); i11 the body's I11 (the form's small caps become Titles, the
+// preview's label Meta words).
+// Phone: the dashboard at 390; i10 tokens, i11 `studioPhoneI11`.
+@with-context(section="studio")
+file {}
+
+// ---- dashboard · 1440 ----
+dashboardHeading = text : doc.specHeading {
+  left: 32px,
+  top: 0px,
+  contents: "Studio · dashboard · 1440 (studio/index.html)"
+}
+
+@variants(dashboardI10)
+dashboard = frame : doc.docBoard {
+  title: "Studio · dashboard · i9",
+  left: 0px,
+  top: 72px,
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i9"
+      }
+    }
+
+    boardCaption {
+      contents: "Studio · dashboard · 1440"
+    }
+  }
+
+  body {
+    overrides: [insert(screen, after = .nil)]
+  }
+
+  screen = frame : chrome.studioSheet {
+    paper {
+      page {
+        overrides: [insert(dash, after = .nil)]
+      }
+    }
+
+    dash = frame : dsh.dashBody {
+      width: .nil
+    }
+  }
+}
+
+@variants(dashboardI11)
+@context(i10="on")
+dashboardI10 = frame : dashboard {
+  title: "Studio · dashboard · i10",
+  left: 1840px,
+  top: 72px,
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i10"
+      }
+    }
+  }
+
+  body {
+    screen {
+      fill[1].image.sizing.scale: 1
+    }
+  }
+}
+
+@context(i10="on", i11="on")
+dashboardI11 = frame : dashboardI10 {
+  title: "Studio · dashboard · i11",
+  left: 3680px,
+  top: 72px,
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i11"
+      }
+    }
+  }
+
+  body {
+    screen {
+      fill[1].image.sizing.scale: 1.08,
+
+      paper {
+        page {
+          @with-variant(dsh.dashBodyI11)
+          dash {}
+        }
+      }
+    }
+  }
+}
+
+// ---- music editor · 1440 ----
+musicEditorHeading = text : doc.specHeading {
+  left: 32px,
+  top: 2120px,
+  contents: "Studio · music editor · 1440 (a collection, ?view=collection)"
+}
+
+@variants(musicEditorI10)
+musicEditor = frame : doc.docBoard {
+  title: "Studio · music editor · i9",
+  left: 0px,
+  top: 2192px,
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i9"
+      }
+    }
+
+    boardCaption {
+      contents: "Studio · music editor · 1440"
+    }
+  }
+
+  body {
+    overrides: [insert(screen, after = .nil)]
+  }
+
+  screen = frame : chrome.studioSheetMusic {
+    paper {
+      page {
+        overrides: [insert(editor, after = .nil)]
+      }
+    }
+
+    editor = frame : mus.musicEditor {
+      width: .nil
+    }
+  }
+}
+
+@variants(musicEditorI11)
+@context(i10="on")
+musicEditorI10 = frame : musicEditor {
+  title: "Studio · music editor · i10",
+  left: 1840px,
+  top: 2192px,
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i10"
+      }
+    }
+  }
+
+  body {
+    screen {
+      fill[1].image.sizing.scale: 1.0584,
+
+      paper {
+        page {
+          @with-variant(mus.musicEditorI10)
+          editor {}
+        }
+      }
+    }
+  }
+}
+
+@context(i10="on", i11="on")
+musicEditorI11 = frame : musicEditorI10 {
+  title: "Studio · music editor · i11",
+  left: 3680px,
+  top: 2192px,
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i11"
+      }
+    }
+  }
+
+  body {
+    screen {
+      fill[1].image.sizing.scale: 1.0296,
+
+      paper {
+        page {
+          @with-variant(mus.musicEditorI11)
+          editor {}
+        }
+      }
+    }
+  }
+}
+
+// ---- article editor · 1440 ----
+articleEditorHeading = text : doc.specHeading {
+  left: 32px,
+  top: 5360px,
+  contents: "Studio · article editor · 1440 (Thoughts, ?view=article)"
+}
+
+@variants(articleEditorI10)
+articleEditor = frame : doc.docBoard {
+  title: "Studio · article editor · i9",
+  left: 0px,
+  top: 5432px,
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i9"
+      }
+    }
+
+    boardCaption {
+      contents: "Studio · article editor · 1440"
+    }
+  }
+
+  body {
+    overrides: [insert(screen, after = .nil)]
+  }
+
+  screen = frame : chrome.studioSheetThoughts {
+    paper {
+      page {
+        overrides: [insert(editor, after = .nil)]
+      }
+    }
+
+    editor = frame : arted.articleEditor {
+      width: 100%
+    }
+  }
+}
+
+@variants(articleEditorI11)
+@context(i10="on")
+articleEditorI10 = frame : articleEditor {
+  title: "Studio · article editor · i10",
+  left: 1840px,
+  top: 5432px,
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i10"
+      }
+    }
+  }
+
+  body {
+    screen {
+      fill[1].image.sizing.scale: 0.99
+    }
+  }
+}
+
+@context(i10="on", i11="on")
+articleEditorI11 = frame : articleEditorI10 {
+  title: "Studio · article editor · i11",
+  left: 3680px,
+  top: 5432px,
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i11"
+      }
+    }
+  }
+
+  body {
+    screen {
+      fill[1].image.sizing.scale: 0.98,
+
+      paper {
+        page {
+          @with-variant(arted.articleEditorI11)
+          editor {}
+        }
+      }
+    }
+  }
+}
+
+// ---- phone · 390 × 844 ----
+phoneHeading = text : doc.specHeading {
+  left: 32px,
+  top: 7640px,
+  contents: "Studio · phone · 390 × 844 (the dashboard)"
+}
+
+@variants(phoneI10)
+phone = frame : doc.docBoard {
+  title: "Studio · phone · i9",
+  left: 0px,
+  top: 7712px,
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i9"
+      }
+    }
+
+    boardCaption {
+      contents: "Studio · phone · dashboard"
+    }
+  }
+
+  body {
+    overrides: [insert(screen, after = .nil)]
+  }
+
+  screen = frame : ps.studioPhone {
+    left: 0px,
+    top: 0px
+  }
+}
+
+@variants(phoneI11)
+@context(i10="on")
+phoneI10 = frame : phone {
+  title: "Studio · phone · i10",
+  left: 1840px,
+  top: 7712px,
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i10"
+      }
+    }
+  }
+}
+
+@context(i10="on", i11="on")
+phoneI11 = frame : phoneI10 {
+  title: "Studio · phone · i11",
+  left: 3680px,
+  top: 7712px,
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i11"
+      }
+    }
+  }
+
+  body {
+    @with-variant(ps.studioPhoneI11)
+    screen {}
+  }
+}

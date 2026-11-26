@@ -1,0 +1,1230 @@
+import "tokens/color/roles.elyx" as col
+import "tokens/color/palette.elyx" as pal
+import "tokens/space/space.elyx" as spc
+import "components/atoms/text.elyx" as txt
+import "components/atoms/doc.elyx" as doc
+import "components/atoms/surface.elyx" as surf
+import "components/atoms/art.elyx" as arts
+import "assets/art/alphabet-city-collection.svg" as alphabetCityCover
+import "assets/art/farewell-my-star.svg" as farewellCover
+import "assets/art/gleaming-shadows.svg" as gleamingCover
+import "assets/art/glooming-shadows-of-alphabet-city.svg" as gloomingCover
+import "components/atoms/eq-bars.elyx" as eq
+import "components/molecules/fact.elyx" as fct
+import "components/molecules/button.elyx" as btn
+import "assets/icons/bold/shuffle.svg" as shuffleIcon
+import "components/organisms/player.elyx" as pl
+import "assets/music/wave-played.svg" as wavePlayed
+import "assets/music/wave-rest.svg" as waveRest
+import "assets/icons/fill/skip-back.svg" as prevIcon
+import "assets/icons/fill/skip-forward.svg" as nextIcon
+import "assets/icons/fill/speaker-high.svg" as muteIcon
+import "assets/art/cast-adrift.svg" as castAdriftCover
+import "assets/art/marmalade-cafe.svg" as marmaladeCover
+import "assets/icons/bold/caret-down.svg" as collapseIcon
+import "assets/icons/bold/link.svg" as copyIcon
+import "assets/icons/bold/repeat.svg" as repeatIcon
+import "assets/icons/bold/dots-six-vertical.svg" as gripIcon
+import "assets/icons/bold/x.svg" as removeIcon
+import "assets/icons/bold/circle.svg" as beepboxIcon
+import "assets/icons/bold/youtube-logo.svg" as youtubeIcon
+
+// The phone player (kit/player.js, compact; COMPONENTS.md §20), its three
+// views: the DISC (closed: it rests at the right end of the floating row,
+// organisms/phone-nav.elyx), the BAR (in the slot: organisms/player.elyx
+// `playerPhone`) and the PAGE (open: a sheet over a scrim, the whole
+// screen). Live colour = the live role (i9 red; from i10 Music's purple on
+// every page); everything else that changes by iteration is a token or a
+// text role (the page's title a Heading, its notes Body, rows card-sized).
+// ---- the disc ----
+// A 60 record (the player's own disc: grooves, stitch, the song's art on
+// its label) on a 76 white knit rim, the song's progress a 74 ring round it
+// (a dashed quiet track, the played part in the live colour from the top).
+// Children: `rim`, `track`, `done`, `record`.
+export playerDisc = frame {
+  title: "Player · phone disc (closed)",
+  left: 0px,
+  top: 40px,
+  width: spc.controls.pdisc-rim,
+  height: spc.controls.pdisc-rim,
+  children: [rim, track, done, record],
+
+  rim = frame {
+    left: 0px,
+    top: 0px,
+    right: 0px,
+    bottom: 0px,
+    fill: col.roles.surface,
+    shadow: [
+      {
+        drop-shadow: {
+          color: pal.palette.shadow-1,
+          offset: point(0px, 1px),
+          blur-radius: 0px
+        }
+      },
+      {
+        drop-shadow: {
+          color: pal.palette.shadow-pop,
+          offset: point(0px, 6px),
+          blur-radius: 16px,
+          spread: -5px
+        }
+      }
+    ],
+    corner-radius: spc.radii.pill
+  }
+
+  // the ring: 74 round (1 in from the rim), 3 wide
+  track = frame {
+    left: 1px,
+    top: 1px,
+    right: 1px,
+    bottom: 1px,
+    border: {
+      color: col.roles.stitch,
+      width: spc.controls.pbar-thread,
+      dash: [2px, 3px]
+    },
+    corner-radius: spc.radii.pill
+  }
+
+  done = frame {
+    left: 1px,
+    top: 1px,
+    right: 1px,
+    bottom: 1px,
+    border: {
+      width: spc.controls.pbar-thread,
+      angular-gradient: {
+        at: point(50%, 50%),
+        angle: 0deg,
+        stops: [
+          stop(0%, col.roles.live),
+          stop(39%, col.roles.live),
+          stop(39.1%, pal.palette.clear),
+          stop(100%, pal.palette.clear)
+        ]
+      }
+    },
+    corner-radius: spc.radii.pill
+  }
+
+  record = frame : pl.player.disc {
+    left: spc.steps.s2,
+    top: spc.steps.s2,
+    right: spc.steps.s1,
+    width: spc.controls.pdisc,
+    height: spc.controls.pdisc,
+
+    label {
+      left: spc.controls.pdisc-label-in,
+      top: spc.controls.pdisc-label-in,
+      width: spc.controls.pdisc-label,
+      height: spc.controls.pdisc-label
+    }
+
+    hole {
+      left: spc.controls.pdisc-hole-in,
+      top: spc.controls.pdisc-hole-in
+    }
+  }
+}
+
+// ---- a queue row (.yp-qr) ----
+// grip · swatch · the song (Label) + where it's from (Meta) · its length
+// (Numeric) · ✕ (touch: always there; in the mock's pointer view it waits
+// for hover, so its column stays empty). Children: `grip`, `main` (`sw`
+// (`dim`, `bars`), `words` (`name`, `sub`), `len`), `x`.
+@variants(queueRowNow)
+export queueRow = frame {
+  title: "Queue row",
+  left: 470px,
+  top: 40px,
+  width: spc.controls.slot-w,
+  min-height: spc.controls.q-row,
+  layout: {grid: {columns: [.auto, 1fr, .auto], align-items: .center}},
+  corner-radius: spc.radii.q-row,
+  children: [grip, main, x],
+
+  grip = frame {
+    width: spc.controls.q-grip,
+    height: spc.controls.q-row,
+    layout: {stack: {justify-content: .center, align-items: .center}},
+    children: gripGlyph,
+
+    gripGlyph = asset {
+      width: spc.controls.icon-sm,
+      height: spc.controls.icon-sm,
+      fill: col.roles.fg-3,
+      contents: gripIcon
+    }
+  }
+
+  main = frame {
+    width: 100%,
+    layout: {
+      grid: {
+        columns: [.auto, 1fr, .auto],
+        column-gap: spc.steps.s3,
+        align-items: .center
+      }
+    },
+    padding: [spc.steps.s1, spc.steps.s2, spc.steps.s1, 0px],
+    children: [sw, words, len],
+
+    sw = frame : arts.art {
+      width: spc.controls.q-sw,
+      height: spc.controls.q-sw,
+      corner-radius: spc.radii.q-sw,
+      fill[1].image.ref: alphabetCityCover,
+      layout.stack.align-items: .center,
+      layout.stack.justify-content: .center,
+      overrides: [insert(dim, after = .nil), insert(bars, after = dim)],
+
+      // the playing row: the swatch dims under white bars
+      dim = frame {
+        left: 0px,
+        top: 0px,
+        right: 0px,
+        bottom: 0px,
+        display: .none,
+        ignore-stack: .true,
+        fill: col.roles.scrim
+      }
+
+      bars = frame : eq.eqBarsOnLive {
+        display: .none
+      }
+    }
+
+    words = frame {
+      width: 100%,
+      layout: {stack: {direction: .column, item-gap: 2px}},
+      overflow: .clip,
+      children: [name, sub],
+
+      name = text : txt.labelCard {
+        contents: "uncovering the truth abo…"
+      }
+
+      sub = text : txt.metaCard {
+        contents: "Alphabet City Collection · 3/4"
+      }
+    }
+
+    len = text : txt.numCard {
+      contents: "1:16"
+    }
+  }
+
+  x = frame {
+    width: spc.controls.q-x,
+    height: spc.controls.q-x,
+    layout: {stack: {justify-content: .center, align-items: .center}},
+    corner-radius: spc.radii.pill,
+    children: xGlyph,
+
+    xGlyph = asset {
+      width: spc.controls.icon-sm,
+      height: spc.controls.icon-sm,
+      display: .none,
+      fill: col.roles.fg-3,
+      contents: removeIcon
+    }
+  }
+}
+
+// Now playing: white knit with the live rope on its edge, the swatch
+// dimmed under the live bars, where it's from in the live deep shade; no
+// grip (it can't be dragged away from playing).
+export queueRowNow = frame : queueRow {
+  title: "Queue row · now playing",
+  left: 940px,
+  top: 40px,
+  fill[0].color: col.roles.surface,
+  overrides: [insert(nowRope, after = queueRow.x)],
+  shadow[0].drop-shadow.blur-radius: 0px,
+  shadow[0].drop-shadow.color: pal.palette.shadow-1,
+  shadow[0].drop-shadow.offset: [0px, 1px],
+  shadow[1].drop-shadow.blur-radius: 6px,
+  shadow[1].drop-shadow.color: pal.palette.shadow-1,
+  shadow[1].drop-shadow.offset: [0px, 2px],
+
+  main {
+    words {
+      sub {
+        fill[0].color: col.roles.live-deep,
+        contents: "Alphabet City Collection · 2/4"
+      }
+
+      name {
+        contents: "glooming shadows of alp…"
+      }
+    }
+
+    sw {
+      fill[1].image.ref: gloomingCover,
+
+      bars {
+        display: .visible
+      }
+
+      dim {
+        display: .visible
+      }
+    }
+
+    len {
+      contents: "2:01"
+    }
+  }
+
+  grip {
+    gripGlyph {
+      display: .none
+    }
+  }
+
+  nowRope = frame : surf.rope {
+    left: 0px,
+    top: 0px,
+    right: 0px,
+    bottom: 0px,
+    width: .nil,
+    height: .nil,
+    ignore-stack: .true,
+    corner-radius: spc.radii.q-row,
+    border[0].color: col.roles.live,
+    border[1].color: col.roles.live-deep
+  }
+}
+
+// ---- the page (open) ----
+// The player's full page on a phone: a scrim over the screen, a white knit
+// sheet 8 from its top (24 at the top corners, a stitch 6 in), the grab
+// handle and its header (⌄ · copy link · mute), then one scrolling column:
+// the art (210) · the title (Heading) · "from <Collection>" · the facts ·
+// the platform links · the notes under a labelled seam (this song, then
+// the collection) · the big waveform with its times · the queue. The
+// transport row (⤮ ⏮ ▶ ⏭ ⟳) is pinned to the sheet's foot over a seam.
+// Children: `scrim`, `sheet` (`sheetStitch`, `top` (`grab`, `head`),
+// `body` (`hero`, `notes`, `big`, `queue`), `tx`).
+@variants(playerPagePaused, playerPageQueue)
+export playerPage = frame {
+  title: "Player · phone page (open) · playing",
+  left: 0px,
+  top: 236px,
+  width: spc.controls.phone-w,
+  height: spc.controls.phone-h,
+  overflow: .clip,
+  children: [scrim, sheet],
+
+  scrim = frame {
+    left: 0px,
+    top: 0px,
+    right: 0px,
+    bottom: 0px,
+    fill: col.roles.scrim
+  }
+
+  sheet = frame {
+    left: 0px,
+    top: spc.layout.psheet-top,
+    right: 0px,
+    bottom: 0px,
+    layout: {stack: {direction: .column, align-items: .stretch}},
+    fill: col.roles.surface,
+    shadow: {
+      drop-shadow: {
+        color: pal.palette.shadow-pop,
+        offset: point(0px, -4px),
+        blur-radius: 24px
+      }
+    },
+    corner-radius: [spc.radii.psheet, spc.radii.psheet, 0px, 0px],
+    overflow: .clip,
+    children: [sheetStitch, top, body, tx],
+
+    sheetStitch = frame : surf.stitch {
+      left: spc.layout.stitch-in,
+      top: spc.layout.stitch-in,
+      right: spc.layout.stitch-in,
+      bottom: spc.layout.stitch-in,
+      width: .nil,
+      height: .nil,
+      ignore-stack: .true,
+      corner-radius: spc.radii.player-stitch
+    }
+
+    // the grab handle, then ⌄ (left) · copy link + mute (right)
+    top = frame {
+      layout: {
+        stack: {
+          direction: .column,
+          align-items: .stretch,
+          item-gap: spc.steps.s1
+        }
+      },
+      padding: [spc.steps.s2, spc.layout.psheet-head-x, spc.steps.s1],
+      children: [grab, head],
+
+      grab = frame {
+        layout: {stack: {justify-content: .center}},
+        children: grabBar,
+
+        grabBar = frame {
+          width: spc.controls.grab-w,
+          height: spc.controls.grab-h,
+          fill: col.roles.stitch,
+          corner-radius: spc.radii.pill
+        }
+      }
+
+      head = frame {
+        layout: {stack: {justify-content: .space-between, align-items: .center}},
+        children: [collapse, utils],
+
+        collapse = frame {
+          width: spc.controls.psheet-btn,
+          height: spc.controls.psheet-btn,
+          layout: {stack: {justify-content: .center, align-items: .center}},
+          corner-radius: spc.radii.pill,
+          children: collapseGlyph,
+
+          collapseGlyph = asset {
+            width: spc.controls.player-icon,
+            height: spc.controls.player-icon,
+            fill: col.roles.fg,
+            contents: collapseIcon
+          }
+        }
+
+        utils = frame {
+          layout: {stack: {align-items: .center}},
+          children: [copy, mute],
+
+          copy = frame {
+            width: spc.controls.psheet-btn,
+            height: spc.controls.psheet-btn,
+            layout: {stack: {justify-content: .center, align-items: .center}},
+            corner-radius: spc.radii.pill,
+            children: copyGlyph,
+
+            copyGlyph = asset {
+              width: spc.controls.player-icon,
+              height: spc.controls.player-icon,
+              fill: col.roles.fg-2,
+              contents: copyIcon
+            }
+          }
+
+          mute = frame {
+            width: spc.controls.psheet-btn,
+            height: spc.controls.psheet-btn,
+            layout: {stack: {justify-content: .center, align-items: .center}},
+            corner-radius: spc.radii.pill,
+            children: muteGlyph,
+
+            muteGlyph = asset {
+              width: spc.controls.icon,
+              height: spc.controls.icon,
+              fill: col.roles.fg,
+              contents: muteIcon
+            }
+          }
+        }
+      }
+    }
+
+    // the scrolling column
+    body = frame {
+      layout: {stack: {direction: .column, align-items: .stretch}},
+      padding: [0px, spc.layout.psheet-x],
+      children: [hero, notes, big, queue],
+
+      hero = frame {
+        layout: {
+          stack: {
+            direction: .column,
+            align-items: .center,
+            item-gap: spc.layout.psheet-gap
+          }
+        },
+        padding-top: spc.steps.s1,
+        children: [art, id],
+
+        art = frame : arts.artGlooming {
+          width: spc.controls.psheet-art,
+          height: spc.controls.psheet-art,
+          corner-radius: spc.radii.psheet-art,
+          overrides: [insert(artStitch, after = .nil)],
+
+          artStitch = frame : surf.stitch {
+            left: spc.steps.s2,
+            top: spc.steps.s2,
+            right: spc.steps.s2,
+            bottom: spc.steps.s2,
+            width: .nil,
+            height: .nil,
+            corner-radius: spc.radii.psheet-art-stitch,
+            border[0].color: col.roles.media-stitch
+          }
+        }
+
+        id = frame {
+          width: 100%,
+          layout: {
+            stack: {
+              direction: .column,
+              align-items: .center,
+              item-gap: spc.steps.s3
+            }
+          },
+          children: [title, sub, facts, links],
+
+          title = text : txt.heading {
+            width: 100%,
+            contents: "glooming shadows of alphabet city",
+            align: .center
+          }
+
+          sub = text : txt.meta {
+            contents: "from Alphabet City Collection",
+            subrange[0].fill[0].color: col.roles.fg,
+            subrange[0].range: [5, 29],
+            subrange[0].underline: .single
+          }
+
+          facts = frame {
+            layout: {stack: {align-items: .center, item-gap: spc.steps.s4}},
+            children: [inst, status],
+
+            inst = frame : fct.factChip {
+              disc {
+                glyph {
+                  contents: beepboxIcon
+                }
+              }
+
+              label {
+                contents: "BeepBox"
+              }
+            }
+
+            status = frame : fct.fact {
+              sub {
+                display: .none
+              }
+
+              label {
+                contents: "Completed Jul 2025"
+              }
+            }
+          }
+
+          links = frame {
+            layout: {stack: {align-items: .center, item-gap: spc.steps.s2}},
+            children: [youtube, beepbox],
+
+            youtube = frame : btn.btnD {
+              glyph {
+                contents: youtubeIcon
+              }
+
+              label {
+                contents: "YouTube"
+              }
+            }
+
+            beepbox = frame : btn.btnD {
+              glyph {
+                contents: beepboxIcon
+              }
+
+              label {
+                contents: "BeepBox"
+              }
+            }
+          }
+        }
+      }
+
+      // the notes: the song's own, then the collection's under a seam
+      notes = frame {
+        layout: {
+          stack: {
+            direction: .column,
+            align-items: .stretch,
+            item-gap: spc.steps.s4
+          }
+        },
+        padding-top: spc.layout.psheet-notes,
+        children: [song, seam, coll],
+
+        song = frame {
+          layout: {
+            stack: {
+              direction: .column,
+              align-items: .stretch,
+              item-gap: spc.steps.s1
+            }
+          },
+          children: [songFrom, songText],
+
+          songFrom = text : txt.micro {
+            contents: "ABOUT THIS SONG",
+            fill[0].color: col.roles.fg-3
+          }
+
+          songText = text : txt.body {
+            width: 100%,
+            contents: "e starts Gurgling Gutter water as ITS Gooey Grip Grabs him from the sewers of alphabet city. IT Gets Giddy and Grins as e tries to edge away. IT garrotes e as e lets out one final eeek that echos in ITS dungeon followed by Giggles Greedy for more."
+          }
+        }
+
+        seam = frame : surf.stitch {
+          width: 100%,
+          height: spc.layout.stitch-w,
+          corner-radius: 0px,
+          border[0].color: col.roles.line,
+          border[0].sides: .top
+        }
+
+        coll = frame {
+          layout: {
+            stack: {
+              direction: .column,
+              align-items: .stretch,
+              item-gap: spc.steps.s1
+            }
+          },
+          children: [collFrom, collText],
+
+          collFrom = text : txt.micro {
+            contents: "ABOUT ALPHABET CITY COLLECTION",
+            fill[0].color: col.roles.fg-3
+          }
+
+          collText = text : txt.body {
+            width: 100%,
+            contents: "Joke submissions for the 7th Beepbox Tournament"
+          }
+        }
+      }
+
+      // the big controls: the waveform and its times (the transport row is
+      // pinned to the foot)
+      big = frame {
+        layout: {
+          stack: {
+            direction: .column,
+            align-items: .stretch,
+            item-gap: spc.layout.psheet-rule
+          }
+        },
+        padding-top: spc.layout.psheet-big,
+        children: [bigRule, scrub],
+
+        bigRule = frame : surf.stitch {
+          width: 100%,
+          height: spc.layout.stitch-w,
+          corner-radius: 0px,
+          border[0].color: col.roles.line,
+          border[0].sides: .top
+        }
+
+        scrub = frame {
+          layout: {
+            stack: {
+              direction: .column,
+              align-items: .stretch,
+              item-gap: spc.steps.s2
+            }
+          },
+          children: [wave, times],
+
+          wave = frame {
+            height: spc.controls.psheet-wave,
+            children: [rest, played],
+
+            rest = asset {
+              left: 0px,
+              top: 0px,
+              right: 0px,
+              bottom: 0px,
+              fill: col.roles.line,
+              contents: waveRest
+            }
+
+            played = asset {
+              left: 0px,
+              top: 0px,
+              right: 0px,
+              bottom: 0px,
+              fill: col.roles.live,
+              contents: wavePlayed
+            }
+          }
+
+          times = frame {
+            layout: {stack: {justify-content: .space-between}},
+            children: [elapsed, remain],
+
+            elapsed = text : txt.num {
+              contents: "0:47"
+            }
+
+            remain = text : txt.num {
+              contents: "-1:13"
+            }
+          }
+        }
+      }
+
+      // the queue: "Up next" and its count, then the rows (the playing one
+      // roped)
+      queue = frame {
+        layout: {
+          stack: {
+            direction: .column,
+            align-items: .stretch,
+            item-gap: spc.layout.psheet-queue-rule
+          }
+        },
+        padding-top: spc.layout.psheet-queue,
+        children: [queueRule, qh, rows],
+
+        queueRule = frame : surf.stitch {
+          width: 100%,
+          height: spc.layout.stitch-w,
+          corner-radius: 0px,
+          border[0].color: col.roles.line,
+          border[0].sides: .top
+        }
+
+        qh = frame {
+          layout: {stack: {align-items: .center, item-gap: spc.steps.s3}},
+          children: [qTitle, qCount],
+
+          qTitle = text : txt.title {
+            contents: "Up next"
+          }
+
+          qCount = text : txt.meta {
+            contents: "6 tracks · 11:44"
+          }
+        }
+
+        rows = frame {
+          layout: {
+            stack: {
+              direction: .column,
+              align-items: .stretch,
+              item-gap: spc.layout.q-gap
+            }
+          },
+          children: [now, r2, r3, r4, r5, r6, r7],
+
+          now = frame : queueRowNow {
+            width: 100%
+          }
+
+          r2 = frame : queueRow {
+            width: 100%
+          }
+
+          r3 = frame : queueRow {
+            width: 100%,
+
+            main {
+              words {
+                name {
+                  contents: "escaping the shadow of …"
+                }
+
+                sub {
+                  contents: "Alphabet City Collection · 4/4"
+                }
+              }
+
+              len {
+                contents: "1:41"
+              }
+            }
+          }
+
+          r4 = frame : queueRow {
+            width: 100%,
+
+            main {
+              sw {
+                fill[1].image.ref: castAdriftCover
+              }
+
+              words {
+                sub {
+                  display: .none
+                }
+
+                name {
+                  contents: "cast adrift"
+                }
+              }
+
+              len {
+                contents: "3:41"
+              }
+            }
+          }
+
+          r5 = frame : queueRow {
+            width: 100%,
+
+            main {
+              sw {
+                fill[1].image.ref: marmaladeCover
+              }
+
+              words {
+                sub {
+                  display: .none
+                }
+
+                name {
+                  contents: "marmalade cafe"
+                }
+              }
+
+              len {
+                contents: "1:52"
+              }
+            }
+          }
+
+          r6 = frame : queueRow {
+            width: 100%,
+
+            main {
+              sw {
+                fill[1].image.ref: gleamingCover
+              }
+
+              words {
+                sub {
+                  display: .none
+                }
+
+                name {
+                  contents: "gleaming shadows"
+                }
+              }
+
+              len {
+                contents: "1:38"
+              }
+            }
+          }
+
+          r7 = frame : queueRow {
+            width: 100%,
+
+            main {
+              sw {
+                fill[1].image.ref: farewellCover
+              }
+
+              words {
+                sub {
+                  display: .none
+                }
+
+                name {
+                  contents: "farewell my star"
+                }
+              }
+
+              len {
+                contents: "1:36"
+              }
+            }
+          }
+        }
+      }
+    }
+
+    // the transport, pinned to the foot over a seam: ⤮ ⏮ ▶ ⏭ ⟳
+    tx = frame {
+      left: 0px,
+      right: 0px,
+      bottom: 0px,
+      height: spc.controls.ptx-h,
+      ignore-stack: .true,
+      layout: {
+        grid: {
+          columns: [1fr, 1fr, 1fr, 1fr, 1fr],
+          justify-items: .center,
+          align-items: .center
+        }
+      },
+      fill: col.roles.surface,
+      padding: [0px, spc.layout.ptx-x, spc.layout.ptx-b],
+      children: [txSeam, shuffle, prev, play, next, repeat],
+
+      txSeam = frame : surf.stitch {
+        left: spc.layout.psheet-x,
+        top: 0px,
+        right: spc.layout.psheet-x,
+        width: .nil,
+        height: spc.layout.stitch-w,
+        ignore-stack: .true,
+        corner-radius: 0px,
+        border[0].color: col.roles.line,
+        border[0].sides: .top
+      }
+
+      shuffle = frame {
+        width: spc.controls.pbar-btn,
+        height: spc.controls.pbar-btn,
+        layout: {stack: {justify-content: .center, align-items: .center}},
+        corner-radius: spc.radii.pill,
+        children: shuffleGlyph,
+
+        shuffleGlyph = asset {
+          width: spc.controls.player-icon,
+          height: spc.controls.player-icon,
+          fill: col.roles.fg,
+          contents: shuffleIcon
+        }
+      }
+
+      prev = frame : shuffle {
+        shuffleGlyph {
+          contents: prevIcon
+        }
+      }
+
+      // ▶ (the live fill, ⏸ while it plays)
+      play = frame : pl.player.tx.play {
+        width: spc.controls.ptx-play,
+        height: spc.controls.ptx-play,
+
+        pauseGlyph {
+          width: spc.controls.ptx-play-icon,
+          height: spc.controls.ptx-play-icon
+        }
+
+        playGlyph {
+          width: spc.controls.ptx-play-icon,
+          height: spc.controls.ptx-play-icon
+        }
+      }
+
+      next = frame : shuffle {
+        shuffleGlyph {
+          contents: nextIcon
+        }
+      }
+
+      repeat = frame : shuffle {
+        shuffleGlyph {
+          contents: repeatIcon
+        }
+      }
+    }
+  }
+}
+
+// Paused: ▶ where ⏸ was; at rest ▶ is the view's primary (i9 red, from
+// i10 ink), not live.
+export playerPagePaused = frame : playerPage {
+  title: "Player · phone page · paused",
+  left: 470px,
+  top: 236px,
+
+  sheet {
+    tx {
+      play {
+        fill[0].color: col.roles.primary-bg,
+
+        playGlyph {
+          fill[0].color: col.roles.primary-fg,
+          display: .visible
+        }
+
+        pauseGlyph {
+          display: .none
+        }
+      }
+    }
+  }
+}
+
+// Scrolled to the queue: the art, the words and the notes have gone up
+// under the header; the waveform, then Up next with the playing row roped.
+export playerPageQueue = frame : playerPage {
+  title: "Player · phone page · the queue",
+  left: 940px,
+  top: 236px,
+
+  sheet {
+    body {
+      hero {
+        display: .none
+      }
+
+      notes {
+        display: .none
+      }
+
+      big {
+        bigRule {
+          display: .none
+        }
+
+        padding-top: 0px
+      }
+    }
+  }
+}
+
+lbl-queueRow = text : doc.specLabel {
+  left: 470px,
+  top: 0px,
+  contents: "queueRow"
+}
+
+note-queueRow = text : doc.specNote {
+  left: 470px,
+  top: 16px,
+  contents: "a queue row · rest"
+}
+
+lbl-queueRowNow = text : doc.specLabel {
+  left: 940px,
+  top: 0px,
+  contents: "queueRowNow"
+}
+
+note-queueRowNow = text : doc.specNote {
+  left: 940px,
+  top: 16px,
+  contents: "now: playing"
+}
+
+lbl-playerPage = text : doc.specLabel {
+  left: 0px,
+  top: 196px,
+  contents: "playerPage"
+}
+
+note-playerPage = text : doc.specNote {
+  left: 0px,
+  top: 212px,
+  contents: "open · playing"
+}
+
+lbl-playerPagePaused = text : doc.specLabel {
+  left: 470px,
+  top: 196px,
+  contents: "playerPagePaused"
+}
+
+note-playerPagePaused = text : doc.specNote {
+  left: 470px,
+  top: 212px,
+  contents: "open · paused"
+}
+
+lbl-playerPageQueue = text : doc.specLabel {
+  left: 940px,
+  top: 196px,
+  contents: "playerPageQueue"
+}
+
+note-playerPageQueue = text : doc.specNote {
+  left: 940px,
+  top: 212px,
+  contents: "scrolled to the queue"
+}
+
+@variants(playerPhoneStatesI10)
+playerPhoneStates = frame : doc.docBoard {
+  title: "Phone player · states · i9",
+  left: 0px,
+  top: 1312px,
+
+  body {
+    layout.stack.item-gap: 48px,
+    overrides: [insert(row-1, after = .nil), insert(row-2, after = row-1)]
+  }
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i9"
+      }
+    }
+
+    boardCaption {
+      contents: "Phone player · every state"
+    }
+  }
+
+  row-1 = frame : doc.specRow {
+    layout.stack.item-gap: 48px,
+    overrides: [
+      insert(st-playerDisc, after = .nil),
+      insert(st-queueRow, after = st-playerDisc),
+      insert(st-queueRowNow, after = st-queueRow)
+    ]
+  }
+
+  row-2 = frame : doc.specRow {
+    layout.stack.item-gap: 48px,
+    overrides: [
+      insert(st-playerPage, after = .nil),
+      insert(st-playerPagePaused, after = st-playerPage),
+      insert(st-playerPageQueue, after = st-playerPagePaused)
+    ]
+  }
+
+  st-playerDisc = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "playerDisc"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "the disc · closed"
+    }
+
+    it = frame : playerDisc {}
+  }
+
+  st-queueRow = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "queueRow"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "a queue row · rest"
+    }
+
+    it = frame : queueRow {}
+  }
+
+  st-queueRowNow = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "queueRowNow"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "now: playing"
+    }
+
+    it = frame : queueRowNow {}
+  }
+
+  st-playerPage = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "playerPage"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "open · playing"
+    }
+
+    it = frame : playerPage {}
+  }
+
+  st-playerPagePaused = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "playerPagePaused"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "open · paused"
+    }
+
+    it = frame : playerPagePaused {}
+  }
+
+  st-playerPageQueue = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "playerPageQueue"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "scrolled to the queue"
+    }
+
+    it = frame : playerPageQueue {}
+  }
+}
+
+@variants(playerPhoneStatesI11)
+@context(i10="on")
+playerPhoneStatesI10 = frame : playerPhoneStates {
+  title: "Phone player · states · i10",
+  left: 1594px,
+  top: 1312px,
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i10"
+      }
+    }
+  }
+}
+
+@context(i10="on", i11="on")
+playerPhoneStatesI11 = frame : playerPhoneStatesI10 {
+  title: "Phone player · states · i11",
+  left: 3188px,
+  top: 1312px,
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i11"
+      }
+    }
+  }
+}

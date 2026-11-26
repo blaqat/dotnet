@@ -1,0 +1,1249 @@
+import "tokens/space/space.elyx" as spc
+import "components/molecules/year-pill.elyx" as yp
+import "components/atoms/doc.elyx" as doc
+import "components/molecules/fact.elyx" as fct
+import "components/molecules/link-disc.elyx" as lnk
+import "components/organisms/project.elyx" as pj
+import "components/molecules/media-thumb.elyx" as mt
+import "assets/icons/stack/nextjs.svg" as nextLogo
+import "assets/icons/stack/supabase.svg" as supabaseLogo
+import "assets/icons/stack/c.svg" as cLogo
+import "assets/icons/stack/stm32.svg" as stmLogo
+import "assets/icons/bold/cpu.svg" as cpuIcon
+import "redesign/v3-yarn-11/media/bankresult.png" as bankShot
+import "redesign/v3-yarn-11/media/fitr-redesign.gif" as fitrShot
+import "assets/icons/stack/typescript.svg" as typescriptLogo
+import "assets/icons/stack/react.svg" as reactLogo
+import "assets/icons/stack/python.svg" as pythonLogo
+import "assets/icons/stack/postgresql.svg" as postgresLogo
+import "assets/icons/stack/zola.svg" as zolaLogo
+import "assets/icons/stack/rust.svg" as rustLogo
+import "assets/icons/stack/mongodb.svg" as mongoLogo
+import "assets/icons/stack/sqlite.svg" as sqliteLogo
+import "assets/icons/stack/semantic-ui.svg" as semanticLogo
+import "assets/icons/stack/toml.svg" as tomlLogo
+import "assets/icons/stack/json.svg" as jsonLogo
+import "assets/icons/bold/waveform.svg" as waveIcon
+import "assets/icons/stack/discordjs.svg" as discordLogo
+import "assets/icons/bold/cloud.svg" as cloudIcon
+import "assets/icons/stack/flask.svg" as flaskLogo
+import "assets/icons/bold/open-ai-logo.svg" as openaiIcon
+import "assets/icons/stack/azure.svg" as azureLogo
+import "assets/icons/stack/java.svg" as javaLogo
+import "assets/icons/stack/javascript.svg" as jsLogo
+import "assets/icons/stack/spark.svg" as sparkLogo
+import "assets/icons/bold/brackets-curly.svg" as bracesIcon
+import "assets/icons/stack/nodejs.svg" as nodeLogo
+import "assets/icons/stack/google.svg" as googleLogo
+import "assets/icons/bold/circle.svg" as circleIcon
+import "redesign/v3-yarn-11/media/rawsy.png" as rawsyShot
+import "redesign/v3-yarn-11/media/portal-coach.gif" as portalShot
+import "redesign/v3-yarn-11/media/sona-different.png" as sonaShot
+import "redesign/v3-yarn-11/media/beepsearch.png" as beepShot
+
+// Projects' grid (`.ygroups` with `grid: true`): the projects by year, newest
+// first. Each year is its ruled pill (the year + a Meta count, the dashed
+// rule across the column) and 16 below it a two-column grid of project
+// cards, the same gap across and down (i9 20 · 20; i10 R6: 24 · 24); the
+// grid stretches the cards in a row to one height, so their feet line up.
+// Years are i9 34 · i10 32 · i11 48 apart (spc.layout.pj-group-gap).
+// `projectsGrid` holds the twelve real projects (kit/data.js, i8's order);
+// its I10 variant picks the cards' I10 variant (the duotone discs and the
+// write-up pill). i11 changes nothing here but tokens.
+// ---- one year: the pill + rule, then up to four cards (c1…c4; hide the
+// slots a year doesn't use)
+export projectsYear = frame {
+  title: "Projects · a year (pill + grid)",
+  left: 0px,
+  top: 40px,
+  width: 1332px,
+  layout: {stack: {direction: .column, item-gap: spc.steps.s4}},
+  children: [head, cards],
+
+  head = frame : yp.yearHeader {
+    width: 100%,
+    padding-top: 0px,
+    padding-left: 0px,
+    padding-bottom: 0px,
+    padding-right: 0px,
+
+    pill {
+      year {
+        contents: "2025"
+      }
+
+      count {
+        contents: "2 projects"
+      }
+    }
+  }
+
+  cards = frame {
+    width: 100%,
+    layout: {
+      grid: {
+        columns: [1fr, 1fr],
+        column-gap: spc.layout.gutter-x,
+        row-gap: spc.layout.pj-grid-y
+      }
+    },
+    children: [c1, c2, c3, c4],
+
+    c1 = frame : pj.project {
+      width: 100%,
+      height: 100%
+    }
+
+    c2 = frame : pj.project {
+      width: 100%,
+      height: 100%
+    }
+
+    c3 = frame : pj.project {
+      width: 100%,
+      height: 100%,
+      display: .none
+    }
+
+    c4 = frame : pj.project {
+      width: 100%,
+      height: 100%,
+      display: .none
+    }
+  }
+}
+
+// ---- every year (the twelve projects)
+@variants(projectsGridI10)
+export projectsGrid = frame {
+  title: "Projects · grid (every year)",
+  left: 0px,
+  top: 462px,
+  width: 1332px,
+  layout: {stack: {direction: .column, item-gap: spc.layout.pj-group-gap}},
+  children: [y2025, y2024, y2023, y2021, y2020],
+
+  y2025 = frame : projectsYear {
+    width: 100%,
+
+    cards {
+      c2 {
+        cols {
+          side {
+            media {
+              fill[1].image.ref: fitrShot,
+              fill[1].image.sizing: {scale: 0.26, offset: [0px, 22px]}
+            }
+
+            foot {
+              links {
+                display: .none
+              }
+            }
+          }
+
+          info {
+            stack {
+              t5 {
+                glyph {
+                  contents: reactLogo
+                }
+
+                label {
+                  contents: "React"
+                }
+
+                display: .visible
+              }
+
+              t4 {
+                glyph {
+                  contents: typescriptLogo
+                }
+
+                label {
+                  contents: "Typescript"
+                }
+              }
+
+              t2 {
+                glyph {
+                  contents: supabaseLogo
+                }
+
+                label {
+                  contents: "Supabase"
+                }
+              }
+
+              t1 {
+                glyph {
+                  contents: nextLogo
+                }
+
+                label {
+                  contents: "Next.js"
+                }
+              }
+            }
+
+            main {
+              descBox {
+                desc {
+                  contents: "This was my capstone project. Collaborated with 6 other SWEN seniors on the development of a web based job board platform modeled after dating apps, enabling recruiters and candidates to connect based o…"
+                }
+              }
+
+              facts {
+                @with-variant(fct.fact)
+                status {}
+
+                @with-variant(fct.factSchool)
+                kind {}
+              }
+
+              heading {
+                contents: "FiTR Skills Career Roadmaps"
+              }
+            }
+          }
+        }
+      }
+
+      c1 {
+        cols {
+          info {
+            main {
+              facts {
+                status {
+                  label {
+                    contents: "WIP since Sep 2025"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  y2024 = frame : projectsYear {
+    width: 100%,
+
+    cards {
+      c4 {
+        cols {
+          side {
+            media {
+              fill[1].image.ref: bankShot,
+              fill[1].image.sizing: {scale: 0.1797, offset: [0px, 8px]}
+            }
+
+            foot {
+              links {
+                disc2 {
+                  display: .none
+                }
+
+                wu {
+                  display: .visible
+                }
+              }
+            }
+          }
+
+          info {
+            stack {
+              t3 {
+                glyph {
+                  fill[0].visible: .true,
+                  contents: cpuIcon
+                }
+
+                label {
+                  contents: "FreeRTOS"
+                }
+              }
+
+              t4 {
+                display: .none
+              }
+
+              t2 {
+                glyph {
+                  contents: stmLogo
+                }
+
+                label {
+                  contents: "STM32"
+                }
+              }
+
+              t1 {
+                glyph {
+                  contents: cLogo
+                }
+
+                label {
+                  contents: "C"
+                }
+              }
+            }
+
+            main {
+              descBox {
+                desc {
+                  contents: "Developed a FreeRTOS-based real-time simulation of a bank environment, leveraging a multifunction shield on a STM32 microcontroller for displaying and managing customer queues and teller operations on an LCD.…"
+                }
+              }
+
+              facts {
+                @with-variant(fct.fact)
+                status {
+                  label {
+                    contents: "Completed Apr 2024"
+                  }
+                }
+
+                @with-variant(fct.factSchool)
+                kind {}
+              }
+
+              heading {
+                contents: "Bank Simulation"
+              }
+            }
+          }
+        }
+
+        display: .visible
+      }
+
+      c3 {
+        display: .visible,
+
+        cols {
+          side {
+            foot {
+              links {
+                @with-variant(lnk.linkDiscGithub)
+                disc2 {}
+              }
+            }
+
+            @with-variant(mt.mediaThumbFelt)
+            media {}
+          }
+
+          info {
+            stack {
+              t4 {
+                glyph {
+                  contents: jsonLogo
+                }
+
+                label {
+                  contents: "JSON"
+                }
+              }
+
+              t3 {
+                glyph {
+                  contents: tomlLogo
+                }
+
+                label {
+                  contents: "TOML"
+                }
+              }
+
+              t2 {
+                glyph {
+                  contents: pythonLogo
+                }
+
+                label {
+                  contents: "Python"
+                }
+              }
+
+              t1 {
+                glyph {
+                  contents: rustLogo
+                }
+
+                label {
+                  contents: "Rust"
+                }
+              }
+            }
+
+            main {
+              descBox {
+                desc {
+                  contents: "A json and toml preprocessor tool that allows users to create a theme language that can be used to create and generate themes for multiple code editors and IDEs from a single source of truth. Currently supports Zed,…"
+                }
+              }
+
+              facts {
+                @with-variant(fct.factPaused)
+                status {}
+              }
+
+              heading {
+                contents: "Code Editor Theme Generator"
+              }
+            }
+          }
+        }
+      }
+
+      c2 {
+        cols {
+          side {
+            media {
+              fill[1].image.ref: portalShot,
+              fill[1].image.sizing: {scale: 0.26, offset: [0px, 20px]}
+            }
+          }
+
+          info {
+            stack {
+              t4 {
+                display: .none
+              }
+
+              t3 {
+                glyph {
+                  contents: semanticLogo
+                }
+
+                label {
+                  contents: "Semantic UI"
+                }
+              }
+
+              t2 {
+                glyph {
+                  contents: sqliteLogo
+                }
+
+                label {
+                  contents: "Sqlite3"
+                }
+              }
+
+              t1 {
+                glyph {
+                  contents: reactLogo
+                }
+
+                label {
+                  contents: "React"
+                }
+              }
+            }
+
+            main {
+              descBox {
+                desc {
+                  contents: "Planned, Designed, and Implemented a Peer Evaluation feature inside of a live Project Development Portal to simplify the processes taken by Admins, Coaches, and Students by making the feature in-house instead of…"
+                }
+              }
+
+              facts {
+                @with-variant(fct.fact)
+                status {
+                  label {
+                    contents: "Completed Oct 2024"
+                  }
+                }
+
+                @with-variant(fct.factWork)
+                kind {}
+              }
+
+              heading {
+                contents: "RIT Senior Project Portal"
+              }
+            }
+          }
+        }
+      }
+
+      c1 {
+        cols {
+          side {
+            media {
+              fill[1].image.ref: rawsyShot
+            }
+          }
+
+          info {
+            stack {
+              t5 {
+                glyph {
+                  contents: mongoLogo
+                }
+
+                label {
+                  contents: "MongoDB"
+                }
+
+                display: .visible
+              }
+
+              t4 {
+                glyph {
+                  contents: rustLogo
+                }
+
+                label {
+                  contents: "Rust"
+                }
+              }
+
+              t3 {
+                glyph {
+                  contents: zolaLogo
+                }
+
+                label {
+                  contents: "Zola"
+                }
+              }
+
+              t2 {
+                glyph {
+                  contents: postgresLogo
+                }
+
+                label {
+                  contents: "PostgreSQL"
+                }
+              }
+
+              t1 {
+                glyph {
+                  contents: pythonLogo
+                }
+
+                label {
+                  contents: "Python"
+                }
+              }
+            }
+
+            main {
+              descBox {
+                desc {
+                  contents: "Researched on code vulnerabilities and how much the Rust language mitigates them by default to aid the writing of a related white paper. Categorized and analyzed CWEs based on Rust’s built-in protections.…"
+                }
+              }
+
+              facts {
+                @with-variant(fct.fact)
+                status {
+                  label {
+                    contents: "Completed Dec 2024"
+                  }
+                }
+
+                @with-variant(fct.factWork)
+                kind {}
+              }
+
+              heading {
+                contents: "Rust Are We Secure Yet?"
+              }
+            }
+          }
+        }
+      }
+    }
+
+    head {
+      pill {
+        count {
+          contents: "4 projects"
+        }
+
+        year {
+          contents: "2024"
+        }
+      }
+    }
+  }
+
+  y2023 = frame : projectsYear {
+    width: 100%,
+
+    cards {
+      c4 {
+        cols {
+          side {
+            foot {
+              links {
+                disc2 {
+                  display: .none
+                }
+              }
+            }
+
+            @with-variant(mt.mediaThumbFelt)
+            media {}
+          }
+
+          info {
+            stack {
+              t3 {
+                glyph {
+                  fill[0].visible: .true,
+                  contents: waveIcon
+                }
+
+                label {
+                  contents: "DAC"
+                }
+              }
+
+              t4 {
+                display: .none
+              }
+
+              t2 {
+                glyph {
+                  contents: stmLogo
+                }
+
+                label {
+                  contents: "STM32"
+                }
+              }
+
+              t1 {
+                glyph {
+                  contents: cLogo
+                }
+
+                label {
+                  contents: "C"
+                }
+              }
+            }
+
+            main {
+              descBox {
+                desc {
+                  contents: "A Midi Player in C lang, which can interpret midi files and play songs through an STM32 microcontroller using Digital to Analog Conversion. I have also incorporated key controls for the player, such as play,…"
+                }
+              }
+
+              facts {
+                @with-variant(fct.fact)
+                status {
+                  label {
+                    contents: "Completed Apr 2023"
+                  }
+                }
+
+                @with-variant(fct.factSchool)
+                kind {}
+              }
+
+              heading {
+                contents: "Microcontroller Midi Player"
+              }
+            }
+          }
+        }
+
+        display: .visible
+      }
+
+      @with-variant(pj.projectText)
+      c3 {
+        cols {
+          info {
+            stack {
+              t4 {
+                display: .none
+              }
+
+              t3 {
+                display: .none
+              }
+
+              t2 {
+                display: .none
+              }
+
+              t1 {
+                glyph {
+                  contents: rustLogo
+                }
+
+                label {
+                  contents: "Rust"
+                }
+              }
+            }
+
+            main {
+              descBox {
+                desc {
+                  contents: "Using Rust, I created a program that can understand and run a part of the Forth programming language, which works with an interrior stack of data in memory. I also made a Lexer that turns input strings into tokens, which are easier to process and execute."
+                }
+              }
+
+              facts {
+                @with-variant(fct.fact)
+                status {
+                  label {
+                    contents: "Completed Jun 2023"
+                  }
+                }
+              }
+
+              heading {
+                contents: "Forth Evaluator"
+              }
+            }
+          }
+
+          side {
+            foot {
+              links {
+                wu {
+                  display: .visible
+                }
+              }
+            }
+          }
+        }
+
+        display: .visible
+      }
+
+      @with-variant(pj.projectText)
+      c2 {
+        cols {
+          info {
+            stack {
+              t4 {
+                glyph {
+                  fill[0].visible: .true,
+                  contents: openaiIcon
+                }
+
+                label {
+                  contents: "OpenAI API"
+                }
+              }
+
+              t5 {
+                glyph {
+                  contents: azureLogo
+                }
+
+                label {
+                  contents: "Azure"
+                }
+
+                display: .visible
+              }
+
+              t3 {
+                glyph {
+                  contents: reactLogo
+                }
+
+                label {
+                  contents: "React"
+                }
+              }
+
+              t2 {
+                glyph {
+                  contents: flaskLogo
+                }
+
+                label {
+                  contents: "Flask"
+                }
+              }
+
+              t1 {
+                glyph {
+                  contents: pythonLogo
+                }
+
+                label {
+                  contents: "Python"
+                }
+              }
+            }
+
+            main {
+              descBox {
+                desc {
+                  contents: "Engaged in customer discovery to identify market needs, testing the viability and user interaction level of AI and computer vision integrated solutions, enabling further research and potential development for the client. Used Azure and OpenAI services to build a MVP in React/Tailwind/TS, managed communications via a Flask server, and enhanced digital experiences with Unity through a websocket client and blender animations."
+                }
+              }
+
+              facts {
+                @with-variant(fct.fact)
+                status {
+                  label {
+                    contents: "Completed Dec 2023"
+                  }
+                }
+
+                @with-variant(fct.factWork)
+                kind {}
+              }
+
+              heading {
+                contents: "Fishbowl AI Assistant"
+              }
+            }
+          }
+
+          side {
+            foot {
+              links {
+                display: .none
+              }
+            }
+          }
+        }
+      }
+
+      c1 {
+        cols {
+          side {
+            foot {
+              links {
+                @with-variant(lnk.linkDiscDiscord)
+                disc2 {}
+              }
+            }
+
+            media {
+              fill[1].image.ref: sonaShot
+            }
+          }
+
+          info {
+            stack {
+              t3 {
+                glyph {
+                  fill[0].visible: .true,
+                  contents: cloudIcon
+                }
+
+                label {
+                  contents: "Cloudbased LLM Provider APIs"
+                }
+              }
+
+              t4 {
+                display: .none
+              }
+
+              t2 {
+                glyph {
+                  contents: discordLogo
+                }
+
+                label {
+                  contents: "Discord.py"
+                }
+              }
+
+              t1 {
+                glyph {
+                  contents: pythonLogo
+                }
+
+                label {
+                  contents: "Python"
+                }
+              }
+            }
+
+            main {
+              descBox {
+                desc {
+                  contents: "a discord bot thats just like me :). Developed a Discord bot with natural language processing for text and voice interactions, featuring a flexible AI manager that supports integration with multiple AI models (e.g.,…"
+                }
+              }
+
+              facts {
+                status {
+                  label {
+                    contents: "WIP since Dec 2023"
+                  }
+                }
+              }
+
+              heading {
+                contents: "Sonata"
+              }
+            }
+          }
+        }
+      }
+    }
+
+    head {
+      pill {
+        count {
+          contents: "4 projects"
+        }
+
+        year {
+          contents: "2023"
+        }
+      }
+    }
+  }
+
+  y2021 = frame : projectsYear {
+    width: 100%,
+
+    cards {
+      c2 {
+        display: .none
+      }
+
+      c1 {
+        cols {
+          side {
+            foot {
+              links {
+                disc2 {
+                  display: .none
+                }
+              }
+            }
+
+            @with-variant(mt.mediaThumbFelt)
+            media {}
+          }
+
+          info {
+            stack {
+              t4 {
+                glyph {
+                  fill[0].visible: .true,
+                  contents: bracesIcon
+                }
+
+                label {
+                  contents: "Freemarker"
+                }
+              }
+
+              t3 {
+                glyph {
+                  contents: sparkLogo
+                }
+
+                label {
+                  contents: "Spark"
+                }
+              }
+
+              t2 {
+                glyph {
+                  contents: jsLogo
+                }
+
+                label {
+                  contents: "JavaScript"
+                }
+              }
+
+              t1 {
+                glyph {
+                  contents: javaLogo
+                }
+
+                label {
+                  contents: "Java"
+                }
+              }
+            }
+
+            main {
+              descBox {
+                desc {
+                  contents: "Collaborated with 3 other students to develop a web app of Anglo-American checkers using Java, Javascript, Spark, and Freemarker for the code base and web server connections Utilizing Agile (OpenUp) framewor…"
+                }
+              }
+
+              facts {
+                @with-variant(fct.fact)
+                status {
+                  label {
+                    contents: "Completed Dec 2021"
+                  }
+                }
+
+                @with-variant(fct.factSchool)
+                kind {}
+              }
+
+              heading {
+                contents: "Webcheckers"
+              }
+            }
+          }
+        }
+      }
+    }
+
+    head {
+      pill {
+        count {
+          contents: "1 project"
+        }
+
+        year {
+          contents: "2021"
+        }
+      }
+    }
+  }
+
+  y2020 = frame : projectsYear {
+    width: 100%,
+
+    cards {
+      c1 {
+        cols {
+          side {
+            media {
+              fill[1].image.ref: beepShot,
+              fill[1].image.sizing: {scale: 0.1691, offset: [0px, 19px]}
+            }
+
+            foot {
+              links {
+                display: .none
+              }
+            }
+          }
+
+          info {
+            stack {
+              t4 {
+                glyph {
+                  fill[0].visible: .true,
+                  contents: circleIcon
+                }
+
+                label {
+                  contents: "Beepbox"
+                }
+              }
+
+              t3 {
+                glyph {
+                  contents: googleLogo
+                }
+
+                label {
+                  contents: "Google Sheets API"
+                }
+              }
+
+              t2 {
+                glyph {
+                  contents: discordLogo
+                }
+
+                label {
+                  contents: "Discord.js"
+                }
+              }
+
+              t1 {
+                glyph {
+                  contents: nodeLogo
+                }
+
+                label {
+                  contents: "Node.js"
+                }
+              }
+            }
+
+            main {
+              descBox {
+                desc {
+                  contents: "I had been working on a project that involves creating a Discord bot using node.js. The bot can take a song link from https://www.beepbox.co/ or a shortened link that redirects to it, and convert it into a ReadableStream…"
+                }
+              }
+
+              facts {
+                @with-variant(fct.fact)
+                status {
+                  label {
+                    contents: "Completed Apr 2021"
+                  }
+                }
+              }
+
+              heading {
+                contents: "Beepbox Bot"
+              }
+            }
+          }
+        }
+      }
+
+      c2 {
+        display: .none
+      }
+    }
+
+    head {
+      pill {
+        count {
+          contents: "1 project"
+        }
+
+        year {
+          contents: "2020"
+        }
+      }
+    }
+  }
+}
+
+// i10: every card's I10 variant; where the i9 grid shows a card's write-up
+// or swaps its second disc, it re-picks their I10 variants too
+@context(i10="on")
+export projectsGridI10 = frame : projectsGrid {
+  title: "Projects · grid · i10",
+  left: 1596px,
+  top: 462px,
+
+  y2020 {
+    cards {
+      @with-variant(pj.projectI10)
+      c1 {}
+    }
+  }
+
+  y2021 {
+    cards {
+      @with-variant(pj.projectI10)
+      c1 {}
+    }
+  }
+
+  y2023 {
+    cards {
+      @with-variant(pj.projectI10)
+      c4 {}
+
+      @with-variant(pj.projectTextI10)
+      c3 {}
+
+      @with-variant(pj.projectTextI10)
+      c2 {}
+
+      @with-variant(pj.projectI10)
+      c1 {
+        cols {
+          side {
+            foot {
+              links {
+                @with-variant(lnk.linkDiscDiscordI10)
+                disc2 {}
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  y2024 {
+    cards {
+      @with-variant(pj.projectI10)
+      c4 {}
+
+      @with-variant(pj.projectI10)
+      c3 {
+        cols {
+          side {
+            foot {
+              links {
+                @with-variant(lnk.linkDiscGithubI10)
+                disc2 {}
+              }
+            }
+          }
+        }
+      }
+
+      @with-variant(pj.projectI10)
+      c2 {}
+
+      @with-variant(pj.projectI10)
+      c1 {}
+    }
+  }
+
+  y2025 {
+    cards {
+      @with-variant(pj.projectI10)
+      c2 {}
+
+      @with-variant(pj.projectI10)
+      c1 {}
+    }
+  }
+}
+
+// ==== states page (labels over the definitions, then the states boards: i9 · i10 · i11) ====
+lbl-projectsYear = text : doc.specLabel {
+  left: 0px,
+  top: 0px,
+  contents: "projectsYear"
+}
+
+note-projectsYear = text : doc.specNote {
+  left: 0px,
+  top: 16px,
+  contents: "a year of cards"
+}
+
+lbl-projectsGrid = text : doc.specLabel {
+  left: 0px,
+  top: 422px,
+  contents: "projectsGrid"
+}
+
+note-projectsGrid = text : doc.specNote {
+  left: 0px,
+  top: 438px,
+  contents: "the grid · i9"
+}
+
+lbl-projectsGridI10 = text : doc.specLabel {
+  left: 1596px,
+  top: 422px,
+  contents: "projectsGridI10"
+}
+
+note-projectsGridI10 = text : doc.specNote {
+  left: 1596px,
+  top: 438px,
+  contents: "i10 (i11 = tokens)"
+}

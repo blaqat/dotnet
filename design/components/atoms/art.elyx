@@ -1,0 +1,385 @@
+import "tokens/color/roles.elyx" as col
+import "tokens/color/palette.elyx" as pal
+import "tokens/space/space.elyx" as spc
+import "assets/art/alphabet-city-collection.svg" as alphabetCityCover
+import "assets/art/revealed.svg" as revealedCover
+import "assets/art/aikisus-shorts.svg" as aikisuCover
+import "assets/art/peppy-snowday.svg" as peppyCover
+import "assets/art/farewell-my-star.svg" as farewellCover
+import "assets/art/gleaming-shadows.svg" as gleamingCover
+import "assets/art/glooming-shadows-of-alphabet-city.svg" as gloomingCover
+import "components/atoms/doc.elyx" as doc
+
+// Cover art: a release's knitted swatch (kit/swatch.js, exported to
+// assets/art/). The instrument picks the yarn: piano = black keys / argyle,
+// BeepBox = purple rings, DAW = blue waves. 64px, radius art (i11: 8, the
+// card's radius − its inset). A card's art sits in its corner; Music's grid
+// uses `artSm` (54). Swap the cover with a cover variant below.
+@variants(
+  artSm,
+  artRevealed,
+  artAikisu,
+  artPeppy,
+  artFarewell,
+  artGleaming,
+  artGlooming
+)
+export art = frame {
+  title: "Art · Alphabet City Collection",
+  left: 0px,
+  top: 40px,
+  width: spc.controls.art,
+  height: spc.controls.art,
+  fill: [col.roles.recess, {image: {ref: alphabetCityCover}}],
+  shadow: [
+    {
+      drop-shadow: {
+        color: pal.palette.hairline,
+        offset: point(0px, 1px),
+        blur-radius: 0px
+      }
+    },
+    {
+      drop-shadow: {
+        color: pal.palette.stitch-soft,
+        offset: point(0px, 2px),
+        blur-radius: 6px
+      }
+    },
+    {
+      inner-shadow: {
+        color: pal.palette.shadow-1,
+        offset: point(0px, 0px),
+        blur-radius: 0px,
+        spread: 1px
+      }
+    }
+  ],
+  corner-radius: spc.radii.art,
+  overflow: .clip
+}
+
+// Music's grid: the folder card's art (54).
+export artSm = frame : art {
+  title: "Art · sm (Music's grid)",
+  left: 231px,
+  top: 40px,
+  width: spc.controls.art-sm,
+  height: spc.controls.art-sm
+}
+
+// The covers: piano collection (Revealed)
+export artRevealed = frame : art {
+  title: "Revealed",
+  left: 351px,
+  top: 40px,
+  fill[1].image.ref: revealedCover
+}
+
+// BeepBox collection (aikisu's shorts)
+export artAikisu = frame : art {
+  title: "aikisu's shorts",
+  left: 0px,
+  top: 240px,
+  fill[1].image.ref: aikisuCover
+}
+
+// piano single, argyle (peppy snowday)
+export artPeppy = frame : art {
+  title: "peppy snowday",
+  left: 231px,
+  top: 240px,
+  fill[1].image.ref: peppyCover
+}
+
+// DAW single, a wave (farewell my star)
+export artFarewell = frame : art {
+  title: "farewell my star",
+  left: 351px,
+  top: 240px,
+  fill[1].image.ref: farewellCover
+}
+
+// BeepBox single, a ring (gleaming shadows)
+export artGleaming = frame : art {
+  title: "gleaming shadows",
+  left: 488px,
+  top: 240px,
+  fill[1].image.ref: gleamingCover
+}
+
+// a song (the player's art): glooming shadows of alphabet city
+export artGlooming = frame : art {
+  title: "glooming shadows (a song)",
+  left: 625px,
+  top: 240px,
+  fill[1].image.ref: gloomingCover
+}
+
+// ==== states page (labels over the definitions, then the states boards: i9 · i10 · i11) ====
+lbl-art = text : doc.specLabel {
+  left: 0px,
+  top: 0px,
+  contents: "art"
+}
+
+note-art = text : doc.specNote {
+  left: 0px,
+  top: 16px,
+  contents: "a cover (felt, no art yet)"
+}
+
+lbl-artSm = text : doc.specLabel {
+  left: 231px,
+  top: 0px,
+  contents: "artSm"
+}
+
+note-artSm = text : doc.specNote {
+  left: 231px,
+  top: 16px,
+  contents: "sm"
+}
+
+lbl-artRevealed = text : doc.specLabel {
+  left: 351px,
+  top: 0px,
+  contents: "artRevealed"
+}
+
+note-artRevealed = text : doc.specNote {
+  left: 351px,
+  top: 16px,
+  contents: "revealed"
+}
+
+lbl-artAikisu = text : doc.specLabel {
+  left: 0px,
+  top: 200px,
+  contents: "artAikisu"
+}
+
+note-artAikisu = text : doc.specNote {
+  left: 0px,
+  top: 216px,
+  contents: "a cover"
+}
+
+lbl-artPeppy = text : doc.specLabel {
+  left: 231px,
+  top: 200px,
+  contents: "artPeppy"
+}
+
+lbl-artFarewell = text : doc.specLabel {
+  left: 351px,
+  top: 200px,
+  contents: "artFarewell"
+}
+
+lbl-artGleaming = text : doc.specLabel {
+  left: 488px,
+  top: 200px,
+  contents: "artGleaming"
+}
+
+lbl-artGlooming = text : doc.specLabel {
+  left: 625px,
+  top: 200px,
+  contents: "artGlooming"
+}
+
+@variants(artStatesI10)
+artStates = frame : doc.docBoard {
+  title: "Art · states · i9",
+  left: 0px,
+  top: 464px,
+
+  body {
+    layout.stack.item-gap: 48px,
+    overrides: [insert(row-1, after = .nil), insert(row-2, after = row-1)]
+  }
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i9"
+      }
+    }
+
+    boardCaption {
+      contents: "Art · every state"
+    }
+  }
+
+  row-1 = frame : doc.specRow {
+    layout.stack.item-gap: 48px,
+    overrides: [
+      insert(st-art, after = .nil),
+      insert(st-artSm, after = st-art),
+      insert(st-artRevealed, after = st-artSm)
+    ]
+  }
+
+  row-2 = frame : doc.specRow {
+    layout.stack.item-gap: 48px,
+    overrides: [
+      insert(st-artAikisu, after = .nil),
+      insert(st-artPeppy, after = st-artAikisu),
+      insert(st-artFarewell, after = st-artPeppy),
+      insert(st-artGleaming, after = st-artFarewell),
+      insert(st-artGlooming, after = st-artGleaming)
+    ]
+  }
+
+  st-art = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "art"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "a cover (felt, no art yet)"
+    }
+
+    it = frame : art {}
+  }
+
+  st-artSm = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "artSm"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "sm"
+    }
+
+    it = frame : artSm {}
+  }
+
+  st-artRevealed = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "artRevealed"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "revealed"
+    }
+
+    it = frame : artRevealed {}
+  }
+
+  st-artAikisu = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "artAikisu"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "a cover"
+    }
+
+    it = frame : artAikisu {}
+  }
+
+  st-artPeppy = frame : doc.spec {
+    label {
+      contents: "artPeppy"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    it = frame : artPeppy {}
+  }
+
+  st-artFarewell = frame : doc.spec {
+    label {
+      contents: "artFarewell"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    it = frame : artFarewell {}
+  }
+
+  st-artGleaming = frame : doc.spec {
+    label {
+      contents: "artGleaming"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    it = frame : artGleaming {}
+  }
+
+  st-artGlooming = frame : doc.spec {
+    label {
+      contents: "artGlooming"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    it = frame : artGlooming {}
+  }
+}
+
+@variants(artStatesI11)
+@context(i10="on")
+artStatesI10 = frame : artStates {
+  title: "Art · states · i10",
+  left: 746px,
+  top: 464px,
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i10"
+      }
+    }
+  }
+}
+
+@context(i10="on", i11="on")
+artStatesI11 = frame : artStatesI10 {
+  title: "Art · states · i11",
+  left: 1492px,
+  top: 464px,
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i11"
+      }
+    }
+  }
+}

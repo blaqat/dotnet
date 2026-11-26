@@ -1,0 +1,156 @@
+import "tokens/color/roles.elyx" as col
+import "tokens/space/space.elyx" as spc
+import "components/atoms/text.elyx" as txt
+import "redesign/v3-yarn-11/media/blaqat.svg" as catSvg
+import "components/atoms/doc.elyx" as doc
+
+// The blaqat cat (the nav brand's mark), 28px, in ink.
+export mark = asset {
+  title: "Mark · the cat",
+  left: 0px,
+  top: 40px,
+  width: spc.controls.mark,
+  height: spc.controls.mark,
+  fill: col.roles.fg,
+  contents: catSvg
+}
+
+// The nav brand: the cat + the "blaqat.net" wordmark (a Title; its dot is the
+// brand red in every iteration). 44px tall, the nav's control height.
+export logo = frame {
+  title: "Logo · blaqat.net",
+  left: 178px,
+  top: 40px,
+  min-height: spc.controls.nav-h,
+  layout: {stack: {align-items: .center, item-gap: spc.steps.s2}},
+  children: [logoMark, wordmark],
+
+  logoMark = asset : mark {}
+
+  wordmark = text : txt.title {
+    contents: "blaqat.net",
+    subrange[0].fill[0].color: col.roles.brand,
+    subrange[0].range: [6, 7]
+  }
+}
+
+// ==== states page (labels over the definitions, then the states boards: i9 · i10 · i11) ====
+lbl-mark = text : doc.specLabel {
+  left: 0px,
+  top: 0px,
+  contents: "mark"
+}
+
+note-mark = text : doc.specNote {
+  left: 0px,
+  top: 16px,
+  contents: "the mark (the cat)"
+}
+
+lbl-logo = text : doc.specLabel {
+  left: 178px,
+  top: 0px,
+  contents: "logo"
+}
+
+note-logo = text : doc.specNote {
+  left: 178px,
+  top: 16px,
+  contents: "the logo"
+}
+
+@variants(logoStatesI10)
+logoStates = frame : doc.docBoard {
+  title: "Logo · states · i9",
+  left: 0px,
+  top: 244px,
+
+  body {
+    layout.stack.item-gap: 48px,
+    overrides: [insert(row-1, after = .nil)]
+  }
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i9"
+      }
+    }
+
+    boardCaption {
+      contents: "Logo · every state"
+    }
+  }
+
+  row-1 = frame : doc.specRow {
+    layout.stack.item-gap: 48px,
+    overrides: [insert(st-mark, after = .nil), insert(st-logo, after = st-mark)]
+  }
+
+  st-mark = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "mark"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "the mark (the cat)"
+    }
+
+    it = asset : mark {}
+  }
+
+  st-logo = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "logo"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "the logo"
+    }
+
+    it = frame : logo {}
+  }
+}
+
+@variants(logoStatesI11)
+@context(i10="on")
+logoStatesI10 = frame : logoStates {
+  title: "Logo · states · i10",
+  left: 488px,
+  top: 244px,
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i10"
+      }
+    }
+  }
+}
+
+@context(i10="on", i11="on")
+logoStatesI11 = frame : logoStatesI10 {
+  title: "Logo · states · i11",
+  left: 974px,
+  top: 244px,
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i11"
+      }
+    }
+  }
+}

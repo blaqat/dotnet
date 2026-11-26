@@ -1,0 +1,2554 @@
+import "tokens/color/palette.elyx" as pal
+import "tokens/space/space.elyx" as spc
+import "components/molecules/year-pill.elyx" as yp
+import "components/atoms/doc.elyx" as doc
+import "components/organisms/post-card.elyx" as pc
+import "components/molecules/media-thumb.elyx" as mt
+import "assets/icons/bold/ranking.svg" as rankingIcon
+import "components/organisms/thoughts-tools.elyx" as tools
+import "assets/icons/bold/folder-simple.svg" as projectIcon
+import "redesign/v3-yarn-11/media/portal-coach.gif" as portalCoachImage
+import "redesign/v3-yarn-11/media/portal-student.png" as portalStudentImage
+import "redesign/v3-yarn-11/media/fitr-redesign.gif" as fitrImage
+
+// Thoughts' stitched feed (thoughts/stitched.html): the rail on the left,
+// then the posts by month, newest first. A month is its ruled pill (the
+// month + a Meta count) and 14 below it three columns of post cards (the
+// masonry, i9 16 apart, i10 24), a month-gap to the next (i9 / i10 32,
+// i11 48: a section). Cards are `components/organisms/post-card.elyx`
+// filled with the real posts (kit/thoughts-data.js).
+// i10 / i11 are iteration variants of each month: the kicker's words in
+// Micro caps ("2 MIN", "NOV 7"), the pick's link button (postPickI10), the
+// 1 + 2 images on top of each other (postImages3I10), i11's cut "Read →"
+// (postArticleI11) and, where the masonry falls differently in the mock,
+// a card moved to its column. `thoughtsFeed` (+ I10 / I11) is the rail and
+// the months side by side, as a screen inserts it into the sheet.
+@variants(monthNovI10)
+export monthNov = frame {
+  title: "Feed · November 2026",
+  left: 0px,
+  top: 40px,
+  width: spc.controls.feed-w,
+  layout: {stack: {direction: .column, item-gap: spc.layout.month-head}},
+  children: [heading, grid],
+
+  heading = frame : yp.yearHeader {
+    width: 100%,
+    padding-top: 0px,
+    padding-left: 0px,
+    padding-bottom: 0px,
+    padding-right: 0px,
+
+    pill {
+      year {
+        contents: "November 2026"
+      }
+
+      count {
+        contents: "9 posts"
+      }
+    }
+  }
+
+  grid = frame {
+    width: 100%,
+    layout: {
+      grid: {columns: [1fr, 1fr, 1fr], column-gap: spc.layout.post-gutter}
+    },
+    children: [c1, c2, c3],
+
+    c1 = frame {
+      width: 100%,
+      layout: {stack: {direction: .column, item-gap: spc.layout.post-gutter}},
+      children: [scratchCat, movingSite, scratchFeedback],
+
+      scratchCat = frame : pc.postNote {
+        width: 100%,
+
+        kicker {
+          date {
+            contents: "Nov 7 · 11:41 pm"
+          }
+        }
+
+        quote {
+          contents: "“what if every website had a little cat that judged your scroll speed"
+        }
+
+        foot {
+          tags {
+            t1 {
+              label {
+                contents: "shower"
+              }
+            }
+          }
+        }
+      }
+
+      movingSite = frame : pc.postArticleCover {
+        width: 100%,
+
+        body {
+          about {
+            display: .none
+          }
+
+          head {
+            kicker {
+              lead {
+                extra {
+                  x {
+                    contents: "7 min read"
+                  }
+                }
+              }
+
+              date {
+                contents: "Nov 5"
+              }
+            }
+
+            words {
+              headline {
+                contents: "Moving a site from\nAstro to SvelteKit\nwithout losing the music"
+              }
+
+              dek {
+                contents: "One <audio> element, a root layout, and why the player kept restarting."
+              }
+            }
+          }
+
+          foot {
+            tags {
+              t1 {
+                label {
+                  contents: "svelte"
+                }
+              }
+
+              t2 {
+                label {
+                  contents: "learnings"
+                }
+              }
+            }
+          }
+        }
+      }
+
+      scratchFeedback = frame : pc.postNotePink {
+        width: 100%,
+
+        foot {
+          display: .none
+        }
+
+        kicker {
+          date {
+            contents: "Nov 1 · 8:12 am"
+          }
+        }
+
+        quote {
+          contents: "“the best ui feedback is the one you only notice when it's missing"
+        }
+      }
+    }
+
+    c2 = frame {
+      width: 100%,
+      layout: {stack: {direction: .column, item-gap: spc.layout.post-gutter}},
+      children: [ghosttyArticle, tenBrowsers, browsersRanked],
+
+      ghosttyArticle = frame : pc.postArticle {
+        width: 100%,
+
+        body {
+          head {
+            kicker {
+              lead {
+                extra {
+                  x {
+                    contents: "2 min read"
+                  }
+                }
+              }
+
+              date {
+                contents: "Nov 7"
+              }
+            }
+
+            words {
+              headline {
+                contents: "Ghostty, three months in"
+              }
+
+              dek {
+                contents: "The terminal I stopped tweaking."
+              }
+            }
+          }
+
+          about {
+            label {
+              contents: "Ghostty"
+            }
+          }
+
+          foot {
+            tags {
+              t1 {
+                label {
+                  contents: "tools"
+                }
+              }
+
+              t2 {
+                label {
+                  contents: "terminal"
+                }
+              }
+            }
+          }
+        }
+      }
+
+      tenBrowsers = frame : pc.postArticle {
+        width: 100%,
+
+        body {
+          about {
+            glyph {
+              contents: rankingIcon
+            }
+
+            label {
+              contents: "My favorite browsers, ranked"
+            }
+          }
+
+          head {
+            kicker {
+              lead {
+                extra {
+                  x {
+                    contents: "3 min read"
+                  }
+                }
+              }
+
+              date {
+                contents: "Nov 4"
+              }
+            }
+
+            words {
+              headline {
+                contents: "Ten browsers, a month each"
+              }
+
+              dek {
+                contents: "How the ranking happened, and why Chrome is in D."
+              }
+            }
+          }
+
+          foot {
+            tags {
+              t1 {
+                label {
+                  contents: "browsers"
+                }
+              }
+
+              t2 {
+                label {
+                  contents: "ranked"
+                }
+              }
+            }
+          }
+        }
+      }
+
+      browsersRanked = frame : pc.postRanking {
+        width: 100%,
+
+        head {
+          kicker {
+            lead {
+              extra {
+                x {
+                  contents: "214 ranked"
+                }
+              }
+            }
+
+            date {
+              contents: "Nov 2"
+            }
+          }
+
+          headline {
+            contents: "My favorite browsers, ranked"
+          }
+        }
+
+        writeup {
+          count {
+            contents: "3 min"
+          }
+        }
+
+        actions {
+          comments {
+            label {
+              contents: "4 comments"
+            }
+          }
+        }
+
+        foot {
+          tags {
+            t1 {
+              label {
+                contents: "browsers"
+              }
+            }
+
+            t2 {
+              label {
+                contents: "ranked"
+              }
+            }
+          }
+        }
+      }
+    }
+
+    c3 = frame {
+      width: 100%,
+      layout: {stack: {direction: .column, item-gap: spc.layout.post-gutter}},
+      children: [heliumArticle, zedPick, ghosttyPick],
+
+      heliumArticle = frame : pc.postArticle {
+        width: 100%,
+
+        body {
+          about {
+            glyph {
+              display: .none
+            }
+
+            label {
+              contents: "Helium"
+            }
+
+            tier {
+              display: .visible
+            }
+          }
+
+          head {
+            kicker {
+              lead {
+                extra {
+                  x {
+                    contents: "2 min read"
+                  }
+                }
+              }
+
+              date {
+                contents: "Nov 6"
+              }
+            }
+
+            words {
+              headline {
+                contents: "Helium, the quiet one"
+              }
+
+              dek {
+                contents: "A month in, I forgot I'd switched. That's why it's in S."
+              }
+            }
+          }
+
+          foot {
+            tags {
+              t1 {
+                label {
+                  contents: "browser"
+                }
+              }
+
+              t2 {
+                label {
+                  contents: "tools"
+                }
+              }
+            }
+          }
+        }
+      }
+
+      zedPick = frame : pc.postPick {
+        width: 100%,
+
+        head {
+          kicker {
+            date {
+              contents: "Nov 4"
+            }
+          }
+
+          words {
+            headline {
+              contents: "Zed"
+            }
+
+            dek {
+              contents: "Fast editor. I write my own themes for it."
+            }
+          }
+        }
+
+        foot {
+          links {
+            ext {
+              extLabel {
+                contents: "zed.dev"
+              }
+            }
+
+            extBtn {
+              label {
+                contents: "zed.dev"
+              }
+            }
+          }
+
+          tagLine {
+            tags {
+              t1 {
+                label {
+                  contents: "tools"
+                }
+              }
+
+              t2 {
+                label {
+                  contents: "editor"
+                }
+              }
+            }
+          }
+        }
+      }
+
+      ghosttyPick = frame : pc.postPick {
+        width: 100%,
+
+        stub {
+          fill[0].color: pal.palette.stub-ink,
+          border[0].color: pal.palette.stub-seam,
+          fill[1].visible: .true
+        }
+
+        head {
+          kicker {
+            date {
+              contents: "Nov 3"
+            }
+          }
+
+          words {
+            headline {
+              contents: "Ghostty"
+            }
+
+            dek {
+              contents: "A terminal that gets out of the way."
+            }
+          }
+        }
+
+        writeup {
+          count {
+            contents: "2 min"
+          }
+
+          display: .visible
+        }
+
+        foot {
+          links {
+            ext {
+              extLabel {
+                contents: "ghostty.org"
+              }
+            }
+
+            extBtn {
+              label {
+                contents: "ghostty.org"
+              }
+            }
+          }
+
+          tagLine {
+            tags {
+              t1 {
+                label {
+                  contents: "tools"
+                }
+              }
+
+              t2 {
+                label {
+                  contents: "terminal"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+@variants(monthNovI11)
+@context(i10="on")
+export monthNovI10 = frame : monthNov {
+  title: "Feed · November 2026 · i10",
+  left: 1596px,
+  top: 40px,
+
+  grid {
+    c3 {
+      overrides: [
+        insert(browsersRankedI10, after = monthNov.grid.c3.zedPick),
+        remove(monthNov.grid.c3.ghosttyPick)
+      ],
+
+      @with-variant(pc.postPickI10)
+      zedPick {
+        head {
+          kicker {
+            date {
+              contents: "NOV 4"
+            }
+          }
+        }
+      }
+
+      heliumArticle {
+        body {
+          head {
+            kicker {
+              date {
+                contents: "NOV 6"
+              }
+
+              lead {
+                extra {
+                  x {
+                    contents: "2 MIN"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+
+    c2 {
+      overrides: [
+        insert(ghosttyPickI10, after = monthNov.grid.c2.tenBrowsers),
+        remove(monthNov.grid.c2.browsersRanked)
+      ],
+
+      tenBrowsers {
+        body {
+          head {
+            kicker {
+              date {
+                contents: "NOV 4"
+              }
+
+              lead {
+                extra {
+                  x {
+                    contents: "3 MIN"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+
+      ghosttyArticle {
+        body {
+          head {
+            kicker {
+              date {
+                contents: "NOV 7"
+              }
+
+              lead {
+                extra {
+                  x {
+                    contents: "2 MIN"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+
+    c1 {
+      scratchFeedback {
+        kicker {
+          date {
+            contents: "NOV 1 · 8:12 AM"
+          }
+        }
+      }
+
+      movingSite {
+        body {
+          head {
+            words {
+              headline {
+                contents: "Moving a site from Astro to\nSvelteKit without losing the music"
+              }
+            }
+
+            kicker {
+              date {
+                contents: "NOV 5"
+              }
+
+              lead {
+                extra {
+                  x {
+                    contents: "7 MIN"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+
+      scratchCat {
+        kicker {
+          date {
+            contents: "NOV 7 · 11:41 PM"
+          }
+        }
+      }
+    }
+  }
+
+  ghosttyPickI10 = frame : pc.postPickI10 {
+    width: 100%,
+
+    stub {
+      fill[0].color: pal.palette.stub-ink,
+      border[0].color: pal.palette.stub-seam,
+      fill[1].visible: .true
+    }
+
+    head {
+      kicker {
+        date {
+          contents: "NOV 3"
+        }
+      }
+
+      words {
+        headline {
+          contents: "Ghostty"
+        }
+
+        dek {
+          contents: "A terminal that gets out of the way."
+        }
+      }
+    }
+
+    writeup {
+      count {
+        contents: "2 min"
+      }
+
+      display: .visible
+    }
+
+    foot {
+      links {
+        ext {
+          extLabel {
+            contents: "ghostty.org"
+          }
+        }
+
+        extBtn {
+          label {
+            contents: "ghostty.org"
+          }
+        }
+      }
+
+      tagLine {
+        tags {
+          t1 {
+            label {
+              contents: "tools"
+            }
+          }
+
+          t2 {
+            label {
+              contents: "terminal"
+            }
+          }
+        }
+      }
+    }
+  }
+
+  browsersRankedI10 = frame : pc.postRanking {
+    width: 100%,
+
+    head {
+      kicker {
+        lead {
+          extra {
+            x {
+              contents: "214"
+            }
+          }
+        }
+
+        date {
+          contents: "NOV 2"
+        }
+      }
+
+      headline {
+        contents: "My favorite browsers, ranked"
+      }
+    }
+
+    writeup {
+      count {
+        contents: "3 min"
+      }
+    }
+
+    actions {
+      comments {
+        label {
+          contents: "4 comments"
+        }
+      }
+    }
+
+    foot {
+      tags {
+        t1 {
+          label {
+            contents: "browsers"
+          }
+        }
+
+        t2 {
+          label {
+            contents: "ranked"
+          }
+        }
+      }
+    }
+  }
+}
+
+@context(i10="on", i11="on")
+export monthNovI11 = frame : monthNovI10 {
+  title: "Feed · November 2026 · i11",
+  left: 3192px,
+  top: 40px,
+
+  grid {
+    c3 {
+      overrides: [
+        insert(ghosttyPickI11, after = monthNov.grid.c3.zedPick),
+        remove(monthNovI10.browsersRankedI10)
+      ],
+
+      @with-variant(pc.postArticleI11)
+      heliumArticle {}
+    }
+
+    c2 {
+      overrides: [
+        insert(browsersRankedI11, after = monthNov.grid.c2.tenBrowsers),
+        remove(monthNovI10.ghosttyPickI10)
+      ],
+
+      @with-variant(pc.postArticleI11)
+      tenBrowsers {}
+
+      @with-variant(pc.postArticleI11)
+      ghosttyArticle {}
+    }
+
+    c1 {
+      scratchFeedback {
+        quote {
+          contents: "“the best ui feedback is the one\nyou only notice when it's missing"
+        }
+      }
+
+      @with-variant(pc.postArticleCoverI11)
+      movingSite {}
+
+      scratchCat {
+        quote {
+          contents: "“what if every website had a little\ncat that judged your scroll speed"
+        }
+      }
+    }
+  }
+
+  browsersRankedI11 = frame : pc.postRanking {
+    width: 100%,
+
+    head {
+      kicker {
+        lead {
+          extra {
+            x {
+              contents: "214"
+            }
+          }
+        }
+
+        date {
+          contents: "NOV 2"
+        }
+      }
+
+      headline {
+        contents: "My favorite browsers, ranked"
+      }
+    }
+
+    writeup {
+      count {
+        contents: "3 min"
+      }
+    }
+
+    actions {
+      comments {
+        label {
+          contents: "4 comments"
+        }
+      }
+    }
+
+    foot {
+      tags {
+        t1 {
+          label {
+            contents: "browsers"
+          }
+        }
+
+        t2 {
+          label {
+            contents: "ranked"
+          }
+        }
+      }
+    }
+  }
+
+  ghosttyPickI11 = frame : pc.postPickI10 {
+    width: 100%,
+
+    stub {
+      fill[0].color: pal.palette.stub-ink,
+      border[0].color: pal.palette.stub-seam,
+      fill[1].visible: .true
+    }
+
+    head {
+      kicker {
+        date {
+          contents: "NOV 3"
+        }
+      }
+
+      words {
+        headline {
+          contents: "Ghostty"
+        }
+
+        dek {
+          contents: "A terminal that gets out of the way."
+        }
+      }
+    }
+
+    writeup {
+      count {
+        contents: "2 min"
+      }
+
+      display: .visible
+    }
+
+    foot {
+      links {
+        ext {
+          extLabel {
+            contents: "ghostty.org"
+          }
+        }
+
+        extBtn {
+          label {
+            contents: "ghostty.org"
+          }
+        }
+      }
+
+      tagLine {
+        tags {
+          t1 {
+            label {
+              contents: "tools"
+            }
+          }
+
+          t2 {
+            label {
+              contents: "terminal"
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+@variants(monthOctI10)
+export monthOct = frame {
+  title: "Feed · October 2026",
+  left: 0px,
+  top: 1329px,
+  width: spc.controls.feed-w,
+  layout: {stack: {direction: .column, item-gap: spc.layout.month-head}},
+  children: [heading, grid],
+
+  heading = frame : yp.yearHeader {
+    width: 100%,
+    padding-top: 0px,
+    padding-left: 0px,
+    padding-bottom: 0px,
+    padding-right: 0px,
+
+    pill {
+      year {
+        contents: "October 2026"
+      }
+
+      count {
+        contents: "10 posts"
+      }
+    }
+  }
+
+  grid = frame {
+    width: 100%,
+    layout: {
+      grid: {columns: [1fr, 1fr, 1fr], column-gap: spc.layout.post-gutter}
+    },
+    children: [c1, c2, c3],
+
+    c1 = frame {
+      width: 100%,
+      layout: {stack: {direction: .column, item-gap: spc.layout.post-gutter}},
+      children: [lateNight, misePick, heliumPick, scratchPlaylist],
+
+      lateNight = frame : pc.postPlaylist {
+        width: 100%
+      }
+
+      misePick = frame : pc.postPick {
+        width: 100%,
+
+        stub {
+          fill[0].color: pal.palette.blue,
+          border[0].color: pal.palette.stub-seam,
+          fill[1].visible: .true
+        }
+
+        head {
+          kicker {
+            date {
+              contents: "Oct 18"
+            }
+          }
+
+          words {
+            headline {
+              contents: "mise"
+            }
+
+            dek {
+              contents: "One tool for node, bun, python versions."
+            }
+          }
+        }
+
+        foot {
+          links {
+            ext {
+              extLabel {
+                contents: "mise.jdx.dev"
+              }
+            }
+
+            extBtn {
+              label {
+                contents: "mise.jdx.dev"
+              }
+            }
+          }
+
+          tagLine {
+            tags {
+              t1 {
+                label {
+                  contents: "tools"
+                }
+              }
+
+              t2 {
+                label {
+                  contents: "terminal"
+                }
+              }
+            }
+          }
+        }
+      }
+
+      heliumPick = frame : pc.postPick {
+        width: 100%,
+
+        head {
+          kicker {
+            date {
+              contents: "Oct 9"
+            }
+          }
+
+          words {
+            headline {
+              contents: "Helium"
+            }
+
+            dek {
+              contents: "Quiet Chromium browser. Currently my S tier."
+            }
+          }
+        }
+
+        foot {
+          links {
+            ext {
+              extLabel {
+                contents: "helium.computer"
+              }
+            }
+
+            extBtn {
+              label {
+                contents: "helium.computer"
+              }
+            }
+          }
+
+          tagLine {
+            tags {
+              t1 {
+                label {
+                  contents: "tools"
+                }
+              }
+
+              t2 {
+                label {
+                  contents: "browser"
+                }
+              }
+            }
+          }
+        }
+      }
+
+      scratchPlaylist = frame : pc.postNoteSky {
+        width: 100%,
+
+        foot {
+          display: .none
+        }
+
+        kicker {
+          date {
+            contents: "Oct 2 · 5:20 pm"
+          }
+        }
+
+        quote {
+          contents: "“a playlist is a mood with a tracklist"
+        }
+      }
+    }
+
+    c2 = frame {
+      width: 100%,
+      layout: {stack: {direction: .column, item-gap: spc.layout.post-gutter}},
+      children: [sonaSheets, codingFonts],
+
+      sonaSheets = frame : pc.postImages {
+        width: 100%,
+
+        head {
+          kicker {
+            lead {
+              extra {
+                x {
+                  contents: "4 images"
+                }
+              }
+            }
+
+            date {
+              contents: "Oct 28"
+            }
+          }
+
+          words {
+            headline {
+              contents: "Sona character sheets"
+            }
+
+            dek {
+              contents: "Old drawings I found. Tap to look closer."
+            }
+          }
+        }
+
+        foot {
+          tags {
+            t1 {
+              label {
+                contents: "design"
+              }
+            }
+
+            t2 {
+              label {
+                contents: "wip"
+              }
+            }
+          }
+        }
+      }
+
+      codingFonts = frame : pc.postRanking {
+        width: 100%,
+
+        writeup {
+          display: .none
+        }
+
+        tiers {
+          rD {
+            display: .none
+          }
+
+          @with-variant(pc.postTierNamed)
+          rC {
+            tray {
+              fill[0].color: pal.palette.tray-ink,
+
+              i2 {
+                dot {
+                  fill[0].color: pal.palette.stub-ink
+                }
+
+                name {
+                  contents: "Consolas"
+                }
+              }
+
+              i1 {
+                dot {
+                  fill[0].color: pal.palette.stub-ink
+                }
+
+                name {
+                  contents: "Courier New"
+                }
+              }
+            }
+
+            key {
+              fill[0].color: pal.palette.stub-ink,
+
+              letter {
+                contents: "Only in someone else's screenshot"
+              }
+            }
+          }
+
+          @with-variant(pc.postTierNamed)
+          rB {
+            tray {
+              fill[0].color: pal.palette.tray-lilac,
+
+              i2 {
+                dot {
+                  fill[0].color: pal.palette.tier-lilac
+                }
+
+                name {
+                  contents: "Comic Mono"
+                }
+              }
+
+              i1 {
+                dot {
+                  fill[0].color: pal.palette.tier-lilac
+                }
+
+                name {
+                  contents: "Fira Code"
+                }
+              }
+            }
+
+            key {
+              fill[0].color: pal.palette.tier-lilac,
+
+              letter {
+                contents: "Nice for a Sunday"
+              }
+            }
+          }
+
+          @with-variant(pc.postTierNamed)
+          rA {
+            tray {
+              fill[0].color: pal.palette.tray-teal,
+
+              i3 {
+                dot {
+                  fill[0].color: pal.palette.tier-teal
+                }
+
+                name {
+                  contents: "Monaspace"
+                }
+
+                display: .visible
+              }
+
+              i2 {
+                dot {
+                  fill[0].color: pal.palette.tier-teal
+                }
+
+                name {
+                  contents: "Iosevka"
+                }
+              }
+
+              i1 {
+                dot {
+                  fill[0].color: pal.palette.tier-teal
+                }
+
+                name {
+                  contents: "JetBrains Mono"
+                }
+              }
+            }
+
+            key {
+              fill[0].color: pal.palette.tier-teal,
+
+              letter {
+                contents: "In the rotation"
+              }
+            }
+          }
+
+          @with-variant(pc.postTierNamed)
+          rS {
+            tray {
+              fill[0].color: pal.palette.tray-red,
+
+              i2 {
+                name {
+                  contents: "Berkeley Mono"
+                }
+
+                display: .visible
+              }
+
+              i1 {
+                name {
+                  contents: "Maple Mono"
+                }
+              }
+            }
+          }
+        }
+
+        foot {
+          tags {
+            t1 {
+              label {
+                contents: "design"
+              }
+            }
+          }
+        }
+
+        actions {
+          comments {
+            label {
+              contents: "3 comments"
+            }
+          }
+        }
+
+        head {
+          headline {
+            contents: "Coding fonts, by\nhow long they'd last"
+          }
+
+          kicker {
+            date {
+              contents: "Oct 19"
+            }
+
+            lead {
+              extra {
+                x {
+                  contents: "86 ranked"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+
+    c3 = frame {
+      width: 100%,
+      layout: {stack: {direction: .column, item-gap: spc.layout.post-gutter}},
+      children: [chezmoiPick, scratchFolders, springs, seniorPortal],
+
+      chezmoiPick = frame : pc.postPick {
+        width: 100%,
+
+        stub {
+          fill[0].color: pal.palette.red,
+          border[0].color: pal.palette.stub-seam,
+          fill[1].visible: .true
+        }
+
+        head {
+          kicker {
+            date {
+              contents: "Oct 26"
+            }
+          }
+
+          words {
+            headline {
+              contents: "chezmoi"
+            }
+
+            dek {
+              contents: "Dotfiles across machines, with encrypted secrets."
+            }
+          }
+        }
+
+        foot {
+          links {
+            ext {
+              extLabel {
+                contents: "chezmoi.io"
+              }
+            }
+
+            extBtn {
+              label {
+                contents: "chezmoi.io"
+              }
+            }
+          }
+
+          tagLine {
+            tags {
+              t1 {
+                label {
+                  contents: "tools"
+                }
+              }
+
+              t2 {
+                label {
+                  contents: "dotfiles"
+                }
+              }
+            }
+          }
+        }
+      }
+
+      scratchFolders = frame : pc.postNoteMint {
+        width: 100%,
+
+        kicker {
+          date {
+            contents: "Oct 24 · 1:03 am"
+          }
+        }
+
+        quote {
+          contents: "“folders are just tabs that grew up"
+        }
+
+        foot {
+          tags {
+            t1 {
+              label {
+                contents: "shower"
+              }
+            }
+          }
+        }
+      }
+
+      springs = frame : pc.postArticle {
+        width: 100%,
+
+        body {
+          about {
+            display: .none
+          }
+
+          head {
+            kicker {
+              lead {
+                extra {
+                  x {
+                    contents: "4 min read"
+                  }
+                }
+              }
+
+              date {
+                contents: "Oct 20"
+              }
+            }
+
+            words {
+              headline {
+                contents: "Springs, not durations"
+              }
+
+              dek {
+                contents: "What I took from Apple's fluid interface talk and how it maps to CSS."
+              }
+            }
+          }
+
+          foot {
+            tags {
+              t1 {
+                label {
+                  contents: "design"
+                }
+              }
+
+              t2 {
+                label {
+                  contents: "learnings"
+                }
+              }
+            }
+          }
+        }
+      }
+
+      seniorPortal = frame : pc.postImages2 {
+        width: 100%,
+
+        grid {
+          row {
+            s1 {
+              fill[1].image.ref: portalCoachImage,
+              overrides: [insert(coachGif, after = mt.mediaThumb.thumbStitch)]
+            }
+
+            s2 {
+              fill[1].image.ref: portalStudentImage
+            }
+          }
+        }
+
+        head {
+          words {
+            dek {
+              display: .none
+            }
+
+            headline {
+              contents: "Senior project portal, coach view"
+            }
+          }
+
+          kicker {
+            lead {
+              extra {
+                x {
+                  contents: "2 images"
+                }
+              }
+            }
+
+            date {
+              contents: "Oct 15"
+            }
+          }
+        }
+
+        foot {
+          tags {
+            t2 {
+              display: .none
+            }
+
+            t1 {
+              label {
+                contents: "projects"
+              }
+            }
+          }
+        }
+
+        coachGif = frame : pc.postGif {
+          right: spc.layout.stack-tight,
+          bottom: spc.layout.stack-tight
+        }
+      }
+    }
+  }
+}
+
+@variants(monthOctI11)
+@context(i10="on")
+export monthOctI10 = frame : monthOct {
+  title: "Feed · October 2026 · i10",
+  left: 1596px,
+  top: 1329px,
+
+  grid {
+    c3 {
+      overrides: [
+        insert(scratchPlaylistI10, after = monthOct.grid.c3.seniorPortal)
+      ],
+
+      seniorPortal {
+        head {
+          kicker {
+            date {
+              contents: "OCT 15"
+            }
+
+            lead {
+              extra {
+                x {
+                  contents: "2 IMAGES"
+                }
+              }
+            }
+          }
+        }
+      }
+
+      springs {
+        body {
+          head {
+            kicker {
+              date {
+                contents: "OCT 20"
+              }
+
+              lead {
+                extra {
+                  x {
+                    contents: "4 MIN"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+
+      scratchFolders {
+        kicker {
+          date {
+            contents: "OCT 24 · 1:03 AM"
+          }
+        }
+      }
+
+      @with-variant(pc.postPickI10)
+      chezmoiPick {
+        head {
+          kicker {
+            date {
+              contents: "OCT 26"
+            }
+          }
+        }
+      }
+    }
+
+    c2 {
+      codingFonts {
+        head {
+          kicker {
+            date {
+              contents: "OCT 19"
+            }
+
+            lead {
+              extra {
+                x {
+                  contents: "86"
+                }
+              }
+            }
+          }
+        }
+      }
+
+      sonaSheets {
+        head {
+          kicker {
+            date {
+              contents: "OCT 28"
+            }
+
+            lead {
+              extra {
+                x {
+                  contents: "4 IMAGES"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+
+    c1 {
+      overrides: [remove(monthOct.grid.c1.scratchPlaylist)],
+
+      @with-variant(pc.postPickI10)
+      heliumPick {
+        head {
+          kicker {
+            date {
+              contents: "OCT 9"
+            }
+          }
+        }
+      }
+
+      @with-variant(pc.postPickI10)
+      misePick {
+        head {
+          kicker {
+            date {
+              contents: "OCT 18"
+            }
+          }
+        }
+      }
+
+      lateNight {
+        kicker {
+          date {
+            contents: "OCT 30"
+          }
+        }
+      }
+    }
+  }
+
+  scratchPlaylistI10 = frame : pc.postNoteSky {
+    width: 100%,
+
+    foot {
+      display: .none
+    }
+
+    kicker {
+      date {
+        contents: "OCT 2 · 5:20 PM"
+      }
+    }
+
+    quote {
+      contents: "“a playlist is a mood with a tracklist"
+    }
+  }
+}
+
+@context(i10="on", i11="on")
+export monthOctI11 = frame : monthOctI10 {
+  title: "Feed · October 2026 · i11",
+  left: 3192px,
+  top: 1329px,
+
+  grid {
+    c3 {
+      @with-variant(pc.postArticleI11)
+      springs {}
+
+      chezmoiPick {
+        head {
+          words {
+            dek {
+              contents: "Dotfiles across machines, with\nencrypted secrets."
+            }
+          }
+        }
+      }
+    }
+
+    c2 {
+      codingFonts {
+        head {
+          headline {
+            contents: "Coding fonts, by how long they'd last"
+          }
+        }
+      }
+    }
+
+    c1 {
+      heliumPick {
+        head {
+          words {
+            dek {
+              contents: "Quiet Chromium browser. Currently my\nS tier."
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+// September: "Old builds, in motion": two clips the mock doesn't have
+// (mt.mediaThumbMissing: the felt, a camera, its words) and a GIF.
+@variants(monthSepI10)
+export monthSep = frame {
+  title: "Feed · September 2026",
+  left: 0px,
+  top: 2679px,
+  width: spc.controls.feed-w,
+  layout: {stack: {direction: .column, item-gap: spc.layout.month-head}},
+  children: [heading, grid],
+
+  heading = frame : yp.yearHeader {
+    width: 100%,
+    padding-top: 0px,
+    padding-left: 0px,
+    padding-bottom: 0px,
+    padding-right: 0px,
+
+    pill {
+      year {
+        contents: "September 2026"
+      }
+
+      count {
+        contents: "1 post"
+      }
+    }
+  }
+
+  grid = frame {
+    width: 100%,
+    layout: {
+      grid: {columns: [1fr, 1fr, 1fr], column-gap: spc.layout.post-gutter}
+    },
+    children: [c1, c2, c3],
+
+    c1 = frame {
+      width: 100%,
+      layout: {stack: {direction: .column, item-gap: spc.layout.post-gutter}},
+      children: oldBuilds,
+
+      oldBuilds = frame : pc.postImages3 {
+        width: 100%,
+
+        foot {
+          tags {
+            t2 {
+              label {
+                contents: "video"
+              }
+            }
+
+            t1 {
+              label {
+                contents: "projects"
+              }
+            }
+          }
+        }
+
+        grid {
+          row {
+            @with-variant(mt.mediaThumbMissing)
+            s2 {}
+
+            s1 {
+              overrides: [insert(fitrGif, after = mt.mediaThumb.thumbStitch)],
+              fill[1].image.ref: fitrImage
+            }
+          }
+
+          @with-variant(mt.mediaThumbMissing)
+          big {}
+        }
+
+        head {
+          words {
+            dek {
+              contents: "Two clips and a gif from the archive."
+            }
+
+            headline {
+              contents: "Old builds, in motion"
+            }
+          }
+
+          kicker {
+            date {
+              contents: "Sep 21"
+            }
+
+            lead {
+              extra {
+                x {
+                  contents: "3 items"
+                }
+              }
+            }
+          }
+        }
+
+        fitrGif = frame : pc.postGif {
+          right: spc.layout.stack-tight,
+          bottom: spc.layout.stack-tight
+        }
+      }
+    }
+
+    c2 = frame {
+      width: 100%,
+      layout: {stack: {direction: .column, item-gap: spc.layout.post-gutter}}
+    }
+
+    c3 = frame {
+      width: 100%,
+      layout: {stack: {direction: .column, item-gap: spc.layout.post-gutter}}
+    }
+  }
+}
+
+// i10: the 1 + 2 images on top of each other. (Switching the post's
+// variant drops its thumbs' felt picture, so it's restated here.)
+@context(i10="on")
+export monthSepI10 = frame : monthSep {
+  title: "Feed · September 2026 · i10",
+  left: 1596px,
+  top: 2679px,
+
+  grid {
+    c1 {
+      @with-variant(pc.postImages3I10)
+      oldBuilds {
+        head {
+          kicker {
+            date {
+              contents: "SEP 21"
+            }
+
+            lead {
+              extra {
+                x {
+                  contents: "3 ITEMS"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+@variants(monthAprI10)
+export monthApr = frame {
+  title: "Feed · April 2024",
+  left: 0px,
+  top: 3330px,
+  width: spc.controls.feed-w,
+  layout: {stack: {direction: .column, item-gap: spc.layout.month-head}},
+  children: [heading, grid],
+
+  heading = frame : yp.yearHeader {
+    width: 100%,
+    padding-top: 0px,
+    padding-left: 0px,
+    padding-bottom: 0px,
+    padding-right: 0px,
+
+    pill {
+      year {
+        contents: "April 2024"
+      }
+
+      count {
+        contents: "1 post"
+      }
+    }
+  }
+
+  grid = frame {
+    width: 100%,
+    layout: {
+      grid: {columns: [1fr, 1fr, 1fr], column-gap: spc.layout.post-gutter}
+    },
+    children: [c1, c2, c3],
+
+    c1 = frame {
+      width: 100%,
+      layout: {stack: {direction: .column, item-gap: spc.layout.post-gutter}},
+      children: bankSim,
+
+      bankSim = frame : pc.postArticle {
+        width: 100%,
+
+        body {
+          foot {
+            tags {
+              t2 {
+                display: .none
+              }
+
+              t1 {
+                label {
+                  contents: "learnings"
+                }
+              }
+            }
+          }
+
+          about {
+            glyph {
+              contents: projectIcon
+            }
+
+            label {
+              contents: "Bank Simulation"
+            }
+          }
+
+          head {
+            kicker {
+              lead {
+                extra {
+                  x {
+                    contents: "1 min read"
+                  }
+                }
+              }
+
+              date {
+                contents: "Apr 26"
+              }
+            }
+
+            words {
+              headline {
+                contents: "Simulating a bank\non an STM32"
+              }
+
+              dek {
+                contents: "FreeRTOS tasks, queues and semaphores, and how I stopped busy-waiting."
+              }
+            }
+          }
+        }
+      }
+    }
+
+    c2 = frame {
+      width: 100%,
+      layout: {stack: {direction: .column, item-gap: spc.layout.post-gutter}}
+    }
+
+    c3 = frame {
+      width: 100%,
+      layout: {stack: {direction: .column, item-gap: spc.layout.post-gutter}}
+    }
+  }
+}
+
+@variants(monthAprI11)
+@context(i10="on")
+export monthAprI10 = frame : monthApr {
+  title: "Feed · April 2024 · i10",
+  left: 1596px,
+  top: 3330px,
+
+  grid {
+    c1 {
+      bankSim {
+        body {
+          head {
+            kicker {
+              lead {
+                extra {
+                  x {
+                    contents: "1 MIN"
+                  }
+                }
+              }
+
+              date {
+                contents: "APR 26"
+              }
+            }
+
+            words {
+              headline {
+                contents: "Simulating a bank on an STM32"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+@context(i10="on", i11="on")
+export monthAprI11 = frame : monthAprI10 {
+  title: "Feed · April 2024 · i11",
+  left: 3192px,
+  top: 3330px,
+
+  grid {
+    c1 {
+      @with-variant(pc.postArticleI11)
+      bankSim {}
+    }
+  }
+}
+
+@variants(monthJunI10)
+export monthJun = frame {
+  title: "Feed · June 2023",
+  left: 0px,
+  top: 3747px,
+  width: spc.controls.feed-w,
+  layout: {stack: {direction: .column, item-gap: spc.layout.month-head}},
+  children: [heading, grid],
+
+  heading = frame : yp.yearHeader {
+    width: 100%,
+    padding-top: 0px,
+    padding-left: 0px,
+    padding-bottom: 0px,
+    padding-right: 0px,
+
+    pill {
+      year {
+        contents: "June 2023"
+      }
+
+      count {
+        contents: "1 post"
+      }
+    }
+  }
+
+  grid = frame {
+    width: 100%,
+    layout: {
+      grid: {columns: [1fr, 1fr, 1fr], column-gap: spc.layout.post-gutter}
+    },
+    children: [c1, c2, c3],
+
+    c1 = frame {
+      width: 100%,
+      layout: {stack: {direction: .column, item-gap: spc.layout.post-gutter}},
+      children: forthEval,
+
+      forthEval = frame : pc.postArticle {
+        width: 100%,
+
+        body {
+          foot {
+            tags {
+              t2 {
+                display: .none
+              }
+
+              t1 {
+                label {
+                  contents: "learnings"
+                }
+              }
+            }
+          }
+
+          about {
+            glyph {
+              contents: projectIcon
+            }
+
+            label {
+              contents: "Forth Evaluator"
+            }
+          }
+
+          head {
+            kicker {
+              lead {
+                extra {
+                  x {
+                    contents: "3 min read"
+                  }
+                }
+              }
+
+              date {
+                contents: "Jun 20"
+              }
+            }
+
+            words {
+              headline {
+                contents: "Writing a Forth\nevaluator in Rust, twice"
+              }
+
+              dek {
+                contents: "Closures in a HashMap, then a tokenizer. The second one stuck."
+              }
+            }
+          }
+        }
+      }
+    }
+
+    c2 = frame {
+      width: 100%,
+      layout: {stack: {direction: .column, item-gap: spc.layout.post-gutter}}
+    }
+
+    c3 = frame {
+      width: 100%,
+      layout: {stack: {direction: .column, item-gap: spc.layout.post-gutter}}
+    }
+  }
+}
+
+@variants(monthJunI11)
+@context(i10="on")
+export monthJunI10 = frame : monthJun {
+  title: "Feed · June 2023 · i10",
+  left: 1596px,
+  top: 3747px,
+
+  grid {
+    c1 {
+      forthEval {
+        body {
+          head {
+            kicker {
+              lead {
+                extra {
+                  x {
+                    contents: "3 MIN"
+                  }
+                }
+              }
+
+              date {
+                contents: "JUN 20"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+@context(i10="on", i11="on")
+export monthJunI11 = frame : monthJunI10 {
+  title: "Feed · June 2023 · i11",
+  left: 3192px,
+  top: 3747px,
+
+  grid {
+    c1 {
+      @with-variant(pc.postArticleI11)
+      forthEval {
+        body {
+          head {
+            words {
+              headline {
+                contents: "Writing a Forth evaluator in Rust, twice"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+@variants(thoughtsFeedI10)
+export thoughtsFeed = frame {
+  title: "Thoughts feed (rail + months)",
+  left: 0px,
+  top: 4171px,
+  layout: {stack: {item-gap: spc.layout.rail-gap}},
+  children: [rail, stream],
+
+  rail = frame : tools.thoughtsRail {}
+
+  stream = frame {
+    width: spc.controls.feed-w,
+    layout: {stack: {direction: .column, item-gap: spc.layout.month-gap}},
+    children: [nov, oct, sep, apr, jun],
+
+    nov = frame : monthNov {
+      width: 100%
+    }
+
+    oct = frame : monthOct {
+      width: 100%
+    }
+
+    sep = frame : monthSep {
+      width: 100%
+    }
+
+    apr = frame : monthApr {
+      width: 100%
+    }
+
+    jun = frame : monthJun {
+      width: 100%
+    }
+  }
+}
+
+@variants(thoughtsFeedI11)
+@context(i10="on")
+export thoughtsFeedI10 = frame : thoughtsFeed {
+  title: "Thoughts feed · i10",
+  left: 1596px,
+  top: 4171px,
+
+  stream {
+    @with-variant(monthJunI10)
+    jun {}
+
+    @with-variant(monthAprI10)
+    apr {}
+
+    @with-variant(monthSepI10)
+    sep {}
+
+    @with-variant(monthOctI10)
+    oct {}
+
+    @with-variant(monthNovI10)
+    nov {}
+  }
+}
+
+@context(i10="on", i11="on")
+export thoughtsFeedI11 = frame : thoughtsFeedI10 {
+  title: "Thoughts feed · i11",
+  left: 3192px,
+  top: 4171px,
+
+  stream {
+    @with-variant(monthJunI11)
+    jun {}
+
+    @with-variant(monthAprI11)
+    apr {}
+
+    @with-variant(monthOctI11)
+    oct {}
+
+    @with-variant(monthNovI11)
+    nov {}
+  }
+
+  @with-variant(tools.thoughtsRailI11)
+  rail {}
+}
+
+// ==== states page (labels over the definitions, then the states boards: i9 · i10 · i11) ====
+lbl-monthNov = text : doc.specLabel {
+  left: 0px,
+  top: 0px,
+  contents: "monthNov"
+}
+
+note-monthNov = text : doc.specNote {
+  left: 0px,
+  top: 16px,
+  contents: "a month · i9"
+}
+
+lbl-monthNovI10 = text : doc.specLabel {
+  left: 1596px,
+  top: 0px,
+  contents: "monthNovI10"
+}
+
+note-monthNovI10 = text : doc.specNote {
+  left: 1596px,
+  top: 16px,
+  contents: "i10"
+}
+
+lbl-monthNovI11 = text : doc.specLabel {
+  left: 3192px,
+  top: 0px,
+  contents: "monthNovI11"
+}
+
+note-monthNovI11 = text : doc.specNote {
+  left: 3192px,
+  top: 16px,
+  contents: "i11"
+}
+
+lbl-monthOct = text : doc.specLabel {
+  left: 0px,
+  top: 1289px,
+  contents: "monthOct"
+}
+
+note-monthOct = text : doc.specNote {
+  left: 0px,
+  top: 1305px,
+  contents: "a month · i9"
+}
+
+lbl-monthOctI10 = text : doc.specLabel {
+  left: 1596px,
+  top: 1289px,
+  contents: "monthOctI10"
+}
+
+note-monthOctI10 = text : doc.specNote {
+  left: 1596px,
+  top: 1305px,
+  contents: "i10"
+}
+
+lbl-monthOctI11 = text : doc.specLabel {
+  left: 3192px,
+  top: 1289px,
+  contents: "monthOctI11"
+}
+
+note-monthOctI11 = text : doc.specNote {
+  left: 3192px,
+  top: 1305px,
+  contents: "i11"
+}
+
+lbl-monthSep = text : doc.specLabel {
+  left: 0px,
+  top: 2639px,
+  contents: "monthSep"
+}
+
+note-monthSep = text : doc.specNote {
+  left: 0px,
+  top: 2655px,
+  contents: "a month · i9"
+}
+
+lbl-monthSepI10 = text : doc.specLabel {
+  left: 1596px,
+  top: 2639px,
+  contents: "monthSepI10"
+}
+
+note-monthSepI10 = text : doc.specNote {
+  left: 1596px,
+  top: 2655px,
+  contents: "i10 (i11 = tokens)"
+}
+
+lbl-monthApr = text : doc.specLabel {
+  left: 0px,
+  top: 3290px,
+  contents: "monthApr"
+}
+
+note-monthApr = text : doc.specNote {
+  left: 0px,
+  top: 3306px,
+  contents: "a month · i9"
+}
+
+lbl-monthAprI10 = text : doc.specLabel {
+  left: 1596px,
+  top: 3290px,
+  contents: "monthAprI10"
+}
+
+note-monthAprI10 = text : doc.specNote {
+  left: 1596px,
+  top: 3306px,
+  contents: "i10"
+}
+
+lbl-monthAprI11 = text : doc.specLabel {
+  left: 3192px,
+  top: 3290px,
+  contents: "monthAprI11"
+}
+
+note-monthAprI11 = text : doc.specNote {
+  left: 3192px,
+  top: 3306px,
+  contents: "i11"
+}
+
+lbl-monthJun = text : doc.specLabel {
+  left: 0px,
+  top: 3707px,
+  contents: "monthJun"
+}
+
+note-monthJun = text : doc.specNote {
+  left: 0px,
+  top: 3723px,
+  contents: "a month · i9"
+}
+
+lbl-monthJunI10 = text : doc.specLabel {
+  left: 1596px,
+  top: 3707px,
+  contents: "monthJunI10"
+}
+
+note-monthJunI10 = text : doc.specNote {
+  left: 1596px,
+  top: 3723px,
+  contents: "i10"
+}
+
+lbl-monthJunI11 = text : doc.specLabel {
+  left: 3192px,
+  top: 3707px,
+  contents: "monthJunI11"
+}
+
+note-monthJunI11 = text : doc.specNote {
+  left: 3192px,
+  top: 3723px,
+  contents: "i11"
+}
+
+lbl-thoughtsFeed = text : doc.specLabel {
+  left: 0px,
+  top: 4131px,
+  contents: "thoughtsFeed"
+}
+
+note-thoughtsFeed = text : doc.specNote {
+  left: 0px,
+  top: 4147px,
+  contents: "the feed · i9"
+}
+
+lbl-thoughtsFeedI10 = text : doc.specLabel {
+  left: 1596px,
+  top: 4131px,
+  contents: "thoughtsFeedI10"
+}
+
+note-thoughtsFeedI10 = text : doc.specNote {
+  left: 1596px,
+  top: 4147px,
+  contents: "i10"
+}
+
+lbl-thoughtsFeedI11 = text : doc.specLabel {
+  left: 3192px,
+  top: 4131px,
+  contents: "thoughtsFeedI11"
+}
+
+note-thoughtsFeedI11 = text : doc.specNote {
+  left: 3192px,
+  top: 4147px,
+  contents: "i11"
+}

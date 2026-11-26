@@ -1,0 +1,181 @@
+// i11 · T6 breathing room (48 between sections) + T10 isometric insets
+// and nested radii: card 16 + inner 8 = 24.
+import "./space-i10.elyx" as base
+
+@context(i10=on, i11=on)
+file {}
+
+export layoutI11 = tokens : base.layoutI10 {
+  section-gap: 48px,
+  section-gap-phone: 32px,
+  gutter-x: 24px,
+  gutter-y: 24px,
+  gutter-phone: 16px,
+  inset-x: 16px,
+  inset-y: 16px,
+  inset-phone: 12px,
+  folder-inset: 16px,
+  row-inset-x: 8px,
+  row-inset-y: 8px,
+  pop-inset: 8px,
+  field-inset: 4px,
+  sheet-inset: 16px,
+  panel-inset: 24px,
+  // buttons at Label 14
+  btn-d-r: 15px,
+  // T10 equal insets: a segment (38 − 14) / 2, the year pill .45em all
+  // round, a field 12 all round, the hint 6 / 8
+  seg-x: 12px,
+  pill-x: 10px,
+  pill-y: 10px,
+  pill-gap: 10px,
+  field-x: 12px,
+  tip-x: 8px,
+  tip-y: 6px,
+  // Thoughts (T6, T10): the rail's sections 24 apart, its intro a
+  // section away; a month a section after its last card; every post card
+  // holds its content on the inset, the sticky note and the pick too; the
+  // cover on the inset; track rows 8 all round, reaching 8 past the text
+  rail-section: 24px,
+  rail-intro: 48px,
+  rail-chips-x: 4px,
+  rail-chips-y: 8px,
+  type-row-l: 13px,
+  type-row-r: 13px,
+  month-gap: 48px,
+  cover-top: 16px,
+  cover-x: 16px,
+  note-top: 16px,
+  note-x: 16px,
+  note-bottom: 16px,
+  pick-y: 16px,
+  pick-r: 16px,
+  pick-l: 50px,
+  track-y: 8px,
+  track-l: 0px,
+  track-r: 0px,
+  track-gap: 12px,
+  thumb-gap: 8px,
+  quote-y: 16px,
+  quote-x: 16px,
+  quote-l: 23px,
+  // Projects (T6, T10): the card on the inset all round; a section between
+  // year groups and from the header to the tools; the item's media a
+  // section above its prose
+  pj-pad-t: 16px,
+  pj-pad-x: 16px,
+  pj-pad-b: 16px,
+  pj-group-gap: 48px,
+  pj-head-gap: 48px,
+  pj-item-gap: 52px,
+  pj-row-y: 8px,
+  pj-row-l: 8px,
+  pj-row-r: 8px,
+  // Home (T6): the bio and the section buttons a section apart (48 · 32 on
+  // phones), the contact row 24 under them; the tagline 12 (8) under the
+  // lockup; the badge's em insets at Label 14; the scribble at .62em of 17
+  tagline-gap: 12px,
+  tagline-gap-phone: 8px,
+  lead-gap: 48px,
+  lead-gap-phone: 32px,
+  lead-line-gap-phone: 12px,
+  hnav-gap: 48px,
+  contact-top: 24px,
+  contact-top-phone: 32px,
+  contact-gap: 12px,
+  hero-x-phone: 16px,
+  stk-l: 7px,
+  stk-r: 10px,
+  stk-gap: 6px,
+  scribble-drop: -4px,
+  // Studio (T6 + T10): 48 between panes, 16 under a heading; cards and
+  // rows on their inset all round; the preview pane 16 all round
+  st-head-gap: 48px,
+  st-pane-gap: 52px,
+  st-pane-head: 16px,
+  st-tile-b: 16px,
+  st-row-l: 12px,
+  st-row-r: 12px,
+  st-row-y: 12px,
+  pane-inset: 16px,
+  pane-inset-y: 16px,
+  // Music (T6, T10): the folder card 16 all round (as i10); year groups a
+  // section apart; the results line one gutter above its list; the
+  // player's bar on 12
+  folder-inset-y: 16px,
+  folder-gap: 12px,
+  folder-head-gap: 16px,
+  folder-tt-gap: 4px,
+  folder-links-gap: 8px,
+  folder-room: 20px,
+  folder-tabs-top: -8px,
+  group-gap: 48px,
+  results-gap: 24px,
+  player-inset: 12px,
+  player-who-l: 12px,
+  pill-sm-x: 11px,
+  pill-sm-y: 11px,
+  st-fan-l: 10px,
+  // phones: year groups are sections (M3: the phone's section gap)
+  group-gap-phone: 32px
+}
+
+export radiiI11 = tokens : base.radiiI10 {
+  inner: 8px,
+  card: 24px,
+  row: 16px,
+  pop: 16px,
+  field: 12px,
+  sheet: 24px,
+  pane: 24px,
+  panel: 32px,
+  art: 8px,
+  // a popover's option row + the hint: pop 16 − inset 8
+  opt: 8px,
+  tip: 8px,
+  // Thoughts: a track row (inner 8 + 8), a thumb on the inset, a tier item
+  // 4 in from its tray (8 − 4)
+  track: 16px,
+  thumb: 8px,
+  tier-item: 4px,
+  // Projects: a card's media on the inset (24 − 16)
+  pj-thumb: 8px,
+  pj-thumb-in: 4px,
+  // Music: a card's stitch (24 − 6), the folder card's art (24 − 16), the
+  // player bar and its stitch (20 − 6), a track row's art (16 − 8)
+  card-stitch: 18px,
+  folder-art: 8px,
+  player: 20px,
+  player-stitch: 14px,
+  trk-art: 8px
+}
+
+export controlsI11 = tokens : base.controlsI10 {
+  btn-d-icon: 16px,
+  cover-h: 150px,
+  thumb-h: 169px,
+  thumb-sm-h: 71px,
+  thumb-sq: 146px,
+  kick-h: 20px,
+  post-foot-h: 23px,
+  thumb-half-h: 110px,
+  // Projects: the card's foot is its discs (32)
+  pj-foot: 32px,
+  pj-wu-mark: 0px,
+  pj-wu-mark-icon: 0px,
+  pj-desc-max: 84px,
+  // Home: the scribble at .62em of 17; the phone's stack circles (T5: 24,
+  // inside the bio's 25.5 line)
+  scribble-h: 10.5px,
+  stk-sm: 24px,
+  stk-sm-icon: 15px,
+  // the phone's lockup: the 344 column (390 − 2 × 7 − 2 × 16)
+  lockup-w-phone: 344px,
+  lockup-h-phone: 90px,
+  // Music: 2 lines of Body 14 in a card (3 in two columns)
+  folder-desc-h: 42px,
+  folder-desc-h3: 63px,
+  // phones: the folder card's two lines of Body 14
+  folder-desc-h-phone: 42px,
+  pj-desc-h-phone: 42px
+}

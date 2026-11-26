@@ -1,0 +1,19 @@
+{
+  "version": 2,
+  "skills": {
+    "elyx": {
+      "source": "elyx-design/agents",
+      "commit": "2fbf84475a364e04c679f94eab2a3b736099043f",
+      "sourceType": "github",
+      "skillPath": "plugins/elyx/skills/elyx/SKILL.md",
+      "computedHash": "890af7ce3a253a5b62f4803ddcf493856da9ae873f246d5ac467b8b9287c76d9"
+    },
+    "elyx-code": {
+      "source": "elyx-design/agents",
+      "commit": "2fbf84475a364e04c679f94eab2a3b736099043f",
+      "sourceType": "github",
+      "skillPath": "plugins/elyx/skills/elyx-code/SKILL.md",
+      "computedHash": "8d989fc577d1494d55b16223e04387c6b8e71035af464459afe307a17f23f3ce"
+    }
+  }
+}

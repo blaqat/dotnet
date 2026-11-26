@@ -1,0 +1,694 @@
+import "tokens/color/roles.elyx" as col
+import "tokens/color/palette.elyx" as pal
+import "tokens/color/sections.elyx" as sec
+import "tokens/space/space.elyx" as spc
+import "components/atoms/text.elyx" as txt
+import "components/atoms/doc.elyx" as doc
+import "components/atoms/surface.elyx" as surf
+import "components/molecules/nav-tab.elyx" as tab
+import "assets/icons/fill/folder-simple.svg" as projectsIcon
+import "assets/icons/fill/music-notes.svg" as musicIcon
+import "assets/icons/fill/cloud.svg" as thoughtsIcon
+import "assets/icons/fill/house.svg" as homeIcon
+import "assets/icons/bold/caret-up.svg" as caretIcon
+import "assets/icons/bold/caret-down.svg" as caretDownIcon
+import "assets/icons/fill/squares-four.svg" as studioIcon
+
+// The sections pill (`.yspool__btn`): the phones' nav, closed. A 52px white
+// pill at the sheet's bottom-left: the page's felt dot (34, the section's
+// hue: Home red), its name (Label) and a caret (it unspools upward into
+// the four sections). It keeps its thin stitch in every iteration.
+// Children: `pillStitch`, `dot` (its `glyph`), `label`, `caret`.
+// Variants: one per section (`section=…`: a top-level instance picks it
+// from the canvas; inside a component pick it with `@with-variant`), Open
+// (the caret turns down while the menu is out: organisms/phone-nav.elyx)
+// and Up (.846: it waits on the up line while the player's bar holds the
+// slot). Set the section on Open / Up with `dot { fill[0].color: …
+// glyph {contents: …} }` and `label {contents: …}`.
+@variants(
+  sectionsPillProjects,
+  sectionsPillMusic,
+  sectionsPillThoughts,
+  sectionsPillStudio,
+  sectionsPillOpen,
+  sectionsPillUp
+)
+export sectionsPill = frame {
+  title: "Sections pill · Home (closed)",
+  left: 0px,
+  top: 40px,
+  height: spc.controls.spool,
+  layout: {stack: {align-items: .center, item-gap: spc.layout.spool-gap}},
+  fill: col.roles.surface,
+  shadow: [
+    {
+      drop-shadow: {
+        color: pal.palette.shadow-1,
+        offset: point(0px, 1px),
+        blur-radius: 0px
+      }
+    },
+    {
+      drop-shadow: {
+        color: pal.palette.shadow-pop,
+        offset: point(0px, 6px),
+        blur-radius: 16px,
+        spread: -5px
+      }
+    }
+  ],
+  corner-radius: spc.radii.pill,
+  padding: [0px, spc.layout.spool-r, 0px, spc.layout.spool-l],
+  children: [pillStitch, dot, label, caret],
+
+  pillStitch = frame : surf.stitch {
+    left: spc.layout.stitch-in,
+    top: spc.layout.stitch-in,
+    right: spc.layout.stitch-in,
+    bottom: spc.layout.stitch-in,
+    width: .nil,
+    height: .nil,
+    ignore-stack: .true,
+    corner-radius: spc.radii.pill,
+    border[0].width: 1
+  }
+
+  dot = frame : tab.navTab.dot {
+    width: spc.controls.spool-dot,
+    height: spc.controls.spool-dot,
+    fill[0].color: sec.section.sec,
+
+    dotStitch {
+      border[0].color: col.roles.dot-stitch
+    }
+
+    glyph {
+      fill[0].color: col.roles.dot-fg,
+      width: spc.controls.spool-icon,
+      height: spc.controls.spool-icon,
+      contents: homeIcon
+    }
+
+    dotRest {
+      display: .none
+    }
+  }
+
+  label = text : txt.label {
+    contents: "Home"
+  }
+
+  caret = asset {
+    width: spc.controls.spool-caret,
+    height: spc.controls.spool-caret,
+    fill: col.roles.fg-3,
+    contents: caretIcon
+  }
+}
+
+// ---- one per section (the page's felt dot, its filled glyph, its name) ----
+@context(section="projects")
+export sectionsPillProjects = frame : sectionsPill {
+  title: "Sections pill · Projects",
+  left: 0px,
+  top: 212px,
+
+  dot {
+    fill[0].color: sec.section.hue-projects,
+
+    glyph {
+      contents: projectsIcon
+    }
+  }
+
+  label {
+    contents: "Projects"
+  }
+}
+
+@context(section="music")
+export sectionsPillMusic = frame : sectionsPill {
+  title: "Sections pill · Music",
+  left: 204px,
+  top: 212px,
+
+  dot {
+    fill[0].color: sec.section.hue-music,
+
+    glyph {
+      contents: musicIcon
+    }
+  }
+
+  label {
+    contents: "Music"
+  }
+}
+
+@context(section="thoughts")
+export sectionsPillThoughts = frame : sectionsPill {
+  title: "Sections pill · Thoughts",
+  left: 392px,
+  top: 212px,
+
+  dot {
+    fill[0].color: sec.section.hue-thoughts,
+
+    glyph {
+      contents: thoughtsIcon
+    }
+  }
+
+  label {
+    contents: "Thoughts"
+  }
+}
+
+// Studio: its own page list (Studio · Projects · Music · Thoughts · Media);
+// the ink dot with the dashboard's grid.
+@context(section="studio")
+export sectionsPillStudio = frame : sectionsPill {
+  title: "Sections pill · Studio",
+  left: 606px,
+  top: 212px,
+
+  dot {
+    fill[0].color: sec.section.hue-studio,
+
+    glyph {
+      contents: studioIcon
+    }
+  }
+
+  label {
+    contents: "Studio"
+  }
+}
+
+// ---- states ----
+// Open: the caret turns down while the sections menu is out above it.
+export sectionsPillOpen = frame : sectionsPill {
+  title: "Sections pill · open",
+  left: 204px,
+  top: 40px,
+
+  caret {
+    contents: caretDownIcon
+  }
+}
+
+// Up: while the player's bar holds the slot the pill waits on the up line,
+// .846 of its size (44 tall: the menu's rows keep their 48).
+export sectionsPillUp = frame : sectionsPill {
+  title: "Sections pill · up (the player has the slot)",
+  left: 392px,
+  top: 40px,
+  height: spc.controls.spool-up,
+  padding-left: spc.layout.spool-up-l,
+  padding-right: spc.layout.spool-up-r,
+  layout.stack.item-gap: spc.layout.spool-up-gap,
+
+  caret {
+    width: spc.controls.spool-up-caret,
+    height: spc.controls.spool-up-caret
+  }
+
+  @with-variant(txt.labelCard)
+  label {}
+
+  dot {
+    width: spc.controls.spool-up-dot,
+
+    glyph {
+      width: spc.controls.spool-up-icon,
+      height: spc.controls.spool-up-icon
+    }
+
+    height: spc.controls.spool-up-dot
+  }
+}
+
+// ==== states page (labels over the definitions, then the states boards: i9 · i10 · i11) ====
+lbl-sectionsPill = text : doc.specLabel {
+  left: 0px,
+  top: 0px,
+  contents: "sectionsPill"
+}
+
+note-sectionsPill = text : doc.specNote {
+  left: 0px,
+  top: 16px,
+  contents: "Home · closed"
+}
+
+lbl-sectionsPillOpen = text : doc.specLabel {
+  left: 204px,
+  top: 0px,
+  contents: "sectionsPillOpen"
+}
+
+note-sectionsPillOpen = text : doc.specNote {
+  left: 204px,
+  top: 16px,
+  contents: "the menu out"
+}
+
+lbl-sectionsPillUp = text : doc.specLabel {
+  left: 392px,
+  top: 0px,
+  contents: "sectionsPillUp"
+}
+
+note-sectionsPillUp = text : doc.specNote {
+  left: 392px,
+  top: 16px,
+  contents: "the player in the slot"
+}
+
+lbl-sectionsPillProjects = text : doc.specLabel {
+  left: 0px,
+  top: 172px,
+  contents: "sectionsPillProjects"
+}
+
+note-sectionsPillProjects = text : doc.specNote {
+  left: 0px,
+  top: 188px,
+  contents: "section = projects"
+}
+
+lbl-sectionsPillMusic = text : doc.specLabel {
+  left: 204px,
+  top: 172px,
+  contents: "sectionsPillMusic"
+}
+
+note-sectionsPillMusic = text : doc.specNote {
+  left: 204px,
+  top: 188px,
+  contents: "section = music"
+}
+
+lbl-sectionsPillThoughts = text : doc.specLabel {
+  left: 392px,
+  top: 172px,
+  contents: "sectionsPillThoughts"
+}
+
+note-sectionsPillThoughts = text : doc.specNote {
+  left: 392px,
+  top: 188px,
+  contents: "section = thoughts"
+}
+
+lbl-sectionsPillStudio = text : doc.specLabel {
+  left: 606px,
+  top: 172px,
+  contents: "sectionsPillStudio"
+}
+
+note-sectionsPillStudio = text : doc.specNote {
+  left: 606px,
+  top: 188px,
+  contents: "section = studio"
+}
+
+@variants(
+  sectionsPillStatesI10,
+  sectionsPillStatesProjects,
+  sectionsPillStatesMusic,
+  sectionsPillStatesThoughts,
+  sectionsPillStatesStudio
+)
+sectionsPillStates = frame : doc.docBoard {
+  title: "Sections pill · states · i9",
+  left: 0px,
+  top: 408px,
+
+  body {
+    layout.stack.item-gap: 48px,
+    overrides: [insert(row-1, after = .nil)]
+  }
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i9"
+      }
+    }
+
+    boardCaption {
+      contents: "Sections pill · every state"
+    }
+  }
+
+  row-1 = frame : doc.specRow {
+    layout.stack.item-gap: 48px,
+    overrides: [
+      insert(st-sectionsPill, after = .nil),
+      insert(st-sectionsPillOpen, after = st-sectionsPill),
+      insert(st-sectionsPillUp, after = st-sectionsPillOpen)
+    ]
+  }
+
+  st-sectionsPill = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "sectionsPill"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "Home · closed"
+    }
+
+    it = frame : sectionsPill {}
+  }
+
+  st-sectionsPillOpen = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "sectionsPillOpen"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "the menu out"
+    }
+
+    it = frame : sectionsPillOpen {}
+  }
+
+  st-sectionsPillUp = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "sectionsPillUp"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "the player in the slot"
+    }
+
+    it = frame : sectionsPillUp {}
+  }
+}
+
+@variants(sectionsPillStatesI11)
+@context(i10="on")
+sectionsPillStatesI10 = frame : sectionsPillStates {
+  title: "Sections pill · states · i10",
+  left: 724px,
+  top: 408px,
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i10"
+      }
+    }
+  }
+}
+
+@context(i10="on", i11="on")
+sectionsPillStatesI11 = frame : sectionsPillStatesI10 {
+  title: "Sections pill · states · i11",
+  left: 1438px,
+  top: 408px,
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i11"
+      }
+    }
+  }
+}
+
+@variants(sectionsPillStatesProjectsI10)
+@context(section="projects")
+sectionsPillStatesProjects = frame : sectionsPillStates {
+  title: "Sections pill · projects · states · i9",
+  left: 0px,
+  top: 782px,
+
+  body {
+    row-1 {
+      st-sectionsPill {
+        slot {
+          @with-variant(sectionsPillProjects)
+          it {}
+        }
+
+        note {
+          contents: "section = projects"
+        }
+
+        label {
+          contents: "sectionsPillProjects"
+        }
+      }
+    }
+  }
+
+  boardHead {
+    boardCaption {
+      contents: "Sections pill · section = projects"
+    }
+  }
+}
+
+@variants(sectionsPillStatesProjectsI11)
+@context(i10="on", section="projects")
+sectionsPillStatesProjectsI10 = frame : sectionsPillStatesProjects {
+  title: "Sections pill · projects · states · i10",
+  left: 724px,
+  top: 782px,
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i10"
+      }
+    }
+  }
+}
+
+@context(i10="on", i11="on", section="projects")
+sectionsPillStatesProjectsI11 = frame : sectionsPillStatesProjectsI10 {
+  title: "Sections pill · projects · states · i11",
+  left: 1438px,
+  top: 782px,
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i11"
+      }
+    }
+  }
+}
+
+@variants(sectionsPillStatesMusicI10)
+@context(section="music")
+sectionsPillStatesMusic = frame : sectionsPillStates {
+  title: "Sections pill · music · states · i9",
+  left: 0px,
+  top: 1116px,
+
+  body {
+    row-1 {
+      st-sectionsPill {
+        slot {
+          @with-variant(sectionsPillMusic)
+          it {}
+        }
+
+        note {
+          contents: "section = music"
+        }
+
+        label {
+          contents: "sectionsPillMusic"
+        }
+      }
+    }
+  }
+
+  boardHead {
+    boardCaption {
+      contents: "Sections pill · section = music"
+    }
+  }
+}
+
+@variants(sectionsPillStatesMusicI11)
+@context(i10="on", section="music")
+sectionsPillStatesMusicI10 = frame : sectionsPillStatesMusic {
+  title: "Sections pill · music · states · i10",
+  left: 724px,
+  top: 1116px,
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i10"
+      }
+    }
+  }
+}
+
+@context(i10="on", i11="on", section="music")
+sectionsPillStatesMusicI11 = frame : sectionsPillStatesMusicI10 {
+  title: "Sections pill · music · states · i11",
+  left: 1438px,
+  top: 1116px,
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i11"
+      }
+    }
+  }
+}
+
+@variants(sectionsPillStatesThoughtsI10)
+@context(section="thoughts")
+sectionsPillStatesThoughts = frame : sectionsPillStates {
+  title: "Sections pill · thoughts · states · i9",
+  left: 0px,
+  top: 1450px,
+
+  body {
+    row-1 {
+      st-sectionsPill {
+        slot {
+          @with-variant(sectionsPillThoughts)
+          it {}
+        }
+
+        note {
+          contents: "section = thoughts"
+        }
+
+        label {
+          contents: "sectionsPillThoughts"
+        }
+      }
+    }
+  }
+
+  boardHead {
+    boardCaption {
+      contents: "Sections pill · section = thoughts"
+    }
+  }
+}
+
+@variants(sectionsPillStatesThoughtsI11)
+@context(i10="on", section="thoughts")
+sectionsPillStatesThoughtsI10 = frame : sectionsPillStatesThoughts {
+  title: "Sections pill · thoughts · states · i10",
+  left: 724px,
+  top: 1450px,
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i10"
+      }
+    }
+  }
+}
+
+@context(i10="on", i11="on", section="thoughts")
+sectionsPillStatesThoughtsI11 = frame : sectionsPillStatesThoughtsI10 {
+  title: "Sections pill · thoughts · states · i11",
+  left: 1438px,
+  top: 1450px,
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i11"
+      }
+    }
+  }
+}
+
+@variants(sectionsPillStatesStudioI10)
+@context(section="studio")
+sectionsPillStatesStudio = frame : sectionsPillStates {
+  title: "Sections pill · studio · states · i9",
+  left: 0px,
+  top: 1784px,
+
+  body {
+    row-1 {
+      st-sectionsPill {
+        slot {
+          @with-variant(sectionsPillStudio)
+          it {}
+        }
+
+        note {
+          contents: "section = studio"
+        }
+
+        label {
+          contents: "sectionsPillStudio"
+        }
+      }
+    }
+  }
+
+  boardHead {
+    boardCaption {
+      contents: "Sections pill · section = studio"
+    }
+  }
+}
+
+@variants(sectionsPillStatesStudioI11)
+@context(i10="on", section="studio")
+sectionsPillStatesStudioI10 = frame : sectionsPillStatesStudio {
+  title: "Sections pill · studio · states · i10",
+  left: 724px,
+  top: 1784px,
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i10"
+      }
+    }
+  }
+}
+
+@context(i10="on", i11="on", section="studio")
+sectionsPillStatesStudioI11 = frame : sectionsPillStatesStudioI10 {
+  title: "Sections pill · studio · states · i11",
+  left: 1438px,
+  top: 1784px,
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i11"
+      }
+    }
+  }
+}

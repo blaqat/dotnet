@@ -1,0 +1,959 @@
+import "tokens/color/roles.elyx" as col
+import "tokens/color/palette.elyx" as pal
+import "tokens/space/space.elyx" as spc
+import "tokens/type/type.elyx" as typ
+import "components/atoms/text.elyx" as txt
+import "components/atoms/surface.elyx" as surf
+import "components/atoms/doc.elyx" as doc
+import "assets/icons/bold/copy.svg" as copyIcon
+import "assets/icons/bold/arrow-up.svg" as upIcon
+import "redesign/v3-yarn-11/media/site-plan.png" as sitePlanImage
+
+// The prose blocks (kit §15b, `.ydetail__text` / `.yprose`): what an
+// article's or a write-up's markdown draws, one part per block, wherever
+// it shows: an opened article, a project's item page, Studio's block
+// editor and its preview. Deco (the h2 rule, the quote bar, the bullets)
+// is red in i9 and the section's ink from i10.
+// Two sizes: the reading size (`.yprose`, an article: 17 / 1.72, the
+// default) and the detail text's (`.ydetail__text`, a project's page,
+// Studio's editor: 16 / 1.65, i10 15 / 1.5): `prosePSm`, `proseItemSm`.
+// Inline bold and inline code inside a paragraph are subranges of its text
+// (bold: `typ.faces.body-bold`; code: `typ.faces.code` at `typ.sizes.num`);
+// `proseCodeInline` is the code chip on its own.
+// Parts: `proseP`, `proseH2` (`words`, `rule`), `proseH3`, `proseQuote`
+// (`words`), `proseItem` (`bullet`, `words`), `proseCode` (`bar` (`lead`
+// (`dots`, `lang`), `copy`), `lines`), `proseCodeInline` (`words`),
+// `proseTable` (`head`, `r1`…`r3`, each `a` `b` `c`), `proseFigure`
+// (`image`, `caption` (`capGlyph`, `capWords`)), `proseDivider`.
+// ---- words
+// A paragraph: the prose words in ink.
+@variants(prosePSm)
+export proseP = text : txt.body {
+  title: "Prose · paragraph",
+  left: 0px,
+  top: 40px,
+  width: spc.controls.item-w,
+  contents: "Every page change remounted the player, so audio cut out. The fix is boring: own the <audio> element in the root layout and never unmount it.",
+  font-size: typ.sizes.article-prose,
+  line-height: typ.leading.article-prose,
+  fill[0].color: col.roles.fg
+}
+
+// The detail text's size (a project's page, Studio's editor).
+export prosePSm = text : proseP {
+  title: "Prose · paragraph · detail size",
+  left: 912px,
+  top: 40px,
+  font-size: typ.sizes.prose,
+  line-height: typ.leading.prose
+}
+
+// An h2: Heading words over a short dashed rule in the deco colour.
+export proseH2 = frame {
+  title: "Prose · h2",
+  left: 0px,
+  top: 234px,
+  layout: {stack: {direction: .column, item-gap: spc.steps.s1}},
+  children: [words, rule],
+
+  words = text : txt.heading {
+    contents: "The problem",
+    font-size: typ.sizes.prose-h2,
+    font-style: typ.faces.title-style
+  }
+
+  rule = frame {
+    width: spc.controls.h2-rule-w,
+    height: spc.layout.stitch-w,
+    border: {
+      color: col.roles.deco,
+      width: spc.layout.stitch-w,
+      dash: [5px, 3px],
+      sides: .top
+    }
+  }
+}
+
+// An h3: Title words, no rule.
+export proseH3 = text : txt.title {
+  title: "Prose · h3",
+  left: 912px,
+  top: 234px,
+  contents: "What moved",
+  font-size: typ.sizes.prose-h3
+}
+
+// A quote: a white patch with the deco bar on its left edge.
+export proseQuote = frame {
+  title: "Prose · quote",
+  left: 0px,
+  top: 405px,
+  width: spc.controls.item-w,
+  layout: {stack: {}},
+  fill: col.roles.surface,
+  border: {color: col.roles.deco, width: spc.steps.s1, sides: .left},
+  shadow: [
+    {
+      drop-shadow: {
+        color: pal.palette.shadow-1,
+        offset: point(0px, 1px),
+        blur-radius: 0px
+      }
+    },
+    {
+      drop-shadow: {
+        color: pal.palette.shadow-1,
+        offset: point(0px, 2px),
+        blur-radius: 6px
+      }
+    }
+  ],
+  corner-radius: [spc.steps.s1, spc.radii.inner, spc.radii.inner, spc.steps.s1],
+  padding: [
+    spc.layout.quote-y,
+    spc.layout.quote-x,
+    spc.layout.quote-y,
+    spc.layout.quote-l
+  ],
+  children: words,
+
+  words = text : txt.title {
+    width: 100%,
+    contents: "If something has to survive navigation, it lives above the router.",
+    font-size: typ.sizes.prose-quote,
+    font-style: typ.faces.prose-quote-style
+  }
+}
+
+// A list item: the deco bullet, the words.
+@variants(proseItemSm)
+export proseItem = frame {
+  title: "Prose · list item",
+  left: 0px,
+  top: 599px,
+  width: spc.controls.item-w,
+  layout: {stack: {align-items: .center, item-gap: spc.steps.s4}},
+  padding-left: spc.steps.s2,
+  children: [bullet, words],
+
+  bullet = frame {
+    width: spc.controls.bullet,
+    height: spc.controls.bullet,
+    fill: col.roles.deco,
+    corner-radius: spc.radii.pill
+  }
+
+  words = text : txt.body {
+    contents: "Media went to R2",
+    font-size: typ.sizes.article-prose,
+    line-height: typ.leading.article-prose,
+    fill[0].color: col.roles.fg
+  }
+}
+
+// The detail text's size.
+export proseItemSm = frame : proseItem {
+  title: "Prose · list item · detail size",
+  left: 912px,
+  top: 599px,
+
+  words {
+    font-size: typ.sizes.prose,
+    line-height: typ.leading.prose
+  }
+}
+
+// ---- code
+// A code block: the dark well, its bar (three dots, the language, Copy),
+// the lines in mono with the kit's syntax colours.
+export proseCode = frame {
+  title: "Prose · code",
+  left: 0px,
+  top: 764px,
+  width: spc.controls.item-w,
+  layout: {stack: {direction: .column}},
+  fill: pal.palette.code-bg,
+  shadow: [
+    {
+      drop-shadow: {
+        color: pal.palette.hairline,
+        offset: point(0px, 2px),
+        blur-radius: 0px
+      }
+    },
+    {
+      drop-shadow: {
+        color: pal.palette.stitch-soft,
+        offset: point(0px, 8px),
+        blur-radius: 20px
+      }
+    }
+  ],
+  corner-radius: spc.radii.card,
+  padding: [spc.steps.s3, spc.steps.s4, spc.steps.s4],
+  children: [bar, lines],
+
+  bar = frame {
+    width: 100%,
+    layout: {stack: {justify-content: .space-between, align-items: .center}},
+    children: [lead, copy],
+
+    lead = frame {
+      layout: {stack: {align-items: .center, item-gap: spc.steps.s3}},
+      children: [dots, lang],
+
+      dots = frame {
+        layout: {stack: {align-items: .center, item-gap: spc.steps.s1}},
+        children: [d1, d2, d3],
+
+        d1 = frame {
+          width: spc.steps.s2,
+          height: spc.steps.s2,
+          fill: pal.palette.code-dot,
+          corner-radius: spc.radii.pill
+        }
+
+        d2 = frame {
+          width: spc.steps.s2,
+          height: spc.steps.s2,
+          fill: pal.palette.code-dot,
+          corner-radius: spc.radii.pill
+        }
+
+        d3 = frame {
+          width: spc.steps.s2,
+          height: spc.steps.s2,
+          fill: pal.palette.code-dot,
+          corner-radius: spc.radii.pill
+        }
+      }
+
+      lang = text : txt.micro {
+        contents: "TS",
+        letter-spacing: typ.tracking.caps,
+        fill[0].color: pal.palette.code-dim
+      }
+    }
+
+    copy = frame {
+      height: spc.controls.chip-sm,
+      layout: {stack: {align-items: .center, item-gap: spc.steps.s1}},
+      fill: pal.palette.code-chip,
+      corner-radius: spc.radii.pill,
+      padding: [0px, spc.steps.s3],
+      children: [copyGlyph, copyWord],
+
+      copyGlyph = asset {
+        width: spc.controls.icon-sm,
+        height: spc.controls.icon-sm,
+        fill: pal.palette.code-fg,
+        contents: copyIcon
+      }
+
+      copyWord = text : txt.labelCard {
+        contents: "Copy",
+        fill[0].color: pal.palette.code-fg
+      }
+    }
+  }
+
+  lines = text : txt.num {
+    width: 100%,
+    contents: "// +layout.svelte\nlet audio: HTMLAudioElement;\nsetContext(\"player\", createPlayer(() ⇒ audio));",
+    font-size: typ.sizes.body-card,
+    font-family: typ.faces.code,
+    font-style: typ.faces.code-style,
+    line-height: 1.6,
+    fill[0].color: pal.palette.code-fg,
+    subrange[0].fill[0].color: pal.palette.code-comment,
+    subrange[0].range: [0, 17],
+    subrange[1].fill[0].color: pal.palette.code-key,
+    subrange[1].range: [18, 21],
+    subrange[2].fill[0].color: pal.palette.code-type,
+    subrange[2].range: [29, 45],
+    subrange[3].fill[0].color: pal.palette.code-fn,
+    subrange[3].range: [47, 57],
+    subrange[4].fill[0].color: pal.palette.code-str,
+    subrange[4].range: [58, 66],
+    subrange[5].fill[0].color: pal.palette.code-fn,
+    subrange[5].range: [68, 80]
+  }
+}
+
+// Inline code on its own: mono on the cotton-2 chip with a hairline ring
+// (inside a paragraph it's the text's mono subrange).
+export proseCodeInline = frame {
+  title: "Prose · inline code",
+  left: 1824px,
+  top: 234px,
+  layout: {stack: {align-items: .center}},
+  fill: col.roles.recess,
+  shadow: {
+    inner-shadow: {
+      color: col.roles.line,
+      offset: point(0px, 0px),
+      blur-radius: 0px,
+      spread: 1px
+    }
+  },
+  corner-radius: spc.radii.kbd,
+  padding: [2px, spc.steps.s2],
+  children: words,
+
+  words = text : txt.num {
+    contents: "<audio>",
+    font-family: typ.faces.code,
+    fill[0].color: col.roles.fg
+  }
+}
+
+// ---- table
+// A table on a white patch: Micro caps heads, rows on dashed rules.
+export proseTable = frame : surf.patch {
+  title: "Prose · table",
+  left: 912px,
+  top: 764px,
+  width: spc.controls.item-w,
+  min-height: .nil,
+  padding-top: spc.steps.s1,
+  padding-left: spc.steps.s4,
+  padding-bottom: spc.steps.s1,
+  padding-right: spc.steps.s4,
+  layout.stack.item-gap: 0,
+  overrides: [
+    insert(head, after = surf.patch.patchStitch),
+    insert(r1, after = head),
+    insert(r2, after = r1),
+    insert(r3, after = r2)
+  ],
+
+  head = frame {
+    width: 100%,
+    layout: {grid: {columns: [3fr, 2.1fr, 1.9fr], align-items: .center}},
+    padding: [spc.steps.s3, 0px],
+    children: [h1, h2, h3],
+
+    h1 = text : txt.micro {
+      contents: "THING",
+      letter-spacing: typ.tracking.caps,
+      fill[0].color: col.roles.fg-3
+    }
+
+    h2 = text : txt.micro {
+      contents: "BEFORE",
+      letter-spacing: typ.tracking.caps,
+      fill[0].color: col.roles.fg-3
+    }
+
+    h3 = text : txt.micro {
+      contents: "AFTER",
+      letter-spacing: typ.tracking.caps,
+      fill[0].color: col.roles.fg-3
+    }
+  }
+
+  r1 = frame {
+    width: 100%,
+    layout: {grid: {columns: [3fr, 2.1fr, 1.9fr], align-items: .center}},
+    border: {color: col.roles.stitch, dash: [4px, 3px], sides: .top},
+    padding: [spc.steps.s3, 0px],
+    children: [a, b, c],
+
+    a = text : txt.label {
+      contents: "Player"
+    }
+
+    b = text : txt.body {
+      contents: "per page",
+      fill[0].color: col.roles.fg
+    }
+
+    c = text : txt.body {
+      contents: "root layout",
+      fill[0].color: col.roles.fg
+    }
+  }
+
+  r2 = frame {
+    width: 100%,
+    layout: {grid: {columns: [3fr, 2.1fr, 1.9fr], align-items: .center}},
+    border: {color: col.roles.stitch, dash: [4px, 3px], sides: .top},
+    padding: [spc.steps.s3, 0px],
+    children: [a, b, c],
+
+    a = text : txt.label {
+      contents: "Content"
+    }
+
+    b = text : txt.body {
+      contents: "JSON in git",
+      fill[0].color: col.roles.fg
+    }
+
+    c = text : txt.body {
+      contents: "D1",
+      fill[0].color: col.roles.fg
+    }
+  }
+
+  r3 = frame {
+    width: 100%,
+    layout: {grid: {columns: [3fr, 2.1fr, 1.9fr], align-items: .center}},
+    border: {color: col.roles.stitch, dash: [4px, 3px], sides: .top},
+    padding: [spc.steps.s3, 0px],
+    children: [a, b, c],
+
+    a = text : txt.label {
+      contents: "Deploy for a typo"
+    }
+
+    b = text : txt.body {
+      contents: "yes",
+      fill[0].color: col.roles.fg
+    }
+
+    c = text : txt.body {
+      contents: "no",
+      fill[0].color: col.roles.fg
+    }
+  }
+}
+
+// ---- media + rule
+// A figure (`.r-fig`, one image as wide as the text): the picture on the
+// patch shadow, its caption under it, centred, after a ↑. An article's
+// cover is this part without its caption (`caption {display: .none}`).
+export proseFigure = frame {
+  title: "Prose · figure + caption",
+  left: 0px,
+  top: 1085px,
+  width: spc.controls.item-w,
+  layout: {
+    stack: {direction: .column, align-items: .center, item-gap: spc.steps.s2}
+  },
+  children: [image, caption],
+
+  image = frame {
+    width: 100%,
+    height: spc.controls.article-cover-h,
+    fill: [col.roles.recess, {image: {ref: sitePlanImage}}],
+    shadow: [
+      {
+        drop-shadow: {
+          color: pal.palette.shadow-1,
+          offset: point(0px, 1px),
+          blur-radius: 0px
+        }
+      },
+      {
+        drop-shadow: {
+          color: pal.palette.shadow-1,
+          offset: point(0px, 2px),
+          blur-radius: 6px
+        }
+      }
+    ],
+    corner-radius: spc.radii.card,
+    overflow: .clip
+  }
+
+  caption = frame {
+    layout: {stack: {align-items: .center, item-gap: spc.steps.s1}},
+    children: [capGlyph, capWords],
+
+    capGlyph = asset {
+      width: spc.controls.icon-sm,
+      height: spc.controls.icon-sm,
+      fill: col.roles.fg-3,
+      contents: upIcon
+    }
+
+    capWords = text : txt.meta {
+      contents: "Planning the site"
+    }
+  }
+}
+
+// A divider (`hr`): a 2px dashed rule across the text.
+export proseDivider = frame {
+  title: "Prose · divider",
+  left: 912px,
+  top: 405px,
+  width: spc.controls.item-w,
+  height: spc.layout.stitch-w,
+  border: {
+    color: col.roles.line,
+    width: spc.layout.stitch-w,
+    dash: [5px, 4px],
+    sides: .top
+  }
+}
+
+// ==== states page (labels over the definitions, then the states boards: i9 · i10 · i11) ====
+lbl-proseP = text : doc.specLabel {
+  left: 0px,
+  top: 0px,
+  contents: "proseP"
+}
+
+note-proseP = text : doc.specNote {
+  left: 0px,
+  top: 16px,
+  contents: "reading size (.yprose)"
+}
+
+lbl-prosePSm = text : doc.specLabel {
+  left: 912px,
+  top: 0px,
+  contents: "prosePSm"
+}
+
+note-prosePSm = text : doc.specNote {
+  left: 912px,
+  top: 16px,
+  contents: "detail size (.ydetail__text)"
+}
+
+lbl-proseH2 = text : doc.specLabel {
+  left: 0px,
+  top: 194px,
+  contents: "proseH2"
+}
+
+note-proseH2 = text : doc.specNote {
+  left: 0px,
+  top: 210px,
+  contents: "a section heading"
+}
+
+lbl-proseH3 = text : doc.specLabel {
+  left: 912px,
+  top: 194px,
+  contents: "proseH3"
+}
+
+note-proseH3 = text : doc.specNote {
+  left: 912px,
+  top: 210px,
+  contents: "a sub-heading"
+}
+
+lbl-proseCodeInline = text : doc.specLabel {
+  left: 1824px,
+  top: 194px,
+  contents: "proseCodeInline"
+}
+
+note-proseCodeInline = text : doc.specNote {
+  left: 1824px,
+  top: 210px,
+  contents: "inline code"
+}
+
+lbl-proseQuote = text : doc.specLabel {
+  left: 0px,
+  top: 365px,
+  contents: "proseQuote"
+}
+
+note-proseQuote = text : doc.specNote {
+  left: 0px,
+  top: 381px,
+  contents: "a quote"
+}
+
+lbl-proseDivider = text : doc.specLabel {
+  left: 912px,
+  top: 365px,
+  contents: "proseDivider"
+}
+
+note-proseDivider = text : doc.specNote {
+  left: 912px,
+  top: 381px,
+  contents: "a divider"
+}
+
+lbl-proseItem = text : doc.specLabel {
+  left: 0px,
+  top: 559px,
+  contents: "proseItem"
+}
+
+note-proseItem = text : doc.specNote {
+  left: 0px,
+  top: 575px,
+  contents: "a list item"
+}
+
+lbl-proseItemSm = text : doc.specLabel {
+  left: 912px,
+  top: 559px,
+  contents: "proseItemSm"
+}
+
+note-proseItemSm = text : doc.specNote {
+  left: 912px,
+  top: 575px,
+  contents: "a list item · detail size"
+}
+
+lbl-proseCode = text : doc.specLabel {
+  left: 0px,
+  top: 724px,
+  contents: "proseCode"
+}
+
+note-proseCode = text : doc.specNote {
+  left: 0px,
+  top: 740px,
+  contents: "a code block"
+}
+
+lbl-proseTable = text : doc.specLabel {
+  left: 912px,
+  top: 724px,
+  contents: "proseTable"
+}
+
+note-proseTable = text : doc.specNote {
+  left: 912px,
+  top: 740px,
+  contents: "a table"
+}
+
+lbl-proseFigure = text : doc.specLabel {
+  left: 0px,
+  top: 1045px,
+  contents: "proseFigure"
+}
+
+note-proseFigure = text : doc.specNote {
+  left: 0px,
+  top: 1061px,
+  contents: "an image + caption"
+}
+
+@variants(proseStatesI10)
+proseStates = frame : doc.docBoard {
+  title: "Prose blocks · states · i9",
+  left: 0px,
+  top: 1614px,
+
+  body {
+    layout.stack.item-gap: 48px,
+    overrides: [
+      insert(row-1, after = .nil),
+      insert(row-2, after = row-1),
+      insert(row-3, after = row-2),
+      insert(row-4, after = row-3),
+      insert(row-5, after = row-4),
+      insert(row-6, after = row-5)
+    ]
+  }
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i9"
+      }
+    }
+
+    boardCaption {
+      contents: "Prose blocks · every state"
+    }
+  }
+
+  row-1 = frame : doc.specRow {
+    layout.stack.item-gap: 48px,
+    overrides: [
+      insert(st-proseP, after = .nil),
+      insert(st-prosePSm, after = st-proseP)
+    ]
+  }
+
+  row-2 = frame : doc.specRow {
+    layout.stack.item-gap: 48px,
+    overrides: [
+      insert(st-proseH2, after = .nil),
+      insert(st-proseH3, after = st-proseH2),
+      insert(st-proseCodeInline, after = st-proseH3)
+    ]
+  }
+
+  row-3 = frame : doc.specRow {
+    layout.stack.item-gap: 48px,
+    overrides: [
+      insert(st-proseQuote, after = .nil),
+      insert(st-proseDivider, after = st-proseQuote)
+    ]
+  }
+
+  row-4 = frame : doc.specRow {
+    layout.stack.item-gap: 48px,
+    overrides: [
+      insert(st-proseItem, after = .nil),
+      insert(st-proseItemSm, after = st-proseItem)
+    ]
+  }
+
+  row-5 = frame : doc.specRow {
+    layout.stack.item-gap: 48px,
+    overrides: [
+      insert(st-proseCode, after = .nil),
+      insert(st-proseTable, after = st-proseCode)
+    ]
+  }
+
+  row-6 = frame : doc.specRow {
+    layout.stack.item-gap: 48px,
+    overrides: [insert(st-proseFigure, after = .nil)]
+  }
+
+  st-proseP = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "proseP"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "reading size (.yprose)"
+    }
+
+    it = text : proseP {}
+  }
+
+  st-prosePSm = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "prosePSm"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "detail size (.ydetail__text)"
+    }
+
+    it = text : prosePSm {}
+  }
+
+  st-proseH2 = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "proseH2"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "a section heading"
+    }
+
+    it = frame : proseH2 {}
+  }
+
+  st-proseH3 = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "proseH3"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "a sub-heading"
+    }
+
+    it = text : proseH3 {}
+  }
+
+  st-proseCodeInline = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "proseCodeInline"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "inline code"
+    }
+
+    it = frame : proseCodeInline {}
+  }
+
+  st-proseQuote = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "proseQuote"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "a quote"
+    }
+
+    it = frame : proseQuote {}
+  }
+
+  st-proseDivider = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "proseDivider"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "a divider"
+    }
+
+    it = frame : proseDivider {}
+  }
+
+  st-proseItem = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "proseItem"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "a list item"
+    }
+
+    it = frame : proseItem {}
+  }
+
+  st-proseItemSm = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "proseItemSm"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "a list item · detail size"
+    }
+
+    it = frame : proseItemSm {}
+  }
+
+  st-proseCode = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "proseCode"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "a code block"
+    }
+
+    it = frame : proseCode {}
+  }
+
+  st-proseTable = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "proseTable"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "a table"
+    }
+
+    it = frame : proseTable {}
+  }
+
+  st-proseFigure = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "proseFigure"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "an image + caption"
+    }
+
+    it = frame : proseFigure {}
+  }
+}
+
+@variants(proseStatesI11)
+@context(i10="on")
+proseStatesI10 = frame : proseStates {
+  title: "Prose blocks · states · i10",
+  left: 1960px,
+  top: 1614px,
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i10"
+      }
+    }
+  }
+}
+
+@context(i10="on", i11="on")
+proseStatesI11 = frame : proseStatesI10 {
+  title: "Prose blocks · states · i11",
+  left: 3920px,
+  top: 1614px,
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i11"
+      }
+    }
+  }
+}

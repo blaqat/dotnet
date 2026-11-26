@@ -1,0 +1,204 @@
+import "tokens/color/roles.elyx" as col
+import "tokens/space/space.elyx" as spc
+import "components/atoms/surface.elyx" as surf
+import "components/atoms/doc.elyx" as doc
+import "components/molecules/search.elyx" as srch
+import "components/molecules/chip.elyx" as chips
+import "assets/icons/bold/hammer.svg" as wipIcon
+import "assets/icons/bold/trash-simple.svg" as droppedIcon
+import "assets/icons/bold/faders-horizontal.svg" as browseIcon
+
+// Music's tools line (.mu-top.ytools--line): the search takes what's left
+// of the line; the filters follow it: All (a 40 circle, on = nothing
+// filtered) | instruments (Piano · BeepBox · DAW) | statuses (Complete ·
+// WIP · Dropped), then Browse. Groups are split by a dashed divider. Every
+// change between iterations is in the molecules' tokens (i9 knit + stitch,
+// red on; i10 calm, the section's tint on).
+// Children: `search`, `filters` (`scroll` (`all`, `div1`, `inst` (`piano`,
+// `beepbox`, `daw`), `div2`, `status` (`complete`, `wip`, `dropped`)),
+// `browse`).
+export musicTools = frame {
+  title: "Music · tools line",
+  left: 0px,
+  top: 40px,
+  width: 1332px,
+  layout: {
+    grid: {
+      columns: [1fr, .auto],
+      column-gap: spc.steps.s4,
+      align-items: .center
+    }
+  },
+  children: [search, filters],
+
+  search = frame : srch.search {
+    width: 100%
+  }
+
+  filters = frame {
+    layout: {stack: {align-items: .center, item-gap: spc.steps.s2}},
+    children: [scroll, browse],
+
+    scroll = frame {
+      layout: {stack: {align-items: .center, item-gap: spc.layout.pill-x}},
+      children: [all, div1, inst, div2, status],
+
+      all = frame : chips.chipAllOn {}
+
+      div1 = frame : surf.stitch {
+        width: spc.layout.stitch-w,
+        height: spc.steps.s5,
+        corner-radius: 0px,
+        border[0].color: col.roles.line,
+        border[0].sides: .left
+      }
+
+      inst = frame {
+        layout: {stack: {align-items: .center, item-gap: spc.layout.chip-gap}},
+        children: [piano, beepbox, daw],
+
+        piano = frame : chips.chipPiano {}
+
+        beepbox = frame : chips.chipBeepbox {}
+
+        daw = frame : chips.chipDaw {}
+      }
+
+      div2 = frame : surf.stitch {
+        width: spc.layout.stitch-w,
+        height: spc.steps.s5,
+        corner-radius: 0px,
+        border[0].color: col.roles.line,
+        border[0].sides: .left
+      }
+
+      status = frame {
+        layout: {stack: {align-items: .center, item-gap: spc.layout.chip-gap}},
+        children: [complete, wip, dropped],
+
+        complete = frame : chips.chip {}
+
+        wip = frame : chips.chip {
+          glyph {
+            contents: wipIcon
+          }
+
+          label {
+            contents: "WIP"
+          }
+        }
+
+        dropped = frame : chips.chip {
+          glyph {
+            contents: droppedIcon
+          }
+
+          label {
+            contents: "Dropped"
+          }
+        }
+      }
+    }
+
+    browse = frame : chips.chip {
+      glyph {
+        contents: browseIcon
+      }
+
+      label {
+        contents: "Browse"
+      }
+    }
+  }
+}
+
+// ==== states page (labels over the definitions, then the states boards: i9 · i10 · i11) ====
+lbl-musicTools = text : doc.specLabel {
+  left: 0px,
+  top: 0px,
+  contents: "musicTools"
+}
+
+note-musicTools = text : doc.specNote {
+  left: 0px,
+  top: 16px,
+  contents: "search + the filter chips + the view switch"
+}
+
+@variants(musicToolsStatesI10)
+musicToolsStates = frame : doc.docBoard {
+  title: "Music tools · states · i9",
+  left: 0px,
+  top: 236px,
+
+  body {
+    layout.stack.item-gap: 48px,
+    overrides: [insert(row-1, after = .nil)]
+  }
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i9"
+      }
+    }
+
+    boardCaption {
+      contents: "Music tools · every state"
+    }
+  }
+
+  row-1 = frame : doc.specRow {
+    layout.stack.item-gap: 48px,
+    overrides: [insert(st-musicTools, after = .nil)]
+  }
+
+  st-musicTools = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "musicTools"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "search + the filter chips + the view switch"
+    }
+
+    it = frame : musicTools {}
+  }
+}
+
+@variants(musicToolsStatesI11)
+@context(i10="on")
+musicToolsStatesI10 = frame : musicToolsStates {
+  title: "Music tools · states · i10",
+  left: 1676px,
+  top: 236px,
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i10"
+      }
+    }
+  }
+}
+
+@context(i10="on", i11="on")
+musicToolsStatesI11 = frame : musicToolsStatesI10 {
+  title: "Music tools · states · i11",
+  left: 3352px,
+  top: 236px,
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i11"
+      }
+    }
+  }
+}

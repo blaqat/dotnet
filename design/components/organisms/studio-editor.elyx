@@ -1,0 +1,2285 @@
+import "tokens/color/roles.elyx" as col
+import "tokens/color/palette.elyx" as pal
+import "tokens/space/space.elyx" as spc
+import "tokens/type/type.elyx" as typ
+import "components/atoms/text.elyx" as txt
+import "components/atoms/doc.elyx" as doc
+import "components/atoms/surface.elyx" as surf
+import "components/molecules/button.elyx" as btn
+import "assets/icons/bold/music-notes.svg" as musicIcon
+import "components/molecules/chip.elyx" as chips
+import "components/molecules/fact.elyx" as fct
+import "assets/icons/bold/check.svg" as checkIcon
+import "components/molecules/field.elyx" as fld
+import "components/molecules/link-disc.elyx" as lnk
+import "components/organisms/detail.elyx" as dt
+import "assets/icons/fill/play.svg" as playIcon
+import "assets/icons/bold/plus.svg" as plusIcon
+import "assets/art/combat.svg" as combatSw
+import "components/organisms/studio-parts.elyx" as prt
+import "assets/art/studio/track-explore-piano.svg" as explorePianoSw
+import "assets/art/studio/track-boss.svg" as bossSw
+import "assets/art/studio/track-death.svg" as deathSw
+import "assets/art/studio/track-victory.svg" as victorySw
+import "assets/art/studio/track-explore.svg" as exploreSw
+import "assets/art/studio/inst-piano.svg" as pianoSw
+import "assets/art/studio/daw-sine.svg" as sineSw
+import "assets/art/studio/daw-square.svg" as squareSw
+import "assets/art/studio/daw-triangle.svg" as triangleSw
+import "assets/art/studio/daw-saw.svg" as sawSw
+import "assets/studio/waveform.svg" as waveArt
+import "assets/icons/bold/clock-counter-clockwise.svg" as historyIcon
+import "assets/icons/bold/paper-plane-tilt.svg" as publishIcon
+import "assets/icons/bold/arrows-clockwise.svg" as replaceIcon
+import "assets/icons/bold/dots-six-vertical.svg" as gripIcon
+import "assets/icons/bold/x.svg" as removeIcon
+import "assets/art/studio/vgm-mixed.svg" as vgmSw
+
+// Studio's editor (studio-editors.js): the kit's detail shell. The top bar
+// (← the section · History · the publish button), the head (the publish
+// state + autosave facts, the title, which IS the input), then the form |
+// the live preview (studio-preview.elyx). The form is sections of fields:
+// kit fields, chips, rows and swatches. i9 → i10 → i11 is tokens, except
+// the sections' small caps (prt.eyebrow*, picked in a block's I11).
+// ---- the top bar: back on the left, History + publish on the right.
+// The publish button: "Published" (a quiet ghost, nothing to publish) or
+// `edBarPublish` (the one primary: Publish).
+// Children: `back` (`backGlyph`, `backWord`), `acts` (`history`,
+// `published`, `publish`).
+@variants(edBarPublish)
+export edBar = frame {
+  title: "Editor bar · published",
+  left: 0px,
+  top: 40px,
+  width: 1332px,
+  layout: {stack: {justify-content: .space-between, align-items: .center}},
+  padding: [spc.steps.s2, 0px],
+  children: [back, acts],
+
+  back = frame : dt.detailBack {
+    backWord {
+      contents: "Music"
+    }
+  }
+
+  acts = frame {
+    layout: {stack: {align-items: .center, item-gap: spc.layout.chip-gap}},
+    children: [history, published, publish],
+
+    history = frame : btn.btnIcon {
+      glyph {
+        width: spc.controls.icon,
+        height: spc.controls.icon,
+        contents: historyIcon
+      }
+
+      btnStitch {
+        display: .none
+      }
+    }
+
+    // nothing to publish: the ghost, quiet
+    published = frame : btn.btnGhost {
+      opacity: 0.5,
+
+      glyph {
+        contents: checkIcon,
+        display: .visible
+      }
+
+      label {
+        contents: "Published"
+      }
+    }
+
+    publish = frame : btn.btnPrimary {
+      display: .none,
+
+      glyph {
+        contents: publishIcon
+      }
+
+      label {
+        contents: "Publish"
+      }
+    }
+  }
+}
+
+// A draft (or unpublished edits): Publish is the page's primary.
+export edBarPublish = frame : edBar {
+  title: "Editor bar · publish",
+  left: 1596px,
+  top: 40px,
+
+  acts {
+    published {
+      display: .none
+    }
+
+    publish {
+      display: .visible
+    }
+  }
+
+  back {
+    backWord {
+      contents: "Thoughts"
+    }
+  }
+}
+
+// ---- the head: the publish state + autosave facts, then the title (the
+// shell's title type: i9 2.4rem Black; from i10 Display). `edHeadDraft`:
+// a draft. Children: `facts` (`state`, `saved`), `titleBox` (`titleText`).
+@variants(edHeadDraft)
+export edHead = frame {
+  title: "Editor head · live",
+  left: 0px,
+  top: 220px,
+  width: 1332px,
+  layout: {stack: {direction: .column, item-gap: spc.steps.s2}},
+  padding-top: spc.layout.fact-gap,
+  children: [facts, titleBox],
+
+  facts = frame {
+    height: spc.controls.tag,
+    layout: {stack: {align-items: .center, item-gap: spc.layout.facts-gap}},
+    children: [state, saved],
+
+    state = frame : fct.factLive {}
+
+    saved = frame : fct.factChip {
+      disc {
+        glyph {
+          contents: checkIcon
+        }
+      }
+
+      label {
+        contents: "Saved 4:44 pm"
+      }
+    }
+  }
+
+  titleBox = frame {
+    width: 100%,
+    layout: {stack: {}},
+    padding: [spc.steps.s1, 0px, spc.layout.fact-gap],
+    children: titleText,
+
+    titleText = text : txt.display {
+      contents: "VGM Class Final Project",
+      font-size: typ.sizes.st-title,
+      line-height: typ.leading.st-title,
+      subrange[0].fill[0].color: col.roles.fg
+    }
+  }
+}
+
+export edHeadDraft = frame : edHead {
+  title: "Editor head · draft",
+  left: 1596px,
+  top: 220px,
+
+  titleBox {
+    titleText {
+      contents: "Building the Studio"
+    }
+  }
+
+  facts {
+    saved {
+      label {
+        contents: "Saved 2:20 pm"
+      }
+    }
+
+    @with-variant(fct.factDraft)
+    state {}
+  }
+}
+
+// ---- a form section (.st-sec): a dashed rule on top, its head (an
+// eyebrow + an optional small action on the right), then its fields
+// (insert them after `headRow`). `formSecSub`: a section inside the
+// folder (12 above and below). The first section of a form hides its rule
+// (`border[0].visible: .false`).
+// Children: `headRow` (`head`, `act`).
+@variants(formSecSub)
+export formSec = frame {
+  title: "Form section",
+  left: 0px,
+  top: 433px,
+  width: spc.controls.st-form-w,
+  layout: {
+    stack: {
+      direction: .column,
+      align-items: .stretch,
+      item-gap: spc.layout.st-sec-gap
+    }
+  },
+  border: {
+    color: col.roles.stitch,
+    width: spc.layout.stitch-w-sm,
+    dash: [5px, 4px],
+    sides: .top
+  },
+  padding: [spc.layout.st-sec-y, 0px],
+  children: headRow,
+
+  headRow = frame {
+    layout: {stack: {justify-content: .space-between, align-items: .center}},
+    children: [head, act],
+
+    head = frame : prt.eyebrow {
+      word {
+        contents: "TRACKS"
+      }
+    }
+
+    act = frame : btn.btnGhostSm {
+      display: .none
+    }
+  }
+}
+
+export formSecSub = frame : formSec {
+  title: "Form section · in the folder",
+  left: 1596px,
+  top: 433px,
+  padding-top: spc.steps.s3,
+  padding-left: 0px,
+  padding-bottom: spc.steps.s3,
+  padding-right: 0px,
+
+  headRow {
+    head {
+      word {
+        contents: "AUDIO"
+      }
+    }
+  }
+}
+
+// ---- a field's label (.st-lab): the Label words + an optional Meta note
+// beside them. Children: `word`, `note`.
+export fieldLabel = frame {
+  title: "Field label",
+  left: 3192px,
+  top: 433px,
+  layout: {stack: {align-items: .center, item-gap: spc.layout.fact-gap}},
+  children: [word, note],
+
+  word = text : txt.label {
+    contents: "Track name",
+    font-size: typ.sizes.st-lab,
+    line-height: typ.leading.st-lab,
+    fill[0].color: col.roles.fg-2
+  }
+
+  note = text : txt.meta {
+    display: .none,
+    contents: "the yarn says it, so the site never labels it"
+  }
+}
+
+// A labelled field (.st-field): the label over a kit field.
+// Children: `lab`, `input` (fld.field).
+export labeled = frame {
+  title: "Labelled field",
+  left: 0px,
+  top: 601px,
+  width: spc.controls.st-form-w,
+  layout: {
+    stack: {
+      direction: .column,
+      align-items: .stretch,
+      item-gap: spc.layout.st-lab-gap
+    }
+  },
+  children: [lab, input],
+
+  lab = frame : fieldLabel {}
+
+  input = frame : fld.field {
+    width: 100%,
+
+    value {
+      contents: "combat"
+    }
+  }
+}
+
+// ---- a track tab (.st-tab): a collection's tracks sit on its folder as
+// tabs (the editor's version of the kit's folder tabs). Cotton-2 knit,
+// the track's swatch (20) + its name; chosen (`trackTabPicked`): white,
+// 4 up, the pick rope on its edge; `trackTabAdd`: + Track, a dashed edge.
+// Children: `sw`, `name`.
+@variants(trackTabPicked, trackTabAdd)
+export trackTab = frame {
+  title: "Track tab",
+  left: 0px,
+  top: 881px,
+  height: spc.controls.st-tab-h,
+  layout: {stack: {align-items: .center, item-gap: spc.layout.fact-gap}},
+  fill: col.roles.recess,
+  shadow: {
+    inner-shadow: {
+      color: pal.palette.stitch,
+      offset: point(0px, -6px),
+      blur-radius: 6px,
+      spread: -6px
+    }
+  },
+  corner-radius: [spc.radii.st-tab, spc.radii.st-tab, 0px, 0px],
+  padding: [0px, spc.layout.st-tab-x, 0px, spc.layout.st-tab-l],
+  children: [sw, name],
+
+  sw = frame {
+    width: spc.controls.st-tab-sw,
+    height: spc.controls.st-tab-sw,
+    fill: [col.roles.recess, {image: {ref: explorePianoSw}}],
+    corner-radius: spc.radii.st-tab-sw,
+    overflow: .clip
+  }
+
+  name = text : txt.label {
+    contents: "explore (piano)",
+    font-size: typ.sizes.st-tab,
+    fill[0].color: col.roles.fg-2
+  }
+}
+
+export trackTabPicked = frame : trackTab {
+  title: "Track tab · chosen",
+  left: 1596px,
+  top: 881px,
+  height: spc.controls.st-tab-up,
+  padding-top: spc.steps.s2,
+  fill[0].color: col.roles.surface,
+  layout.stack.align-items: .start,
+  overrides: [insert(tabRope, after = trackTab.name)],
+  shadow[0].inner-shadow.visible: .false,
+
+  sw {
+    fill[1].image.ref: combatSw
+  }
+
+  name {
+    fill[0].color: col.roles.fg,
+    contents: "combat"
+  }
+
+  tabRope = frame : surf.rope {
+    left: 0px,
+    top: 0px,
+    right: 0px,
+    bottom: 0px,
+    width: .nil,
+    height: .nil,
+    ignore-stack: .true,
+    corner-radius: [spc.radii.st-tab, spc.radii.st-tab, 0px, 0px]
+  }
+}
+
+export trackTabAdd = frame : trackTab {
+  title: "Track tab · + Track",
+  left: 3192px,
+  top: 881px,
+  padding-left: spc.layout.st-tab-x,
+  fill[0].color: pal.palette.clear,
+  overrides: [
+    insert(addStitch, after = .nil),
+    insert(addGlyph, after = addStitch)
+  ],
+  shadow[0].inner-shadow.visible: .false,
+
+  name {
+    fill[0].color: col.roles.link,
+    contents: "Track"
+  }
+
+  sw {
+    display: .none
+  }
+
+  addGlyph = asset {
+    width: spc.controls.icon-sm,
+    height: spc.controls.icon-sm,
+    fill: col.roles.link,
+    contents: plusIcon
+  }
+
+  addStitch = frame : surf.stitch {
+    left: spc.layout.stitch-in-ctl,
+    top: spc.layout.stitch-in-ctl,
+    right: spc.layout.stitch-in-ctl,
+    bottom: 0px,
+    width: .nil,
+    height: .nil,
+    ignore-stack: .true,
+    corner-radius: [spc.radii.inner, spc.radii.inner, 0px, 0px],
+    border[0].width: spc.layout.stitch-w-sm
+  }
+}
+
+// ---- a collection's folder: the track tabs on top (their feet tucked
+// under), the body (a patch, its top-left corner tucked under the first
+// tab). Insert the track's fields into `body`.
+// Children: `tabs` (`t1` … `t6`, `addTab`), `body` (`bodyStitch`).
+export folder = frame {
+  title: "Folder · VGM Class Final Project",
+  left: 1596px,
+  top: 601px,
+  width: spc.controls.st-form-w,
+  layout: {
+    stack: {
+      direction: .column,
+      align-items: .stretch,
+      item-gap: spc.layout.st-tab-tuck
+    }
+  },
+  padding-top: spc.steps.s2,
+  children: [tabs, body],
+
+  tabs = frame {
+    layout: {stack: {align-items: .end, item-gap: spc.steps.s1}},
+    padding-left: spc.layout.st-tabs-l,
+    children: [t1, t2, t3, t4, t5, t6, addTab],
+
+    t1 = frame : trackTab {}
+
+    t2 = frame : trackTabPicked {}
+
+    t3 = frame : trackTab {
+      sw {
+        fill[1].image.ref: bossSw
+      }
+
+      name {
+        contents: "boss"
+      }
+    }
+
+    t4 = frame : trackTab {
+      sw {
+        fill[1].image.ref: deathSw
+      }
+
+      name {
+        contents: "death"
+      }
+    }
+
+    t5 = frame : trackTab {
+      sw {
+        fill[1].image.ref: victorySw
+      }
+
+      name {
+        contents: "victory"
+      }
+    }
+
+    t6 = frame : trackTab {
+      sw {
+        fill[1].image.ref: exploreSw
+      }
+
+      name {
+        contents: "explore"
+      }
+    }
+
+    addTab = frame : trackTabAdd {}
+  }
+
+  body = frame {
+    min-height: spc.controls.st-ta-h,
+    layout: {
+      stack: {
+        direction: .column,
+        align-items: .stretch,
+        item-gap: spc.layout.st-sub-gap
+      }
+    },
+    fill: col.roles.surface,
+    shadow: [
+      {
+        drop-shadow: {
+          color: pal.palette.shadow-1,
+          offset: point(0px, 1px),
+          blur-radius: 0px
+        }
+      },
+      {
+        drop-shadow: {
+          color: pal.palette.shadow-1,
+          offset: point(0px, 2px),
+          blur-radius: 6px
+        }
+      }
+    ],
+    corner-radius: [
+      spc.radii.st-tuck,
+      spc.radii.st-folder,
+      spc.radii.st-folder,
+      spc.radii.st-folder
+    ],
+    padding: spc.layout.st-folder-inset,
+    children: bodyStitch,
+
+    bodyStitch = frame : surf.stitch {
+      left: spc.layout.stitch-in,
+      top: spc.layout.stitch-in,
+      right: spc.layout.stitch-in,
+      bottom: spc.layout.stitch-in,
+      width: .nil,
+      height: .nil,
+      ignore-stack: .true,
+      corner-radius: [0px, spc.steps.s3, spc.steps.s3, spc.steps.s3]
+    }
+  }
+}
+
+// ---- the audio box (.st-audio): ▶ (ink), the file's name + its time,
+// Replace; the waveform (the player's bars) with the scrub pin (the live
+// colour). Children: `top` (`play`, `file` (`fileName`, `fileMeta`),
+// `replace`), `wave` (`bars`, `pin` (`pinHead`)).
+export audioBox = frame {
+  title: "Audio box",
+  left: 0px,
+  top: 1270px,
+  width: 642px,
+  layout: {
+    stack: {
+      direction: .column,
+      align-items: .stretch,
+      item-gap: spc.layout.st-sec-gap
+    }
+  },
+  fill: col.roles.surface,
+  shadow: [
+    {
+      drop-shadow: {
+        color: pal.palette.shadow-1,
+        offset: point(0px, 1px),
+        blur-radius: 0px
+      }
+    },
+    {
+      drop-shadow: {
+        color: pal.palette.shadow-1,
+        offset: point(0px, 2px),
+        blur-radius: 6px
+      }
+    }
+  ],
+  corner-radius: spc.radii.card,
+  padding: spc.layout.st-box,
+  children: [boxStitch, top, wave],
+
+  boxStitch = frame : surf.stitch {
+    left: spc.layout.stitch-in,
+    top: spc.layout.stitch-in,
+    right: spc.layout.stitch-in,
+    bottom: spc.layout.stitch-in,
+    width: .nil,
+    height: .nil,
+    ignore-stack: .true,
+    corner-radius: spc.radii.inner
+  }
+
+  top = frame {
+    layout: {stack: {justify-content: .space-between, align-items: .center}},
+    children: [lead, replace],
+
+    lead = frame {
+      layout: {stack: {align-items: .center, item-gap: spc.steps.s3}},
+      children: [play, file],
+
+      // ▶ on ink (a sample, not the act)
+      play = frame : btn.btnIcon {
+        fill[0].color: col.roles.dark,
+        shadow[1].drop-shadow.color: pal.palette.shadow-1,
+
+        btnStitch {
+          border[0].color: col.roles.ctl-stitch-fill
+        }
+
+        glyph {
+          fill[0].color: col.roles.dark-fg,
+          contents: playIcon
+        }
+      }
+
+      file = frame {
+        layout: {stack: {direction: .column, item-gap: spc.steps.s1}},
+        children: [fileName, fileMeta],
+
+        fileName = text : txt.titleCard {
+          contents: "combat.mp3",
+          font-size: typ.sizes.st-row
+        }
+
+        fileMeta = text : txt.meta {
+          contents: "0:00 / 1:58 · waveform saved"
+        }
+      }
+    }
+
+    replace = frame : btn.btnGhostSm {
+      glyph {
+        contents: replaceIcon
+      }
+    }
+  }
+
+  wave = frame {
+    height: spc.controls.st-wave-h,
+    children: [bars, pin],
+
+    bars = asset {
+      left: 0px,
+      top: 0px,
+      right: 0px,
+      bottom: 0px,
+      fill: col.roles.line,
+      contents: waveArt,
+      sizing: .stretch
+    }
+
+    pin = frame {
+      left: 0px,
+      top: -4px,
+      bottom: -4px,
+      width: 2px,
+      fill: col.roles.live-deep,
+      corner-radius: 1px,
+      children: pinHead,
+
+      pinHead = frame {
+        left: -5px,
+        top: -6px,
+        width: spc.controls.st-pin,
+        height: spc.controls.st-pin,
+        fill: col.roles.live,
+        shadow: {
+          drop-shadow: {
+            color: pal.palette.shadow-pop,
+            offset: point(0px, 1px),
+            blur-radius: 2px
+          }
+        },
+        corner-radius: spc.radii.pill
+      }
+    }
+  }
+}
+
+// ---- an instrument option (.st-insts .yrow, a single choice): the
+// instrument's swatch (44), its name over what its yarn looks like;
+// chosen (`instOptPicked`): the pick rope. Children: `sw`, `words`
+// (`name`, `look`).
+@variants(instOptPicked)
+export instOpt = frame {
+  title: "Instrument option",
+  left: 3466px,
+  top: 881px,
+  width: spc.controls.st-inst-w,
+  height: spc.controls.st-inst-h,
+  layout: {stack: {align-items: .center, item-gap: spc.layout.st-list-gap}},
+  fill: col.roles.surface,
+  shadow: [
+    {
+      drop-shadow: {
+        color: pal.palette.shadow-1,
+        offset: point(0px, 1px),
+        blur-radius: 0px
+      }
+    },
+    {
+      drop-shadow: {
+        color: pal.palette.shadow-1,
+        offset: point(0px, 2px),
+        blur-radius: 6px
+      }
+    }
+  ],
+  corner-radius: spc.radii.row,
+  padding: [
+    spc.layout.st-opt-l,
+    spc.layout.st-opt-r,
+    spc.layout.st-opt-l,
+    spc.layout.st-opt-l
+  ],
+  children: [optStitch, sw, words],
+
+  optStitch = frame : surf.stitch {
+    left: spc.steps.s1,
+    top: spc.steps.s1,
+    right: spc.steps.s1,
+    bottom: spc.steps.s1,
+    width: .nil,
+    height: .nil,
+    ignore-stack: .true,
+    corner-radius: spc.radii.inner,
+    border[0].width: spc.layout.stitch-w-sm
+  }
+
+  sw = frame {
+    width: spc.controls.st-inst-sw,
+    height: spc.controls.st-inst-sw,
+    fill: [col.roles.recess, {image: {ref: pianoSw}}],
+    corner-radius: spc.radii.art,
+    overflow: .clip
+  }
+
+  words = frame {
+    layout: {stack: {direction: .column, item-gap: spc.steps.s1}},
+    children: [name, look],
+
+    name = text : txt.labelCard {
+      contents: "Piano"
+    }
+
+    look = text : txt.metaCard {
+      contents: "black yarn",
+      font-size: typ.sizes.st-small
+    }
+  }
+}
+
+export instOptPicked = frame : instOpt {
+  title: "Instrument option · chosen",
+  left: 3740px,
+  top: 881px,
+  overrides: [insert(optRope, after = instOpt.words)],
+
+  sw {
+    fill[1].image.ref: combatSw
+  }
+
+  optStitch {
+    display: .none
+  }
+
+  words {
+    name {
+      contents: "DAW"
+    }
+
+    look {
+      contents: "blue, waves"
+    }
+  }
+
+  optRope = frame : surf.rope {
+    left: 0px,
+    top: 0px,
+    right: 0px,
+    bottom: 0px,
+    width: .nil,
+    height: .nil,
+    ignore-stack: .true,
+    corner-radius: spc.radii.row
+  }
+}
+
+// ---- a pattern option (.st-motif): the swatch (52) over its name;
+// chosen (`motifOptPicked`): the rope round both, the name in ink.
+// Children: `sw`, `name`.
+@variants(motifOptPicked)
+export motifOpt = frame {
+  title: "Pattern option",
+  left: 4005px,
+  top: 881px,
+  layout: {
+    stack: {direction: .column, align-items: .center, item-gap: spc.steps.s1}
+  },
+  corner-radius: spc.radii.st-motif,
+  children: [sw, name],
+
+  sw = frame {
+    width: spc.controls.st-motif,
+    height: spc.controls.st-motif,
+    fill: [col.roles.recess, {image: {ref: sineSw}}],
+    corner-radius: spc.radii.st-motif,
+    overflow: .clip
+  }
+
+  name = text : txt.metaCard {
+    contents: "sine",
+    font-size: typ.sizes.st-small
+  }
+}
+
+export motifOptPicked = frame : motifOpt {
+  title: "Pattern option · chosen",
+  left: 4157px,
+  top: 881px,
+  overrides: [insert(motifRope, after = motifOpt.name)],
+
+  sw {
+    fill[1].image.ref: combatSw
+  }
+
+  name {
+    fill[0].color: col.roles.fg,
+    contents: "auto"
+  }
+
+  motifRope = frame : surf.rope {
+    left: 0px,
+    top: 0px,
+    right: 0px,
+    bottom: 0px,
+    width: .nil,
+    height: .nil,
+    ignore-stack: .true,
+    corner-radius: spc.radii.st-motif
+  }
+}
+
+// The five patterns (auto picks one from the track).
+export motifRow = frame {
+  title: "Pattern options (DAW)",
+  left: 4315px,
+  top: 881px,
+  layout: {stack: {item-gap: spc.steps.s2}},
+  children: [auto, sine, square, triangle, saw],
+
+  auto = frame : motifOptPicked {}
+
+  sine = frame : motifOpt {}
+
+  square = frame : motifOpt {
+    sw {
+      fill[1].image.ref: squareSw
+    }
+
+    name {
+      contents: "square"
+    }
+  }
+
+  triangle = frame : motifOpt {
+    sw {
+      fill[1].image.ref: triangleSw
+    }
+
+    name {
+      contents: "triangle"
+    }
+  }
+
+  saw = frame : motifOpt {
+    sw {
+      fill[1].image.ref: sawSw
+    }
+
+    name {
+      contents: "saw"
+    }
+  }
+}
+
+// ---- a status option (.st-opt, a single choice): a 44 chip holding the
+// status's fact; chosen (`statusOptPicked`): the pick rope.
+// Children: `opt` (a fct.fact*: swap it with @with-variant).
+@variants(statusOptPicked)
+export statusOpt = frame : chips.chip {
+  title: "Status option",
+  left: 0px,
+  top: 1071px,
+  height: spc.controls.btn,
+  padding-left: spc.layout.st-tab-x,
+  padding-right: spc.layout.st-opt-r,
+  overrides: [insert(opt, after = chips.chip.glyph)],
+
+  glyph {
+    display: .none
+  }
+
+  label {
+    display: .none
+  }
+
+  opt = frame : fct.factWip {
+    label {
+      fill[0].color: col.roles.fg,
+      contents: "WIP"
+    }
+
+    sub {
+      display: .none
+    }
+  }
+}
+
+export statusOptPicked = frame : statusOpt {
+  title: "Status option · chosen",
+  left: 1596px,
+  top: 1071px,
+  overrides: [insert(optRope, after = chips.chip.chipRing)],
+
+  @with-variant(fct.fact)
+  opt {
+    label {
+      contents: "Complete"
+    }
+  }
+
+  chipStitch {
+    display: .none
+  }
+
+  optRope = frame : surf.rope {
+    left: 0px,
+    top: 0px,
+    right: 0px,
+    bottom: 0px,
+    width: .nil,
+    height: .nil,
+    ignore-stack: .true
+  }
+}
+
+// ---- a link (studio-links.js): the grip, then a kit row: the site's
+// mark (a link disc, the kind under it), its text (empty = the site's
+// name, the placeholder) over its address (mono), ✕.
+// Children: `grip` (`gripGlyph`), `row` (`rowStitch`, `mark` (`disc`,
+// `kind`), `inputs` (`words`, `url`), `remove`).
+export linkRow = frame {
+  title: "Link row",
+  left: 0px,
+  top: 1536px,
+  width: 642px,
+  layout: {stack: {align-items: .stretch, item-gap: spc.steps.s2}},
+  children: [grip, row],
+
+  grip = frame {
+    width: spc.controls.st-grip,
+    layout: {stack: {justify-content: .center, align-items: .center}},
+    children: gripGlyph,
+
+    gripGlyph = asset {
+      width: spc.controls.icon,
+      height: spc.controls.icon,
+      fill: col.roles.fg-3,
+      contents: gripIcon
+    }
+  }
+
+  row = frame {
+    width: 100%,
+    layout: {stack: {item-gap: spc.steps.s3}},
+    fill: col.roles.surface,
+    shadow: [
+      {
+        drop-shadow: {
+          color: pal.palette.shadow-1,
+          offset: point(0px, 1px),
+          blur-radius: 0px
+        }
+      },
+      {
+        drop-shadow: {
+          color: pal.palette.shadow-1,
+          offset: point(0px, 2px),
+          blur-radius: 6px
+        }
+      }
+    ],
+    corner-radius: spc.radii.row,
+    padding: spc.layout.st-list-gap,
+    children: [rowStitch, mark, inputs, remove],
+
+    rowStitch = frame : surf.stitch {
+      left: spc.layout.stitch-in-ctl,
+      top: spc.layout.stitch-in-ctl,
+      right: spc.layout.stitch-in-ctl,
+      bottom: spc.layout.stitch-in-ctl,
+      width: .nil,
+      height: .nil,
+      ignore-stack: .true,
+      corner-radius: spc.radii.opt,
+      border[0].width: spc.layout.stitch-w-sm
+    }
+
+    mark = frame {
+      layout: {
+        stack: {
+          direction: .column,
+          align-items: .center,
+          item-gap: spc.steps.s1
+        }
+      },
+      children: [disc, kind],
+
+      disc = frame : lnk.linkDiscSoundcloud {
+        width: spc.controls.btn,
+        height: spc.controls.btn,
+
+        glyph {
+          width: spc.controls.icon,
+          height: spc.controls.icon
+        }
+      }
+
+      kind = text : txt.micro {
+        contents: "TRACK",
+        letter-spacing: typ.tracking.caps,
+        fill[0].color: col.roles.fg-3
+      }
+    }
+
+    inputs = frame {
+      width: 100%,
+      layout: {
+        stack: {
+          direction: .column,
+          align-items: .stretch,
+          item-gap: spc.layout.fact-gap
+        }
+      },
+      children: [words, url],
+
+      words = frame : fld.fieldPlaceholder {
+        width: 100%,
+        height: spc.controls.st-in-sm,
+        padding-top: 0px,
+        padding-left: spc.layout.st-in-x,
+        padding-bottom: 0px,
+        padding-right: spc.layout.st-in-x,
+
+        value {
+          contents: "SoundCloud"
+        }
+      }
+
+      url = frame : fld.field {
+        width: 100%,
+        height: spc.controls.st-in-xs,
+        padding-top: 0px,
+        padding-left: spc.layout.st-in-x,
+        padding-bottom: 0px,
+        padding-right: spc.layout.st-in-x,
+
+        value {
+          contents: "https://soundcloud.com/litter_box/combat?in=litter_box/sets/…",
+          font-size: typ.sizes.meta,
+          font-family: typ.faces.meta,
+          font-style: typ.faces.meta-style
+        }
+      }
+    }
+
+    remove = frame : lnk.linkDisc {
+      glyph {
+        contents: removeIcon
+      }
+    }
+  }
+}
+
+// Add links: paste one or many (one per line), then Add.
+// Children: `paste` (fld.field), `add` (btn.btn).
+export linkAdd = frame {
+  title: "Links · add",
+  left: 0px,
+  top: 1758px,
+  width: 642px,
+  layout: {stack: {align-items: .center, item-gap: spc.steps.s2}},
+  children: [paste, add],
+
+  paste = frame : fld.fieldPlaceholder {
+    width: 100%,
+
+    value {
+      contents: "Paste links: SoundCloud, YouTube, BeepBox…",
+      font-size: typ.sizes.meta,
+      font-family: typ.faces.meta,
+      font-style: typ.faces.meta-style
+    }
+  }
+
+  add = frame : btn.btn {
+    height: spc.controls.st-in-sm,
+
+    glyph {
+      contents: plusIcon
+    }
+
+    label {
+      contents: "Add"
+    }
+  }
+}
+
+// ---- a collection's facts, read-only, from its tracks (.st-derived): a
+// dashed box, the fact's name over its value and where it comes from
+// ("from explore (piano)", a link). Base: the status (a fact + its tally);
+// `derivedBoxDate`: a month. Children: `dt`, `dd` (`value`, `valueText`,
+// `from`).
+@variants(derivedBoxDate)
+export derivedBox = frame {
+  title: "Derived fact · status",
+  left: 3192px,
+  top: 1071px,
+  width: 218px,
+  layout: {
+    stack: {direction: .column, align-items: .stretch, item-gap: spc.steps.s1}
+  },
+  border: {
+    color: col.roles.stitch,
+    width: spc.layout.stitch-w-sm,
+    dash: [5px, 4px]
+  },
+  corner-radius: spc.radii.row,
+  padding: [spc.layout.st-list-gap, spc.steps.s3],
+  children: [dt, dd],
+
+  dt = frame : fieldLabel {
+    word {
+      contents: "Status"
+    }
+  }
+
+  dd = frame {
+    layout: {stack: {direction: .column, item-gap: 2px}},
+    children: [value, valueText, from],
+
+    value = frame : fct.fact {
+      height: spc.controls.st-fact,
+
+      sub {
+        display: .none
+      }
+
+      label {
+        contents: "Complete"
+      }
+    }
+
+    valueText = text : txt.titleCard {
+      display: .none,
+      contents: "May 2021",
+      font-size: typ.sizes.st-row
+    }
+
+    from = text : txt.meta {
+      contents: "5 complete · 1 dropped"
+    }
+  }
+}
+
+// A month, and the track it comes from (a link).
+export derivedBoxDate = frame : derivedBox {
+  title: "Derived fact · a month",
+  left: 3466px,
+  top: 1071px,
+
+  dd {
+    from {
+      subrange[0].range: [5, 20],
+      subrange[0].fill[0].color: col.roles.link,
+      subrange[0].underline: .single,
+      contents: "from explore (piano)"
+    }
+
+    value {
+      display: .none
+    }
+
+    valueText {
+      display: .visible
+    }
+  }
+
+  dt {
+    word {
+      contents: "Started"
+    }
+  }
+}
+
+// ---- a collection's instrument, from its tracks (.st-instmix): its mixed
+// swatch, the fact ("DAW + Piano" on a split disc) over the tally.
+// Children: `sw`, `words` (`inst`, `tally`).
+export instMix = frame {
+  title: "Instrument · from the tracks",
+  left: 1596px,
+  top: 1270px,
+  width: spc.controls.st-form-w,
+  height: spc.controls.st-inst-h,
+  layout: {stack: {align-items: .center, item-gap: spc.steps.s3}},
+  fill: col.roles.surface,
+  shadow: {
+    drop-shadow: {
+      color: pal.palette.shadow-1,
+      offset: point(0px, 1px),
+      blur-radius: 0px
+    }
+  },
+  corner-radius: spc.radii.row,
+  padding: [
+    spc.layout.st-opt-l,
+    spc.layout.st-opt-r,
+    spc.layout.st-opt-l,
+    spc.layout.st-opt-l
+  ],
+  children: [sw, words],
+
+  sw = frame {
+    width: spc.controls.st-inst-sw,
+    height: spc.controls.st-inst-sw,
+    fill: [col.roles.recess, {image: {ref: vgmSw}}],
+    corner-radius: spc.radii.art,
+    overflow: .clip
+  }
+
+  words = frame {
+    layout: {stack: {direction: .column, item-gap: 2px}},
+    children: [inst, tally],
+
+    inst = frame : fct.fact {
+      height: spc.controls.st-fact,
+
+      disc {
+        fill[0].linear-gradient.from: [0%, 50%],
+        fill[0].linear-gradient.stops[3].position: 100%,
+        fill[0].linear-gradient.stops[2].position: 50%,
+        fill[0].linear-gradient.stops[1].position: 50%,
+        fill[0].linear-gradient.stops[0].position: 0%,
+
+        glyph {
+          fill[0].color: col.roles.dark-fg,
+          contents: musicIcon
+        }
+
+        fill[0].linear-gradient.to: [100%, 50%],
+        fill[0].linear-gradient.stops[3].color: pal.palette.inst-piano,
+        fill[0].linear-gradient.stops[2].color: pal.palette.inst-piano,
+        fill[0].linear-gradient.stops[1].color: pal.palette.inst-daw,
+        fill[0].linear-gradient.stops[0].color: pal.palette.inst-daw
+      }
+
+      sub {
+        display: .none
+      }
+
+      label {
+        contents: "DAW + Piano"
+      }
+    }
+
+    tally = text : txt.metaCard {
+      contents: "5 DAW · 1 Piano",
+      font-size: typ.sizes.st-small
+    }
+  }
+}
+
+// ---- "On the card" (.st-shows): the site card's own facts, live.
+// Children: `head` (prt.eyebrow), `fact`.
+export showsStrip = frame {
+  title: "On the card",
+  left: 1596px,
+  top: 1536px,
+  width: spc.controls.st-form-w,
+  layout: {stack: {align-items: .center, item-gap: spc.layout.facts-gap}},
+  fill: col.roles.surface,
+  shadow: [
+    {
+      drop-shadow: {
+        color: pal.palette.shadow-1,
+        offset: point(0px, 1px),
+        blur-radius: 0px
+      }
+    },
+    {
+      drop-shadow: {
+        color: pal.palette.shadow-1,
+        offset: point(0px, 2px),
+        blur-radius: 6px
+      }
+    }
+  ],
+  corner-radius: spc.radii.card,
+  padding: [spc.steps.s2, spc.layout.st-in-x],
+  children: [showsStitch, head, fact],
+
+  showsStitch = frame : surf.stitch {
+    left: spc.layout.stitch-in-ctl,
+    top: spc.layout.stitch-in-ctl,
+    right: spc.layout.stitch-in-ctl,
+    bottom: spc.layout.stitch-in-ctl,
+    width: .nil,
+    height: .nil,
+    ignore-stack: .true,
+    corner-radius: spc.radii.opt,
+    border[0].width: spc.layout.stitch-w-sm
+  }
+
+  head = frame : prt.eyebrow {
+    word {
+      contents: "ON THE CARD"
+    }
+  }
+
+  fact = frame : fct.fact {
+    sub {
+      display: .none
+    }
+
+    label {
+      contents: "Completed May 2021"
+    }
+  }
+}
+
+// ==== states page (labels over the definitions, then the states boards: i9 · i10 · i11) ====
+lbl-edBar = text : doc.specLabel {
+  left: 0px,
+  top: 0px,
+  contents: "edBar"
+}
+
+note-edBar = text : doc.specNote {
+  left: 0px,
+  top: 16px,
+  contents: "the editor bar · saved"
+}
+
+lbl-edBarPublish = text : doc.specLabel {
+  left: 1596px,
+  top: 0px,
+  contents: "edBarPublish"
+}
+
+note-edBarPublish = text : doc.specNote {
+  left: 1596px,
+  top: 16px,
+  contents: "with changes to publish"
+}
+
+lbl-edHead = text : doc.specLabel {
+  left: 0px,
+  top: 180px,
+  contents: "edHead"
+}
+
+note-edHead = text : doc.specNote {
+  left: 0px,
+  top: 196px,
+  contents: "the editor head · live"
+}
+
+lbl-edHeadDraft = text : doc.specLabel {
+  left: 1596px,
+  top: 180px,
+  contents: "edHeadDraft"
+}
+
+note-edHeadDraft = text : doc.specNote {
+  left: 1596px,
+  top: 196px,
+  contents: "a draft"
+}
+
+lbl-formSec = text : doc.specLabel {
+  left: 0px,
+  top: 393px,
+  contents: "formSec"
+}
+
+note-formSec = text : doc.specNote {
+  left: 0px,
+  top: 409px,
+  contents: "a form section"
+}
+
+lbl-formSecSub = text : doc.specLabel {
+  left: 1596px,
+  top: 393px,
+  contents: "formSecSub"
+}
+
+note-formSecSub = text : doc.specNote {
+  left: 1596px,
+  top: 409px,
+  contents: "a sub-section"
+}
+
+lbl-fieldLabel = text : doc.specLabel {
+  left: 3192px,
+  top: 393px,
+  contents: "fieldLabel"
+}
+
+note-fieldLabel = text : doc.specNote {
+  left: 3192px,
+  top: 409px,
+  contents: "a field label"
+}
+
+lbl-labeled = text : doc.specLabel {
+  left: 0px,
+  top: 561px,
+  contents: "labeled"
+}
+
+note-labeled = text : doc.specNote {
+  left: 0px,
+  top: 577px,
+  contents: "a labelled field"
+}
+
+lbl-folder = text : doc.specLabel {
+  left: 1596px,
+  top: 561px,
+  contents: "folder"
+}
+
+note-folder = text : doc.specNote {
+  left: 1596px,
+  top: 577px,
+  contents: "the folder (tabs + card)"
+}
+
+lbl-trackTab = text : doc.specLabel {
+  left: 0px,
+  top: 841px,
+  contents: "trackTab"
+}
+
+note-trackTab = text : doc.specNote {
+  left: 0px,
+  top: 857px,
+  contents: "a track tab · rest"
+}
+
+lbl-trackTabPicked = text : doc.specLabel {
+  left: 1596px,
+  top: 841px,
+  contents: "trackTabPicked"
+}
+
+note-trackTabPicked = text : doc.specNote {
+  left: 1596px,
+  top: 857px,
+  contents: "picked"
+}
+
+lbl-trackTabAdd = text : doc.specLabel {
+  left: 3192px,
+  top: 841px,
+  contents: "trackTabAdd"
+}
+
+note-trackTabAdd = text : doc.specNote {
+  left: 3192px,
+  top: 857px,
+  contents: "add a track"
+}
+
+lbl-instOpt = text : doc.specLabel {
+  left: 3466px,
+  top: 841px,
+  contents: "instOpt"
+}
+
+note-instOpt = text : doc.specNote {
+  left: 3466px,
+  top: 857px,
+  contents: "an instrument · rest"
+}
+
+lbl-instOptPicked = text : doc.specLabel {
+  left: 3740px,
+  top: 841px,
+  contents: "instOptPicked"
+}
+
+note-instOptPicked = text : doc.specNote {
+  left: 3740px,
+  top: 857px,
+  contents: "picked"
+}
+
+lbl-motifOpt = text : doc.specLabel {
+  left: 4005px,
+  top: 841px,
+  contents: "motifOpt"
+}
+
+note-motifOpt = text : doc.specNote {
+  left: 4005px,
+  top: 857px,
+  contents: "a motif · rest"
+}
+
+lbl-motifOptPicked = text : doc.specLabel {
+  left: 4157px,
+  top: 841px,
+  contents: "motifOptPicked"
+}
+
+note-motifOptPicked = text : doc.specNote {
+  left: 4157px,
+  top: 857px,
+  contents: "picked"
+}
+
+lbl-motifRow = text : doc.specLabel {
+  left: 4315px,
+  top: 841px,
+  contents: "motifRow"
+}
+
+note-motifRow = text : doc.specNote {
+  left: 4315px,
+  top: 857px,
+  contents: "the motif row"
+}
+
+lbl-statusOpt = text : doc.specLabel {
+  left: 0px,
+  top: 1031px,
+  contents: "statusOpt"
+}
+
+note-statusOpt = text : doc.specNote {
+  left: 0px,
+  top: 1047px,
+  contents: "a status · rest"
+}
+
+lbl-statusOptPicked = text : doc.specLabel {
+  left: 1596px,
+  top: 1031px,
+  contents: "statusOptPicked"
+}
+
+note-statusOptPicked = text : doc.specNote {
+  left: 1596px,
+  top: 1047px,
+  contents: "picked"
+}
+
+lbl-derivedBox = text : doc.specLabel {
+  left: 3192px,
+  top: 1031px,
+  contents: "derivedBox"
+}
+
+note-derivedBox = text : doc.specNote {
+  left: 3192px,
+  top: 1047px,
+  contents: "a derived value"
+}
+
+lbl-derivedBoxDate = text : doc.specLabel {
+  left: 3466px,
+  top: 1031px,
+  contents: "derivedBoxDate"
+}
+
+note-derivedBoxDate = text : doc.specNote {
+  left: 3466px,
+  top: 1047px,
+  contents: "a derived date"
+}
+
+lbl-audioBox = text : doc.specLabel {
+  left: 0px,
+  top: 1230px,
+  contents: "audioBox"
+}
+
+note-audioBox = text : doc.specNote {
+  left: 0px,
+  top: 1246px,
+  contents: "the audio box"
+}
+
+lbl-instMix = text : doc.specLabel {
+  left: 1596px,
+  top: 1230px,
+  contents: "instMix"
+}
+
+note-instMix = text : doc.specNote {
+  left: 1596px,
+  top: 1246px,
+  contents: "the instrument mix"
+}
+
+lbl-linkRow = text : doc.specLabel {
+  left: 0px,
+  top: 1496px,
+  contents: "linkRow"
+}
+
+note-linkRow = text : doc.specNote {
+  left: 0px,
+  top: 1512px,
+  contents: "a link row"
+}
+
+lbl-showsStrip = text : doc.specLabel {
+  left: 1596px,
+  top: 1496px,
+  contents: "showsStrip"
+}
+
+note-showsStrip = text : doc.specNote {
+  left: 1596px,
+  top: 1512px,
+  contents: "where it shows"
+}
+
+lbl-linkAdd = text : doc.specLabel {
+  left: 0px,
+  top: 1718px,
+  contents: "linkAdd"
+}
+
+note-linkAdd = text : doc.specNote {
+  left: 0px,
+  top: 1734px,
+  contents: "add a link"
+}
+
+@variants(studioEditorStatesI10)
+studioEditorStates = frame : doc.docBoard {
+  title: "Studio · editor parts · states · i9",
+  left: 0px,
+  top: 1944px,
+
+  body {
+    layout.stack.item-gap: 48px,
+    overrides: [
+      insert(row-1, after = .nil),
+      insert(row-2, after = row-1),
+      insert(row-3, after = row-2),
+      insert(row-4, after = row-3),
+      insert(row-5, after = row-4),
+      insert(row-6, after = row-5),
+      insert(row-7, after = row-6),
+      insert(row-8, after = row-7),
+      insert(row-9, after = row-8),
+      insert(row-10, after = row-9),
+      insert(row-11, after = row-10),
+      insert(row-12, after = row-11),
+      insert(row-13, after = row-12)
+    ]
+  }
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i9"
+      }
+    }
+
+    boardCaption {
+      contents: "Studio · editor parts · every state"
+    }
+  }
+
+  row-1 = frame : doc.specRow {
+    layout.stack.item-gap: 48px,
+    overrides: [insert(st-edBar, after = .nil)]
+  }
+
+  row-2 = frame : doc.specRow {
+    layout.stack.item-gap: 48px,
+    overrides: [insert(st-edBarPublish, after = .nil)]
+  }
+
+  row-3 = frame : doc.specRow {
+    layout.stack.item-gap: 48px,
+    overrides: [insert(st-edHead, after = .nil)]
+  }
+
+  row-4 = frame : doc.specRow {
+    layout.stack.item-gap: 48px,
+    overrides: [insert(st-edHeadDraft, after = .nil)]
+  }
+
+  row-5 = frame : doc.specRow {
+    layout.stack.item-gap: 48px,
+    overrides: [
+      insert(st-formSec, after = .nil),
+      insert(st-formSecSub, after = st-formSec),
+      insert(st-fieldLabel, after = st-formSecSub)
+    ]
+  }
+
+  row-6 = frame : doc.specRow {
+    layout.stack.item-gap: 48px,
+    overrides: [
+      insert(st-labeled, after = .nil),
+      insert(st-folder, after = st-labeled)
+    ]
+  }
+
+  row-7 = frame : doc.specRow {
+    layout.stack.item-gap: 48px,
+    overrides: [
+      insert(st-trackTab, after = .nil),
+      insert(st-trackTabPicked, after = st-trackTab),
+      insert(st-trackTabAdd, after = st-trackTabPicked)
+    ]
+  }
+
+  row-8 = frame : doc.specRow {
+    layout.stack.item-gap: 48px,
+    overrides: [
+      insert(st-instOpt, after = .nil),
+      insert(st-instOptPicked, after = st-instOpt)
+    ]
+  }
+
+  row-9 = frame : doc.specRow {
+    layout.stack.item-gap: 48px,
+    overrides: [
+      insert(st-motifOpt, after = .nil),
+      insert(st-motifOptPicked, after = st-motifOpt),
+      insert(st-motifRow, after = st-motifOptPicked)
+    ]
+  }
+
+  row-10 = frame : doc.specRow {
+    layout.stack.item-gap: 48px,
+    overrides: [
+      insert(st-statusOpt, after = .nil),
+      insert(st-statusOptPicked, after = st-statusOpt),
+      insert(st-derivedBox, after = st-statusOptPicked),
+      insert(st-derivedBoxDate, after = st-derivedBox)
+    ]
+  }
+
+  row-11 = frame : doc.specRow {
+    layout.stack.item-gap: 48px,
+    overrides: [
+      insert(st-audioBox, after = .nil),
+      insert(st-instMix, after = st-audioBox)
+    ]
+  }
+
+  row-12 = frame : doc.specRow {
+    layout.stack.item-gap: 48px,
+    overrides: [
+      insert(st-linkRow, after = .nil),
+      insert(st-showsStrip, after = st-linkRow)
+    ]
+  }
+
+  row-13 = frame : doc.specRow {
+    layout.stack.item-gap: 48px,
+    overrides: [insert(st-linkAdd, after = .nil)]
+  }
+
+  st-edBar = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "edBar"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "the editor bar · saved"
+    }
+
+    it = frame : edBar {}
+  }
+
+  st-edBarPublish = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "edBarPublish"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "with changes to publish"
+    }
+
+    it = frame : edBarPublish {}
+  }
+
+  st-edHead = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "edHead"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "the editor head · live"
+    }
+
+    it = frame : edHead {}
+  }
+
+  st-edHeadDraft = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "edHeadDraft"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "a draft"
+    }
+
+    it = frame : edHeadDraft {}
+  }
+
+  st-formSec = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "formSec"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "a form section"
+    }
+
+    it = frame : formSec {}
+  }
+
+  st-formSecSub = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "formSecSub"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "a sub-section"
+    }
+
+    it = frame : formSecSub {}
+  }
+
+  st-fieldLabel = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "fieldLabel"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "a field label"
+    }
+
+    it = frame : fieldLabel {}
+  }
+
+  st-labeled = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "labeled"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "a labelled field"
+    }
+
+    it = frame : labeled {}
+  }
+
+  st-folder = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "folder"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "the folder (tabs + card)"
+    }
+
+    it = frame : folder {}
+  }
+
+  st-trackTab = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "trackTab"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "a track tab · rest"
+    }
+
+    it = frame : trackTab {}
+  }
+
+  st-trackTabPicked = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "trackTabPicked"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "picked"
+    }
+
+    it = frame : trackTabPicked {}
+  }
+
+  st-trackTabAdd = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "trackTabAdd"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "add a track"
+    }
+
+    it = frame : trackTabAdd {}
+  }
+
+  st-instOpt = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "instOpt"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "an instrument · rest"
+    }
+
+    it = frame : instOpt {}
+  }
+
+  st-instOptPicked = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "instOptPicked"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "picked"
+    }
+
+    it = frame : instOptPicked {}
+  }
+
+  st-motifOpt = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "motifOpt"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "a motif · rest"
+    }
+
+    it = frame : motifOpt {}
+  }
+
+  st-motifOptPicked = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "motifOptPicked"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "picked"
+    }
+
+    it = frame : motifOptPicked {}
+  }
+
+  st-motifRow = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "motifRow"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "the motif row"
+    }
+
+    it = frame : motifRow {}
+  }
+
+  st-statusOpt = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "statusOpt"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "a status · rest"
+    }
+
+    it = frame : statusOpt {}
+  }
+
+  st-statusOptPicked = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "statusOptPicked"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "picked"
+    }
+
+    it = frame : statusOptPicked {}
+  }
+
+  st-derivedBox = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "derivedBox"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "a derived value"
+    }
+
+    it = frame : derivedBox {}
+  }
+
+  st-derivedBoxDate = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "derivedBoxDate"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "a derived date"
+    }
+
+    it = frame : derivedBoxDate {}
+  }
+
+  st-audioBox = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "audioBox"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "the audio box"
+    }
+
+    it = frame : audioBox {}
+  }
+
+  st-instMix = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "instMix"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "the instrument mix"
+    }
+
+    it = frame : instMix {}
+  }
+
+  st-linkRow = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "linkRow"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "a link row"
+    }
+
+    it = frame : linkRow {}
+  }
+
+  st-showsStrip = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "showsStrip"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "where it shows"
+    }
+
+    it = frame : showsStrip {}
+  }
+
+  st-linkAdd = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "linkAdd"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "add a link"
+    }
+
+    it = frame : linkAdd {}
+  }
+}
+
+@variants(studioEditorStatesI11)
+@context(i10="on")
+studioEditorStatesI10 = frame : studioEditorStates {
+  title: "Studio · editor parts · states · i10",
+  left: 1905px,
+  top: 1944px,
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i10"
+      }
+    }
+  }
+}
+
+@context(i10="on", i11="on")
+studioEditorStatesI11 = frame : studioEditorStatesI10 {
+  title: "Studio · editor parts · states · i11",
+  left: 3811px,
+  top: 1944px,
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i11"
+      }
+    }
+  }
+}

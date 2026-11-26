@@ -1,0 +1,855 @@
+import "tokens/color/roles.elyx" as col
+import "tokens/color/palette.elyx" as pal
+import "tokens/space/space.elyx" as spc
+import "tokens/type/type.elyx" as typ
+import "components/atoms/text.elyx" as txt
+import "components/atoms/doc.elyx" as doc
+import "components/molecules/fact.elyx" as fct
+import "components/molecules/folder-tab.elyx" as ft
+import "components/molecules/link-disc.elyx" as lnk
+import "components/molecules/play-button.elyx" as pb
+import "components/organisms/folder-card.elyx" as fc
+import "components/organisms/detail.elyx" as dt
+import "assets/icons/bold/music-notes.svg" as musicIcon
+import "assets/art/combat.svg" as combatSw
+import "components/organisms/studio-parts.elyx" as prt
+import "assets/art/studio/vgm-mixed.svg" as vgmSw
+import "assets/art/studio/track-explore-piano.svg" as explorePianoSw
+import "assets/art/studio/track-boss.svg" as bossSw
+import "assets/art/studio/track-death.svg" as deathSw
+import "assets/art/studio/track-victory.svg" as victorySw
+import "assets/art/studio/track-explore.svg" as exploreSw
+import "assets/icons/bold/calendar-blank.svg" as dateIcon
+
+// The editor's live preview (.st-prevbox): the item as the site shows it,
+// built from the site's own parts (the folder card, facts, discs, ▶).
+// `prevPane`: "PREVIEW · as on blaqat.net" over the pane (the sheet's
+// cotton, a hairline ring, --r-pane, --inset-pane: i9 22 at the sides; i11
+// 16 all round, radius 24). Insert the preview into `box`.
+// Children: `head` (prt.eyebrow), `box`.
+export prevPane = frame {
+  title: "Preview pane",
+  left: 0px,
+  top: 40px,
+  width: spc.controls.st-prev-w,
+  layout: {
+    stack: {
+      direction: .column,
+      align-items: .stretch,
+      item-gap: spc.layout.st-sec-gap
+    }
+  },
+  children: [head, box],
+
+  head = frame : prt.eyebrow {
+    word {
+      contents: "PREVIEW"
+    }
+
+    meta {
+      display: .visible,
+      contents: "AS ON BLAQAT.NET"
+    }
+
+    glyph {
+      display: .visible
+    }
+  }
+
+  box = frame {
+    min-height: spc.controls.st-ta-h,
+    layout: {stack: {direction: .column, align-items: .stretch}},
+    fill: col.roles.sheet,
+    shadow: {
+      inner-shadow: {
+        color: pal.palette.hairline,
+        offset: point(0px, 0px),
+        blur-radius: 0px,
+        spread: spc.layout.stitch-w-sm
+      }
+    },
+    corner-radius: spc.radii.pane,
+    padding: [0px, spc.layout.pane-inset]
+  }
+}
+
+// ---- a track in the release's preview (.st-track): the swatch (40), the
+// name; its link (a small disc), its status (the fact's glyph alone), its
+// length. Children: `lead` (`sw`, `name`), `tail` (`link`, `status`,
+// `len`). Hide `tail.link` for a track with no link.
+export prevTrack = frame {
+  title: "Preview · a track",
+  left: 754px,
+  top: 40px,
+  width: 582px,
+  min-height: spc.controls.st-in-sm,
+  layout: {stack: {justify-content: .space-between, align-items: .center}},
+  children: [lead, tail],
+
+  lead = frame {
+    layout: {stack: {align-items: .center, item-gap: spc.layout.st-list-gap}},
+    children: [sw, name],
+
+    sw = frame {
+      width: spc.controls.btn-d,
+      height: spc.controls.btn-d,
+      fill: [col.roles.recess, {image: {ref: combatSw}}],
+      corner-radius: spc.radii.art,
+      overflow: .clip
+    }
+
+    name = text : txt.labelCard {
+      contents: "combat"
+    }
+  }
+
+  tail = frame {
+    layout: {stack: {align-items: .center, item-gap: spc.layout.st-list-gap}},
+    children: [link, status, len],
+
+    link = frame : lnk.linkDiscSoundcloud {}
+
+    status = frame : fct.fact {
+      label {
+        display: .none
+      }
+
+      sub {
+        display: .none
+      }
+    }
+
+    len = text : txt.numCard {
+      width: spc.controls.st-len-w,
+      contents: "1:58"
+    }
+  }
+}
+
+// ---- the collection's preview: "In the library" (its folder card), then
+// its page (back · the copy-link disc, the facts, the art, the title, the
+// tracks, the notes, Play all). The seed: VGM Class Final Project.
+// Children: `lib` (`libHead`, `card`), `page` (`bar` (`back`, `copy`),
+// `facts` (`inst`, `status`, `made`), `art`, `title`, `tracks` (`tracksHead`,
+// `k1` … `k6`), `notes`, `playRow` (`playAll`)).
+@variants(prevReleaseI10)
+export prevRelease = frame {
+  title: "Preview · a collection",
+  left: 0px,
+  top: 306px,
+  width: 582px,
+  layout: {stack: {direction: .column, align-items: .stretch}},
+  children: [lib, page],
+
+  lib = frame {
+    layout: {stack: {direction: .column, item-gap: spc.layout.st-sec-gap}},
+    padding: [spc.layout.pane-inset-y, 0px, spc.layout.pane-inset],
+    children: [libHead, card],
+
+    libHead = frame : prt.eyebrow {
+      word {
+        contents: "IN THE LIBRARY"
+      }
+    }
+
+    card = frame : fc.folderCard {
+      width: spc.controls.st-card-w,
+
+      tabs {
+        strip {
+          after1 {
+            after2 {
+              overrides: [
+                insert(tab5, after = ft.folderTabs.strip.after1.after2.tab4),
+                insert(tab6, after = tab5)
+              ],
+
+              tab4 {
+                name {
+                  contents: "death"
+                }
+              }
+
+              tab3 {
+                name {
+                  contents: "boss"
+                }
+              }
+            }
+
+            tab2 {
+              name {
+                contents: "combat"
+              }
+            }
+          }
+
+          tab1 {
+            name {
+              contents: "explore (piano)"
+            }
+          }
+        }
+      }
+
+      card {
+        foot {
+          layout.stack.justify-content: .end,
+
+          acts {
+            @with-variant(pb.playBtnLabelSm)
+            play {}
+
+            add {
+              display: .none
+            }
+          }
+
+          links {
+            display: .none
+          }
+        }
+
+        top {
+          head {
+            art {
+              fill[1].image.ref: vgmSw
+            }
+
+            tt {
+              facts {
+                label {
+                  contents: "Completed May 2021"
+                }
+              }
+
+              nameRow {
+                count {
+                  contents: "(6 tracks)"
+                }
+
+                name {
+                  contents: "VGM Class Final Project"
+                }
+              }
+            }
+          }
+
+          face {
+            desc {
+              contents: "These are all stitched together since my ableton ran out before i got to export the full tracks so it might sound weird when they switch"
+            }
+          }
+        }
+      }
+    }
+  }
+
+  tab5 = frame : ft.folderTab {
+    number {
+      contents: "05"
+    }
+
+    name {
+      contents: "victory"
+    }
+  }
+
+  tab6 = frame : ft.folderTab {
+    number {
+      contents: "06"
+    }
+
+    name {
+      contents: "explore"
+    }
+  }
+
+  page = frame {
+    layout: {
+      stack: {direction: .column, align-items: .stretch, item-gap: spc.steps.s4}
+    },
+    padding-bottom: spc.layout.pane-inset,
+    children: [bar, facts, art, title, tracks, notes, playRow],
+
+    bar = frame {
+      layout: {stack: {justify-content: .space-between, align-items: .center}},
+      padding: [spc.steps.s2, 0px],
+      children: [back, copy],
+
+      back = frame : dt.detailBack {
+        backWord {
+          contents: "Music"
+        }
+      }
+
+      copy = frame : lnk.linkDisc {
+        width: spc.controls.btn,
+        height: spc.controls.btn,
+
+        glyph {
+          width: spc.controls.icon,
+          height: spc.controls.icon
+        }
+      }
+    }
+
+    facts = frame {
+      layout: {stack: {align-items: .center, item-gap: spc.layout.facts-gap}},
+      children: [inst, status, made],
+
+      // a mixed collection: the disc split between its instruments
+      inst = frame : fct.fact {
+        disc {
+          fill[0].linear-gradient.from: [0%, 50%],
+          fill[0].linear-gradient.stops[3].position: 100%,
+          fill[0].linear-gradient.stops[2].position: 50%,
+          fill[0].linear-gradient.stops[1].position: 50%,
+          fill[0].linear-gradient.stops[0].position: 0%,
+
+          glyph {
+            fill[0].color: col.roles.dark-fg,
+            contents: musicIcon
+          }
+
+          fill[0].linear-gradient.to: [100%, 50%],
+          fill[0].linear-gradient.stops[3].color: pal.palette.inst-piano,
+          fill[0].linear-gradient.stops[2].color: pal.palette.inst-piano,
+          fill[0].linear-gradient.stops[1].color: pal.palette.inst-daw,
+          fill[0].linear-gradient.stops[0].color: pal.palette.inst-daw
+        }
+
+        sub {
+          display: .none
+        }
+
+        label {
+          contents: "DAW + Piano"
+        }
+      }
+
+      status = frame : fct.fact {
+        sub {
+          display: .none
+        }
+
+        label {
+          contents: "Complete"
+        }
+      }
+
+      made = frame : fct.factChip {
+        disc {
+          glyph {
+            contents: dateIcon
+          }
+        }
+
+        label {
+          contents: "May 2021"
+        }
+      }
+    }
+
+    art = frame {
+      width: spc.controls.art,
+      height: spc.controls.art,
+      fill: [col.roles.recess, {image: {ref: vgmSw}}],
+      corner-radius: spc.radii.row,
+      overflow: .clip
+    }
+
+    title = text : txt.display {
+      contents: "VGM Class Final Project",
+      font-size: typ.sizes.st-title,
+      subrange[0].fill[0].color: col.roles.fg
+    }
+
+    tracks = frame {
+      layout: {
+        stack: {
+          direction: .column,
+          align-items: .stretch,
+          item-gap: spc.layout.fact-gap
+        }
+      },
+      children: [tracksHead, k1, k2, k3, k4, k5, k6],
+
+      tracksHead = frame : prt.eyebrow {
+        word {
+          contents: "TRACKS"
+        }
+
+        meta {
+          display: .visible,
+          contents: "6 · 16:10"
+        }
+      }
+
+      k1 = frame : prevTrack {
+        width: .nil,
+
+        lead {
+          sw {
+            fill[1].image.ref: explorePianoSw
+          }
+
+          name {
+            contents: "explore (piano)"
+          }
+        }
+
+        tail {
+          link {
+            opacity: 0
+          }
+
+          len {
+            contents: "2:20"
+          }
+        }
+      }
+
+      k2 = frame : prevTrack {
+        width: .nil
+      }
+
+      k3 = frame : prevTrack {
+        width: .nil,
+
+        tail {
+          len {
+            contents: "1:53"
+          }
+
+          @with-variant(fct.factDropped)
+          status {}
+        }
+
+        lead {
+          sw {
+            fill[1].image.ref: bossSw
+          }
+
+          name {
+            contents: "boss"
+          }
+        }
+      }
+
+      k4 = frame : prevTrack {
+        width: .nil,
+
+        lead {
+          sw {
+            fill[1].image.ref: deathSw
+          }
+
+          name {
+            contents: "death"
+          }
+        }
+
+        tail {
+          len {
+            contents: "1:46"
+          }
+        }
+      }
+
+      k5 = frame : prevTrack {
+        width: .nil,
+
+        lead {
+          sw {
+            fill[1].image.ref: victorySw
+          }
+
+          name {
+            contents: "victory"
+          }
+        }
+
+        tail {
+          len {
+            contents: "4:06"
+          }
+        }
+      }
+
+      k6 = frame : prevTrack {
+        width: .nil,
+
+        lead {
+          sw {
+            fill[1].image.ref: exploreSw
+          }
+
+          name {
+            contents: "explore"
+          }
+        }
+
+        tail {
+          len {
+            contents: "4:07"
+          }
+        }
+      }
+    }
+
+    notes = text : txt.body {
+      width: 100%,
+      contents: "These are all stitched together since my ableton ran out before i got to export the full tracks so it might sound weird when they switch",
+      fill[0].color: col.roles.fg
+    }
+
+    playRow = frame {
+      layout: {stack: {justify-content: .end}},
+      children: playAll,
+
+      playAll = frame : pb.playBtnLabelSm {
+        label {
+          contents: "Play all"
+        }
+      }
+    }
+  }
+}
+
+// i10 · the library card is i10's (its count joins the facts; at rest its
+// foot is + and ▶, no Play all) and the link discs are the duotone ones.
+@variants(prevReleaseI11)
+@context(i10="on")
+export prevReleaseI10 = frame : prevRelease {
+  title: "Preview · a collection · i10",
+  left: 754px,
+  top: 306px,
+
+  page {
+    tracks {
+      k6 {
+        tail {
+          @with-variant(lnk.linkDiscSoundcloudI10)
+          link {}
+        }
+      }
+
+      k5 {
+        tail {
+          @with-variant(lnk.linkDiscSoundcloudI10)
+          link {}
+        }
+      }
+
+      k4 {
+        tail {
+          @with-variant(lnk.linkDiscSoundcloudI10)
+          link {}
+        }
+      }
+
+      k3 {
+        tail {
+          @with-variant(lnk.linkDiscSoundcloudI10)
+          link {}
+        }
+      }
+
+      k2 {
+        tail {
+          @with-variant(lnk.linkDiscSoundcloudI10)
+          link {}
+        }
+      }
+    }
+
+    bar {
+      @with-variant(lnk.linkDiscI10)
+      copy {}
+    }
+  }
+
+  lib {
+    @with-variant(fc.folderCardI10)
+    card {
+      card {
+        top {
+          head {
+            tt {
+              facts {
+                sub {
+                  contents: "· 6 tracks"
+                }
+              }
+            }
+          }
+        }
+
+        foot {
+          acts {
+            add {
+              display: .visible
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+// i11 · "In the library" is a Meta word (T8: a label in disguise), the
+// tracks' head a Title.
+@context(i10="on", i11="on")
+export prevReleaseI11 = frame : prevReleaseI10 {
+  title: "Preview · a collection · i11",
+  left: 1456px,
+  top: 306px,
+
+  page {
+    tracks {
+      @with-variant(prt.eyebrowTitle)
+      tracksHead {
+        ttl {
+          contents: "Tracks"
+        }
+      }
+    }
+  }
+
+  lib {
+    @with-variant(prt.eyebrowQuiet)
+    libHead {
+      quiet {
+        contents: "In the library"
+      }
+    }
+  }
+}
+
+// ==== states page (labels over the definitions, then the states boards: i9 · i10 · i11) ====
+lbl-prevPane = text : doc.specLabel {
+  left: 0px,
+  top: 0px,
+  contents: "prevPane"
+}
+
+note-prevPane = text : doc.specNote {
+  left: 0px,
+  top: 16px,
+  contents: "the preview pane's head"
+}
+
+lbl-prevTrack = text : doc.specLabel {
+  left: 754px,
+  top: 0px,
+  contents: "prevTrack"
+}
+
+note-prevTrack = text : doc.specNote {
+  left: 754px,
+  top: 16px,
+  contents: "a track in the preview"
+}
+
+lbl-prevRelease = text : doc.specLabel {
+  left: 0px,
+  top: 266px,
+  contents: "prevRelease"
+}
+
+note-prevRelease = text : doc.specNote {
+  left: 0px,
+  top: 282px,
+  contents: "a release, as the site shows it"
+}
+
+lbl-prevReleaseI10 = text : doc.specLabel {
+  left: 754px,
+  top: 266px,
+  contents: "prevReleaseI10"
+}
+
+note-prevReleaseI10 = text : doc.specNote {
+  left: 754px,
+  top: 282px,
+  contents: "i10"
+}
+
+lbl-prevReleaseI11 = text : doc.specLabel {
+  left: 1456px,
+  top: 266px,
+  contents: "prevReleaseI11"
+}
+
+note-prevReleaseI11 = text : doc.specNote {
+  left: 1456px,
+  top: 282px,
+  contents: "i11"
+}
+
+@variants(studioPreviewStatesI10)
+studioPreviewStates = frame : doc.docBoard {
+  title: "Studio · preview · states · i9",
+  left: 0px,
+  top: 1551px,
+
+  body {
+    layout.stack.item-gap: 48px,
+    overrides: [
+      insert(row-1, after = .nil),
+      insert(row-2, after = row-1),
+      insert(row-3, after = row-2)
+    ]
+  }
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i9"
+      }
+    }
+
+    boardCaption {
+      contents: "Studio · preview · every state"
+    }
+  }
+
+  row-1 = frame : doc.specRow {
+    layout.stack.item-gap: 48px,
+    overrides: [insert(st-prevPane, after = .nil)]
+  }
+
+  row-2 = frame : doc.specRow {
+    layout.stack.item-gap: 48px,
+    overrides: [insert(st-prevTrack, after = .nil)]
+  }
+
+  row-3 = frame : doc.specRow {
+    layout.stack.item-gap: 48px,
+    overrides: [insert(st-prevRelease, after = .nil)]
+  }
+
+  st-prevPane = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "prevPane"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "the preview pane's head"
+    }
+
+    it = frame : prevPane {}
+  }
+
+  st-prevTrack = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "prevTrack"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "a track in the preview"
+    }
+
+    it = frame : prevTrack {}
+  }
+
+  st-prevRelease = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "prevRelease"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "a release, as the site shows it"
+    }
+
+    it = frame : prevRelease {}
+  }
+}
+
+@variants(studioPreviewStatesI11)
+@context(i10="on")
+studioPreviewStatesI10 = frame : studioPreviewStates {
+  title: "Studio · preview · states · i10",
+  left: 850px,
+  top: 1551px,
+
+  body {
+    row-3 {
+      st-prevRelease {
+        slot {
+          @with-variant(prevReleaseI10)
+          it {}
+        }
+
+        note {
+          contents: "i10"
+        }
+
+        label {
+          contents: "prevReleaseI10"
+        }
+      }
+    }
+  }
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i10"
+      }
+    }
+  }
+}
+
+@context(i10="on", i11="on")
+studioPreviewStatesI11 = frame : studioPreviewStatesI10 {
+  title: "Studio · preview · states · i11",
+  left: 1700px,
+  top: 1551px,
+
+  body {
+    row-3 {
+      st-prevRelease {
+        slot {
+          @with-variant(prevReleaseI11)
+          it {}
+        }
+
+        note {
+          contents: "i11"
+        }
+
+        label {
+          contents: "prevReleaseI11"
+        }
+      }
+    }
+  }
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i11"
+      }
+    }
+  }
+}

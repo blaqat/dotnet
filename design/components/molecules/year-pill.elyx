@@ -1,0 +1,272 @@
+import "tokens/color/roles.elyx" as col
+import "tokens/color/palette.elyx" as pal
+import "tokens/space/space.elyx" as spc
+import "tokens/type/type.elyx" as typ
+import "components/atoms/text.elyx" as txt
+import "components/atoms/surface.elyx" as surf
+import "components/atoms/doc.elyx" as doc
+
+// The kit's .yyear: the one separator (timelines, year groups, months).
+// A white patch pill with its stitch (R9: the year pill keeps its knit),
+// the year + a Meta count. i9 Nunito 850 15.5; i10 Title 17; i11 T1 a
+// section heading (Heading 22) with .45em all round (spc.layout.pill-*).
+// Children: `pillStitch`, `year`, `count`.
+@variants(yearPillSm)
+export yearPill = frame {
+  title: "Year pill",
+  left: 0px,
+  top: 40px,
+  layout: {stack: {align-items: .center, item-gap: spc.layout.pill-gap}},
+  fill: col.roles.surface,
+  shadow: [
+    {
+      drop-shadow: {
+        color: pal.palette.shadow-1,
+        offset: point(0px, 1px),
+        blur-radius: 0px
+      }
+    },
+    {
+      drop-shadow: {
+        color: pal.palette.shadow-1,
+        offset: point(0px, 2px),
+        blur-radius: 6px
+      }
+    }
+  ],
+  corner-radius: spc.radii.pill,
+  padding: [spc.layout.pill-y, spc.layout.pill-x],
+  children: [pillStitch, year, count],
+
+  pillStitch = frame : surf.stitch {
+    left: spc.steps.s1,
+    top: spc.steps.s1,
+    right: spc.steps.s1,
+    bottom: spc.steps.s1,
+    width: .nil,
+    height: .nil,
+    ignore-stack: .true,
+    corner-radius: spc.radii.pill,
+    border[0].width: spc.layout.stitch-w-sm
+  }
+
+  year = text : txt.title {
+    contents: "2025",
+    font-size: typ.sizes.year
+  }
+
+  count = text : txt.meta {
+    contents: "4 projects"
+  }
+}
+
+// A year group's header (Music / Projects grids, the timeline): the pill,
+// then a dashed rule across the rest of its column. The rule fills the
+// header (100%) and the header clips it; set the header's width.
+export yearHeader = frame {
+  title: "Year · group header (ruled)",
+  left: 0px,
+  top: 210px,
+  width: spc.controls.line-w,
+  layout: {stack: {align-items: .center, item-gap: spc.steps.s3}},
+  overflow: .clip,
+  padding: [spc.steps.s1, 0px, spc.steps.s2],
+  children: [pill, rule],
+
+  pill = frame : yearPill {
+    year {
+      contents: "2022 – 2026"
+    }
+
+    count {
+      contents: "10 releases"
+    }
+  }
+
+  rule = frame : surf.stitch {
+    width: 100%,
+    height: spc.layout.stitch-w,
+    corner-radius: 0px,
+    border[0].sides: .top
+  }
+}
+
+// The small pill (.ytl--sm .yyear): a day in a timeline ("Today · 5
+// changes", Studio's Recently). i9 .88rem 850; i11 Label, 11 all round.
+export yearPillSm = frame : yearPill {
+  title: "Year pill · sm (a day)",
+  left: 672px,
+  top: 40px,
+  padding-top: spc.layout.pill-sm-y,
+  padding-left: spc.layout.pill-sm-x,
+  padding-bottom: spc.layout.pill-sm-y,
+  padding-right: spc.layout.pill-sm-x,
+
+  year {
+    contents: "Today",
+    font-size: typ.sizes.year-sm
+  }
+
+  count {
+    contents: "5 changes"
+  }
+}
+
+// ==== states page (labels over the definitions, then the states boards: i9 · i10 · i11) ====
+lbl-yearPill = text : doc.specLabel {
+  left: 0px,
+  top: 0px,
+  contents: "yearPill"
+}
+
+note-yearPill = text : doc.specNote {
+  left: 0px,
+  top: 16px,
+  contents: "the year pill"
+}
+
+lbl-yearPillSm = text : doc.specLabel {
+  left: 672px,
+  top: 0px,
+  contents: "yearPillSm"
+}
+
+note-yearPillSm = text : doc.specNote {
+  left: 672px,
+  top: 16px,
+  contents: "sm"
+}
+
+lbl-yearHeader = text : doc.specLabel {
+  left: 0px,
+  top: 170px,
+  contents: "yearHeader"
+}
+
+note-yearHeader = text : doc.specNote {
+  left: 0px,
+  top: 186px,
+  contents: "ruled: a year group's header"
+}
+
+@variants(yearPillStatesI10)
+yearPillStates = frame : doc.docBoard {
+  title: "Year pill · states · i9",
+  left: 0px,
+  top: 416px,
+
+  body {
+    layout.stack.item-gap: 48px,
+    overrides: [insert(row-1, after = .nil), insert(row-2, after = row-1)]
+  }
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i9"
+      }
+    }
+
+    boardCaption {
+      contents: "Year pill · every state"
+    }
+  }
+
+  row-1 = frame : doc.specRow {
+    layout.stack.item-gap: 48px,
+    overrides: [
+      insert(st-yearPill, after = .nil),
+      insert(st-yearPillSm, after = st-yearPill)
+    ]
+  }
+
+  row-2 = frame : doc.specRow {
+    layout.stack.item-gap: 48px,
+    overrides: [insert(st-yearHeader, after = .nil)]
+  }
+
+  st-yearPill = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "yearPill"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "the year pill"
+    }
+
+    it = frame : yearPill {}
+  }
+
+  st-yearPillSm = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "yearPillSm"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "sm"
+    }
+
+    it = frame : yearPillSm {}
+  }
+
+  st-yearHeader = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "yearHeader"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "ruled: a year group's header"
+    }
+
+    it = frame : yearHeader {}
+  }
+}
+
+@variants(yearPillStatesI11)
+@context(i10="on")
+yearPillStatesI10 = frame : yearPillStates {
+  title: "Year pill · states · i10",
+  left: 784px,
+  top: 416px,
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i10"
+      }
+    }
+  }
+}
+
+@context(i10="on", i11="on")
+yearPillStatesI11 = frame : yearPillStatesI10 {
+  title: "Year pill · states · i11",
+  left: 1568px,
+  top: 416px,
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i11"
+      }
+    }
+  }
+}

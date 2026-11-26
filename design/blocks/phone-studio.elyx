@@ -1,0 +1,709 @@
+import "tokens/space/space.elyx" as spc
+import "components/atoms/doc.elyx" as doc
+import "components/organisms/sheet.elyx" as sh
+import "components/organisms/page-header.elyx" as head
+import "components/organisms/studio-chrome.elyx" as chrome
+import "components/organisms/studio-parts.elyx" as prt
+import "components/organisms/studio-dashboard.elyx" as dsh
+import "components/organisms/phone-nav.elyx" as nv
+import "blocks/studio-dashboard.elyx" as blk
+
+@with-context(section="studio")
+file {}
+
+// Studio · the dashboard on a phone (390 × 844): the ink cord frame, the
+// brand + the woven STUDIO tag + ↗ View site (`studioNavPhone`), the header
+// at the phone's Display with the greeting beside it (Import / New leave
+// it: New is the floating + knob), then one column: the site strip
+// stacked (live · last publish · the media meter · unused files), On the
+// needles (the eight drafts, their facts wrapping), Sections (the four
+// section cards two across, their counts stacked, no fan), Recently. The
+// floating row: Studio's pill and the ink + (`phoneLayerNew`).
+// i9 → i10 is tokens; i11 (`studioPhoneI11`) takes the body's i11 variant
+// (the panes' heads are Headings).
+// Children: `sheet` (`stNav`, `dash` (+ `secPhone` after the needles)),
+// `layer`.
+@variants(studioPhoneI11)
+export studioPhone = frame {
+  title: "Studio · dashboard · phone (i9)",
+  left: 0px,
+  top: 40px,
+  width: spc.controls.phone-w,
+  height: spc.controls.phone-h,
+  overflow: .clip,
+  children: [sheet, layer],
+
+  sheet = frame : sh.sheetPhone {
+    left: 0px,
+    top: 0px,
+    width: 100%,
+    fill[1].image.sizing.scale: 3.24,
+
+    paper {
+      overrides: [insert(stNav, after = sh.sheet.paper.sheetNav)],
+
+      page {
+        overrides: [insert(dash, after = .nil)]
+      }
+
+      sheetNav {
+        display: .none
+      }
+    }
+
+    stNav = frame : chrome.studioNavPhone {
+      width: 100%
+    }
+
+    dash = frame : blk.dashBody {
+      width: .nil,
+      layout.stack.item-gap: spc.layout.section-gap-phone,
+
+      body {
+        cols {
+          recent {
+            width: 100%
+          }
+
+          layout.stack.direction: .column,
+          layout.stack.item-gap: spc.layout.section-gap-phone,
+
+          main {
+            overrides: [
+              insert(secPhone, after = blk.dashBody.body.cols.main.needles)
+            ],
+
+            needles {
+              rows {
+                r8 {
+                  lead {
+                    width: 100%,
+
+                    main {
+                      width: 100%,
+
+                      sub {
+                        height: .auto,
+                        layout.stack.wrap: .true,
+                        layout.stack.line-gap: spc.steps.s1
+                      }
+
+                      name {
+                        width: 100%
+                      }
+                    }
+
+                    layout: {
+                      grid: {
+                        columns: [.auto, 1fr],
+                        column-gap: spc.steps.s3,
+                        align-items: .center
+                      }
+                    }
+                  }
+
+                  layout: {
+                    grid: {
+                      columns: [1fr, .auto],
+                      column-gap: spc.steps.s3,
+                      align-items: .center
+                    }
+                  }
+                }
+
+                r7 {
+                  lead {
+                    width: 100%,
+
+                    main {
+                      width: 100%,
+
+                      sub {
+                        height: .auto,
+                        layout.stack.wrap: .true,
+                        layout.stack.line-gap: spc.steps.s1
+                      }
+
+                      name {
+                        width: 100%
+                      }
+                    }
+
+                    layout: {
+                      grid: {
+                        columns: [.auto, 1fr],
+                        column-gap: spc.steps.s3,
+                        align-items: .center
+                      }
+                    }
+                  }
+
+                  layout: {
+                    grid: {
+                      columns: [1fr, .auto],
+                      column-gap: spc.steps.s3,
+                      align-items: .center
+                    }
+                  }
+                }
+
+                r6 {
+                  lead {
+                    width: 100%,
+
+                    main {
+                      width: 100%,
+
+                      sub {
+                        height: .auto,
+                        layout.stack.wrap: .true,
+                        layout.stack.line-gap: spc.steps.s1
+                      }
+
+                      name {
+                        width: 100%
+                      }
+                    }
+
+                    layout: {
+                      grid: {
+                        columns: [.auto, 1fr],
+                        column-gap: spc.steps.s3,
+                        align-items: .center
+                      }
+                    }
+                  }
+
+                  layout: {
+                    grid: {
+                      columns: [1fr, .auto],
+                      column-gap: spc.steps.s3,
+                      align-items: .center
+                    }
+                  }
+                }
+
+                r5 {
+                  lead {
+                    width: 100%,
+
+                    main {
+                      width: 100%,
+
+                      sub {
+                        height: .auto,
+                        layout.stack.wrap: .true,
+                        layout.stack.line-gap: spc.steps.s1
+                      }
+
+                      name {
+                        width: 100%
+                      }
+                    }
+
+                    layout: {
+                      grid: {
+                        columns: [.auto, 1fr],
+                        column-gap: spc.steps.s3,
+                        align-items: .center
+                      }
+                    }
+                  }
+
+                  layout: {
+                    grid: {
+                      columns: [1fr, .auto],
+                      column-gap: spc.steps.s3,
+                      align-items: .center
+                    }
+                  }
+                }
+
+                r4 {
+                  lead {
+                    width: 100%,
+
+                    main {
+                      width: 100%,
+
+                      sub {
+                        height: .auto,
+                        layout.stack.wrap: .true,
+                        layout.stack.line-gap: spc.steps.s1
+                      }
+
+                      name {
+                        width: 100%
+                      }
+                    }
+
+                    layout: {
+                      grid: {
+                        columns: [.auto, 1fr],
+                        column-gap: spc.steps.s3,
+                        align-items: .center
+                      }
+                    }
+                  }
+
+                  layout: {
+                    grid: {
+                      columns: [1fr, .auto],
+                      column-gap: spc.steps.s3,
+                      align-items: .center
+                    }
+                  }
+                }
+
+                r3 {
+                  lead {
+                    width: 100%,
+
+                    main {
+                      width: 100%,
+
+                      sub {
+                        height: .auto,
+                        layout.stack.wrap: .true,
+                        layout.stack.line-gap: spc.steps.s1
+                      }
+
+                      name {
+                        width: 100%
+                      }
+                    }
+
+                    layout: {
+                      grid: {
+                        columns: [.auto, 1fr],
+                        column-gap: spc.steps.s3,
+                        align-items: .center
+                      }
+                    }
+                  }
+
+                  layout: {
+                    grid: {
+                      columns: [1fr, .auto],
+                      column-gap: spc.steps.s3,
+                      align-items: .center
+                    }
+                  }
+                }
+
+                r2 {
+                  lead {
+                    width: 100%,
+
+                    main {
+                      width: 100%,
+
+                      sub {
+                        height: .auto,
+                        layout.stack.wrap: .true,
+                        layout.stack.line-gap: spc.steps.s1
+                      }
+
+                      name {
+                        width: 100%
+                      }
+                    }
+
+                    layout: {
+                      grid: {
+                        columns: [.auto, 1fr],
+                        column-gap: spc.steps.s3,
+                        align-items: .center
+                      }
+                    }
+                  }
+
+                  layout: {
+                    grid: {
+                      columns: [1fr, .auto],
+                      column-gap: spc.steps.s3,
+                      align-items: .center
+                    }
+                  }
+                }
+
+                r1 {
+                  lead {
+                    width: 100%,
+
+                    main {
+                      width: 100%,
+
+                      sub {
+                        height: .auto,
+                        layout.stack.wrap: .true,
+                        layout.stack.line-gap: spc.steps.s1
+                      }
+
+                      name {
+                        width: 100%
+                      }
+                    }
+
+                    layout: {
+                      grid: {
+                        columns: [.auto, 1fr],
+                        column-gap: spc.steps.s3,
+                        align-items: .center
+                      }
+                    }
+                  }
+
+                  layout: {
+                    grid: {
+                      columns: [1fr, .auto],
+                      column-gap: spc.steps.s3,
+                      align-items: .center
+                    }
+                  }
+                }
+              }
+            }
+
+            layout.stack.item-gap: spc.layout.section-gap-phone,
+
+            sections {
+              display: .none
+            }
+          }
+        }
+
+        layout.stack.item-gap: spc.layout.section-gap-phone,
+
+        strip {
+          info {
+            width: 100%,
+
+            store {
+              width: 100%,
+
+              meter {
+                width: 100%
+              }
+            }
+
+            layout.stack.direction: .column,
+            layout.stack.item-gap: spc.steps.s2,
+            layout.stack.align-items: .start
+          }
+
+          layout.stack.direction: .column,
+          layout.stack.item-gap: spc.steps.s3,
+          layout.stack.align-items: .start
+        }
+      }
+
+      @with-variant(head.pageHeaderMetaPhone)
+      header {
+        actions {
+          display: .none
+        }
+      }
+
+      // Sections, after the drafts: the four cards two across, their counts
+      // stacked (no fan, no +, no "Last touched")
+      secPhone = frame {
+        layout: {stack: {direction: .column, item-gap: spc.layout.st-pane-head}},
+        children: [secHead, secGrid],
+
+        secHead = frame : prt.eyebrow {}
+
+        secGrid = frame {
+          layout: {
+            grid: {
+              columns: [1fr, 1fr],
+              column-gap: spc.layout.st-tile-gap,
+              row-gap: spc.layout.st-tile-gap,
+              align-items: .stretch
+            }
+          },
+          children: [projectsCard, musicCard, thoughtsCard, homeCard],
+
+          projectsCard = frame : dsh.secCard {
+            width: 100%,
+            min-height: 0px,
+
+            counts {
+              height: .auto,
+              layout.stack.direction: .column,
+              layout.stack.align-items: .start,
+              layout.stack.item-gap: spc.steps.s1
+            }
+
+            top {
+              add {
+                display: .none
+              }
+            }
+
+            fanRow {
+              display: .none
+            }
+
+            last {
+              display: .none
+            }
+          }
+
+          musicCard = frame : dsh.secCardMusic {
+            width: 100%,
+            min-height: 0px,
+
+            counts {
+              height: .auto,
+              layout.stack.direction: .column,
+              layout.stack.align-items: .start,
+              layout.stack.item-gap: spc.steps.s1
+            }
+
+            top {
+              add {
+                display: .none
+              }
+            }
+
+            fanRow {
+              display: .none
+            }
+
+            last {
+              display: .none
+            }
+          }
+
+          thoughtsCard = frame : dsh.secCardThoughts {
+            width: 100%,
+            min-height: 0px,
+
+            counts {
+              height: .auto,
+              layout.stack.direction: .column,
+              layout.stack.align-items: .start,
+              layout.stack.item-gap: spc.steps.s1
+            }
+
+            top {
+              add {
+                display: .none
+              }
+            }
+
+            fanRow {
+              display: .none
+            }
+
+            last {
+              display: .none
+            }
+          }
+
+          homeCard = frame : dsh.secCardHome {
+            width: 100%,
+            min-height: 0px,
+
+            counts {
+              height: .auto,
+              layout.stack.direction: .column,
+              layout.stack.align-items: .start,
+              layout.stack.item-gap: spc.steps.s1
+            }
+
+            top {
+              add {
+                display: .none
+              }
+            }
+
+            fanRow {
+              display: .none
+            }
+
+            last {
+              display: .none
+            }
+          }
+        }
+      }
+    }
+  }
+
+  // the floating row: Studio's pill, the ink + (new)
+  layer = frame : nv.phoneLayerNew {
+    left: 0px,
+    top: 0px
+  }
+}
+
+// i11: the body's i11 variant; the panes' heads (and the phone's Sections)
+// are Headings.
+@context(i10="on", i11="on")
+export studioPhoneI11 = frame : studioPhone {
+  title: "Studio · dashboard · phone (i11)",
+  left: 470px,
+  top: 40px,
+
+  sheet {
+    fill[1].image.sizing.scale: 3.53,
+
+    paper {
+      page {
+        @with-variant(blk.dashBodyI11)
+        dash {
+          layout.stack.item-gap: spc.i10.i11.layoutI11.section-gap-phone,
+
+          body {
+            layout.stack.item-gap: spc.i10.i11.layoutI11.section-gap-phone,
+
+            cols {
+              layout.stack.item-gap: spc.i10.i11.layoutI11.section-gap-phone,
+
+              main {
+                layout.stack.item-gap: spc.i10.i11.layoutI11.section-gap-phone,
+
+                secPhone {
+                  @with-variant(prt.eyebrowHeading)
+                  secHead {}
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+// ==== states page (labels over the definitions, then the states boards: i9 · i10 · i11) ====
+lbl-studioPhone = text : doc.specLabel {
+  left: 0px,
+  top: 0px,
+  contents: "studioPhone"
+}
+
+note-studioPhone = text : doc.specNote {
+  left: 0px,
+  top: 16px,
+  contents: "i9 (i10 = tokens)"
+}
+
+lbl-studioPhoneI11 = text : doc.specLabel {
+  left: 470px,
+  top: 0px,
+  contents: "studioPhoneI11"
+}
+
+note-studioPhoneI11 = text : doc.specNote {
+  left: 470px,
+  top: 16px,
+  contents: "i11"
+}
+
+@variants(studioPhoneStatesI10)
+studioPhoneStates = frame : doc.docBoard {
+  title: "Studio · phone · states · i9",
+  left: 0px,
+  top: 1116px,
+
+  body {
+    overrides: [insert(row-1, after = .nil)],
+    layout.stack.item-gap: 48px
+  }
+
+  boardHead {
+    boardCaption {
+      contents: "Studio · phone · every state"
+    }
+  }
+
+  row-1 = frame : doc.specRow {
+    layout.stack.item-gap: 48px,
+    overrides: [insert(st-studioPhone, after = .nil)]
+  }
+
+  st-studioPhone = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    label {
+      contents: "studioPhone"
+    }
+
+    note = text : doc.specNote {
+      contents: "i9 (i10 = tokens)"
+    }
+
+    it = frame : studioPhone {}
+  }
+}
+
+@variants(studioPhoneStatesI11)
+@context(i10="on")
+studioPhoneStatesI10 = frame : studioPhoneStates {
+  title: "Studio · phone · states · i10",
+  left: 614px,
+  top: 1116px,
+
+  body {
+    row-1 {
+      st-studioPhone {
+        slot {
+          it {
+            sheet {
+              fill[1].image.sizing.scale: 3.3485
+            }
+          }
+        }
+      }
+    }
+  }
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i10"
+      }
+    }
+  }
+}
+
+@context(i10="on", i11="on")
+studioPhoneStatesI11 = frame : studioPhoneStatesI10 {
+  title: "Studio · phone · states · i11",
+  left: 1228px,
+  top: 1116px,
+
+  body {
+    row-1 {
+      st-studioPhone {
+        slot {
+          @with-variant(studioPhoneI11)
+          it {}
+        }
+
+        note {
+          contents: "i11"
+        }
+
+        label {
+          contents: "studioPhoneI11"
+        }
+      }
+    }
+  }
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i11"
+      }
+    }
+  }
+}

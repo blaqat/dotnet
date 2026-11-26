@@ -1,0 +1,790 @@
+import "tokens/color/roles.elyx" as col
+import "tokens/color/palette.elyx" as pal
+import "tokens/space/space.elyx" as spc
+import "components/atoms/surface.elyx" as surf
+import "assets/icons/bold/link.svg" as linkBold
+import "assets/icons/bold/soundcloud-logo.svg" as soundcloudBold
+import "assets/icons/brand/beepbox.svg" as beepboxBold
+import "assets/icons/bold/youtube-logo.svg" as youtubeBold
+import "assets/icons/bold/github-logo.svg" as githubBold
+import "assets/icons/bold/arrow-up-right.svg" as externalBold
+import "assets/icons/bold/article.svg" as writeupBold
+import "assets/icons/duotone/link.svg" as linkDuo
+import "assets/icons/duotone/soundcloud-logo.svg" as soundcloudDuo
+import "assets/icons/duotone/circle.svg" as beepboxDuo
+import "assets/icons/duotone/youtube-logo.svg" as youtubeDuo
+import "assets/icons/duotone/github-logo.svg" as githubDuo
+import "assets/icons/duotone/arrow-up-right.svg" as externalDuo
+import "assets/icons/duotone/article.svg" as writeupDuo
+import "assets/icons/bold/discord-logo.svg" as discordBold
+import "assets/icons/duotone/discord-logo.svg" as discordDuo
+import "components/atoms/doc.elyx" as doc
+
+// Every outside link is one part (i10 R7): a 32px disc and its site's glyph.
+// i9 (the base): white discs, the bold glyph in ink, a hairline + a soft
+// shadow (the link glyph, the SoundCloud mark, BeepBox's ringed circle each
+// on a white disc). i10: the one cotton-2 disc, the Phosphor duotone glyph
+// in ink-3, no shadow. Colours are col.roles.linkdisc-* tokens; the glyph's
+// weight (bold → duotone) is the I10 variant of each kind. A parent's I10
+// variant picks it with @with-variant (e.g. lnk.linkDiscSoundcloudI10).
+// Child: `glyph`.
+@variants(
+  linkDiscI10,
+  linkDiscSoundcloud,
+  linkDiscBeepbox,
+  linkDiscYoutube,
+  linkDiscGithub,
+  linkDiscExternal,
+  linkDiscWriteup,
+  linkDiscDiscord,
+  linkDiscHover,
+  linkDiscFocus
+)
+export linkDisc = frame : surf.disc {
+  title: "Link disc · link",
+  left: 0px,
+  top: 40px,
+  border[0].color: col.roles.linkdisc-line,
+  border[0].position: .outside,
+  fill[0].color: col.roles.linkdisc-bg,
+  overrides: [insert(glyph, after = .nil)],
+  shadow[0].drop-shadow.blur-radius: 2px,
+  shadow[0].drop-shadow.color: col.roles.linkdisc-shadow,
+  shadow[0].drop-shadow.offset: [0px, 1px],
+
+  glyph = asset {
+    width: spc.controls.linkdisc-icon,
+    height: spc.controls.linkdisc-icon,
+    fill: col.roles.linkdisc-fg,
+    contents: linkBold
+  }
+}
+
+@variants(linkDiscSoundcloudI10)
+export linkDiscSoundcloud = frame : linkDisc {
+  title: "Link disc · SoundCloud",
+  left: 542px,
+  top: 40px,
+
+  glyph {
+    contents: soundcloudBold
+  }
+}
+
+@variants(linkDiscBeepboxI10)
+export linkDiscBeepbox = frame : linkDisc {
+  title: "Link disc · BeepBox",
+  left: 749px,
+  top: 40px,
+
+  glyph {
+    contents: beepboxBold
+  }
+}
+
+@variants(linkDiscYoutubeI10)
+export linkDiscYoutube = frame : linkDisc {
+  title: "Link disc · YouTube",
+  left: 935px,
+  top: 40px,
+
+  glyph {
+    contents: youtubeBold
+  }
+}
+
+@variants(linkDiscGithubI10)
+export linkDiscGithub = frame : linkDisc {
+  title: "Link disc · GitHub",
+  left: 1121px,
+  top: 40px,
+
+  glyph {
+    contents: githubBold
+  }
+}
+
+// An outside site with no brand (Visit site ↗).
+@variants(linkDiscExternalI10)
+export linkDiscExternal = frame : linkDisc {
+  title: "Link disc · external",
+  left: 1300px,
+  top: 40px,
+
+  glyph {
+    contents: externalBold
+  }
+}
+
+// A thing's write-up (an article).
+@variants(linkDiscWriteupI10)
+export linkDiscWriteup = frame : linkDisc {
+  title: "Link disc · write-up",
+  left: 1493px,
+  top: 40px,
+
+  glyph {
+    contents: writeupBold
+  }
+}
+
+// ---- i10 · R7: the same disc, the duotone glyph ----
+@context(i10="on")
+export linkDiscI10 = frame : linkDisc {
+  title: "Link disc · link · i10",
+  left: 0px,
+  top: 208px,
+
+  glyph {
+    contents: linkDuo
+  }
+}
+
+@context(i10="on")
+export linkDiscSoundcloudI10 = frame : linkDiscSoundcloud {
+  title: "Link disc · SoundCloud · i10",
+  left: 542px,
+  top: 208px,
+
+  glyph {
+    contents: soundcloudDuo
+  }
+}
+
+@context(i10="on")
+export linkDiscBeepboxI10 = frame : linkDiscBeepbox {
+  title: "Link disc · BeepBox · i10",
+  left: 749px,
+  top: 208px,
+
+  glyph {
+    contents: beepboxDuo
+  }
+}
+
+@context(i10="on")
+export linkDiscYoutubeI10 = frame : linkDiscYoutube {
+  title: "Link disc · YouTube · i10",
+  left: 935px,
+  top: 208px,
+
+  glyph {
+    contents: youtubeDuo
+  }
+}
+
+@context(i10="on")
+export linkDiscGithubI10 = frame : linkDiscGithub {
+  title: "Link disc · GitHub · i10",
+  left: 1121px,
+  top: 208px,
+
+  glyph {
+    contents: githubDuo
+  }
+}
+
+@context(i10="on")
+export linkDiscExternalI10 = frame : linkDiscExternal {
+  title: "Link disc · external · i10",
+  left: 1300px,
+  top: 208px,
+
+  glyph {
+    contents: externalDuo
+  }
+}
+
+@context(i10="on")
+export linkDiscWriteupI10 = frame : linkDiscWriteup {
+  title: "Link disc · write-up · i10",
+  left: 1493px,
+  top: 208px,
+
+  glyph {
+    contents: writeupDuo
+  }
+}
+
+// Discord (Projects: a bot's "Add to Discord").
+@variants(linkDiscDiscordI10)
+export linkDiscDiscord = frame : linkDisc {
+  title: "Link disc · Discord",
+  left: 1679px,
+  top: 40px,
+
+  glyph {
+    contents: discordBold
+  }
+}
+
+@context(i10="on")
+export linkDiscDiscordI10 = frame : linkDiscDiscord {
+  title: "Link disc · Discord · i10",
+  left: 1679px,
+  top: 208px,
+
+  glyph {
+    contents: discordDuo
+  }
+}
+
+// ---- interaction states (the kit's round link icons: rest · hover ·
+// focus). Hover lifts and fills: ink with a white glyph (a known site
+// fades to its own colour in the live kit). Focus: the ink ring outside.
+@variants(linkDiscHoverI10)
+export linkDiscHover = frame : linkDisc {
+  title: "Link disc · hover",
+  left: 185px,
+  top: 40px,
+  border[0].color: pal.palette.hairline,
+  fill[0].color: col.roles.fg,
+  shadow[0].drop-shadow.blur-radius: 22px,
+  shadow[0].drop-shadow.color: pal.palette.shadow-lift,
+  shadow[0].drop-shadow.offset: [0px, 10px],
+  shadow[0].drop-shadow.spread: -4px,
+
+  glyph {
+    fill[0].color: col.roles.surface
+  }
+}
+
+@variants(linkDiscFocusI10)
+export linkDiscFocus = frame : linkDisc {
+  title: "Link disc · focus",
+  left: 370px,
+  top: 40px,
+  overrides: [insert(discFocusRing, after = linkDisc.glyph)],
+
+  discFocusRing = frame : surf.focusRing {
+    left: spc.layout.focus-out,
+    top: spc.layout.focus-out,
+    right: spc.layout.focus-out,
+    bottom: spc.layout.focus-out,
+    width: .nil,
+    height: .nil,
+    ignore-stack: .true
+  }
+}
+
+@context(i10="on")
+export linkDiscHoverI10 = frame : linkDiscHover {
+  title: "Link disc · hover · i10",
+  left: 185px,
+  top: 208px,
+
+  glyph {
+    contents: linkDuo
+  }
+}
+
+@context(i10="on")
+export linkDiscFocusI10 = frame : linkDiscFocus {
+  title: "Link disc · focus · i10",
+  left: 370px,
+  top: 208px,
+
+  glyph {
+    contents: linkDuo
+  }
+}
+
+// ==== states page (labels over the definitions, then the states boards: i9 · i10 · i11) ====
+lbl-linkDisc = text : doc.specLabel {
+  left: 0px,
+  top: 0px,
+  contents: "linkDisc"
+}
+
+note-linkDisc = text : doc.specNote {
+  left: 0px,
+  top: 16px,
+  contents: "rest · link"
+}
+
+lbl-linkDiscHover = text : doc.specLabel {
+  left: 185px,
+  top: 0px,
+  contents: "linkDiscHover"
+}
+
+note-linkDiscHover = text : doc.specNote {
+  left: 185px,
+  top: 16px,
+  contents: "hover: lifts, fills"
+}
+
+lbl-linkDiscFocus = text : doc.specLabel {
+  left: 370px,
+  top: 0px,
+  contents: "linkDiscFocus"
+}
+
+note-linkDiscFocus = text : doc.specNote {
+  left: 370px,
+  top: 16px,
+  contents: "focus (keys)"
+}
+
+lbl-linkDiscSoundcloud = text : doc.specLabel {
+  left: 542px,
+  top: 0px,
+  contents: "linkDiscSoundcloud"
+}
+
+lbl-linkDiscBeepbox = text : doc.specLabel {
+  left: 749px,
+  top: 0px,
+  contents: "linkDiscBeepbox"
+}
+
+lbl-linkDiscYoutube = text : doc.specLabel {
+  left: 935px,
+  top: 0px,
+  contents: "linkDiscYoutube"
+}
+
+lbl-linkDiscGithub = text : doc.specLabel {
+  left: 1121px,
+  top: 0px,
+  contents: "linkDiscGithub"
+}
+
+lbl-linkDiscExternal = text : doc.specLabel {
+  left: 1300px,
+  top: 0px,
+  contents: "linkDiscExternal"
+}
+
+lbl-linkDiscWriteup = text : doc.specLabel {
+  left: 1493px,
+  top: 0px,
+  contents: "linkDiscWriteup"
+}
+
+lbl-linkDiscDiscord = text : doc.specLabel {
+  left: 1679px,
+  top: 0px,
+  contents: "linkDiscDiscord"
+}
+
+lbl-linkDiscI10 = text : doc.specLabel {
+  left: 0px,
+  top: 168px,
+  contents: "linkDiscI10"
+}
+
+note-linkDiscI10 = text : doc.specNote {
+  left: 0px,
+  top: 184px,
+  contents: "i10 · duotone glyph"
+}
+
+lbl-linkDiscHoverI10 = text : doc.specLabel {
+  left: 185px,
+  top: 168px,
+  contents: "linkDiscHoverI10"
+}
+
+note-linkDiscHoverI10 = text : doc.specNote {
+  left: 185px,
+  top: 184px,
+  contents: "i10 · hover"
+}
+
+lbl-linkDiscFocusI10 = text : doc.specLabel {
+  left: 370px,
+  top: 168px,
+  contents: "linkDiscFocusI10"
+}
+
+note-linkDiscFocusI10 = text : doc.specNote {
+  left: 370px,
+  top: 184px,
+  contents: "i10 · focus"
+}
+
+lbl-linkDiscSoundcloudI10 = text : doc.specLabel {
+  left: 542px,
+  top: 168px,
+  contents: "linkDiscSoundcloudI10"
+}
+
+lbl-linkDiscBeepboxI10 = text : doc.specLabel {
+  left: 749px,
+  top: 168px,
+  contents: "linkDiscBeepboxI10"
+}
+
+lbl-linkDiscYoutubeI10 = text : doc.specLabel {
+  left: 935px,
+  top: 168px,
+  contents: "linkDiscYoutubeI10"
+}
+
+lbl-linkDiscGithubI10 = text : doc.specLabel {
+  left: 1121px,
+  top: 168px,
+  contents: "linkDiscGithubI10"
+}
+
+lbl-linkDiscExternalI10 = text : doc.specLabel {
+  left: 1300px,
+  top: 168px,
+  contents: "linkDiscExternalI10"
+}
+
+lbl-linkDiscWriteupI10 = text : doc.specLabel {
+  left: 1493px,
+  top: 168px,
+  contents: "linkDiscWriteupI10"
+}
+
+lbl-linkDiscDiscordI10 = text : doc.specLabel {
+  left: 1679px,
+  top: 168px,
+  contents: "linkDiscDiscordI10"
+}
+
+@variants(linkDiscStatesI10)
+linkDiscStates = frame : doc.docBoard {
+  title: "Link disc · states · i9",
+  left: 0px,
+  top: 400px,
+
+  body {
+    layout.stack.item-gap: 48px,
+    overrides: [insert(row-1, after = .nil), insert(row-2, after = row-1)]
+  }
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i9"
+      }
+    }
+
+    boardCaption {
+      contents: "Link disc · every state"
+    }
+  }
+
+  row-1 = frame : doc.specRow {
+    layout.stack.item-gap: 48px,
+    overrides: [
+      insert(st-linkDisc, after = .nil),
+      insert(st-linkDiscHover, after = st-linkDisc),
+      insert(st-linkDiscFocus, after = st-linkDiscHover)
+    ]
+  }
+
+  row-2 = frame : doc.specRow {
+    layout.stack.item-gap: 48px,
+    overrides: [
+      insert(st-linkDiscSoundcloud, after = .nil),
+      insert(st-linkDiscBeepbox, after = st-linkDiscSoundcloud),
+      insert(st-linkDiscYoutube, after = st-linkDiscBeepbox),
+      insert(st-linkDiscGithub, after = st-linkDiscYoutube),
+      insert(st-linkDiscExternal, after = st-linkDiscGithub),
+      insert(st-linkDiscWriteup, after = st-linkDiscExternal),
+      insert(st-linkDiscDiscord, after = st-linkDiscWriteup)
+    ]
+  }
+
+  st-linkDisc = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "linkDisc"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "rest · link"
+    }
+
+    it = frame : linkDisc {}
+  }
+
+  st-linkDiscHover = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "linkDiscHover"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "hover: lifts, fills"
+    }
+
+    it = frame : linkDiscHover {}
+  }
+
+  st-linkDiscFocus = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "linkDiscFocus"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "focus (keys)"
+    }
+
+    it = frame : linkDiscFocus {}
+  }
+
+  st-linkDiscSoundcloud = frame : doc.spec {
+    label {
+      contents: "linkDiscSoundcloud"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    it = frame : linkDiscSoundcloud {}
+  }
+
+  st-linkDiscBeepbox = frame : doc.spec {
+    label {
+      contents: "linkDiscBeepbox"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    it = frame : linkDiscBeepbox {}
+  }
+
+  st-linkDiscYoutube = frame : doc.spec {
+    label {
+      contents: "linkDiscYoutube"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    it = frame : linkDiscYoutube {}
+  }
+
+  st-linkDiscGithub = frame : doc.spec {
+    label {
+      contents: "linkDiscGithub"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    it = frame : linkDiscGithub {}
+  }
+
+  st-linkDiscExternal = frame : doc.spec {
+    label {
+      contents: "linkDiscExternal"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    it = frame : linkDiscExternal {}
+  }
+
+  st-linkDiscWriteup = frame : doc.spec {
+    label {
+      contents: "linkDiscWriteup"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    it = frame : linkDiscWriteup {}
+  }
+
+  st-linkDiscDiscord = frame : doc.spec {
+    label {
+      contents: "linkDiscDiscord"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    it = frame : linkDiscDiscord {}
+  }
+}
+
+@variants(linkDiscStatesI11)
+@context(i10="on")
+linkDiscStatesI10 = frame : linkDiscStates {
+  title: "Link disc · states · i10",
+  left: 1183px,
+  top: 400px,
+
+  body {
+    row-2 {
+      st-linkDiscDiscord {
+        slot {
+          @with-variant(linkDiscDiscordI10)
+          it {}
+        }
+
+        label {
+          contents: "linkDiscDiscordI10"
+        }
+      }
+
+      st-linkDiscWriteup {
+        slot {
+          @with-variant(linkDiscWriteupI10)
+          it {}
+        }
+
+        label {
+          contents: "linkDiscWriteupI10"
+        }
+      }
+
+      st-linkDiscExternal {
+        slot {
+          @with-variant(linkDiscExternalI10)
+          it {}
+        }
+
+        label {
+          contents: "linkDiscExternalI10"
+        }
+      }
+
+      st-linkDiscGithub {
+        slot {
+          @with-variant(linkDiscGithubI10)
+          it {}
+        }
+
+        label {
+          contents: "linkDiscGithubI10"
+        }
+      }
+
+      st-linkDiscYoutube {
+        slot {
+          @with-variant(linkDiscYoutubeI10)
+          it {}
+        }
+
+        label {
+          contents: "linkDiscYoutubeI10"
+        }
+      }
+
+      st-linkDiscBeepbox {
+        slot {
+          @with-variant(linkDiscBeepboxI10)
+          it {}
+        }
+
+        label {
+          contents: "linkDiscBeepboxI10"
+        }
+      }
+
+      st-linkDiscSoundcloud {
+        slot {
+          @with-variant(linkDiscSoundcloudI10)
+          it {}
+        }
+
+        label {
+          contents: "linkDiscSoundcloudI10"
+        }
+      }
+    }
+
+    row-1 {
+      st-linkDiscFocus {
+        slot {
+          @with-variant(linkDiscFocusI10)
+          it {}
+        }
+
+        note {
+          contents: "i10 · focus"
+        }
+
+        label {
+          contents: "linkDiscFocusI10"
+        }
+      }
+
+      st-linkDiscHover {
+        slot {
+          @with-variant(linkDiscHoverI10)
+          it {}
+        }
+
+        note {
+          contents: "i10 · hover"
+        }
+
+        label {
+          contents: "linkDiscHoverI10"
+        }
+      }
+
+      st-linkDisc {
+        slot {
+          @with-variant(linkDiscI10)
+          it {}
+        }
+
+        note {
+          contents: "i10 · duotone glyph"
+        }
+
+        label {
+          contents: "linkDiscI10"
+        }
+      }
+    }
+  }
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i10"
+      }
+    }
+  }
+}
+
+@context(i10="on", i11="on")
+linkDiscStatesI11 = frame : linkDiscStatesI10 {
+  title: "Link disc · states · i11",
+  left: 2514px,
+  top: 400px,
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i11"
+      }
+    }
+  }
+}

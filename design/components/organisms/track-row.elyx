@@ -1,0 +1,519 @@
+import "tokens/color/roles.elyx" as col
+import "tokens/color/palette.elyx" as pal
+import "tokens/space/space.elyx" as spc
+import "components/atoms/text.elyx" as txt
+import "components/atoms/doc.elyx" as doc
+import "components/atoms/surface.elyx" as surf
+import "components/atoms/art.elyx" as arts
+import "components/molecules/link-disc.elyx" as lnk
+import "components/molecules/add-button.elyx" as addb
+import "assets/icons/fill/play.svg" as playIcon
+import "assets/icons/fill/pause.svg" as pauseIcon
+import "assets/icons/bold/caret-down.svg" as notesIcon
+
+// A track row (.mu-trk: a release's songs on its page and its stage). A
+// white knit row (its stitch 5 in): the song's art (40; ▶ on it on hover,
+// ⏸ on the live fill while it plays), the title (Title in a row) over its
+// notes' first line (Meta), then its links, the notes toggle, the + and
+// its length (Numeric). Playing: i9 the live rope on its edge; from i10
+// the live tint (col.roles.live-card) and no rope (live-rope-* clear).
+// Children: `rowStitch`, `art` (`cover`, `artPlay` (`artGlyph`)),
+// `words` (`name`, `note`), `acts` (`links` (`link1`, `link2`), `notes`,
+// `add`, `length`), `rowRope`.
+@variants(trackRowLive, trackRowI10, trackRowHover)
+export trackRow = frame {
+  title: "Track row",
+  left: 0px,
+  top: 40px,
+  width: 760px,
+  layout: {
+    grid: {
+      columns: [40px, 1fr, .auto],
+      column-gap: spc.layout.trk-gap,
+      align-items: .center
+    }
+  },
+  fill: col.roles.surface,
+  shadow: [
+    {
+      drop-shadow: {
+        color: pal.palette.shadow-1,
+        offset: point(0px, 1px),
+        blur-radius: 0px
+      }
+    },
+    {
+      drop-shadow: {
+        color: pal.palette.shadow-1,
+        offset: point(0px, 2px),
+        blur-radius: 6px
+      }
+    }
+  ],
+  corner-radius: spc.radii.row,
+  padding: [
+    spc.layout.row-inset-y,
+    spc.steps.s3,
+    spc.layout.row-inset-y,
+    spc.layout.player-who-l
+  ],
+  children: [rowStitch, art, words, acts, rowRope],
+
+  rowStitch = frame : surf.stitch {
+    left: spc.layout.stitch-in-ctl,
+    top: spc.layout.stitch-in-ctl,
+    right: spc.layout.stitch-in-ctl,
+    bottom: spc.layout.stitch-in-ctl,
+    width: .nil,
+    height: .nil,
+    ignore-stack: .true,
+    corner-radius: spc.radii.inner,
+    border[0].width: spc.layout.stitch-w-sm
+  }
+
+  art = frame {
+    width: spc.controls.trk-art,
+    height: spc.controls.trk-art,
+    children: [cover, artPlay],
+
+    cover = frame : arts.artGlooming {
+      left: 0px,
+      top: 0px,
+      width: 100%,
+      height: 100%,
+      corner-radius: spc.radii.trk-art
+    }
+
+    // ▶ / ⏸ over the art: shown on hover and while it plays
+    artPlay = frame {
+      left: 0px,
+      top: 0px,
+      right: 0px,
+      bottom: 0px,
+      display: .none,
+      layout: {stack: {justify-content: .center, align-items: .center}},
+      fill: col.roles.live,
+      corner-radius: spc.radii.trk-art,
+      children: artGlyph,
+
+      artGlyph = asset {
+        width: spc.controls.play-icon-sm,
+        height: spc.controls.play-icon-sm,
+        fill: col.roles.live-fg,
+        contents: pauseIcon
+      }
+    }
+  }
+
+  words = frame {
+    width: 100%,
+    layout: {stack: {direction: .column, item-gap: spc.steps.s1}},
+    overflow: .clip,
+    children: [name, note],
+
+    name = text : txt.titleCard {
+      contents: "glooming shadows of alphabet city"
+    }
+
+    note = text : txt.metaCard {
+      contents: "e starts Gurgling Gutter water as ITS Gooey Grip Grabs him from the sewers of alphabet city."
+    }
+  }
+
+  acts = frame {
+    layout: {stack: {align-items: .center, item-gap: spc.layout.chip-gap}},
+    children: [links, notes, add, length],
+
+    links = frame {
+      layout: {stack: {align-items: .center, item-gap: spc.layout.chip-gap}},
+      children: [link1, link2],
+
+      link1 = frame : lnk.linkDiscBeepbox {}
+
+      link2 = frame : lnk.linkDiscYoutube {}
+    }
+
+    // the song's notes open under the row
+    notes = frame : lnk.linkDisc {
+      glyph {
+        contents: notesIcon
+      }
+    }
+
+    add = frame : addb.addBtn {}
+
+    length = text : txt.numCard {
+      contents: "2:01"
+    }
+  }
+
+  // the live rope (i9); clear from i10
+  rowRope = frame : surf.rope {
+    left: 0px,
+    top: 0px,
+    right: 0px,
+    bottom: 0px,
+    width: .nil,
+    height: .nil,
+    display: .none,
+    ignore-stack: .true,
+    corner-radius: spc.radii.row,
+    border[0].color: col.roles.live-rope-a,
+    border[1].color: col.roles.live-rope-b
+  }
+}
+
+// Playing: ⏸ on the live fill over the art; i9 the live rope, i10 the
+// live tint.
+@variants(trackRowLiveI10)
+export trackRowLive = frame : trackRow {
+  title: "Track row · playing",
+  left: 1824px,
+  top: 40px,
+  fill[0].color: col.roles.live-card,
+
+  art {
+    artPlay {
+      display: .visible
+    }
+  }
+
+  rowRope {
+    display: .visible
+  }
+}
+
+// Hover: the art's ▶ (a row at rest that's pointed at).
+@variants(trackRowHoverI10)
+export trackRowHover = frame : trackRow {
+  title: "Track row · hover",
+  left: 912px,
+  top: 40px,
+
+  art {
+    artPlay {
+      fill[0].color: col.roles.dark,
+
+      artGlyph {
+        contents: playIcon
+      }
+
+      display: .visible
+    }
+  }
+}
+
+// ---- i10 · R7: the same discs, duotone ----
+@context(i10="on")
+export trackRowI10 = frame : trackRow {
+  title: "Track row · i10",
+  left: 0px,
+  top: 216px,
+
+  acts {
+    @with-variant(lnk.linkDiscI10)
+    notes {}
+
+    links {
+      @with-variant(lnk.linkDiscYoutubeI10)
+      link2 {}
+
+      @with-variant(lnk.linkDiscBeepboxI10)
+      link1 {}
+    }
+  }
+}
+
+@context(i10="on")
+export trackRowLiveI10 = frame : trackRowLive {
+  title: "Track row · playing · i10",
+  left: 1824px,
+  top: 216px,
+
+  acts {
+    @with-variant(lnk.linkDiscI10)
+    notes {}
+
+    links {
+      @with-variant(lnk.linkDiscYoutubeI10)
+      link2 {}
+
+      @with-variant(lnk.linkDiscBeepboxI10)
+      link1 {}
+    }
+  }
+}
+
+@context(i10="on")
+export trackRowHoverI10 = frame : trackRowHover {
+  title: "Track row · hover · i10",
+  left: 912px,
+  top: 216px,
+
+  acts {
+    @with-variant(lnk.linkDiscI10)
+    notes {}
+
+    links {
+      @with-variant(lnk.linkDiscYoutubeI10)
+      link2 {}
+
+      @with-variant(lnk.linkDiscBeepboxI10)
+      link1 {}
+    }
+  }
+}
+
+// ==== states page (labels over the definitions, then the states boards: i9 · i10 · i11) ====
+lbl-trackRow = text : doc.specLabel {
+  left: 0px,
+  top: 0px,
+  contents: "trackRow"
+}
+
+note-trackRow = text : doc.specNote {
+  left: 0px,
+  top: 16px,
+  contents: "rest"
+}
+
+lbl-trackRowHover = text : doc.specLabel {
+  left: 912px,
+  top: 0px,
+  contents: "trackRowHover"
+}
+
+note-trackRowHover = text : doc.specNote {
+  left: 912px,
+  top: 16px,
+  contents: "hover: the art's ▶"
+}
+
+lbl-trackRowLive = text : doc.specLabel {
+  left: 1824px,
+  top: 0px,
+  contents: "trackRowLive"
+}
+
+note-trackRowLive = text : doc.specNote {
+  left: 1824px,
+  top: 16px,
+  contents: "live: playing"
+}
+
+lbl-trackRowI10 = text : doc.specLabel {
+  left: 0px,
+  top: 176px,
+  contents: "trackRowI10"
+}
+
+note-trackRowI10 = text : doc.specNote {
+  left: 0px,
+  top: 192px,
+  contents: "i10 · duotone discs"
+}
+
+lbl-trackRowHoverI10 = text : doc.specLabel {
+  left: 912px,
+  top: 176px,
+  contents: "trackRowHoverI10"
+}
+
+note-trackRowHoverI10 = text : doc.specNote {
+  left: 912px,
+  top: 192px,
+  contents: "i10 · hover"
+}
+
+lbl-trackRowLiveI10 = text : doc.specLabel {
+  left: 1824px,
+  top: 176px,
+  contents: "trackRowLiveI10"
+}
+
+note-trackRowLiveI10 = text : doc.specNote {
+  left: 1824px,
+  top: 192px,
+  contents: "i10 · live tint"
+}
+
+@variants(trackRowStatesI10)
+trackRowStates = frame : doc.docBoard {
+  title: "Track row · states · i9",
+  left: 0px,
+  top: 420px,
+
+  body {
+    layout.stack.item-gap: 48px,
+    overrides: [
+      insert(row-1, after = .nil),
+      insert(row-2, after = row-1),
+      insert(row-3, after = row-2)
+    ]
+  }
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i9"
+      }
+    }
+
+    boardCaption {
+      contents: "Track row · every state"
+    }
+  }
+
+  row-1 = frame : doc.specRow {
+    layout.stack.item-gap: 48px,
+    overrides: [insert(st-trackRow, after = .nil)]
+  }
+
+  row-2 = frame : doc.specRow {
+    layout.stack.item-gap: 48px,
+    overrides: [insert(st-trackRowHover, after = .nil)]
+  }
+
+  row-3 = frame : doc.specRow {
+    layout.stack.item-gap: 48px,
+    overrides: [insert(st-trackRowLive, after = .nil)]
+  }
+
+  st-trackRow = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "trackRow"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "rest"
+    }
+
+    it = frame : trackRow {}
+  }
+
+  st-trackRowHover = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "trackRowHover"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "hover: the art's ▶"
+    }
+
+    it = frame : trackRowHover {}
+  }
+
+  st-trackRowLive = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "trackRowLive"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "live: playing"
+    }
+
+    it = frame : trackRowLive {}
+  }
+}
+
+@variants(trackRowStatesI11)
+@context(i10="on")
+trackRowStatesI10 = frame : trackRowStates {
+  title: "Track row · states · i10",
+  left: 992px,
+  top: 420px,
+
+  body {
+    row-3 {
+      st-trackRowLive {
+        slot {
+          @with-variant(trackRowLiveI10)
+          it {}
+        }
+
+        note {
+          contents: "i10 · live tint"
+        }
+
+        label {
+          contents: "trackRowLiveI10"
+        }
+      }
+    }
+
+    row-2 {
+      st-trackRowHover {
+        slot {
+          @with-variant(trackRowHoverI10)
+          it {}
+        }
+
+        note {
+          contents: "i10 · hover"
+        }
+
+        label {
+          contents: "trackRowHoverI10"
+        }
+      }
+    }
+
+    row-1 {
+      st-trackRow {
+        slot {
+          @with-variant(trackRowI10)
+          it {}
+        }
+
+        note {
+          contents: "i10 · duotone discs"
+        }
+
+        label {
+          contents: "trackRowI10"
+        }
+      }
+    }
+  }
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i10"
+      }
+    }
+  }
+}
+
+@context(i10="on", i11="on")
+trackRowStatesI11 = frame : trackRowStatesI10 {
+  title: "Track row · states · i11",
+  left: 1984px,
+  top: 420px,
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i11"
+      }
+    }
+  }
+}

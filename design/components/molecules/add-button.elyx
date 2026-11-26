@@ -1,0 +1,174 @@
+import "tokens/color/roles.elyx" as col
+import "tokens/color/palette.elyx" as pal
+import "tokens/space/space.elyx" as spc
+import "components/atoms/surface.elyx" as surf
+import "assets/icons/bold/plus.svg" as plusIcon
+import "assets/icons/bold/check.svg" as checkIcon
+import "components/atoms/doc.elyx" as doc
+
+// The quiet + beside ▶ (queue add): a 32px white disc with a hairline, the
+// link discs' size so ▶ (44) stays the biggest button. It is a plain disc
+// in every iteration (never the act fill). Added = in the queue: the ✓ on
+// cotton-2 with an inset ring (i9: the ✓ in red-deep, i10: in ink).
+// Child: `glyph` (the + / ✓).
+@variants(addBtnAdded)
+export addBtn = frame : surf.disc {
+  title: "Add · rest",
+  left: 0px,
+  top: 40px,
+  width: spc.controls.add,
+  height: spc.controls.add,
+  border[0].color: col.roles.disc-line,
+  border[0].position: .outside,
+  overrides: [insert(glyph, after = .nil)],
+  shadow[0].drop-shadow.blur-radius: 2px,
+  shadow[0].drop-shadow.color: pal.palette.shadow-1,
+  shadow[0].drop-shadow.offset: [0px, 1px],
+
+  glyph = asset {
+    width: spc.controls.add-icon,
+    height: spc.controls.add-icon,
+    fill: col.roles.fg,
+    contents: plusIcon
+  }
+}
+
+// Added: the item is in the queue (press again to take it out).
+export addBtnAdded = frame : addBtn {
+  title: "Add · added",
+  left: 172px,
+  top: 40px,
+  border[0].color: col.roles.added-line,
+  border[0].position: .inside,
+  fill[0].color: col.roles.chip,
+  shadow[0]: .nil,
+
+  glyph {
+    fill[0].color: col.roles.added,
+    contents: checkIcon
+  }
+}
+
+// ==== states page (labels over the definitions, then the states boards: i9 · i10 · i11) ====
+lbl-addBtn = text : doc.specLabel {
+  left: 0px,
+  top: 0px,
+  contents: "addBtn"
+}
+
+note-addBtn = text : doc.specNote {
+  left: 0px,
+  top: 16px,
+  contents: "rest: the quiet +"
+}
+
+lbl-addBtnAdded = text : doc.specLabel {
+  left: 172px,
+  top: 0px,
+  contents: "addBtnAdded"
+}
+
+note-addBtnAdded = text : doc.specNote {
+  left: 172px,
+  top: 16px,
+  contents: "added: in the queue (✓)"
+}
+
+@variants(addBtnStatesI10)
+addBtnStates = frame : doc.docBoard {
+  title: "Add (+) · states · i9",
+  left: 0px,
+  top: 232px,
+
+  body {
+    layout.stack.item-gap: 48px,
+    overrides: [insert(row-1, after = .nil)]
+  }
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i9"
+      }
+    }
+
+    boardCaption {
+      contents: "Add (+) · every state"
+    }
+  }
+
+  row-1 = frame : doc.specRow {
+    layout.stack.item-gap: 48px,
+    overrides: [
+      insert(st-addBtn, after = .nil),
+      insert(st-addBtnAdded, after = st-addBtn)
+    ]
+  }
+
+  st-addBtn = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "addBtn"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "rest: the quiet +"
+    }
+
+    it = frame : addBtn {}
+  }
+
+  st-addBtnAdded = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "addBtnAdded"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "added: in the queue (✓)"
+    }
+
+    it = frame : addBtnAdded {}
+  }
+}
+
+@variants(addBtnStatesI11)
+@context(i10="on")
+addBtnStatesI10 = frame : addBtnStates {
+  title: "Add (+) · states · i10",
+  left: 485px,
+  top: 232px,
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i10"
+      }
+    }
+  }
+}
+
+@context(i10="on", i11="on")
+addBtnStatesI11 = frame : addBtnStatesI10 {
+  title: "Add (+) · states · i11",
+  left: 970px,
+  top: 232px,
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i11"
+      }
+    }
+  }
+}

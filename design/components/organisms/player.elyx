@@ -1,0 +1,774 @@
+import "tokens/color/roles.elyx" as col
+import "tokens/color/palette.elyx" as pal
+import "tokens/space/space.elyx" as spc
+import "tokens/type/type.elyx" as typ
+import "components/atoms/text.elyx" as txt
+import "components/atoms/doc.elyx" as doc
+import "components/atoms/surface.elyx" as surf
+import "assets/music/wave-played.svg" as wavePlayed
+import "assets/music/wave-rest.svg" as waveRest
+import "assets/art/glooming-shadows-of-alphabet-city.svg" as gloomingCover
+import "assets/icons/fill/skip-back.svg" as prevIcon
+import "assets/icons/fill/skip-forward.svg" as nextIcon
+import "assets/icons/fill/play.svg" as playIcon
+import "assets/icons/fill/pause.svg" as pauseIcon
+import "assets/icons/fill/speaker-high.svg" as volIcon
+import "assets/icons/bold/caret-up.svg" as expandIcon
+
+@with-context(i11="on")
+file {}
+
+// <yarn-player>'s bar (kit/player.js): a white knit bar (1180 × 76, its
+// stitch 6 in) floating 30 above the window's bottom. Its columns: who
+// (the title in Title, "from …" in a fact's face), the scrub (elapsed ·
+// waveform · remaining, Numeric), the transport (prev · ▶ 48 · next), the
+// volume (a 40 button + an 84 rail), expand (^), and the slot the record
+// sits over. The live colour is the waveform's played part, ▶'s fill and
+// the record's label ring (i9 red, i10 Music's purple); the volume level
+// is `level` (i9 red, i10 ink). Everything that changes by iteration is a
+// token. Children: `barStitch`, `who` (`name`, `sub`), `scrub` (`elapsed`,
+// `wave` (`rest`, `played`), `remain`), `tx` (`prev`, `play`, `next`),
+// `vol` (`volBtn`, `rail`), `expand`, `slot`, `disc`.
+@variants(playerPaused, playerPhone)
+export player = frame {
+  title: "Player · playing",
+  left: 0px,
+  top: 40px,
+  width: spc.controls.player-w,
+  height: spc.controls.player-h,
+  layout: {
+    grid: {
+      columns: [300px, 1fr, .auto, .auto, .auto, 66px],
+      column-gap: spc.layout.player-gap,
+      align-items: .center
+    }
+  },
+  fill: col.roles.surface,
+  shadow: [
+    {
+      drop-shadow: {
+        color: pal.palette.hairline,
+        offset: point(0px, 0px),
+        blur-radius: 0px,
+        spread: 1px
+      }
+    },
+    {
+      drop-shadow: {
+        color: pal.palette.shadow-pop,
+        offset: point(0px, 10px),
+        blur-radius: 28px
+      }
+    }
+  ],
+  corner-radius: spc.radii.player,
+  padding-left: spc.layout.player-inset,
+  children: [barStitch, who, scrub, tx, vol, expand, slot, disc],
+
+  barStitch = frame : surf.stitch {
+    left: spc.layout.stitch-in,
+    top: spc.layout.stitch-in,
+    right: spc.layout.stitch-in,
+    bottom: spc.layout.stitch-in,
+    width: .nil,
+    height: .nil,
+    ignore-stack: .true,
+    corner-radius: spc.radii.player-stitch
+  }
+
+  // what's playing: the song, then where it's from
+  who = frame {
+    width: 100%,
+    layout: {stack: {direction: .column, item-gap: spc.steps.s1}},
+    overflow: .clip,
+    padding: [
+      spc.steps.s1,
+      spc.layout.player-who-r,
+      spc.steps.s1,
+      spc.layout.player-who-l
+    ],
+    children: [name, sub],
+
+    name = text : txt.titleCard {
+      contents: "glooming shadows of alphabet city",
+      font-size: typ.sizes.player
+    }
+
+    sub = text : txt.metaCard {
+      contents: "from Alphabet City Collection",
+      font-size: typ.sizes.fact,
+      font-family: typ.faces.fact,
+      font-style: typ.faces.fact-style
+    }
+  }
+
+  // elapsed · the waveform (its played part in the live colour) · remaining
+  scrub = frame {
+    width: 100%,
+    layout: {
+      grid: {
+        columns: [.auto, 1fr, .auto],
+        column-gap: spc.layout.player-gap,
+        align-items: .center
+      }
+    },
+    children: [elapsed, wave, remain],
+
+    elapsed = text : txt.numCard {
+      contents: "0:47"
+    }
+
+    wave = frame {
+      width: 100%,
+      height: spc.controls.wave-h,
+      children: [rest, played],
+
+      rest = asset {
+        left: 0px,
+        top: 0px,
+        right: 0px,
+        bottom: 0px,
+        fill: col.roles.line,
+        contents: waveRest
+      }
+
+      played = asset {
+        left: 0px,
+        top: 0px,
+        right: 0px,
+        bottom: 0px,
+        fill: col.roles.live,
+        contents: wavePlayed
+      }
+    }
+
+    remain = text : txt.numCard {
+      contents: "-1:13"
+    }
+  }
+
+  // prev · ▶ (the live fill, ⏸ while it plays) · next
+  tx = frame {
+    layout: {stack: {align-items: .center, item-gap: spc.layout.chip-gap}},
+    children: [prev, play, next],
+
+    prev = frame {
+      width: spc.controls.player-btn,
+      height: spc.controls.player-btn,
+      layout: {stack: {justify-content: .center, align-items: .center}},
+      corner-radius: spc.radii.pill,
+      children: prevGlyph,
+
+      prevGlyph = asset {
+        width: spc.controls.player-icon,
+        height: spc.controls.player-icon,
+        fill: col.roles.fg,
+        contents: prevIcon
+      }
+    }
+
+    play = frame {
+      width: spc.controls.player-play,
+      height: spc.controls.player-play,
+      layout: {stack: {justify-content: .center, align-items: .center}},
+      fill: col.roles.live,
+      shadow: [
+        {
+          drop-shadow: {
+            color: pal.palette.shadow-lift,
+            offset: point(0px, 2px),
+            blur-radius: 0px
+          }
+        },
+        {
+          drop-shadow: {
+            color: col.roles.live-glow,
+            offset: point(0px, 6px),
+            blur-radius: 14px,
+            spread: -4px
+          }
+        }
+      ],
+      corner-radius: spc.radii.pill,
+      children: [playStitch, pauseGlyph, playGlyph],
+
+      playStitch = frame : surf.stitch {
+        left: spc.steps.s1,
+        top: spc.steps.s1,
+        right: spc.steps.s1,
+        bottom: spc.steps.s1,
+        width: .nil,
+        height: .nil,
+        ignore-stack: .true,
+        corner-radius: spc.radii.pill,
+        border[0].color: col.roles.dot-stitch
+      }
+
+      pauseGlyph = asset {
+        width: spc.controls.player-play-icon,
+        height: spc.controls.player-play-icon,
+        fill: col.roles.live-fg,
+        contents: pauseIcon
+      }
+
+      playGlyph = asset {
+        width: spc.controls.player-play-icon,
+        height: spc.controls.player-play-icon,
+        display: .none,
+        fill: col.roles.live-fg,
+        contents: playIcon
+      }
+    }
+
+    next = frame {
+      width: spc.controls.player-btn,
+      height: spc.controls.player-btn,
+      layout: {stack: {justify-content: .center, align-items: .center}},
+      corner-radius: spc.radii.pill,
+      children: nextGlyph,
+
+      nextGlyph = asset {
+        width: spc.controls.player-icon,
+        height: spc.controls.player-icon,
+        fill: col.roles.fg,
+        contents: nextIcon
+      }
+    }
+  }
+
+  // the volume: its button, then the rail with the level and its pin
+  vol = frame {
+    layout: {stack: {align-items: .center, item-gap: spc.steps.s1}},
+    children: [volBtn, rail],
+
+    volBtn = frame {
+      width: spc.controls.player-btn,
+      height: spc.controls.player-btn,
+      layout: {stack: {justify-content: .center, align-items: .center}},
+      corner-radius: spc.radii.pill,
+      children: volGlyph,
+
+      volGlyph = asset {
+        width: spc.controls.player-icon,
+        height: spc.controls.player-icon,
+        fill: col.roles.fg,
+        contents: volIcon
+      }
+    }
+
+    rail = frame {
+      width: spc.controls.vol-w,
+      height: spc.controls.vol-h,
+      fill: col.roles.line,
+      corner-radius: spc.radii.pill,
+      children: [level, pin],
+
+      level = frame {
+        left: 0px,
+        top: 0px,
+        bottom: 0px,
+        width: 80%,
+        fill: col.roles.level,
+        corner-radius: spc.radii.pill
+      }
+
+      pin = frame {
+        left: 77%,
+        top: -1px,
+        width: spc.controls.vol-pin,
+        height: spc.controls.vol-pin,
+        fill: col.roles.surface,
+        shadow: {
+          drop-shadow: {
+            color: pal.palette.shadow-lift,
+            offset: point(0px, 1px),
+            blur-radius: 2px
+          }
+        },
+        corner-radius: spc.radii.pill
+      }
+    }
+  }
+
+  expand = frame {
+    width: spc.controls.player-btn,
+    height: spc.controls.player-btn,
+    layout: {stack: {justify-content: .center, align-items: .center}},
+    corner-radius: spc.radii.pill,
+    children: expandGlyph,
+
+    expandGlyph = asset {
+      width: spc.controls.player-icon,
+      height: spc.controls.player-icon,
+      fill: col.roles.fg,
+      contents: expandIcon
+    }
+  }
+
+  // the room the record sits over
+  slot = frame {
+    width: spc.controls.player-slot,
+    height: spc.controls.player-h
+  }
+
+  // the record: an ink disc with its grooves and a white stitch, the
+  // song's art on its label, the spindle hole
+  disc = frame {
+    top: spc.steps.s1,
+    right: spc.steps.s1,
+    width: spc.controls.record,
+    height: spc.controls.record,
+    ignore-stack: .true,
+    fill: col.roles.dark,
+    shadow: [
+      {
+        drop-shadow: {
+          color: pal.palette.stitch-soft,
+          offset: point(0px, 1px),
+          blur-radius: 0px
+        }
+      },
+      {
+        drop-shadow: {
+          color: pal.palette.shadow-pop,
+          offset: point(0px, 3px),
+          blur-radius: 8px
+        }
+      }
+    ],
+    corner-radius: spc.radii.pill,
+    children: [groove1, groove2, discStitch, label, hole],
+
+    groove1 = frame {
+      left: spc.steps.s3,
+      top: spc.steps.s3,
+      right: spc.steps.s3,
+      bottom: spc.steps.s3,
+      opacity: 0.12,
+      border: col.roles.dark-fg,
+      corner-radius: spc.radii.pill
+    }
+
+    groove2 = frame {
+      left: spc.steps.s4,
+      top: spc.steps.s4,
+      right: spc.steps.s4,
+      bottom: spc.steps.s4,
+      opacity: 0.08,
+      border: col.roles.dark-fg,
+      corner-radius: spc.radii.pill
+    }
+
+    discStitch = frame : surf.stitch {
+      left: spc.layout.stitch-in-ctl,
+      top: spc.layout.stitch-in-ctl,
+      right: spc.layout.stitch-in-ctl,
+      bottom: spc.layout.stitch-in-ctl,
+      width: .nil,
+      height: .nil,
+      opacity: 0.5,
+      corner-radius: spc.radii.pill,
+      border[0].color: col.roles.dot-stitch,
+      border[0].width: spc.layout.stitch-w-sm
+    }
+
+    label = frame {
+      left: 19.5px,
+      top: 19.5px,
+      width: spc.controls.record-label,
+      height: spc.controls.record-label,
+      fill: [col.roles.live, {image: {ref: gloomingCover}}],
+      shadow: {
+        drop-shadow: {
+          color: pal.palette.ink,
+          offset: point(0px, 0px),
+          blur-radius: 0px,
+          spread: 1.5px
+        }
+      },
+      corner-radius: spc.radii.pill
+    }
+
+    hole = frame {
+      left: 32px,
+      top: 32px,
+      width: spc.steps.s1,
+      height: spc.steps.s1,
+      fill: col.roles.dark,
+      corner-radius: spc.radii.pill
+    }
+  }
+}
+
+// Paused: ▶ where ⏸ was.
+export playerPaused = frame : player {
+  title: "Player · paused",
+  left: 0px,
+  top: 236px,
+
+  tx {
+    play {
+      pauseGlyph {
+        display: .none
+      }
+
+      playGlyph {
+        display: .visible
+      }
+    }
+  }
+}
+
+// ---- phones (< 960): the bar in the slot (kit/player.js, compact) ----
+// The same shell, 360 × 64 in the slot (8 above the frame's foot, 15 in
+// from each screen edge): who · ⏮ ▶ ⏭ · mute · the record (52, in a 60
+// column). No scrub, no volume rail, no expand: the song's progress is the
+// thread under who (live twill on a quiet line) and the bar drags up into
+// the player's page (organisms/player-phone.elyx). The words are cut as
+// the bar cuts them ("glooming sh…").
+@variants(playerPhonePaused)
+export playerPhone = frame : player {
+  title: "Player · phone bar · playing",
+  left: 0px,
+  top: 432px,
+  width: spc.controls.slot-w,
+  height: spc.controls.slot,
+  padding-left: spc.layout.pbar-l,
+  layout.grid.column-gap: 0,
+  layout.grid.columns: [1fr, .auto, .auto, .auto],
+  overrides: [insert(thread, after = player.slot)],
+
+  disc {
+    label {
+      left: spc.controls.pdisc-bar-label-in,
+      top: spc.controls.pdisc-bar-label-in,
+      width: spc.controls.pdisc-bar-label,
+      height: spc.controls.pdisc-bar-label
+    }
+
+    hole {
+      left: spc.controls.pdisc-bar-hole-in,
+      top: spc.controls.pdisc-bar-hole-in
+    }
+
+    top: spc.layout.stitch-in,
+    right: spc.steps.s1,
+    width: spc.controls.pdisc-bar,
+    height: spc.controls.pdisc-bar
+  }
+
+  tx {
+    prev {
+      width: spc.controls.pbar-btn,
+      height: spc.controls.pbar-btn
+    }
+
+    play {
+      width: spc.controls.pbar-btn,
+
+      pauseGlyph {
+        width: spc.controls.player-icon,
+        height: spc.controls.player-icon
+      }
+
+      playGlyph {
+        width: spc.controls.player-icon,
+        height: spc.controls.player-icon
+      }
+
+      height: spc.controls.pbar-btn
+    }
+
+    next {
+      width: spc.controls.pbar-btn,
+      height: spc.controls.pbar-btn
+    }
+
+    layout.stack.item-gap: 0
+  }
+
+  vol {
+    volBtn {
+      width: spc.controls.pbar-btn,
+      height: spc.controls.pbar-btn
+    }
+
+    rail {
+      display: .none
+    }
+  }
+
+  slot {
+    width: spc.controls.pbar-disc-col,
+    height: spc.controls.slot
+  }
+
+  who {
+    height: spc.controls.pbar-who-h,
+    layout.stack.justify-content: .center,
+
+    name {
+      contents: "glooming sh…",
+      font-size: typ.sizes.player-phone
+    }
+
+    sub {
+      contents: "from Alphabet C…"
+    }
+
+    padding-top: spc.layout.pbar-who-y,
+    padding-left: spc.layout.pbar-who-x,
+    padding-bottom: spc.layout.pbar-who-y,
+    padding-right: spc.layout.pbar-who-x
+  }
+
+  scrub {
+    display: .none
+  }
+
+  expand {
+    display: .none
+  }
+
+  // the song's progress under who (0:47 of 2:01)
+  thread = frame {
+    left: spc.layout.pbar-thread-l,
+    right: spc.layout.pbar-thread-r,
+    bottom: spc.layout.pbar-thread-b,
+    height: spc.controls.pbar-thread,
+    ignore-stack: .true,
+    fill: col.roles.line,
+    corner-radius: spc.radii.pill,
+    children: threadDone,
+
+    threadDone = frame {
+      left: 0px,
+      top: 0px,
+      bottom: 0px,
+      width: 39%,
+      fill: col.roles.live,
+      corner-radius: spc.radii.pill
+    }
+  }
+}
+
+// Paused: ▶ where ⏸ was; at rest ▶ is the view's primary (i9 red, from
+// i10 the ink fill), not live.
+export playerPhonePaused = frame : playerPhone {
+  title: "Player · phone bar · paused",
+  left: 1420px,
+  top: 432px,
+
+  tx {
+    play {
+      fill[0].color: col.roles.primary-bg,
+
+      playGlyph {
+        fill[0].color: col.roles.primary-fg,
+        display: .visible
+      }
+
+      pauseGlyph {
+        display: .none
+      }
+    }
+  }
+}
+
+// ==== states page (labels over the definitions, then the states boards: i9 · i10 · i11) ====
+lbl-player = text : doc.specLabel {
+  left: 0px,
+  top: 0px,
+  contents: "player"
+}
+
+note-player = text : doc.specNote {
+  left: 0px,
+  top: 16px,
+  contents: "the bar · playing"
+}
+
+lbl-playerPaused = text : doc.specLabel {
+  left: 0px,
+  top: 196px,
+  contents: "playerPaused"
+}
+
+note-playerPaused = text : doc.specNote {
+  left: 0px,
+  top: 212px,
+  contents: "the bar · paused"
+}
+
+lbl-playerPhone = text : doc.specLabel {
+  left: 0px,
+  top: 392px,
+  contents: "playerPhone"
+}
+
+note-playerPhone = text : doc.specNote {
+  left: 0px,
+  top: 408px,
+  contents: "phones: the bar in the slot · playing"
+}
+
+lbl-playerPhonePaused = text : doc.specLabel {
+  left: 1420px,
+  top: 392px,
+  contents: "playerPhonePaused"
+}
+
+note-playerPhonePaused = text : doc.specNote {
+  left: 1420px,
+  top: 408px,
+  contents: "phones · paused"
+}
+
+@variants(playerStatesI10)
+playerStates = frame : doc.docBoard {
+  title: "Player · states · i9",
+  left: 0px,
+  top: 640px,
+
+  body {
+    layout.stack.item-gap: 48px,
+    overrides: [
+      insert(row-1, after = .nil),
+      insert(row-2, after = row-1),
+      insert(row-3, after = row-2)
+    ]
+  }
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i9"
+      }
+    }
+
+    boardCaption {
+      contents: "Player · every state"
+    }
+  }
+
+  row-1 = frame : doc.specRow {
+    layout.stack.item-gap: 48px,
+    overrides: [insert(st-player, after = .nil)]
+  }
+
+  row-2 = frame : doc.specRow {
+    layout.stack.item-gap: 48px,
+    overrides: [insert(st-playerPaused, after = .nil)]
+  }
+
+  row-3 = frame : doc.specRow {
+    layout.stack.item-gap: 48px,
+    overrides: [
+      insert(st-playerPhone, after = .nil),
+      insert(st-playerPhonePaused, after = st-playerPhone)
+    ]
+  }
+
+  st-player = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "player"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "the bar · playing"
+    }
+
+    it = frame : player {}
+  }
+
+  st-playerPaused = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "playerPaused"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "the bar · paused"
+    }
+
+    it = frame : playerPaused {}
+  }
+
+  st-playerPhone = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "playerPhone"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "phones: the bar in the slot · playing"
+    }
+
+    it = frame : playerPhone {}
+  }
+
+  st-playerPhonePaused = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "playerPhonePaused"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "phones · paused"
+    }
+
+    it = frame : playerPhonePaused {}
+  }
+}
+
+@variants(playerStatesI11)
+@context(i10="on")
+playerStatesI10 = frame : playerStates {
+  title: "Player · states · i10",
+  left: 1492px,
+  top: 640px,
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i10"
+      }
+    }
+  }
+}
+
+@context(i10="on", i11="on")
+playerStatesI11 = frame : playerStatesI10 {
+  title: "Player · states · i11",
+  left: 2984px,
+  top: 640px,
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i11"
+      }
+    }
+  }
+}

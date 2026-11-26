@@ -1,0 +1,1274 @@
+import "tokens/color/roles.elyx" as col
+import "tokens/color/palette.elyx" as pal
+import "tokens/space/space.elyx" as spc
+import "tokens/type/type.elyx" as typ
+import "components/atoms/text.elyx" as txt
+import "components/atoms/surface.elyx" as surf
+import "assets/icons/fill/check-circle.svg" as completeIcon
+import "assets/icons/bold/hammer.svg" as wipIcon
+import "assets/icons/bold/piano-keys.svg" as pianoIcon
+import "assets/icons/bold/circle.svg" as beepboxIcon
+import "assets/icons/bold/wave-sine.svg" as dawIcon
+import "assets/icons/bold/user.svg" as personalIcon
+import "assets/icons/bold/briefcase.svg" as workIcon
+import "assets/icons/bold/graduation-cap.svg" as schoolIcon
+import "components/atoms/doc.elyx" as doc
+
+// The kit's .ychip: a 40px pill, a leading glyph (`glyph`), a Label
+// (`label`) and an optional count (`count`, hidden unless shown).
+// Rest: i9 white knit + a dashed stitch inside (`chipStitch`); i10 R9
+// "calm": flat white with a 1px ring, no stitch (col.roles.ctl-*).
+// States: …On = a toggle that's on (the on fill; from i10 the section's
+// tint + a ring, `chipRing`) · …Picked = a single choice (the rope,
+// `chipRope`) · …Sm = 32px.
+// Content chips (instruments, project types) wear their own colour when
+// on: i9 the solid colour, i10 its soft tint (col.roles.on-<content>).
+// The on stitch and ring are the role's colour at an alpha: the alpha is
+// the layer's opacity (opacity() and a border paint's opacity resolve
+// statically / don't render). The ring is 0px wide in i9 (on-ring-w).
+// Override `glyph {contents: …}`, `label {contents: …}`, `count {…}`.
+@variants(
+  chipOn,
+  chipPicked,
+  chipSm,
+  chipCount,
+  chipAll,
+  chipPiano,
+  chipBeepbox,
+  chipDaw,
+  chipPersonal,
+  chipWork,
+  chipSchool,
+  chipHover,
+  chipFocus,
+  chipDisabled
+)
+export chip = frame {
+  title: "Chip · rest",
+  left: 0px,
+  top: 40px,
+  height: spc.controls.chip,
+  layout: {stack: {align-items: .center, item-gap: spc.layout.chip-gap}},
+  fill: col.roles.surface,
+  border: {color: col.roles.ctl-line, position: .outside},
+  shadow: [
+    {
+      drop-shadow: {
+        color: pal.palette.shadow-1,
+        offset: point(0px, 1px),
+        blur-radius: 0px
+      }
+    },
+    {
+      drop-shadow: {
+        color: col.roles.ctl-shadow,
+        offset: point(0px, 1px),
+        blur-radius: 3px
+      }
+    }
+  ],
+  corner-radius: spc.radii.pill,
+  padding-left: spc.layout.chip-x,
+  padding-right: spc.layout.chip-x,
+  children: [chipStitch, glyph, label, count, chipRing],
+
+  chipStitch = frame : surf.stitch {
+    left: spc.steps.s1,
+    top: spc.steps.s1,
+    right: spc.steps.s1,
+    bottom: spc.steps.s1,
+    width: .nil,
+    height: .nil,
+    ignore-stack: .true,
+    corner-radius: spc.radii.pill,
+    border[0].color: col.roles.ctl-stitch,
+    border[0].width: spc.layout.stitch-w-sm
+  }
+
+  glyph = asset {
+    width: spc.controls.icon-sm,
+    height: spc.controls.icon-sm,
+    fill: col.roles.fg,
+    contents: completeIcon
+  }
+
+  label = text : txt.label {
+    contents: "Complete",
+    font-size: typ.sizes.chip,
+    fill[0].color: col.roles.fg-2
+  }
+
+  count = text : txt.meta {
+    display: .none,
+    contents: "4"
+  }
+
+  chipRing = frame {
+    left: 0px,
+    top: 0px,
+    right: 0px,
+    bottom: 0px,
+    display: .none,
+    opacity: 0.3,
+    ignore-stack: .true,
+    border: {color: col.roles.on-fg, width: spc.layout.on-ring-w},
+    corner-radius: spc.radii.pill
+  }
+}
+
+// A toggle that's on (filter chips, search tokens): i9 the red fill
+// (tog-red) with a quiet white stitch; i10 L1 the section's soft tint,
+// its deep words, the stitch and a 1px ring in the deep shade at .3.
+@variants(chipOnHover)
+export chipOn = frame : chip {
+  title: "Chip · on",
+  left: 508px,
+  top: 40px,
+  border[0].visible: .false,
+  fill[0].color: col.roles.on-bg,
+  shadow[1].drop-shadow.visible: .false,
+
+  chipStitch {
+    border[0].color: col.roles.on-fg,
+    opacity: 0.3
+  }
+
+  glyph {
+    fill[0].color: col.roles.on-fg
+  }
+
+  label {
+    fill[0].color: col.roles.on-fg
+  }
+
+  count {
+    fill[0].color: col.roles.on-fg
+  }
+
+  chipRing {
+    display: .visible
+  }
+}
+
+// A single choice (a radio chip, a sort): the rope on the edge. The rope
+// replaces the stitch; pick is red in i9, ink from i10.
+export chipPicked = frame : chip {
+  title: "Chip · picked",
+  left: 918px,
+  top: 40px,
+  overrides: [insert(chipRope, after = chip.chipRing)],
+
+  label {
+    fill[0].color: col.roles.fg
+  }
+
+  chipStitch {
+    display: .none
+  }
+
+  chipRope = frame : surf.rope {
+    left: 0px,
+    top: 0px,
+    right: 0px,
+    bottom: 0px,
+    width: .nil,
+    height: .nil,
+    ignore-stack: .true
+  }
+}
+
+// 32px (a suggestion in the search popover, tight rows).
+export chipSm = frame : chip {
+  title: "Chip · sm",
+  left: 0px,
+  top: 216px,
+  height: spc.controls.chip-sm,
+  padding-left: spc.layout.chip-sm-x,
+  padding-right: spc.layout.chip-sm-x,
+
+  label {
+    font-size: typ.sizes.chip-sm
+  }
+}
+
+// With a count (Browse's "rust · 4", a rail's rows).
+export chipCount = frame : chip {
+  title: "Chip · count",
+  left: 178px,
+  top: 216px,
+
+  glyph {
+    contents: wipIcon
+  }
+
+  label {
+    contents: "WIP"
+  }
+
+  count {
+    display: .visible
+  }
+}
+
+// "All": a 40px circle, pressed = nothing filtered.
+@variants(chipAllOn)
+export chipAll = frame : chip {
+  title: "Chip · All",
+  left: 343px,
+  top: 216px,
+  width: spc.controls.chip,
+  padding-left: 0px,
+  padding-right: 0px,
+  layout.stack.justify-content: .center,
+
+  glyph {
+    display: .none
+  }
+
+  label {
+    contents: "All"
+  }
+}
+
+export chipAllOn = frame : chipAll {
+  title: "Chip · All on",
+  left: 508px,
+  top: 216px,
+  border[0].visible: .false,
+  fill[0].color: col.roles.on-bg,
+  shadow[1].drop-shadow.visible: .false,
+
+  chipStitch {
+    border[0].color: col.roles.on-fg,
+    opacity: 0.3
+  }
+
+  label {
+    fill[0].color: col.roles.on-fg
+  }
+
+  chipRing {
+    display: .visible
+  }
+}
+
+// ---- instrument chips (Music): rest = a plain chip; on = the
+// instrument's colour (i9 solid, white words, a white stitch at .4; i10
+// its soft tint, ink words, the glyph + a ring in its deep shade)
+@variants(chipPianoOn)
+export chipPiano = frame : chip {
+  title: "Chip · piano",
+  left: 0px,
+  top: 392px,
+
+  glyph {
+    contents: pianoIcon
+  }
+
+  label {
+    contents: "Piano"
+  }
+}
+
+export chipPianoOn = frame : chipPiano {
+  title: "Chip · piano on",
+  left: 0px,
+  top: 568px,
+  border[0].visible: .false,
+  fill[0].color: col.roles.on-piano,
+  shadow[1].drop-shadow.visible: .false,
+
+  chipStitch {
+    border[0].color: col.roles.ctl-stitch-fill,
+    opacity: 0.4
+  }
+
+  glyph {
+    fill[0].color: col.roles.on-piano-ic
+  }
+
+  label {
+    fill[0].color: col.roles.on-inst-fg
+  }
+
+  chipRing {
+    border[0].color: col.roles.on-piano-ic,
+    display: .visible,
+    opacity: 0.45
+  }
+}
+
+@variants(chipBeepboxOn)
+export chipBeepbox = frame : chip {
+  title: "Chip · beepbox",
+  left: 178px,
+  top: 392px,
+
+  glyph {
+    contents: beepboxIcon
+  }
+
+  label {
+    contents: "BeepBox"
+  }
+}
+
+export chipBeepboxOn = frame : chipBeepbox {
+  title: "Chip · beepbox on",
+  left: 178px,
+  top: 568px,
+  border[0].visible: .false,
+  fill[0].color: col.roles.on-beepbox,
+  shadow[1].drop-shadow.visible: .false,
+
+  chipStitch {
+    border[0].color: col.roles.ctl-stitch-fill,
+    opacity: 0.4
+  }
+
+  glyph {
+    fill[0].color: col.roles.on-beepbox-ic
+  }
+
+  label {
+    fill[0].color: col.roles.on-inst-fg
+  }
+
+  chipRing {
+    border[0].color: col.roles.on-beepbox-ic,
+    display: .visible,
+    opacity: 0.45
+  }
+}
+
+@variants(chipDawOn)
+export chipDaw = frame : chip {
+  title: "Chip · daw",
+  left: 343px,
+  top: 392px,
+
+  glyph {
+    contents: dawIcon
+  }
+
+  label {
+    contents: "DAW"
+  }
+}
+
+export chipDawOn = frame : chipDaw {
+  title: "Chip · daw on",
+  left: 343px,
+  top: 568px,
+  border[0].visible: .false,
+  fill[0].color: col.roles.on-daw,
+  shadow[1].drop-shadow.visible: .false,
+
+  chipStitch {
+    border[0].color: col.roles.ctl-stitch-fill,
+    opacity: 0.4
+  }
+
+  glyph {
+    fill[0].color: col.roles.on-daw-ic
+  }
+
+  label {
+    fill[0].color: col.roles.on-inst-fg
+  }
+
+  chipRing {
+    border[0].color: col.roles.on-daw-ic,
+    display: .visible,
+    opacity: 0.45
+  }
+}
+
+// ---- project-type chips (Projects): on = the type's colour (i9 solid,
+// an ink stitch; i10 its soft tint, the glyph + a ring in its deep
+// shade); ink words in both
+@variants(chipPersonalOn)
+export chipPersonal = frame : chip {
+  title: "Chip · personal",
+  left: 508px,
+  top: 392px,
+
+  glyph {
+    contents: personalIcon
+  }
+
+  label {
+    contents: "Personal"
+  }
+}
+
+export chipPersonalOn = frame : chipPersonal {
+  title: "Chip · personal on",
+  left: 508px,
+  top: 568px,
+  border[0].visible: .false,
+  fill[0].color: col.roles.on-personal,
+  shadow[1].drop-shadow.visible: .false,
+
+  glyph {
+    fill[0].color: col.roles.on-personal-ic
+  }
+
+  label {
+    fill[0].color: col.roles.fg
+  }
+
+  chipRing {
+    border[0].color: col.roles.on-personal-ic,
+    display: .visible,
+    opacity: 0.45
+  }
+}
+
+@variants(chipWorkOn)
+export chipWork = frame : chip {
+  title: "Chip · work",
+  left: 713px,
+  top: 392px,
+
+  glyph {
+    contents: workIcon
+  }
+
+  label {
+    contents: "Work"
+  }
+}
+
+export chipWorkOn = frame : chipWork {
+  title: "Chip · work on",
+  left: 713px,
+  top: 568px,
+  border[0].visible: .false,
+  fill[0].color: col.roles.on-work,
+  shadow[1].drop-shadow.visible: .false,
+
+  glyph {
+    fill[0].color: col.roles.on-work-ic
+  }
+
+  label {
+    fill[0].color: col.roles.fg
+  }
+
+  chipRing {
+    border[0].color: col.roles.on-work-ic,
+    display: .visible,
+    opacity: 0.45
+  }
+}
+
+@variants(chipSchoolOn)
+export chipSchool = frame : chip {
+  title: "Chip · school",
+  left: 918px,
+  top: 392px,
+
+  glyph {
+    contents: schoolIcon
+  }
+
+  label {
+    contents: "School"
+  }
+}
+
+export chipSchoolOn = frame : chipSchool {
+  title: "Chip · school on",
+  left: 918px,
+  top: 568px,
+  border[0].visible: .false,
+  fill[0].color: col.roles.on-school,
+  shadow[1].drop-shadow.visible: .false,
+
+  glyph {
+    fill[0].color: col.roles.on-school-ic
+  }
+
+  label {
+    fill[0].color: col.roles.fg
+  }
+
+  chipRing {
+    border[0].color: col.roles.on-school-ic,
+    display: .visible,
+    opacity: 0.45
+  }
+}
+
+// ---- interaction states (the kit's chips table: rest · hover · focus ·
+// on · on + hover · disabled)
+// Hover (mouse): lifts 1.5px with a soft shadow; the words go full ink.
+export chipHover = frame : chip {
+  title: "Chip · hover",
+  left: 178px,
+  top: 40px,
+  shadow[0].drop-shadow.color: pal.palette.shadow-1,
+  shadow[1].drop-shadow.blur-radius: 14px,
+  shadow[1].drop-shadow.color: pal.palette.shadow-lift,
+  shadow[1].drop-shadow.offset: [0px, 6px],
+  shadow[1].drop-shadow.spread: -4px,
+
+  label {
+    fill[0].color: col.roles.fg
+  }
+}
+
+// Focus (keys only): the dark thread ring 3px outside.
+export chipFocus = frame : chip {
+  title: "Chip · focus",
+  left: 343px,
+  top: 40px,
+  overrides: [insert(chipFocusRing, after = chip.chipRing)],
+
+  chipFocusRing = frame : surf.focusRing {
+    left: spc.layout.focus-out,
+    top: spc.layout.focus-out,
+    right: spc.layout.focus-out,
+    bottom: spc.layout.focus-out,
+    width: .nil,
+    height: .nil,
+    ignore-stack: .true
+  }
+}
+
+// On + hover: the strike says a click clears it.
+export chipOnHover = frame : chipOn {
+  title: "Chip · on + hover",
+  left: 713px,
+  top: 40px,
+
+  label {
+    strikethrough: .single
+  }
+}
+
+// Disabled (the zero facet: the chip would find nothing): no fill, no
+// shadow, the stitch (i9) at half strength, ink-3 words, the glyph at .55.
+export chipDisabled = frame : chip {
+  title: "Chip · disabled (zero)",
+  left: 1129px,
+  top: 40px,
+  fill[0].visible: .false,
+  shadow[0].drop-shadow.visible: .false,
+  shadow[1].drop-shadow.visible: .false,
+
+  label {
+    fill[0].color: col.roles.fg-3
+  }
+
+  chipStitch {
+    opacity: 0.5
+  }
+
+  glyph {
+    opacity: 0.55
+  }
+}
+
+// ==== states page (labels over the definitions, then the states boards: i9 · i10 · i11) ====
+lbl-chip = text : doc.specLabel {
+  left: 0px,
+  top: 0px,
+  contents: "chip"
+}
+
+note-chip = text : doc.specNote {
+  left: 0px,
+  top: 16px,
+  contents: "rest"
+}
+
+lbl-chipHover = text : doc.specLabel {
+  left: 178px,
+  top: 0px,
+  contents: "chipHover"
+}
+
+note-chipHover = text : doc.specNote {
+  left: 178px,
+  top: 16px,
+  contents: "hover: lifts"
+}
+
+lbl-chipFocus = text : doc.specLabel {
+  left: 343px,
+  top: 0px,
+  contents: "chipFocus"
+}
+
+note-chipFocus = text : doc.specNote {
+  left: 343px,
+  top: 16px,
+  contents: "focus (keys)"
+}
+
+lbl-chipOn = text : doc.specLabel {
+  left: 508px,
+  top: 0px,
+  contents: "chipOn"
+}
+
+note-chipOn = text : doc.specNote {
+  left: 508px,
+  top: 16px,
+  contents: "on: a toggle that's on"
+}
+
+lbl-chipOnHover = text : doc.specLabel {
+  left: 713px,
+  top: 0px,
+  contents: "chipOnHover"
+}
+
+note-chipOnHover = text : doc.specNote {
+  left: 713px,
+  top: 16px,
+  contents: "on + hover: the strike"
+}
+
+lbl-chipPicked = text : doc.specLabel {
+  left: 918px,
+  top: 0px,
+  contents: "chipPicked"
+}
+
+note-chipPicked = text : doc.specNote {
+  left: 918px,
+  top: 16px,
+  contents: "picked: a single choice"
+}
+
+lbl-chipDisabled = text : doc.specLabel {
+  left: 1129px,
+  top: 0px,
+  contents: "chipDisabled"
+}
+
+note-chipDisabled = text : doc.specNote {
+  left: 1129px,
+  top: 16px,
+  contents: "disabled: the zero facet"
+}
+
+lbl-chipSm = text : doc.specLabel {
+  left: 0px,
+  top: 176px,
+  contents: "chipSm"
+}
+
+note-chipSm = text : doc.specNote {
+  left: 0px,
+  top: 192px,
+  contents: "sm (32)"
+}
+
+lbl-chipCount = text : doc.specLabel {
+  left: 178px,
+  top: 176px,
+  contents: "chipCount"
+}
+
+note-chipCount = text : doc.specNote {
+  left: 178px,
+  top: 192px,
+  contents: "with a count"
+}
+
+lbl-chipAll = text : doc.specLabel {
+  left: 343px,
+  top: 176px,
+  contents: "chipAll"
+}
+
+note-chipAll = text : doc.specNote {
+  left: 343px,
+  top: 192px,
+  contents: "All · rest"
+}
+
+lbl-chipAllOn = text : doc.specLabel {
+  left: 508px,
+  top: 176px,
+  contents: "chipAllOn"
+}
+
+note-chipAllOn = text : doc.specNote {
+  left: 508px,
+  top: 192px,
+  contents: "All · on"
+}
+
+lbl-chipPiano = text : doc.specLabel {
+  left: 0px,
+  top: 352px,
+  contents: "chipPiano"
+}
+
+note-chipPiano = text : doc.specNote {
+  left: 0px,
+  top: 368px,
+  contents: "instrument · rest"
+}
+
+lbl-chipBeepbox = text : doc.specLabel {
+  left: 178px,
+  top: 352px,
+  contents: "chipBeepbox"
+}
+
+lbl-chipDaw = text : doc.specLabel {
+  left: 343px,
+  top: 352px,
+  contents: "chipDaw"
+}
+
+lbl-chipPersonal = text : doc.specLabel {
+  left: 508px,
+  top: 352px,
+  contents: "chipPersonal"
+}
+
+note-chipPersonal = text : doc.specNote {
+  left: 508px,
+  top: 368px,
+  contents: "project type · rest"
+}
+
+lbl-chipWork = text : doc.specLabel {
+  left: 713px,
+  top: 352px,
+  contents: "chipWork"
+}
+
+lbl-chipSchool = text : doc.specLabel {
+  left: 918px,
+  top: 352px,
+  contents: "chipSchool"
+}
+
+lbl-chipPianoOn = text : doc.specLabel {
+  left: 0px,
+  top: 528px,
+  contents: "chipPianoOn"
+}
+
+note-chipPianoOn = text : doc.specNote {
+  left: 0px,
+  top: 544px,
+  contents: "on: its own colour"
+}
+
+lbl-chipBeepboxOn = text : doc.specLabel {
+  left: 178px,
+  top: 528px,
+  contents: "chipBeepboxOn"
+}
+
+lbl-chipDawOn = text : doc.specLabel {
+  left: 343px,
+  top: 528px,
+  contents: "chipDawOn"
+}
+
+lbl-chipPersonalOn = text : doc.specLabel {
+  left: 508px,
+  top: 528px,
+  contents: "chipPersonalOn"
+}
+
+note-chipPersonalOn = text : doc.specNote {
+  left: 508px,
+  top: 544px,
+  contents: "on: its own colour"
+}
+
+lbl-chipWorkOn = text : doc.specLabel {
+  left: 713px,
+  top: 528px,
+  contents: "chipWorkOn"
+}
+
+lbl-chipSchoolOn = text : doc.specLabel {
+  left: 918px,
+  top: 528px,
+  contents: "chipSchoolOn"
+}
+
+@variants(chipStatesI10)
+chipStates = frame : doc.docBoard {
+  title: "Chip · states · i9",
+  left: 0px,
+  top: 768px,
+
+  body {
+    layout.stack.item-gap: 48px,
+    overrides: [
+      insert(row-1, after = .nil),
+      insert(row-2, after = row-1),
+      insert(row-3, after = row-2),
+      insert(row-4, after = row-3)
+    ]
+  }
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i9"
+      }
+    }
+
+    boardCaption {
+      contents: "Chip · every state"
+    }
+  }
+
+  row-1 = frame : doc.specRow {
+    layout.stack.item-gap: 48px,
+    overrides: [
+      insert(st-chip, after = .nil),
+      insert(st-chipHover, after = st-chip),
+      insert(st-chipFocus, after = st-chipHover),
+      insert(st-chipOn, after = st-chipFocus),
+      insert(st-chipOnHover, after = st-chipOn),
+      insert(st-chipPicked, after = st-chipOnHover),
+      insert(st-chipDisabled, after = st-chipPicked)
+    ]
+  }
+
+  row-2 = frame : doc.specRow {
+    layout.stack.item-gap: 48px,
+    overrides: [
+      insert(st-chipSm, after = .nil),
+      insert(st-chipCount, after = st-chipSm),
+      insert(st-chipAll, after = st-chipCount),
+      insert(st-chipAllOn, after = st-chipAll)
+    ]
+  }
+
+  row-3 = frame : doc.specRow {
+    layout.stack.item-gap: 48px,
+    overrides: [
+      insert(st-chipPiano, after = .nil),
+      insert(st-chipBeepbox, after = st-chipPiano),
+      insert(st-chipDaw, after = st-chipBeepbox),
+      insert(st-chipPersonal, after = st-chipDaw),
+      insert(st-chipWork, after = st-chipPersonal),
+      insert(st-chipSchool, after = st-chipWork)
+    ]
+  }
+
+  row-4 = frame : doc.specRow {
+    layout.stack.item-gap: 48px,
+    overrides: [
+      insert(st-chipPianoOn, after = .nil),
+      insert(st-chipBeepboxOn, after = st-chipPianoOn),
+      insert(st-chipDawOn, after = st-chipBeepboxOn),
+      insert(st-chipPersonalOn, after = st-chipDawOn),
+      insert(st-chipWorkOn, after = st-chipPersonalOn),
+      insert(st-chipSchoolOn, after = st-chipWorkOn)
+    ]
+  }
+
+  st-chip = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "chip"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "rest"
+    }
+
+    it = frame : chip {}
+  }
+
+  st-chipHover = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "chipHover"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "hover: lifts"
+    }
+
+    it = frame : chipHover {}
+  }
+
+  st-chipFocus = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "chipFocus"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "focus (keys)"
+    }
+
+    it = frame : chipFocus {}
+  }
+
+  st-chipOn = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "chipOn"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "on: a toggle that's on"
+    }
+
+    it = frame : chipOn {}
+  }
+
+  st-chipOnHover = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "chipOnHover"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "on + hover: the strike"
+    }
+
+    it = frame : chipOnHover {}
+  }
+
+  st-chipPicked = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "chipPicked"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "picked: a single choice"
+    }
+
+    it = frame : chipPicked {}
+  }
+
+  st-chipDisabled = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "chipDisabled"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "disabled: the zero facet"
+    }
+
+    it = frame : chipDisabled {}
+  }
+
+  st-chipSm = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "chipSm"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "sm (32)"
+    }
+
+    it = frame : chipSm {}
+  }
+
+  st-chipCount = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "chipCount"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "with a count"
+    }
+
+    it = frame : chipCount {}
+  }
+
+  st-chipAll = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "chipAll"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "All · rest"
+    }
+
+    it = frame : chipAll {}
+  }
+
+  st-chipAllOn = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "chipAllOn"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "All · on"
+    }
+
+    it = frame : chipAllOn {}
+  }
+
+  st-chipPiano = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "chipPiano"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "instrument · rest"
+    }
+
+    it = frame : chipPiano {}
+  }
+
+  st-chipBeepbox = frame : doc.spec {
+    label {
+      contents: "chipBeepbox"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    it = frame : chipBeepbox {}
+  }
+
+  st-chipDaw = frame : doc.spec {
+    label {
+      contents: "chipDaw"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    it = frame : chipDaw {}
+  }
+
+  st-chipPersonal = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "chipPersonal"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "project type · rest"
+    }
+
+    it = frame : chipPersonal {}
+  }
+
+  st-chipWork = frame : doc.spec {
+    label {
+      contents: "chipWork"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    it = frame : chipWork {}
+  }
+
+  st-chipSchool = frame : doc.spec {
+    label {
+      contents: "chipSchool"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    it = frame : chipSchool {}
+  }
+
+  st-chipPianoOn = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "chipPianoOn"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "on: its own colour"
+    }
+
+    it = frame : chipPianoOn {}
+  }
+
+  st-chipBeepboxOn = frame : doc.spec {
+    label {
+      contents: "chipBeepboxOn"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    it = frame : chipBeepboxOn {}
+  }
+
+  st-chipDawOn = frame : doc.spec {
+    label {
+      contents: "chipDawOn"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    it = frame : chipDawOn {}
+  }
+
+  st-chipPersonalOn = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "chipPersonalOn"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "on: its own colour"
+    }
+
+    it = frame : chipPersonalOn {}
+  }
+
+  st-chipWorkOn = frame : doc.spec {
+    label {
+      contents: "chipWorkOn"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    it = frame : chipWorkOn {}
+  }
+
+  st-chipSchoolOn = frame : doc.spec {
+    label {
+      contents: "chipSchoolOn"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    it = frame : chipSchoolOn {}
+  }
+}
+
+@variants(chipStatesI11)
+@context(i10="on")
+chipStatesI10 = frame : chipStates {
+  title: "Chip · states · i10",
+  left: 1382px,
+  top: 768px,
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i10"
+      }
+    }
+  }
+}
+
+@context(i10="on", i11="on")
+chipStatesI11 = frame : chipStatesI10 {
+  title: "Chip · states · i11",
+  left: 2764px,
+  top: 768px,
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i11"
+      }
+    }
+  }
+}

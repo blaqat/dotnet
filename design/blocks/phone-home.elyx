@@ -1,0 +1,206 @@
+import "tokens/space/space.elyx" as spc
+import "components/atoms/doc.elyx" as doc
+import "components/organisms/sheet.elyx" as sh
+import "components/organisms/phone-nav.elyx" as nv
+import "blocks/home-hero.elyx" as hero
+
+@with-context(section="home")
+file {}
+
+// Home on a phone (390 × 844), settled (?skip). The sheet fills the screen
+// (the cord frame 7, its corners 16); no brand row (the lockup is the
+// brand); the sound tag hangs 14 in from the right edge; the hero is one
+// centred column above the room the sheet keeps for the floating row,
+// where the sections pill (Home) rests alone: Home has no search. Every
+// iteration difference is a token (the hero's gaps, the type roles).
+// Children: `sheet` (`homeHero`), `layer`.
+export homePhone = frame {
+  title: "Home · phone",
+  left: 0px,
+  top: 40px,
+  width: spc.controls.phone-w,
+  height: spc.controls.phone-h,
+  overflow: .clip,
+  children: [sheet, layer],
+
+  sheet = frame : sh.sheetPhone {
+    left: 0px,
+    top: 0px,
+    width: 100%,
+    height: 100%,
+
+    paper {
+      height: 100%,
+
+      sheetNav {
+        display: .none
+      }
+
+      padding-bottom: spc.layout.bar-room-phone,
+
+      page {
+        overrides: [insert(homeHero, after = .nil)],
+        height: 100%,
+        padding-top: 0px,
+        padding-left: 0px,
+        padding-bottom: 0px,
+        padding-right: 0px
+      }
+    }
+
+    homeHero = frame : hero.homeHeroPhone {
+      width: 100%,
+      height: 100%
+    }
+  }
+
+  // the floating row: the sections pill (Home), no search knob
+  layer = frame : nv.phoneLayer {
+    left: 0px,
+    top: 0px,
+
+    dock {
+      row {
+        knobs {
+          display: .none
+        }
+      }
+    }
+  }
+}
+
+// The pill unspooled over Home.
+homePhoneMenu = frame : homePhone {
+  title: "Home · phone · sections menu open",
+  left: 470px,
+  top: 40px,
+
+  @with-variant(nv.phoneLayerMenu)
+  layer {
+    left: 0px
+  }
+}
+
+// ==== states page (labels over the definitions, then the states boards: i9 · i10 · i11) ====
+lbl-homePhone = text : doc.specLabel {
+  left: 0px,
+  top: 0px,
+  contents: "homePhone"
+}
+
+note-homePhone = text : doc.specNote {
+  left: 0px,
+  top: 16px,
+  contents: "Home on a phone"
+}
+
+lbl-homePhoneMenu = text : doc.specLabel {
+  left: 470px,
+  top: 0px,
+  contents: "homePhoneMenu"
+}
+
+note-homePhoneMenu = text : doc.specNote {
+  left: 470px,
+  top: 16px,
+  contents: "the sections menu open (example)"
+}
+
+@variants(homePhoneStatesI10)
+homePhoneStates = frame : doc.docBoard {
+  title: "Home · phone · states · i9",
+  left: 0px,
+  top: 1116px,
+
+  body {
+    layout.stack.item-gap: 48px,
+    overrides: [insert(row-1, after = .nil)]
+  }
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i9"
+      }
+    }
+
+    boardCaption {
+      contents: "Home · phone · every state"
+    }
+  }
+
+  row-1 = frame : doc.specRow {
+    layout.stack.item-gap: 48px,
+    overrides: [
+      insert(st-homePhone, after = .nil),
+      insert(st-homePhoneMenu, after = st-homePhone)
+    ]
+  }
+
+  st-homePhone = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "homePhone"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "Home on a phone"
+    }
+
+    it = frame : homePhone {}
+  }
+
+  st-homePhoneMenu = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "homePhoneMenu"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "the sections menu open (example)"
+    }
+
+    it = frame : homePhoneMenu {}
+  }
+}
+
+@variants(homePhoneStatesI11)
+@context(i10="on")
+homePhoneStatesI10 = frame : homePhoneStates {
+  title: "Home · phone · states · i10",
+  left: 1068px,
+  top: 1116px,
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i10"
+      }
+    }
+  }
+}
+
+@context(i10="on", i11="on")
+homePhoneStatesI11 = frame : homePhoneStatesI10 {
+  title: "Home · phone · states · i11",
+  left: 2136px,
+  top: 1116px,
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i11"
+      }
+    }
+  }
+}

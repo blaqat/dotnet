@@ -1,0 +1,1254 @@
+import "tokens/color/roles.elyx" as col
+import "tokens/space/space.elyx" as spc
+import "tokens/type/type.elyx" as typ
+import "components/atoms/text.elyx" as txt
+import "components/atoms/doc.elyx" as doc
+import "components/atoms/surface.elyx" as surf
+import "components/molecules/fact.elyx" as fct
+import "components/molecules/tag.elyx" as tg
+import "components/molecules/link-disc.elyx" as lnk
+import "components/molecules/button.elyx" as btn
+import "components/molecules/media-thumb.elyx" as mt
+import "components/organisms/post-card.elyx" as pc
+import "assets/icons/bold/arrow-left.svg" as backIcon
+import "assets/icons/bold/caret-left.svg" as prevIcon
+import "assets/icons/bold/caret-right.svg" as nextIcon
+
+// The detail shell (kit §18, Yarn.detail + Yarn.detailPage): one anatomy
+// for anything opened on its own page. A project's item page and an
+// opened article are both this shell with different content
+// (project-detail.elyx, article.elyx); the prose inside is prose.elyx.
+// One order: the top bar (← back; the pager ‹ n / N › and the copy-link
+// disc), the head (the facts as a label over the title, or the kicker;
+// the title; the dek), the body (media, then the prose column), the
+// closing row (BUILT WITH + the stack on the left, the link row on the
+// right, over a dashed rule). Beside the 760 column: the facts column
+// (`aside`) and the contents rail (`rail`), both hidden until used.
+// `detail`: the item size (a project: Display 38.5 Black in i9; the
+// detail text's measure). `detailLg` (`.ydetail--lg`, an article): the big
+// title, a section between the body's parts, the prose across the column.
+// i10 (`detailI10`, `detailLgI10`): the copy-link disc is the duotone one
+// (R7). i11: tokens (Display 36 / 500, the media a section above the
+// prose).
+// Children: `aside` (`f1` `f2` `f3`: asideFact), `column` (`bar`:
+// detailBar; `head`: detailHead; `body` > `prose`; `foot` (`stack`
+// (`stackHead`, `tags`: tg.tagStackRow), `links`: linkRow)), `rail`
+// (`tocHead`, `t1` `t2`: tocItem). Compose a page by inserting content:
+// `column { body { overrides: [insert(media, after = .nil)] prose {
+// overrides: [insert(p1)] } } }`, with `media`, `p1` declared on the
+// instance (detailMedia, pr.prosePSm…).
+// ---- the top bar
+// Back: ← and the page it returns to (once per page, on the title's edge).
+export detailBack = frame {
+  title: "Detail · back",
+  left: 0px,
+  top: 40px,
+  layout: {stack: {align-items: .center, item-gap: spc.layout.btn-d-gap}},
+  children: [backGlyph, backWord],
+
+  backGlyph = asset {
+    width: spc.controls.icon-sm,
+    height: spc.controls.icon-sm,
+    fill: col.roles.fg-2,
+    contents: backIcon
+  }
+
+  backWord = text : txt.labelCard {
+    contents: "Back",
+    fill[0].color: col.roles.fg-2
+  }
+}
+
+// A pager disc (‹ or ›): a plain white disc, the caret in ink.
+// `detailNavDiscOff`: the end of the list (a bare, faded caret).
+@variants(detailNavDiscOff)
+export detailNavDisc = frame : surf.disc {
+  title: "Detail · pager disc",
+  left: 912px,
+  top: 40px,
+  width: spc.controls.btn,
+  height: spc.controls.btn,
+  border[0].color: col.roles.disc-line,
+  border[0].position: .outside,
+  overrides: [insert(navGlyph, after = .nil)],
+
+  navGlyph = asset {
+    width: spc.controls.icon,
+    height: spc.controls.icon,
+    fill: col.roles.fg,
+    contents: nextIcon
+  }
+}
+
+export detailNavDiscOff = frame : detailNavDisc {
+  title: "Detail · pager disc · off",
+  left: 1824px,
+  top: 40px,
+  opacity: 0.45,
+  border[0].visible: .false,
+  fill[0].visible: .false,
+
+  navGlyph {
+    fill[0].color: col.roles.fg-3
+  }
+}
+
+// The bar: back on the left; the pager (‹ n / N ›) and the copy-link disc
+// on the right. Children: `back`, `pager` (`prev`, `count`, `next`, `copy`).
+@variants(detailBarI10)
+export detailBar = frame {
+  title: "Detail · top bar",
+  left: 0px,
+  top: 204px,
+  width: spc.controls.item-w,
+  height: spc.controls.item-bar,
+  layout: {stack: {justify-content: .space-between, align-items: .center}},
+  children: [back, pager],
+
+  back = frame : detailBack {}
+
+  pager = frame {
+    layout: {stack: {align-items: .center, item-gap: spc.layout.filter-gap}},
+    children: [prev, count, next, copy],
+
+    prev = frame : detailNavDisc {
+      navGlyph {
+        contents: prevIcon
+      }
+    }
+
+    count = text : txt.num {
+      contents: "1 / 12",
+      subrange[0].fill[0].color: col.roles.fg,
+      subrange[0].range: [0, 1]
+    }
+
+    next = frame : detailNavDisc {}
+
+    copy = frame : lnk.linkDisc {
+      width: spc.controls.btn,
+      height: spc.controls.btn,
+
+      glyph {
+        width: spc.controls.pj-disc-icon,
+        height: spc.controls.pj-disc-icon
+      }
+    }
+  }
+}
+
+// i10: the copy link is the duotone disc (R7).
+@context(i10="on")
+export detailBarI10 = frame : detailBar {
+  title: "Detail · top bar · i10",
+  left: 912px,
+  top: 204px,
+
+  pager {
+    @with-variant(lnk.linkDiscI10)
+    copy {}
+  }
+}
+
+// ---- the head
+// The title: Display at the item's size (i9 a Black 38.5; i11 36 / 500).
+// `detailTitleLg`: an article's (i9 Black 49.5; i10 40; i11 36 / 500).
+@variants(detailTitleLg)
+export detailTitle = text : txt.display {
+  title: "Detail · title",
+  left: 0px,
+  top: 394px,
+  contents: "blaqat.net (this site)",
+  font-size: typ.sizes.title-item,
+  font-style: typ.faces.title-item-style,
+  line-height: typ.leading.title-item,
+  letter-spacing: typ.tracking.title-item,
+  subrange[0].fill[0].color: col.roles.fg
+}
+
+export detailTitleLg = text : detailTitle {
+  title: "Detail · title · lg (an article)",
+  left: 912px,
+  top: 394px,
+  font-size: typ.sizes.article-title,
+  font-style: typ.faces.article-title-style,
+  line-height: typ.leading.article-title,
+  letter-spacing: typ.tracking.display
+}
+
+// The dek: one line under the title (an article's lede).
+export detailDek = text : txt.body {
+  title: "Detail · dek",
+  left: 1824px,
+  top: 394px,
+  contents: "One <audio> element, a root layout, and why the player kept restarting.",
+  font-size: typ.sizes.article-dek,
+  font-family: typ.faces.article-dek,
+  font-style: typ.faces.article-dek-style
+}
+
+// The head: the facts (a label over the title: type, status · how long, at
+// the page's Meta size), the kicker (an article's caps kicker: its type,
+// date, read time), the title, the dek. Hide what a page doesn't have:
+// the kicker and the dek are hidden here. Children: `facts` (`kind`,
+// `status`), `kicker` (pc.postKicker), `heading`, `dek`.
+export detailHead = frame {
+  title: "Detail · head",
+  left: 0px,
+  top: 564px,
+  width: spc.controls.item-w,
+  layout: {stack: {direction: .column, item-gap: spc.steps.s1}},
+  children: [facts, kicker, heading, dek],
+
+  facts = frame {
+    layout: {stack: {align-items: .center, item-gap: spc.steps.s4}},
+    padding: [spc.steps.s2, 0px, spc.steps.s1],
+    children: [kind, status],
+
+    kind = frame : fct.factPersonal {
+      height: .auto,
+
+      label {
+        font-size: typ.sizes.fact-page
+      }
+    }
+
+    status = frame : fct.factWip {
+      height: .auto,
+
+      label {
+        contents: "WIP since Sep 2025",
+        font-size: typ.sizes.fact-page
+      }
+
+      sub {
+        contents: "· 1 yr 3 mo",
+        font-size: typ.sizes.fact-page
+      }
+    }
+  }
+
+  kicker = frame : pc.postKicker {
+    width: .auto,
+    min-height: spc.controls.kick-row,
+    display: .none,
+    layout.stack.item-gap: spc.layout.chip-gap,
+    layout.stack.justify-content: .start,
+
+    lead {
+      extra {
+        x {
+          contents: "Nov 5, 2026"
+        }
+      }
+    }
+
+    date {
+      contents: "· 7 min read"
+    }
+  }
+
+  heading = text : detailTitle {
+    width: 100%
+  }
+
+  dek = text : detailDek {
+    width: 100%,
+    display: .none
+  }
+}
+
+// ---- the body's media
+// The media strip (Yarn.carousel, after the facts, never a hero): its
+// label (MEDIA + the count), then the thumbs (148 × 92). Children: `head`
+// (`mediaWord`, `mediaCount`), `strip` (`m1` `m2` `m3`; `m3` hidden).
+// A video the page can't play: `@with-variant(mt.mediaThumbMissing) m2 {}`.
+export detailMedia = frame {
+  title: "Detail · media strip",
+  left: 912px,
+  top: 564px,
+  layout: {stack: {direction: .column, item-gap: spc.steps.s2}},
+  children: [head, strip],
+
+  head = frame {
+    layout: {stack: {align-items: .center, item-gap: spc.layout.filter-gap}},
+    children: [mediaWord, mediaCount],
+
+    mediaWord = text : txt.micro {
+      contents: "MEDIA",
+      fill[0].color: col.roles.fg-3
+    }
+
+    mediaCount = text : txt.meta {
+      contents: "2"
+    }
+  }
+
+  strip = frame {
+    layout: {stack: {item-gap: spc.steps.s3}},
+    children: [m1, m2, m3],
+
+    m1 = frame : mt.mediaThumb {
+      width: spc.controls.pj-media-w,
+      height: spc.controls.pj-media-h,
+      corner-radius: spc.radii.pj-media
+    }
+
+    m2 = frame : mt.mediaThumb {
+      width: spc.controls.pj-media-w,
+      height: spc.controls.pj-media-h,
+      corner-radius: spc.radii.pj-media
+    }
+
+    m3 = frame : mt.mediaThumb {
+      width: spc.controls.pj-media-w,
+      height: spc.controls.pj-media-h,
+      display: .none,
+      corner-radius: spc.radii.pj-media
+    }
+  }
+}
+
+// ---- the link row (Yarn.dlinks): the first is the one primary (i9 red,
+// ink from i10), the rest link buttons. Children: `primary`, `secondary`.
+export linkRow = frame {
+  title: "Detail · link row",
+  left: 1824px,
+  top: 564px,
+  layout: {stack: {align-items: .center, item-gap: spc.steps.s2}},
+  children: [primary, secondary],
+
+  primary = frame : btn.btnPrimary {
+    height: spc.controls.btn-d,
+    padding-left: spc.layout.btn-d-l,
+    padding-right: spc.layout.btn-d-r,
+    layout.stack.item-gap: spc.layout.btn-d-gap,
+
+    @with-variant(txt.labelCard)
+    label {}
+
+    glyph {
+      width: spc.controls.btn-d-icon,
+      height: spc.controls.btn-d-icon
+    }
+  }
+
+  secondary = frame : btn.btnD {
+    label {
+      contents: "Source"
+    }
+  }
+}
+
+// ---- beside the column
+// A fact in the facts column (an article's `aside`): a Micro caps eyebrow
+// over its value. Children: `eyebrow`, `value`.
+export asideFact = frame {
+  title: "Detail · aside fact",
+  left: 2736px,
+  top: 40px,
+  width: spc.controls.article-aside-w,
+  layout: {stack: {direction: .column, item-gap: spc.steps.s1}},
+  children: [eyebrow, value],
+
+  eyebrow = text : txt.micro {
+    contents: "POSTED",
+    letter-spacing: typ.tracking.caps,
+    fill[0].color: col.roles.fg-3
+  }
+
+  value = text : txt.label {
+    contents: "Nov 5, 2026"
+  }
+}
+
+// An entry in the contents rail ("On this page"): an h2 at rest (an open
+// dot). `tocItemCurrent`: the heading you're at (the dot filled, ringed);
+// `tocItemSub`: an h3 (a smaller dot, indented, Label at card size).
+// Children: `dot`, `words`.
+@variants(tocItemCurrent, tocItemSub)
+export tocItem = frame {
+  title: "Detail · contents entry",
+  left: 3648px,
+  top: 40px,
+  layout: {stack: {align-items: .center, item-gap: spc.steps.s2}},
+  children: [dot, words],
+
+  dot = frame {
+    width: spc.steps.s3,
+    height: spc.steps.s3,
+    border: col.roles.fg-3,
+    corner-radius: spc.radii.pill
+  }
+
+  words = text : txt.label {
+    contents: "The problem",
+    fill[0].color: col.roles.fg-2
+  }
+}
+
+export tocItemCurrent = frame : tocItem {
+  title: "Detail · contents entry · current",
+  left: 3840px,
+  top: 40px,
+
+  dot {
+    fill[0].color: col.roles.now,
+    border[0].color: col.roles.line,
+    border[0].width: 2px,
+    border[0].position: .outside
+  }
+}
+
+export tocItemSub = frame : tocItem {
+  title: "Detail · contents entry · h3",
+  left: 4007px,
+  top: 40px,
+  padding-left: spc.steps.s3,
+
+  @with-variant(txt.labelCard)
+  words {
+    contents: "What moved"
+  }
+
+  dot {
+    width: spc.steps.s2,
+    height: spc.steps.s2
+  }
+}
+
+// ---- the shell
+@variants(detailI10, detailLg)
+export detail = frame {
+  title: "Detail · the page (item size)",
+  left: 0px,
+  top: 800px,
+  layout: {stack: {}},
+  children: [aside, column, rail],
+
+  // the facts column (an article's): hidden until a page uses it
+  aside = frame {
+    display: .none,
+    layout: {stack: {direction: .column, item-gap: spc.steps.s4}},
+    padding-top: spc.controls.item-bar,
+    padding-right: spc.controls.article-aside-gap,
+    children: [f1, f2, f3],
+
+    f1 = frame : asideFact {}
+
+    f2 = frame : asideFact {
+      eyebrow {
+        contents: "READING TIME"
+      }
+
+      value {
+        contents: "7 minutes"
+      }
+    }
+
+    f3 = frame : asideFact {
+      eyebrow {
+        contents: "TAGS"
+      }
+
+      value {
+        contents: "#svelte #learnings"
+      }
+    }
+  }
+
+  // the 760 column
+  column = frame {
+    width: spc.controls.item-w,
+    layout: {stack: {direction: .column}},
+    children: [bar, head, body, foot],
+
+    bar = frame : detailBar {
+      width: 100%
+    }
+
+    head = frame : detailHead {
+      width: 100%
+    }
+
+    // the media and the prose (insert them); i11: a section apart
+    body = frame {
+      width: 100%,
+      layout: {stack: {direction: .column, item-gap: spc.layout.pj-item-gap}},
+      padding: [spc.layout.pj-item-pad, 0px],
+      children: prose,
+
+      // the text at its measure (.ydetail__text); insert prose blocks
+      prose = frame {
+        width: spc.controls.prose-w,
+        layout: {stack: {direction: .column, item-gap: spc.steps.s3}}
+      }
+    }
+
+    // the closing row, over a dashed rule: what it's built with, then
+    // where it lives
+    foot = frame {
+      width: 100%,
+      layout: {stack: {justify-content: .space-between, align-items: .end}},
+      border: {
+        color: col.roles.line,
+        width: spc.layout.stitch-w-sm,
+        dash: [4px, 4px],
+        sides: .top
+      },
+      padding: [spc.steps.s4, 0px, spc.steps.s5],
+      children: [stack, links],
+
+      stack = frame {
+        layout: {stack: {direction: .column, item-gap: spc.steps.s3}},
+        children: [stackHead, tags],
+
+        stackHead = text : txt.micro {
+          contents: "BUILT WITH",
+          fill[0].color: col.roles.fg-3
+        }
+
+        // as tall as the buttons, so the tags sit on their centre line
+        tags = frame : tg.tagStackRow {
+          min-height: spc.controls.btn-d
+        }
+      }
+
+      links = frame : linkRow {}
+    }
+  }
+
+  // "On this page": the contents rail, the current heading's dot filled
+  rail = frame {
+    display: .none,
+    layout: {stack: {direction: .column, item-gap: spc.steps.s3}},
+    padding: [spc.controls.item-bar, 0px, 0px, spc.controls.article-toc-gap],
+    children: [tocHead, t1, t2],
+
+    tocHead = text : txt.micro {
+      contents: "ON THIS PAGE",
+      letter-spacing: typ.tracking.caps,
+      fill[0].color: col.roles.fg-3
+    }
+
+    t1 = frame : tocItemCurrent {}
+
+    t2 = frame : tocItemSub {}
+  }
+}
+
+// i10: the duotone copy-link disc.
+@context(i10="on")
+export detailI10 = frame : detail {
+  title: "Detail · the page · i10",
+  left: 912px,
+  top: 800px,
+
+  column {
+    @with-variant(detailBarI10)
+    bar {}
+  }
+}
+
+// An article's size (.ydetail--lg): the big title, a section between the
+// body's parts, the prose across the column (.yprose).
+@variants(detailLgI10)
+export detailLg = frame : detail {
+  title: "Detail · the page · lg (an article)",
+  left: 1824px,
+  top: 800px,
+
+  column {
+    body {
+      prose {
+        width: 100%,
+        layout.stack.item-gap: spc.steps.s5
+      }
+
+      layout.stack.item-gap: spc.layout.section-gap,
+      padding-top: spc.steps.s5,
+      padding-bottom: spc.steps.s5
+    }
+
+    head {
+      @with-variant(detailTitleLg)
+      heading {}
+    }
+  }
+}
+
+@context(i10="on")
+export detailLgI10 = frame : detailLg {
+  title: "Detail · the page · lg · i10",
+  left: 2736px,
+  top: 800px,
+
+  column {
+    @with-variant(detailBarI10)
+    bar {}
+  }
+}
+
+// ==== states page (labels over the definitions, then the states boards: i9 · i10 · i11) ====
+lbl-detailBack = text : doc.specLabel {
+  left: 0px,
+  top: 0px,
+  contents: "detailBack"
+}
+
+lbl-detailNavDisc = text : doc.specLabel {
+  left: 912px,
+  top: 0px,
+  contents: "detailNavDisc"
+}
+
+note-detailNavDisc = text : doc.specNote {
+  left: 912px,
+  top: 16px,
+  contents: "the pager's disc"
+}
+
+lbl-detailNavDiscOff = text : doc.specLabel {
+  left: 1824px,
+  top: 0px,
+  contents: "detailNavDiscOff"
+}
+
+note-detailNavDiscOff = text : doc.specNote {
+  left: 1824px,
+  top: 16px,
+  contents: "off: the end of the list"
+}
+
+lbl-asideFact = text : doc.specLabel {
+  left: 2736px,
+  top: 0px,
+  contents: "asideFact"
+}
+
+note-asideFact = text : doc.specNote {
+  left: 2736px,
+  top: 16px,
+  contents: "a fact in the aside"
+}
+
+lbl-tocItem = text : doc.specLabel {
+  left: 3648px,
+  top: 0px,
+  contents: "tocItem"
+}
+
+note-tocItem = text : doc.specNote {
+  left: 3648px,
+  top: 16px,
+  contents: "a contents item · h2"
+}
+
+lbl-tocItemCurrent = text : doc.specLabel {
+  left: 3840px,
+  top: 0px,
+  contents: "tocItemCurrent"
+}
+
+note-tocItemCurrent = text : doc.specNote {
+  left: 3840px,
+  top: 16px,
+  contents: "current"
+}
+
+lbl-tocItemSub = text : doc.specLabel {
+  left: 4007px,
+  top: 0px,
+  contents: "tocItemSub"
+}
+
+note-tocItemSub = text : doc.specNote {
+  left: 4007px,
+  top: 16px,
+  contents: "h3"
+}
+
+lbl-detailBar = text : doc.specLabel {
+  left: 0px,
+  top: 164px,
+  contents: "detailBar"
+}
+
+note-detailBar = text : doc.specNote {
+  left: 0px,
+  top: 180px,
+  contents: "back, pager, copy link"
+}
+
+lbl-detailBarI10 = text : doc.specLabel {
+  left: 912px,
+  top: 164px,
+  contents: "detailBarI10"
+}
+
+note-detailBarI10 = text : doc.specNote {
+  left: 912px,
+  top: 180px,
+  contents: "i10 · the duotone disc"
+}
+
+lbl-detailTitle = text : doc.specLabel {
+  left: 0px,
+  top: 354px,
+  contents: "detailTitle"
+}
+
+note-detailTitle = text : doc.specNote {
+  left: 0px,
+  top: 370px,
+  contents: "item size"
+}
+
+lbl-detailTitleLg = text : doc.specLabel {
+  left: 912px,
+  top: 354px,
+  contents: "detailTitleLg"
+}
+
+note-detailTitleLg = text : doc.specNote {
+  left: 912px,
+  top: 370px,
+  contents: "an article"
+}
+
+lbl-detailDek = text : doc.specLabel {
+  left: 1824px,
+  top: 354px,
+  contents: "detailDek"
+}
+
+lbl-detailHead = text : doc.specLabel {
+  left: 0px,
+  top: 524px,
+  contents: "detailHead"
+}
+
+note-detailHead = text : doc.specNote {
+  left: 0px,
+  top: 540px,
+  contents: "facts, (kicker), title, (dek)"
+}
+
+lbl-detailMedia = text : doc.specLabel {
+  left: 912px,
+  top: 524px,
+  contents: "detailMedia"
+}
+
+note-detailMedia = text : doc.specNote {
+  left: 912px,
+  top: 540px,
+  contents: "the media strip"
+}
+
+lbl-linkRow = text : doc.specLabel {
+  left: 1824px,
+  top: 524px,
+  contents: "linkRow"
+}
+
+note-linkRow = text : doc.specNote {
+  left: 1824px,
+  top: 540px,
+  contents: "primary + link buttons"
+}
+
+lbl-detail = text : doc.specLabel {
+  left: 0px,
+  top: 760px,
+  contents: "detail"
+}
+
+note-detail = text : doc.specNote {
+  left: 0px,
+  top: 776px,
+  contents: "the shell (item size, empty body)"
+}
+
+lbl-detailI10 = text : doc.specLabel {
+  left: 912px,
+  top: 760px,
+  contents: "detailI10"
+}
+
+note-detailI10 = text : doc.specNote {
+  left: 912px,
+  top: 776px,
+  contents: "i10"
+}
+
+lbl-detailLg = text : doc.specLabel {
+  left: 1824px,
+  top: 760px,
+  contents: "detailLg"
+}
+
+note-detailLg = text : doc.specNote {
+  left: 1824px,
+  top: 776px,
+  contents: "an article's size"
+}
+
+lbl-detailLgI10 = text : doc.specLabel {
+  left: 2736px,
+  top: 760px,
+  contents: "detailLgI10"
+}
+
+note-detailLgI10 = text : doc.specNote {
+  left: 2736px,
+  top: 776px,
+  contents: "i10 · an article's size"
+}
+
+@variants(detailStatesI10)
+detailStates = frame : doc.docBoard {
+  title: "Detail shell + parts · states · i9",
+  left: 0px,
+  top: 1250px,
+
+  body {
+    layout.stack.item-gap: 48px,
+    overrides: [
+      insert(row-1, after = .nil),
+      insert(row-2, after = row-1),
+      insert(row-3, after = row-2),
+      insert(row-4, after = row-3),
+      insert(row-5, after = row-4),
+      insert(row-6, after = row-5),
+      insert(row-7, after = row-6),
+      insert(row-8, after = row-7)
+    ]
+  }
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i9"
+      }
+    }
+
+    boardCaption {
+      contents: "Detail shell + parts · every state"
+    }
+  }
+
+  row-1 = frame : doc.specRow {
+    layout.stack.item-gap: 48px,
+    overrides: [
+      insert(st-detailBack, after = .nil),
+      insert(st-detailNavDisc, after = st-detailBack),
+      insert(st-detailNavDiscOff, after = st-detailNavDisc),
+      insert(st-asideFact, after = st-detailNavDiscOff),
+      insert(st-tocItem, after = st-asideFact),
+      insert(st-tocItemCurrent, after = st-tocItem),
+      insert(st-tocItemSub, after = st-tocItemCurrent)
+    ]
+  }
+
+  row-2 = frame : doc.specRow {
+    layout.stack.item-gap: 48px,
+    overrides: [insert(st-detailBar, after = .nil)]
+  }
+
+  row-3 = frame : doc.specRow {
+    layout.stack.item-gap: 48px,
+    overrides: [
+      insert(st-detailTitle, after = .nil),
+      insert(st-detailTitleLg, after = st-detailTitle)
+    ]
+  }
+
+  row-4 = frame : doc.specRow {
+    layout.stack.item-gap: 48px,
+    overrides: [insert(st-detailDek, after = .nil)]
+  }
+
+  row-5 = frame : doc.specRow {
+    layout.stack.item-gap: 48px,
+    overrides: [
+      insert(st-detailHead, after = .nil),
+      insert(st-linkRow, after = st-detailHead)
+    ]
+  }
+
+  row-6 = frame : doc.specRow {
+    layout.stack.item-gap: 48px,
+    overrides: [insert(st-detailMedia, after = .nil)]
+  }
+
+  row-7 = frame : doc.specRow {
+    layout.stack.item-gap: 48px,
+    overrides: [insert(st-detail, after = .nil)]
+  }
+
+  row-8 = frame : doc.specRow {
+    layout.stack.item-gap: 48px,
+    overrides: [insert(st-detailLg, after = .nil)]
+  }
+
+  st-detailBack = frame : doc.spec {
+    label {
+      contents: "detailBack"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    it = frame : detailBack {}
+  }
+
+  st-detailNavDisc = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "detailNavDisc"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "the pager's disc"
+    }
+
+    it = frame : detailNavDisc {}
+  }
+
+  st-detailNavDiscOff = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "detailNavDiscOff"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "off: the end of the list"
+    }
+
+    it = frame : detailNavDiscOff {}
+  }
+
+  st-asideFact = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "asideFact"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "a fact in the aside"
+    }
+
+    it = frame : asideFact {}
+  }
+
+  st-tocItem = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "tocItem"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "a contents item · h2"
+    }
+
+    it = frame : tocItem {}
+  }
+
+  st-tocItemCurrent = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "tocItemCurrent"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "current"
+    }
+
+    it = frame : tocItemCurrent {}
+  }
+
+  st-tocItemSub = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "tocItemSub"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "h3"
+    }
+
+    it = frame : tocItemSub {}
+  }
+
+  st-detailBar = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "detailBar"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "back, pager, copy link"
+    }
+
+    it = frame : detailBar {}
+  }
+
+  st-detailTitle = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "detailTitle"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "item size"
+    }
+
+    it = text : detailTitle {}
+  }
+
+  st-detailTitleLg = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "detailTitleLg"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "an article"
+    }
+
+    it = text : detailTitleLg {}
+  }
+
+  st-detailDek = frame : doc.spec {
+    label {
+      contents: "detailDek"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    it = text : detailDek {}
+  }
+
+  st-detailHead = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "detailHead"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "facts, (kicker), title, (dek)"
+    }
+
+    it = frame : detailHead {}
+  }
+
+  st-linkRow = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "linkRow"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "primary + link buttons"
+    }
+
+    it = frame : linkRow {}
+  }
+
+  st-detailMedia = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "detailMedia"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "the media strip"
+    }
+
+    it = frame : detailMedia {}
+  }
+
+  st-detail = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "detail"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "the shell (item size, empty body)"
+    }
+
+    it = frame : detail {}
+  }
+
+  st-detailLg = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "detailLg"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "an article's size"
+    }
+
+    it = frame : detailLg {}
+  }
+}
+
+@variants(detailStatesI11)
+@context(i10="on")
+detailStatesI10 = frame : detailStates {
+  title: "Detail shell + parts · states · i10",
+  left: 1395px,
+  top: 1250px,
+
+  body {
+    row-8 {
+      st-detailLg {
+        slot {
+          @with-variant(detailLgI10)
+          it {}
+        }
+
+        note {
+          contents: "i10 · an article's size"
+        }
+
+        label {
+          contents: "detailLgI10"
+        }
+      }
+    }
+
+    row-7 {
+      st-detail {
+        slot {
+          @with-variant(detailI10)
+          it {}
+        }
+
+        note {
+          contents: "i10"
+        }
+
+        label {
+          contents: "detailI10"
+        }
+      }
+    }
+
+    row-2 {
+      st-detailBar {
+        slot {
+          @with-variant(detailBarI10)
+          it {}
+        }
+
+        note {
+          contents: "i10 · the duotone disc"
+        }
+
+        label {
+          contents: "detailBarI10"
+        }
+      }
+    }
+  }
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i10"
+      }
+    }
+  }
+}
+
+@context(i10="on", i11="on")
+detailStatesI11 = frame : detailStatesI10 {
+  title: "Detail shell + parts · states · i11",
+  left: 2776px,
+  top: 1250px,
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i11"
+      }
+    }
+  }
+}

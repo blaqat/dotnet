@@ -1,0 +1,11 @@
+import "./sections.elyx" as base
+import "./palette.elyx" as p
+
+@context(section=studio)
+file {}
+
+export studioSection = tokens : base.section {
+  sec: p.palette.ink,
+  sec-deep: p.palette.ink-2,
+  sec-soft: p.palette.cotton-2
+}

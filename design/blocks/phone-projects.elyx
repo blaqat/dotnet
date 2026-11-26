@@ -1,0 +1,410 @@
+import "tokens/space/space.elyx" as spc
+import "components/atoms/doc.elyx" as doc
+import "components/molecules/sections-pill.elyx" as spl
+import "components/organisms/sheet.elyx" as sh
+import "components/organisms/page-header.elyx" as head
+import "components/organisms/project.elyx" as pj
+import "components/organisms/phone-nav.elyx" as nv
+import "blocks/projects-grid.elyx" as pg
+
+@with-context(section="projects")
+file {}
+
+// Projects · grid on a phone (390 × 844): "Projects." at the phone's
+// Display, then the years (each its ruled pill) with one column of phone
+// cards: the project component's row layout (`pj.projectRow`: the thumb
+// first) grown into a slim card: the thumb 72 square top-left, the title,
+// the facts and two lines of the description beside it; no stack, no
+// links (the card opens the project). No tools line: search and the
+// filters are the floating knob. The floating row: Projects' pill and the
+// search knob. The cards are `blocks/projects-grid.elyx`'s (the real
+// projects), so every iteration is the same structure; the tokens give
+// i9's felt facts and Black title, i10's calm, i11's inset / radius 24 / 8.
+// Children: `sheet` (`header`, `list`), `layer`.
+export projectsPhone = frame {
+  title: "Projects · grid · phone",
+  left: 0px,
+  top: 40px,
+  width: spc.controls.phone-w,
+  height: spc.controls.phone-h,
+  overflow: .clip,
+  children: [sheet, layer],
+
+  sheet = frame : sh.sheetPhone {
+    left: 0px,
+    top: 0px,
+    width: 100%,
+
+    paper {
+      page {
+        overrides: [insert(header, after = .nil), insert(list, after = header)]
+      }
+    }
+
+    header = frame : head.pageHeaderPhone {
+      width: spc.controls.page-w-phone,
+
+      headText {
+        headLine {
+          titleLine {
+            title {
+              contents: "Projects"
+            }
+          }
+        }
+      }
+    }
+
+    // 2025 and 2024 (the years after them run on under the fold)
+    list = frame : pg.projectsGrid {
+      width: 100%,
+      layout.stack.item-gap: spc.layout.group-gap-phone,
+
+      y2020 {
+        display: .none
+      }
+
+      y2021 {
+        display: .none
+      }
+
+      y2023 {
+        display: .none
+      }
+
+      y2024 {
+        cards {
+          layout.grid.columns: 1fr,
+          layout.grid.row-gap: spc.layout.gutter-phone,
+
+          @with-variant(pj.projectRow)
+          c4 {
+            cols {
+              side {
+                media {
+                  width: spc.controls.pj-thumb-phone,
+                  height: spc.controls.pj-thumb-phone
+                }
+              }
+
+              info {
+                main {
+                  descBox {
+                    max-height: spc.controls.pj-desc-h-phone
+                  }
+                }
+
+                stack {
+                  display: .none
+                }
+              }
+
+              layout.grid.column-gap: spc.layout.pj-row-in-phone
+            }
+
+            padding-top: spc.layout.inset-phone,
+            padding-left: spc.layout.inset-phone,
+            padding-bottom: spc.layout.inset-phone,
+            padding-right: spc.layout.inset-phone
+          }
+
+          @with-variant(pj.projectRow)
+          c3 {
+            cols {
+              side {
+                media {
+                  width: spc.controls.pj-thumb-phone,
+                  height: spc.controls.pj-thumb-phone
+                }
+              }
+
+              info {
+                main {
+                  descBox {
+                    max-height: spc.controls.pj-desc-h-phone
+                  }
+                }
+
+                stack {
+                  display: .none
+                }
+              }
+
+              layout.grid.column-gap: spc.layout.pj-row-in-phone
+            }
+
+            padding-top: spc.layout.inset-phone,
+            padding-left: spc.layout.inset-phone,
+            padding-bottom: spc.layout.inset-phone,
+            padding-right: spc.layout.inset-phone
+          }
+
+          @with-variant(pj.projectRow)
+          c2 {
+            cols {
+              side {
+                media {
+                  width: spc.controls.pj-thumb-phone,
+                  height: spc.controls.pj-thumb-phone
+                }
+              }
+
+              info {
+                main {
+                  descBox {
+                    max-height: spc.controls.pj-desc-h-phone
+                  }
+                }
+
+                stack {
+                  display: .none
+                }
+              }
+
+              layout.grid.column-gap: spc.layout.pj-row-in-phone
+            }
+
+            padding-top: spc.layout.inset-phone,
+            padding-left: spc.layout.inset-phone,
+            padding-bottom: spc.layout.inset-phone,
+            padding-right: spc.layout.inset-phone
+          }
+
+          @with-variant(pj.projectRow)
+          c1 {
+            cols {
+              side {
+                media {
+                  width: spc.controls.pj-thumb-phone,
+                  height: spc.controls.pj-thumb-phone
+                }
+              }
+
+              info {
+                main {
+                  descBox {
+                    max-height: spc.controls.pj-desc-h-phone
+                  }
+                }
+
+                stack {
+                  display: .none
+                }
+              }
+
+              layout.grid.column-gap: spc.layout.pj-row-in-phone
+            }
+
+            padding-top: spc.layout.inset-phone,
+            padding-left: spc.layout.inset-phone,
+            padding-bottom: spc.layout.inset-phone,
+            padding-right: spc.layout.inset-phone
+          }
+        }
+      }
+
+      y2025 {
+        cards {
+          layout.grid.columns: 1fr,
+          layout.grid.row-gap: spc.layout.gutter-phone,
+
+          @with-variant(pj.projectRow)
+          c2 {
+            cols {
+              side {
+                media {
+                  width: spc.controls.pj-thumb-phone,
+                  height: spc.controls.pj-thumb-phone
+                }
+              }
+
+              info {
+                main {
+                  descBox {
+                    max-height: spc.controls.pj-desc-h-phone
+                  }
+                }
+
+                stack {
+                  display: .none
+                }
+              }
+
+              layout.grid.column-gap: spc.layout.pj-row-in-phone
+            }
+
+            padding-top: spc.layout.inset-phone,
+            padding-left: spc.layout.inset-phone,
+            padding-bottom: spc.layout.inset-phone,
+            padding-right: spc.layout.inset-phone
+          }
+
+          @with-variant(pj.projectRow)
+          c1 {
+            cols {
+              side {
+                media {
+                  width: spc.controls.pj-thumb-phone,
+                  height: spc.controls.pj-thumb-phone
+                }
+              }
+
+              info {
+                main {
+                  descBox {
+                    max-height: spc.controls.pj-desc-h-phone
+                  }
+                }
+
+                stack {
+                  display: .none
+                }
+              }
+
+              layout.grid.column-gap: spc.layout.pj-row-in-phone
+            }
+
+            padding-top: spc.layout.inset-phone,
+            padding-left: spc.layout.inset-phone,
+            padding-bottom: spc.layout.inset-phone,
+            padding-right: spc.layout.inset-phone
+          }
+        }
+      }
+    }
+  }
+
+  // the floating row: Projects' pill, the search knob
+  layer = frame : nv.phoneLayer {
+    left: 0px,
+    top: 0px,
+
+    dock {
+      row {
+        spool {
+          @with-variant(spl.sectionsPillProjects)
+          pill {}
+        }
+      }
+    }
+  }
+}
+
+// ==== states page (labels over the definitions, then the states boards: i9 · i10 · i11) ====
+lbl-projectsPhone = text : doc.specLabel {
+  left: 0px,
+  top: 0px,
+  contents: "projectsPhone"
+}
+
+note-projectsPhone = text : doc.specNote {
+  left: 0px,
+  top: 16px,
+  contents: "i9 / i10 / i11: tokens"
+}
+
+@variants(projectsPhoneStatesI10)
+projectsPhoneStates = frame : doc.docBoard {
+  title: "Projects · phone · states · i9",
+  left: 0px,
+  top: 1116px,
+
+  body {
+    layout.stack.item-gap: 48px,
+    overrides: [insert(row-1, after = .nil)]
+  }
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i9"
+      }
+    }
+
+    boardCaption {
+      contents: "Projects · phone · every state"
+    }
+  }
+
+  row-1 = frame : doc.specRow {
+    layout.stack.item-gap: 48px,
+    overrides: [insert(st-projectsPhone, after = .nil)]
+  }
+
+  st-projectsPhone = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "projectsPhone"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "i9 / i10 / i11: tokens"
+    }
+
+    it = frame : projectsPhone {}
+  }
+}
+
+@variants(projectsPhoneStatesI11)
+@context(i10="on")
+projectsPhoneStatesI10 = frame : projectsPhoneStates {
+  title: "Projects · phone · states · i10",
+  left: 614px,
+  top: 1116px,
+
+  body {
+    row-1 {
+      st-projectsPhone {
+        slot {
+          it {
+            sheet {
+              fill[1].image.sizing.scale: 3.44
+            }
+          }
+        }
+      }
+    }
+  }
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i10"
+      }
+    }
+  }
+}
+
+@context(i10="on", i11="on")
+projectsPhoneStatesI11 = frame : projectsPhoneStatesI10 {
+  title: "Projects · phone · states · i11",
+  left: 1228px,
+  top: 1116px,
+
+  body {
+    row-1 {
+      st-projectsPhone {
+        slot {
+          it {
+            sheet {
+              fill[1].image.sizing.scale: 3.4
+            }
+          }
+        }
+      }
+    }
+  }
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i11"
+      }
+    }
+  }
+}

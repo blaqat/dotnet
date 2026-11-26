@@ -1,0 +1,419 @@
+import "tokens/color/roles.elyx" as col
+import "tokens/color/palette.elyx" as pal
+import "tokens/space/space.elyx" as spc
+import "components/atoms/doc.elyx" as doc
+
+// The dashed stitch. Put it as the first child of a surface with
+// `ignore-stack: .true`; it pins to all four edges at `stitch-in`.
+// Override corner-radius to (surface radius − stitch-in).
+export stitch = frame {
+  title: "Stitch",
+  left: 0px,
+  top: 40px,
+  width: 120px,
+  height: 60px,
+  border: {
+    color: col.roles.stitch,
+    width: spc.layout.stitch-w,
+    dash: [5px, 4px]
+  },
+  corner-radius: 10px
+}
+
+// A card's surface. Instances insert content after `patchStitch`.
+@variants(patchLifted)
+export patch = frame {
+  title: "Patch",
+  left: 0px,
+  top: 236px,
+  width: 320px,
+  height: .auto,
+  min-height: 96px,
+  layout: {stack: {direction: .column, item-gap: spc.layout.stack-loose}},
+  fill: col.roles.surface,
+  shadow: [
+    {
+      drop-shadow: {
+        color: pal.palette.shadow-1,
+        offset: point(0px, 1px),
+        blur-radius: 0px
+      }
+    },
+    {
+      drop-shadow: {
+        color: pal.palette.shadow-1,
+        offset: point(0px, 2px),
+        blur-radius: 6px
+      }
+    }
+  ],
+  corner-radius: spc.radii.card,
+  padding: [spc.layout.inset-y, spc.layout.inset-x],
+  children: patchStitch,
+
+  patchStitch = frame : stitch {
+    left: spc.layout.stitch-in,
+    top: spc.layout.stitch-in,
+    right: spc.layout.stitch-in,
+    bottom: spc.layout.stitch-in,
+    width: .nil,
+    height: .nil,
+    ignore-stack: .true,
+    corner-radius: spc.radii.inner
+  }
+}
+
+// Hover: lifts 2px with the lift shadow.
+export patchLifted = frame : patch {
+  title: "Patch · hover",
+  left: 384px,
+  top: 236px,
+  shadow[0].drop-shadow.offset: [0px, 2px],
+  shadow[1].drop-shadow.blur-radius: 22px,
+  shadow[1].drop-shadow.color: pal.palette.shadow-lift,
+  shadow[1].drop-shadow.offset: [0px, 10px]
+}
+
+// The rope: a chosen single option. Lay it over the element as the last
+// child (`ignore-stack`, pinned 0 on all sides) and match its radius.
+@variants(ropeHere)
+export rope = frame {
+  title: "Rope · pick",
+  left: 0px,
+  top: 468px,
+  width: 120px,
+  height: 44px,
+  border: [{color: col.roles.pick-a, width: 4px}, col.roles.pick-b],
+  corner-radius: spc.radii.pill
+}
+
+// The nav's current tab ("here"); section-coloured from i10.
+export ropeHere = frame : rope {
+  title: "Rope · here",
+  left: 384px,
+  top: 468px,
+  border[0].color: col.roles.here-a,
+  border[1].color: col.roles.here-b
+}
+
+// Focus (keys only): a dark 3px thread ring, 3px outside the control. Lay
+// it over the control as the last child of its …Focus variant
+// (`ignore-stack`, pinned spc.layout.focus-out on all sides) and match the
+// control's radius (a pill stays a pill).
+export focusRing = frame {
+  title: "Focus ring",
+  left: 768px,
+  top: 40px,
+  width: 120px,
+  height: 44px,
+  border: {color: col.roles.focus, width: spc.layout.focus-w},
+  corner-radius: spc.radii.pill
+}
+
+// A round felt base: link discs, the +, the play button.
+export disc = frame {
+  title: "Disc",
+  left: 384px,
+  top: 40px,
+  width: spc.controls.disc,
+  height: spc.controls.disc,
+  layout: {stack: {justify-content: .center, align-items: .center}},
+  fill: col.roles.surface,
+  border: col.roles.line,
+  corner-radius: spc.radii.pill
+}
+
+// ==== states page (labels over the definitions, then the states boards: i9 · i10 · i11) ====
+lbl-stitch = text : doc.specLabel {
+  left: 0px,
+  top: 0px,
+  contents: "stitch"
+}
+
+note-stitch = text : doc.specNote {
+  left: 0px,
+  top: 16px,
+  contents: "the dashed stitch"
+}
+
+lbl-disc = text : doc.specLabel {
+  left: 384px,
+  top: 0px,
+  contents: "disc"
+}
+
+note-disc = text : doc.specNote {
+  left: 384px,
+  top: 16px,
+  contents: "a round felt base"
+}
+
+lbl-focusRing = text : doc.specLabel {
+  left: 768px,
+  top: 0px,
+  contents: "focusRing"
+}
+
+note-focusRing = text : doc.specNote {
+  left: 768px,
+  top: 16px,
+  contents: "focus (keys): the ink ring"
+}
+
+lbl-patch = text : doc.specLabel {
+  left: 0px,
+  top: 196px,
+  contents: "patch"
+}
+
+note-patch = text : doc.specNote {
+  left: 0px,
+  top: 212px,
+  contents: "a card's cloth · rest"
+}
+
+lbl-patchLifted = text : doc.specLabel {
+  left: 384px,
+  top: 196px,
+  contents: "patchLifted"
+}
+
+note-patchLifted = text : doc.specNote {
+  left: 384px,
+  top: 212px,
+  contents: "hover: lifts"
+}
+
+lbl-rope = text : doc.specLabel {
+  left: 0px,
+  top: 428px,
+  contents: "rope"
+}
+
+note-rope = text : doc.specNote {
+  left: 0px,
+  top: 444px,
+  contents: "pick: a single choice"
+}
+
+lbl-ropeHere = text : doc.specLabel {
+  left: 384px,
+  top: 428px,
+  contents: "ropeHere"
+}
+
+note-ropeHere = text : doc.specNote {
+  left: 384px,
+  top: 444px,
+  contents: "here: the nav's current tab"
+}
+
+@variants(surfaceStatesI10)
+surfaceStates = frame : doc.docBoard {
+  title: "Surfaces · states · i9",
+  left: 0px,
+  top: 672px,
+
+  body {
+    layout.stack.item-gap: 48px,
+    overrides: [
+      insert(row-1, after = .nil),
+      insert(row-2, after = row-1),
+      insert(row-3, after = row-2)
+    ]
+  }
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i9"
+      }
+    }
+
+    boardCaption {
+      contents: "Surfaces · every state"
+    }
+  }
+
+  row-1 = frame : doc.specRow {
+    layout.stack.item-gap: 48px,
+    overrides: [
+      insert(st-stitch, after = .nil),
+      insert(st-disc, after = st-stitch),
+      insert(st-focusRing, after = st-disc)
+    ]
+  }
+
+  row-2 = frame : doc.specRow {
+    layout.stack.item-gap: 48px,
+    overrides: [
+      insert(st-patch, after = .nil),
+      insert(st-patchLifted, after = st-patch)
+    ]
+  }
+
+  row-3 = frame : doc.specRow {
+    layout.stack.item-gap: 48px,
+    overrides: [
+      insert(st-rope, after = .nil),
+      insert(st-ropeHere, after = st-rope)
+    ]
+  }
+
+  st-stitch = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "stitch"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "the dashed stitch"
+    }
+
+    it = frame : stitch {}
+  }
+
+  st-disc = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "disc"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "a round felt base"
+    }
+
+    it = frame : disc {}
+  }
+
+  st-focusRing = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "focusRing"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "focus (keys): the ink ring"
+    }
+
+    it = frame : focusRing {}
+  }
+
+  st-patch = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "patch"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "a card's cloth · rest"
+    }
+
+    it = frame : patch {}
+  }
+
+  st-patchLifted = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "patchLifted"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "hover: lifts"
+    }
+
+    it = frame : patchLifted {}
+  }
+
+  st-rope = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "rope"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "pick: a single choice"
+    }
+
+    it = frame : rope {}
+  }
+
+  st-ropeHere = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "ropeHere"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "here: the nav's current tab"
+    }
+
+    it = frame : ropeHere {}
+  }
+}
+
+@variants(surfaceStatesI11)
+@context(i10="on")
+surfaceStatesI10 = frame : surfaceStates {
+  title: "Surfaces · states · i10",
+  left: 912px,
+  top: 672px,
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i10"
+      }
+    }
+  }
+}
+
+@context(i10="on", i11="on")
+surfaceStatesI11 = frame : surfaceStatesI10 {
+  title: "Surfaces · states · i11",
+  left: 1824px,
+  top: 672px,
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i11"
+      }
+    }
+  }
+}

@@ -1,0 +1,3002 @@
+import "tokens/color/roles.elyx" as col
+import "tokens/color/palette.elyx" as pal
+import "tokens/space/space.elyx" as spc
+import "tokens/type/type.elyx" as typ
+import "components/atoms/text.elyx" as txt
+import "components/atoms/doc.elyx" as doc
+import "components/atoms/surface.elyx" as surf
+import "components/atoms/logo.elyx" as brandLogo
+import "components/molecules/chip.elyx" as chips
+import "components/molecules/tag.elyx" as tg
+import "components/molecules/button.elyx" as btns
+import "assets/icons/bold/arrow-up-right.svg" as extIcon
+import "components/molecules/play-button.elyx" as play
+import "components/molecules/segmented.elyx" as segm
+import "components/molecules/media-thumb.elyx" as mt
+import "assets/art/farewell-my-star.svg" as farewellArt
+import "redesign/v3-yarn-11/media/site-plan.png" as sitePlanImage
+import "assets/icons/bold/article.svg" as articleIcon
+import "assets/icons/bold/scribble-loop.svg" as scratchIcon
+import "assets/icons/bold/tag.svg" as pickIcon
+import "assets/icons/bold/ranking.svg" as rankingIcon
+import "assets/icons/bold/playlist.svg" as playlistIcon
+import "assets/icons/bold/images.svg" as imagesIcon
+import "assets/icons/bold/arrow-right.svg" as goIcon
+import "assets/icons/bold/users.svg" as usersIcon
+import "assets/icons/bold/users-three.svg" as everyoneIcon
+import "assets/icons/bold/scroll.svg" as writeupIcon
+import "assets/icons/bold/plus.svg" as plusIcon
+import "assets/icons/bold/chat-circle.svg" as commentIcon
+import "assets/posts/ribbon.svg" as ribbonShape
+import "assets/posts/ribbon-sew.svg" as ribbonSew
+import "assets/posts/yarn-loop.svg" as yarnLoop
+import "assets/posts/yarn-twist.svg" as yarnTwist
+import "assets/posts/tape.svg" as tapeArt
+import "assets/posts/twill.svg" as twillTexture
+import "assets/posts/record-grooves.svg" as groovesArt
+import "assets/art/feline-shores.svg" as felineArt
+import "assets/art/combat.svg" as combatArt
+import "assets/art/explore-piano.svg" as exploreArt
+import "redesign/v3-yarn-11/media/sona.png" as sonaImage
+import "redesign/v3-yarn-11/media/sona-different.png" as sonaDifferentImage
+import "redesign/v3-yarn-11/media/sona-auri.png" as sonaAuriImage
+import "redesign/v3-yarn-11/media/rawsy.png" as rawsyImage
+
+// Thoughts' post cards (kit/posts.js, Y.post). Every card reads, top to
+// bottom: the kicker (`postKicker`: the type in its felt circle, the read
+// time, the date on the right), the title, the dek, an about / write-up
+// pill, then the foot (the tags; "Read →" on an article until i11 T8 cut
+// it). The kicker's words are content: i9 writes them "2 min read" and
+// "Nov 7" (Maple Mono), i10+ "· 2 MIN" and "NOV 7" (Micro caps), so a
+// screen restates them in its i10 variant.
+// Types: `postArticle` (+ `postArticleCover`), `postNote` (a scratch on a
+// sticky note, + colours), `postPick` (a hang tag on red yarn), `postPlaylist`
+// (record + track rows + Play all), `postImages` (1 + 3 · 2 · 1 + 2),
+// `postRanking` (a mini felt board). Bookmarks (the ribbon, the yarn) stay
+// the `mark` red everywhere; gold (`sec.section` on Thoughts) is the shelf
+// pill only. Owner colours (note paper, pick stub, tier felts) are content.
+// i9 → i10 is tokens except the pick's links (`postPickI10`); i11 cuts the
+// article's "Read →" (`postArticleI11`, `postArticleCoverI11`).
+// ---- parts ----------------------------------------------------------------
+// The kicker. Children: `lead` (`badge` (`disc` > `glyph`, `kind`), `extra`
+// (`sep` (the i10 ·), `xGlyph`, `x`)), `date`. Hide `lead.extra` when a type
+// has no read time; show `xGlyph` for a ranking's people.
+export postKicker = frame {
+  title: "Post · kicker",
+  left: 0px,
+  top: 40px,
+  width: spc.controls.post-w,
+  min-height: spc.controls.kick-h,
+  layout: {
+    stack: {
+      justify-content: .space-between,
+      align-items: .center,
+      item-gap: spc.steps.s2
+    }
+  },
+  children: [lead, date],
+
+  lead = frame {
+    layout: {stack: {align-items: .center, item-gap: spc.layout.kick-x-gap}},
+    children: [badge, extra],
+
+    badge = frame {
+      layout: {stack: {align-items: .center, item-gap: spc.layout.chip-gap}},
+      children: [disc, kind],
+
+      disc = frame {
+        width: spc.controls.kick-badge,
+        height: spc.controls.kick-badge,
+        layout: {stack: {justify-content: .center, align-items: .center}},
+        fill: col.roles.recess,
+        shadow: {
+          inner-shadow: {
+            color: col.roles.line,
+            offset: point(0px, 0px),
+            blur-radius: 0px,
+            spread: 1px
+          }
+        },
+        corner-radius: spc.radii.pill,
+        children: glyph,
+
+        glyph = asset {
+          width: spc.controls.kick-badge-icon,
+          height: spc.controls.kick-badge-icon,
+          fill: col.roles.kick,
+          contents: articleIcon
+        }
+      }
+
+      kind = text : txt.micro {
+        contents: "ARTICLE",
+        letter-spacing: typ.tracking.caps,
+        fill[0].color: col.roles.kick
+      }
+    }
+
+    extra = frame {
+      layout: {stack: {align-items: .center, item-gap: spc.steps.s1}},
+      children: [sep, xGlyph, x],
+
+      sep = text : txt.micro {
+        contents: "·",
+        font-size: typ.sizes.kick-x,
+        font-family: typ.faces.kick-x,
+        font-style: typ.faces.kick-x-style,
+        fill[0].color: col.roles.kick-sep
+      }
+
+      xGlyph = asset {
+        width: spc.controls.kick-badge-icon,
+        height: spc.controls.kick-badge-icon,
+        display: .none,
+        fill: col.roles.fg-3,
+        contents: usersIcon
+      }
+
+      x = text : txt.micro {
+        contents: "2 min read",
+        font-size: typ.sizes.kick-x,
+        font-family: typ.faces.kick-x,
+        font-style: typ.faces.kick-x-style,
+        letter-spacing: typ.tracking.kick-x,
+        fill[0].color: col.roles.fg-3
+      }
+    }
+  }
+
+  date = text : txt.micro {
+    contents: "Nov 7",
+    font-size: typ.sizes.kick-x,
+    font-family: typ.faces.kick-x,
+    font-style: typ.faces.kick-x-style,
+    letter-spacing: typ.tracking.kick-x,
+    fill[0].color: col.roles.fg-3
+  }
+}
+
+// The about pill (.yabout): what a post is about, on the recess, the
+// control's stitch (i9) or ring (i10). "about" + a glyph + the name + →.
+// `tier` (a tiny felt key) replaces the glyph for a ranked thing.
+@variants(postWriteup)
+export postAbout = frame : chips.chipSm {
+  title: "Post · about pill",
+  left: 402px,
+  top: 40px,
+  fill[0].color: col.roles.recess,
+  overrides: [
+    insert(key, after = chips.chip.chipStitch),
+    insert(tier, after = chips.chip.glyph),
+    insert(go, after = chips.chip.count)
+  ],
+  shadow[0].drop-shadow.visible: .false,
+  shadow[1].drop-shadow.visible: .false,
+
+  label {
+    fill[0].color: col.roles.fg,
+    contents: "Ghostty",
+    font-size: typ.sizes.label-card
+  }
+
+  count {
+    fill[0].color: col.roles.fg-3
+  }
+
+  glyph {
+    width: spc.controls.kick-badge-icon,
+    height: spc.controls.kick-badge-icon,
+    contents: pickIcon
+  }
+
+  key = text : txt.metaCard {
+    contents: "about"
+  }
+
+  tier = frame {
+    width: spc.controls.fact-wip,
+    height: spc.controls.fact-wip,
+    display: .none,
+    layout: {stack: {justify-content: .center, align-items: .center}},
+    fill: [
+      pal.palette.tier-s,
+      {image: {ref: twillTexture, sizing: {scale: 1, offset: [0px, 0px]}}}
+    ],
+    corner-radius: spc.radii.kbd,
+    children: tierLetter,
+
+    tierLetter = text : txt.micro {
+      contents: "S",
+      fill[0].color: col.roles.dark-fg
+    }
+  }
+
+  go = asset {
+    width: spc.controls.kick-badge-icon,
+    height: spc.controls.kick-badge-icon,
+    fill: col.roles.fg-2,
+    contents: goIcon
+  }
+}
+
+// The write-up pill (.yabout--wu): the scroll, "Write-up", its read time.
+export postWriteup = frame : postAbout {
+  title: "Post · write-up pill",
+  left: 804px,
+  top: 40px,
+
+  key {
+    display: .none
+  }
+
+  glyph {
+    contents: writeupIcon
+  }
+
+  label {
+    contents: "Write-up"
+  }
+
+  count {
+    display: .visible,
+    contents: "2 min"
+  }
+}
+
+// A go-link (.ypost__go, .ypost__coll): the link role's words + →. i9 red
+// words; i10 ink words on a 1.5px underline (col.roles.go-line).
+export postGo = frame {
+  title: "Post · go link",
+  left: 1206px,
+  top: 40px,
+  layout: {stack: {align-items: .center, item-gap: spc.layout.btn-d-gap}},
+  children: [words, arrow],
+
+  words = frame {
+    layout: {stack: {}},
+    border: {
+      color: col.roles.go-line,
+      width: spc.layout.stitch-w-sm,
+      sides: .bottom
+    },
+    padding-bottom: 2px,
+    children: label,
+
+    label = text : txt.labelCard {
+      contents: "Read",
+      fill[0].color: col.roles.link
+    }
+  }
+
+  arrow = asset {
+    width: spc.controls.icon-sm,
+    height: spc.controls.icon-sm,
+    fill: col.roles.link,
+    contents: goIcon
+  }
+}
+
+// The red twill bookmark (an article): 20 × 40, notched, sewn.
+export postRibbon = frame {
+  title: "Post · bookmark",
+  left: 1608px,
+  top: 40px,
+  width: spc.controls.ribbon-w,
+  height: spc.controls.ribbon-h,
+  children: [cloth, sewing],
+
+  cloth = asset {
+    left: 0px,
+    top: 0px,
+    width: spc.controls.ribbon-w,
+    height: spc.controls.ribbon-h,
+    fill: col.roles.mark,
+    shadow: {
+      drop-shadow: {
+        color: pal.palette.shadow-lift,
+        offset: point(0px, 1px),
+        blur-radius: 0px
+      }
+    },
+    contents: ribbonShape
+  }
+
+  sewing = asset {
+    left: 0px,
+    top: 0px,
+    width: spc.controls.ribbon-w,
+    height: spc.controls.ribbon-h,
+    contents: ribbonSew
+  }
+}
+
+// A card's tags (pressable): pulled out by their own inset from i10 so the
+// # lines up with the words above. Hide `t3` (or `t2`) for fewer.
+export postTags = frame {
+  title: "Post · tags",
+  left: 1747px,
+  top: 40px,
+  layout: {stack: {align-items: .center, item-gap: spc.steps.s1}},
+  children: [t1, t2, t3],
+
+  t1 = frame : tg.tagPress {
+    label {
+      contents: "tools"
+    }
+  }
+
+  t2 = frame : tg.tagPress {
+    label {
+      contents: "terminal"
+    }
+  }
+
+  t3 = frame : tg.tagPress {
+    display: .none,
+
+    label {
+      contents: "design"
+    }
+  }
+}
+
+// ---- article --------------------------------------------------------------
+// An article: a patch with the red bookmark. Children: `body` (`head`
+// (`kicker`, `words` (`headline`, `dek`)), `about`, `foot` (`tags`, `go`)),
+// `ribbon`. Hide `body.about` when it's about nothing.
+@variants(postArticleCover, postArticleI11)
+export postArticle = frame : surf.patch {
+  title: "Article",
+  left: 0px,
+  top: 200px,
+  width: spc.controls.post-w,
+  min-height: .nil,
+  padding-top: 0px,
+  padding-left: 0px,
+  padding-bottom: 0px,
+  padding-right: 0px,
+  layout.stack.item-gap: 0,
+  overrides: [
+    insert(body, after = surf.patch.patchStitch),
+    insert(ribbon, after = body)
+  ],
+
+  body = frame {
+    width: 100%,
+    layout: {stack: {direction: .column, item-gap: spc.layout.post-gap}},
+    padding: [spc.layout.inset-y, spc.layout.inset-x],
+    children: [head, about, foot],
+
+    head = frame {
+      width: 100%,
+      layout: {stack: {direction: .column, item-gap: spc.layout.post-kick}},
+      children: [kicker, words],
+
+      kicker = frame : postKicker {
+        width: 100%,
+        padding-right: spc.layout.kick-clear
+      }
+
+      words = frame {
+        width: 100%,
+        layout: {stack: {direction: .column, item-gap: spc.layout.post-dek}},
+        children: [headline, dek],
+
+        headline = text : txt.titleCard {
+          width: 100%,
+          contents: "Ghostty, three months in",
+          font-size: typ.sizes.post-title,
+          letter-spacing: typ.tracking.post-title
+        }
+
+        dek = text : txt.bodyCard {
+          width: 100%,
+          contents: "The terminal I stopped tweaking."
+        }
+      }
+    }
+
+    about = frame : postAbout {}
+
+    foot = frame {
+      width: 100%,
+      height: spc.controls.post-foot-h,
+      layout: {stack: {justify-content: .end, align-items: .center}},
+      children: [tags, go],
+
+      tags = frame : postTags {
+        left: spc.layout.tag-pull,
+        top: 0px,
+        ignore-stack: .true
+      }
+
+      go = frame : postGo {}
+    }
+  }
+
+  ribbon = frame : postRibbon {
+    top: 0px,
+    right: spc.layout.ribbon-r,
+    ignore-stack: .true
+  }
+}
+
+// With a cover (2 : 1): i9 / i10 flush with the top, 8 in; i11 on the inset.
+@variants(postArticleCoverI11)
+export postArticleCover = frame : postArticle {
+  title: "Article · cover",
+  left: 402px,
+  top: 200px,
+  overrides: [insert(cover, after = surf.patch.patchStitch)],
+
+  body {
+    about {
+      display: .none
+    }
+
+    head {
+      words {
+        headline {
+          contents: "Moving a site from Astro to SvelteKit without losing the music"
+        }
+
+        dek {
+          contents: "One <audio> element, a root layout, and why the player kept restarting."
+        }
+      }
+
+      kicker {
+        padding-right: 0px
+      }
+    }
+
+    foot {
+      tags {
+        t1 {
+          label {
+            contents: "svelte"
+          }
+        }
+
+        t2 {
+          label {
+            contents: "learnings"
+          }
+        }
+      }
+    }
+  }
+
+  cover = frame {
+    width: 100%,
+    layout: {stack: {}},
+    padding: [spc.layout.cover-top, spc.layout.cover-x, 0px],
+    children: coverArt,
+
+    coverArt = frame {
+      width: 100%,
+      height: spc.controls.cover-h,
+      fill: [col.roles.recess, {image: {ref: sitePlanImage}}],
+      corner-radius: spc.radii.art,
+      overflow: .clip
+    }
+  }
+}
+
+// i11 T8: the card is the link, so "Read →" is cut.
+@context(i10="on", i11="on")
+export postArticleI11 = frame : postArticle {
+  title: "Article · i11 (no Read →)",
+  left: 804px,
+  top: 200px,
+
+  body {
+    foot {
+      go {
+        display: .none
+      }
+    }
+  }
+}
+
+@context(i10="on", i11="on")
+export postArticleCoverI11 = frame : postArticleCover {
+  title: "Article · cover · i11",
+  left: 1206px,
+  top: 200px,
+
+  body {
+    foot {
+      go {
+        display: .none
+      }
+    }
+  }
+}
+
+// ---- scratch (a sticky note) -----------------------------------------------
+// A scratch: the owner's quote on a sticky note under a strip of tape.
+// Paper colours are content (canary, pink, mint, sky). Children: `tapeStrip`
+// (> `tape`), `kicker`, `quote`, `foot` (> `tags`).
+@variants(postNotePink, postNoteMint, postNoteSky)
+export postNote = frame {
+  title: "Scratch · canary",
+  left: 0px,
+  top: 713px,
+  width: spc.controls.post-w,
+  layout: {stack: {direction: .column, item-gap: spc.layout.post-gap}},
+  fill: pal.palette.note-canary,
+  shadow: [
+    {
+      drop-shadow: {
+        color: pal.palette.note-edge,
+        offset: point(0px, 1px),
+        blur-radius: 1px
+      }
+    },
+    {
+      drop-shadow: {
+        color: pal.palette.note-drop,
+        offset: point(0px, 7px),
+        blur-radius: 12px,
+        spread: -9px
+      }
+    }
+  ],
+  corner-radius: [
+    spc.radii.note,
+    spc.radii.note,
+    spc.radii.note-curl,
+    spc.radii.note
+  ],
+  padding: [spc.layout.note-top, spc.layout.note-x, spc.layout.note-bottom],
+  children: [tapeStrip, kicker, quote, foot],
+
+  tapeStrip = frame {
+    left: 0px,
+    top: spc.layout.tape-top,
+    right: 0px,
+    height: spc.controls.tape-h,
+    ignore-stack: .true,
+    layout: {stack: {justify-content: .center}},
+    children: tape,
+
+    tape = asset {
+      width: spc.controls.tape-w,
+      height: spc.controls.tape-h,
+      contents: tapeArt
+    }
+  }
+
+  kicker = frame : postKicker {
+    width: 100%,
+
+    lead {
+      badge {
+        disc {
+          fill[0].color: pal.palette.note-chip,
+
+          glyph {
+            fill[0].color: pal.palette.note-canary-fg,
+            contents: scratchIcon
+          }
+        }
+
+        kind {
+          fill[0].color: pal.palette.note-canary-fg,
+          contents: "SCRATCH"
+        }
+      }
+
+      extra {
+        display: .none
+      }
+    }
+
+    date {
+      fill[0].color: pal.palette.note-canary-fg-3,
+      contents: "Nov 7 · 11:41 pm"
+    }
+  }
+
+  // the quote is a Title; its opening mark sits inline in the deco colour
+  quote = text : txt.titleCard {
+    width: 100%,
+    contents: "“what if every website had a little cat that judged your scroll speed",
+    font-size: typ.sizes.quote,
+    line-height: typ.leading.quote,
+    fill[0].color: col.roles.fg,
+    subrange[0].fill[0].color: col.roles.deco,
+    subrange[0].range: [0, 1]
+  }
+
+  foot = frame {
+    width: 100%,
+    height: spc.controls.post-foot-h,
+    children: tags,
+
+    tags = frame : postTags {
+      left: spc.layout.tag-pull,
+      top: 0px,
+
+      t1 {
+        label {
+          fill[0].color: pal.palette.note-canary-fg-3,
+          contents: "shower"
+        }
+
+        hash {
+          fill[0].color: pal.palette.note-canary-fg-3
+        }
+      }
+
+      t2 {
+        display: .none
+      }
+    }
+  }
+}
+
+export postNotePink = frame : postNote {
+  title: "Scratch · pink",
+  left: 402px,
+  top: 713px,
+  fill[0].color: pal.palette.note-pink,
+
+  kicker {
+    lead {
+      badge {
+        disc {
+          glyph {
+            fill[0].color: pal.palette.note-pink-fg
+          }
+        }
+
+        kind {
+          fill[0].color: pal.palette.note-pink-fg
+        }
+      }
+    }
+
+    date {
+      fill[0].color: pal.palette.note-pink-fg-3,
+      contents: "Nov 1 · 8:12 am"
+    }
+  }
+
+  foot {
+    display: .none
+  }
+
+  quote {
+    contents: "“the best ui feedback is the one you only notice when it's missing"
+  }
+}
+
+export postNoteMint = frame : postNote {
+  title: "Scratch · mint",
+  left: 804px,
+  top: 713px,
+  fill[0].color: pal.palette.note-mint,
+
+  kicker {
+    lead {
+      badge {
+        disc {
+          glyph {
+            fill[0].color: pal.palette.note-mint-fg
+          }
+        }
+
+        kind {
+          fill[0].color: pal.palette.note-mint-fg
+        }
+      }
+    }
+
+    date {
+      fill[0].color: pal.palette.note-mint-fg-3,
+      contents: "Oct 24 · 1:03 am"
+    }
+  }
+
+  foot {
+    tags {
+      t1 {
+        label {
+          fill[0].color: pal.palette.note-mint-fg-3
+        }
+
+        hash {
+          fill[0].color: pal.palette.note-mint-fg-3
+        }
+      }
+    }
+  }
+
+  quote {
+    contents: "“folders are just tabs that grew up"
+  }
+}
+
+export postNoteSky = frame : postNote {
+  title: "Scratch · sky",
+  left: 1206px,
+  top: 713px,
+  fill[0].color: pal.palette.note-sky,
+
+  kicker {
+    lead {
+      badge {
+        disc {
+          glyph {
+            fill[0].color: pal.palette.note-sky-fg
+          }
+        }
+
+        kind {
+          fill[0].color: pal.palette.note-sky-fg
+        }
+      }
+    }
+
+    date {
+      fill[0].color: pal.palette.note-sky-fg-3,
+      contents: "Oct 2 · 5:20 pm"
+    }
+  }
+
+  foot {
+    display: .none
+  }
+
+  quote {
+    contents: "“a playlist is a mood with a tracklist"
+  }
+}
+
+// ---- pick (a hang tag on a loop of red yarn) ---------------------------------
+// A pick: the owner's stub on the left (content colour: tan knit; ink, red,
+// blue twill), the eyelet + the red yarn, then the text past the stub.
+// i9: the link in mono with ↗ after, the shelf a gold pill; i10
+// (`postPickI10`): the link a small link button, the shelf plain words.
+// Children: `stub`, `eyelet`, `yarn` (`strand`, `twist`, `knot`), `head`
+// (`kicker`, `words`), `writeup` (hidden), `foot` (`links` (`ext`, `extBtn`,
+// `coll`), `tags`). Recolour the stub: `stub { fill[0].color: … }` and show
+// its twill (`fill[1].visible`).
+@variants(postPickI10)
+export postPick = frame : surf.patch {
+  title: "Pick",
+  left: 0px,
+  top: 987px,
+  width: spc.controls.post-w,
+  min-height: .nil,
+  corner-radius: [spc.radii.art, spc.radii.card, spc.radii.card, spc.radii.art],
+  padding-top: spc.layout.pick-y,
+  padding-left: spc.layout.pick-l,
+  padding-bottom: spc.layout.pick-y,
+  padding-right: spc.layout.pick-r,
+  layout.stack.item-gap: spc.layout.post-gap,
+  overrides: [
+    insert(stub, after = .nil),
+    insert(eyelet, after = stub),
+    insert(head, after = surf.patch.patchStitch),
+    insert(writeup, after = head),
+    insert(foot, after = writeup),
+    insert(yarn, after = foot)
+  ],
+
+  patchStitch {
+    left: spc.controls.stub
+  }
+
+  stub = frame {
+    left: 0px,
+    top: 0px,
+    bottom: 0px,
+    width: spc.controls.stub,
+    ignore-stack: .true,
+    fill: [
+      pal.palette.stub-tan,
+      {
+        visible: .false,
+        image: {ref: twillTexture, sizing: {scale: 1, offset: [0px, 0px]}}
+      }
+    ],
+    border: {
+      color: pal.palette.stub-tan-seam,
+      width: spc.layout.stitch-w-sm,
+      dash: [4px, 3px],
+      sides: .right
+    },
+    corner-radius: [spc.radii.art, 0px, 0px, spc.radii.art]
+  }
+
+  eyelet = frame {
+    left: 11px,
+    top: spc.layout.inset-y,
+    width: spc.controls.eyelet,
+    height: spc.controls.eyelet,
+    ignore-stack: .true,
+    fill: col.roles.sheet,
+    border: [
+      {color: col.roles.surface, width: 2.5px, position: .outside},
+      {color: pal.palette.stitch, position: .outside}
+    ],
+    shadow: {
+      inner-shadow: {
+        color: pal.palette.shadow-lift,
+        offset: point(0px, 1px),
+        blur-radius: 2px
+      }
+    },
+    corner-radius: spc.radii.pill
+  }
+
+  yarn = frame {
+    left: -14px,
+    top: -16px,
+    width: spc.controls.yarn-w,
+    height: spc.controls.yarn-h,
+    ignore-stack: .true,
+    children: [strand, twist, knot],
+
+    strand = asset {
+      left: 0px,
+      top: 0px,
+      width: spc.controls.yarn-w,
+      height: spc.controls.yarn-h,
+      fill: col.roles.mark,
+      contents: yarnLoop
+    }
+
+    twist = asset {
+      left: 0px,
+      top: 0px,
+      width: spc.controls.yarn-w,
+      height: spc.controls.yarn-h,
+      contents: yarnTwist
+    }
+
+    knot = frame {
+      left: 28px,
+      top: 39px,
+      width: 5px,
+      height: 5px,
+      fill: col.roles.mark-deep,
+      corner-radius: spc.radii.pill
+    }
+  }
+
+  head = frame {
+    width: 100%,
+    layout: {stack: {direction: .column, item-gap: spc.layout.post-kick}},
+    children: [kicker, words],
+
+    kicker = frame : postKicker {
+      width: 100%,
+
+      lead {
+        extra {
+          display: .none
+        }
+
+        badge {
+          disc {
+            glyph {
+              contents: pickIcon
+            }
+          }
+
+          kind {
+            contents: "PICK"
+          }
+        }
+      }
+
+      date {
+        contents: "Nov 4"
+      }
+    }
+
+    words = frame {
+      width: 100%,
+      layout: {stack: {direction: .column, item-gap: spc.layout.post-dek}},
+      children: [headline, dek],
+
+      headline = text : txt.titleCard {
+        width: 100%,
+        contents: "Zed",
+        font-size: typ.sizes.post-title-pick,
+        letter-spacing: typ.tracking.post-title
+      }
+
+      dek = text : txt.bodyCard {
+        width: 100%,
+        contents: "Fast editor. I write my own themes for it."
+      }
+    }
+  }
+
+  writeup = frame : postWriteup {
+    display: .none
+  }
+
+  foot = frame {
+    width: 100%,
+    layout: {stack: {direction: .column, item-gap: spc.steps.s1}},
+    children: [links, tagLine],
+
+    links = frame {
+      width: 100%,
+      layout: {stack: {justify-content: .space-between, align-items: .center}},
+      children: [ext, extBtn, coll],
+
+      // i9: the host in mono, ↗ after it
+      ext = frame {
+        height: spc.controls.chip-sm,
+        layout: {stack: {align-items: .center, item-gap: spc.steps.s1}},
+        children: [extLabel, extGlyph],
+
+        extLabel = text : txt.metaCard {
+          contents: "zed.dev"
+        }
+
+        extGlyph = asset {
+          width: spc.controls.kick-badge-icon,
+          height: spc.controls.kick-badge-icon,
+          fill: col.roles.fg-3,
+          contents: extIcon
+        }
+      }
+
+      // i10: the kit's small link button (↗ + the host)
+      extBtn = frame : btns.btnD {
+        height: spc.controls.chip-sm,
+        display: .none,
+
+        glyph {
+          width: spc.controls.icon-sm,
+          height: spc.controls.icon-sm,
+          contents: extIcon
+        }
+
+        label {
+          contents: "zed.dev"
+        }
+      }
+
+      // the shelf: i9 a gold pill (Thoughts' identity), i10 plain words
+      coll = frame {
+        height: spc.controls.chip-sm,
+        layout: {stack: {align-items: .center, item-gap: spc.layout.btn-d-gap}},
+        fill: col.roles.coll-bg,
+        corner-radius: spc.radii.pill,
+        padding: [0px, spc.layout.coll-x],
+        children: [collStitch, collWords, collArrow],
+
+        collStitch = frame : surf.stitch {
+          left: spc.steps.s1,
+          top: spc.steps.s1,
+          right: spc.steps.s1,
+          bottom: spc.steps.s1,
+          width: .nil,
+          height: .nil,
+          ignore-stack: .true,
+          corner-radius: spc.radii.pill,
+          border[0].color: col.roles.coll-stitch,
+          border[0].width: spc.layout.stitch-w-sm
+        }
+
+        collWords = frame {
+          layout: {stack: {}},
+          border: {
+            color: col.roles.go-line,
+            width: spc.layout.stitch-w-sm,
+            sides: .bottom
+          },
+          padding-bottom: 2px,
+          children: collLabel,
+
+          collLabel = text : txt.labelCard {
+            contents: "Tools I like",
+            fill[0].color: col.roles.coll-fg
+          }
+        }
+
+        collArrow = asset {
+          width: spc.controls.icon-sm,
+          height: spc.controls.icon-sm,
+          fill: col.roles.coll-fg,
+          contents: goIcon
+        }
+      }
+    }
+
+    tagLine = frame {
+      width: 100%,
+      height: spc.controls.post-foot-h,
+      children: tags,
+
+      tags = frame : postTags {
+        left: spc.layout.tag-pull,
+        top: 0px,
+
+        t2 {
+          label {
+            contents: "editor"
+          }
+        }
+      }
+    }
+  }
+}
+
+// i10 (r2 · cards): the link becomes the small link button; the shelf is
+// plain words on the go-line (colours are tokens).
+@context(i10="on")
+export postPickI10 = frame : postPick {
+  title: "Pick · i10",
+  left: 402px,
+  top: 987px,
+
+  foot {
+    links {
+      ext {
+        display: .none
+      }
+
+      extBtn {
+        display: .visible
+      }
+    }
+  }
+}
+
+// ---- playlist ---------------------------------------------------------------
+// A track row (.ypost__track): its swatch, the name + who, the length.
+export postTrack = frame {
+  title: "Playlist · track",
+  left: 804px,
+  top: 987px,
+  width: spc.controls.post-w,
+  layout: {stack: {justify-content: .space-between, align-items: .center}},
+  corner-radius: spc.radii.track,
+  padding: [
+    spc.layout.track-y,
+    spc.layout.track-r,
+    spc.layout.track-y,
+    spc.layout.track-l
+  ],
+  children: [lead, dur],
+
+  lead = frame {
+    layout: {stack: {align-items: .center, item-gap: spc.layout.track-gap}},
+    children: [swatch, names],
+
+    swatch = frame {
+      width: spc.controls.track-art,
+      height: spc.controls.track-art,
+      fill: [col.roles.recess, {image: {ref: felineArt}}],
+      shadow: [
+        {
+          drop-shadow: {
+            color: pal.palette.hairline,
+            offset: point(0px, 1px),
+            blur-radius: 0px
+          }
+        },
+        {
+          drop-shadow: {
+            color: pal.palette.stitch-soft,
+            offset: point(0px, 2px),
+            blur-radius: 6px
+          }
+        }
+      ],
+      corner-radius: spc.radii.inner,
+      overflow: .clip
+    }
+
+    names = frame {
+      layout: {stack: {align-items: .center, item-gap: spc.layout.fact-gap}},
+      children: [name, who],
+
+      name = text : txt.labelCard {
+        contents: "feline shores",
+        font-size: typ.sizes.track
+      }
+
+      who = text : txt.metaCard {
+        contents: "aiden"
+      }
+    }
+  }
+
+  dur = text : txt.numCard {
+    contents: "2:41"
+  }
+}
+
+// A playlist: the record leads its head, the track rows under a dashed
+// rule, then Play all (the kit's play part) and the tags. Children:
+// `kicker`, `head` (`record` (`grooves`, `label` > `cat`), `info`
+// (`headline`, `dek`, `count`)), `tracks` (`tr1`…`tr4`), `foot`.
+export postPlaylist = frame : surf.patch {
+  title: "Playlist",
+  left: 1206px,
+  top: 987px,
+  width: spc.controls.post-w,
+  min-height: .nil,
+  layout.stack.item-gap: spc.layout.post-gap,
+  overrides: [
+    insert(kicker, after = surf.patch.patchStitch),
+    insert(head, after = kicker),
+    insert(tracks, after = head),
+    insert(foot, after = tracks)
+  ],
+
+  kicker = frame : postKicker {
+    width: 100%,
+
+    lead {
+      extra {
+        display: .none
+      }
+
+      badge {
+        disc {
+          glyph {
+            contents: playlistIcon
+          }
+        }
+
+        kind {
+          contents: "PLAYLIST"
+        }
+      }
+    }
+
+    date {
+      contents: "Oct 30"
+    }
+  }
+
+  head = frame {
+    width: 100%,
+    layout: {stack: {align-items: .center, item-gap: spc.steps.s4}},
+    children: [record, info],
+
+    record = frame {
+      width: spc.controls.record,
+      height: spc.controls.record,
+      layout: {stack: {justify-content: .center, align-items: .center}},
+      fill: col.roles.dark,
+      shadow: [
+        {
+          drop-shadow: {
+            color: pal.palette.stitch-soft,
+            offset: point(0px, 1px),
+            blur-radius: 0px
+          }
+        },
+        {
+          drop-shadow: {
+            color: pal.palette.stitch-btn,
+            offset: point(0px, 3px),
+            blur-radius: 8px
+          }
+        }
+      ],
+      corner-radius: spc.radii.pill,
+      children: [grooves, label],
+
+      grooves = asset {
+        left: 0px,
+        top: 0px,
+        width: spc.controls.record,
+        height: spc.controls.record,
+        ignore-stack: .true,
+        contents: groovesArt
+      }
+
+      label = frame {
+        width: spc.controls.record-label,
+        height: spc.controls.record-label,
+        layout: {stack: {justify-content: .center, align-items: .center}},
+        fill: [
+          col.roles.live,
+          {image: {ref: twillTexture, sizing: {scale: 1, offset: [0px, 0px]}}}
+        ],
+        border: {
+          color: pal.palette.shadow-pop,
+          width: 1.5px,
+          position: .outside
+        },
+        corner-radius: spc.radii.pill,
+        children: cat,
+
+        cat = asset : brandLogo.mark {
+          width: spc.controls.icon-sm,
+          height: spc.controls.icon-sm,
+          fill[0].color: col.roles.live-fg
+        }
+      }
+    }
+
+    info = frame {
+      width: 100%,
+      layout: {stack: {direction: .column, item-gap: spc.layout.post-dek}},
+      children: [headline, dek, count],
+
+      headline = text : txt.titleCard {
+        width: 100%,
+        contents: "late night, low lights",
+        font-size: typ.sizes.post-title-list,
+        letter-spacing: typ.tracking.post-title
+      }
+
+      dek = text : txt.bodyCard {
+        width: 100%,
+        contents: "Stuff I've been writing to. Mostly mine, sorry."
+      }
+
+      count = text : txt.metaCard {
+        contents: "4 tracks · 10:11"
+      }
+    }
+  }
+
+  tracks = frame {
+    width: 100%,
+    layout: {stack: {direction: .column, item-gap: spc.steps.s1}},
+    border: {color: col.roles.line, dash: [4px, 4px], sides: .top},
+    padding-top: spc.steps.s2,
+    children: [tr1, tr2, tr3, tr4],
+
+    tr1 = frame : postTrack {
+      width: 100%
+    }
+
+    tr2 = frame : postTrack {
+      width: 100%,
+
+      lead {
+        swatch {
+          fill[1].image.ref: farewellArt
+        }
+
+        names {
+          name {
+            contents: "farewell my star"
+          }
+        }
+      }
+
+      dur {
+        contents: "3:12"
+      }
+    }
+
+    tr3 = frame : postTrack {
+      width: 100%,
+
+      lead {
+        swatch {
+          fill[1].image.ref: combatArt
+        }
+
+        names {
+          name {
+            contents: "combat"
+          }
+        }
+      }
+
+      dur {
+        contents: "1:58"
+      }
+    }
+
+    tr4 = frame : postTrack {
+      width: 100%,
+
+      lead {
+        swatch {
+          fill[1].image.ref: exploreArt
+        }
+
+        names {
+          name {
+            contents: "explore (piano)"
+          }
+        }
+      }
+
+      dur {
+        contents: "2:20"
+      }
+    }
+  }
+
+  foot = frame {
+    width: 100%,
+    layout: {stack: {align-items: .center, item-gap: spc.steps.s3}},
+    children: [playAll, tags],
+
+    playAll = frame : play.playBtnLabelSm {
+      label {
+        contents: "Play all"
+      }
+    }
+
+    tags = frame : postTags {
+      t1 {
+        label {
+          contents: "music"
+        }
+      }
+
+      t2 {
+        label {
+          contents: "focus"
+        }
+      }
+    }
+  }
+}
+
+// ---- images -----------------------------------------------------------------
+// An images post: two rows at most, 1 big + up to 3 small (`postImages`);
+// 2 side by side (`postImages2`); 1 + 2 (`postImages3`). Children:
+// `kicker`, `words`, `grid` (`big`, `row` (`s1`, `s2`, `s3`)), `foot`.
+@variants(postImages2, postImages3)
+export postImages = frame : surf.patch {
+  title: "Images · 1 + 3",
+  left: 0px,
+  top: 1524px,
+  width: spc.controls.post-w,
+  min-height: .nil,
+  layout.stack.item-gap: spc.layout.post-gap,
+  overrides: [
+    insert(head, after = surf.patch.patchStitch),
+    insert(grid, after = head),
+    insert(foot, after = grid)
+  ],
+
+  head = frame {
+    width: 100%,
+    layout: {stack: {direction: .column, item-gap: spc.layout.post-kick}},
+    children: [kicker, words],
+
+    kicker = frame : postKicker {
+      width: 100%,
+
+      lead {
+        badge {
+          disc {
+            glyph {
+              contents: imagesIcon
+            }
+          }
+
+          kind {
+            contents: "IMAGES"
+          }
+        }
+
+        extra {
+          x {
+            contents: "4 images"
+          }
+        }
+      }
+
+      date {
+        contents: "Oct 28"
+      }
+    }
+
+    words = frame {
+      width: 100%,
+      layout: {stack: {direction: .column, item-gap: spc.layout.post-dek}},
+      children: [headline, dek],
+
+      headline = text : txt.titleCard {
+        width: 100%,
+        contents: "Sona character sheets",
+        font-size: typ.sizes.post-title-images,
+        letter-spacing: typ.tracking.post-title
+      }
+
+      dek = text : txt.bodyCard {
+        width: 100%,
+        contents: "Old drawings I found. Tap to look closer."
+      }
+    }
+  }
+
+  grid = frame {
+    width: 100%,
+    layout: {stack: {direction: .column, item-gap: spc.layout.thumb-gap}},
+    children: [big, row],
+
+    big = frame : mt.mediaThumb {
+      width: 100%,
+      height: spc.controls.thumb-h,
+      corner-radius: spc.radii.thumb,
+      fill[1].image.ref: sonaImage
+    }
+
+    row = frame {
+      width: 100%,
+      layout: {
+        grid: {columns: [1fr, 1fr, 1fr], column-gap: spc.layout.thumb-gap}
+      },
+      children: [s1, s2, s3],
+
+      s1 = frame : mt.mediaThumb {
+        width: 100%,
+        height: spc.controls.thumb-sm-h,
+        corner-radius: spc.radii.thumb,
+        fill[1].image.ref: sonaDifferentImage
+      }
+
+      s2 = frame : mt.mediaThumb {
+        width: 100%,
+        height: spc.controls.thumb-sm-h,
+        corner-radius: spc.radii.thumb,
+        fill[1].image.ref: sonaAuriImage
+      }
+
+      s3 = frame : mt.mediaThumb {
+        width: 100%,
+        height: spc.controls.thumb-sm-h,
+        corner-radius: spc.radii.thumb,
+        fill[1].image.ref: rawsyImage
+      }
+    }
+  }
+
+  foot = frame {
+    width: 100%,
+    height: spc.controls.post-foot-h,
+    children: tags,
+
+    tags = frame : postTags {
+      left: spc.layout.tag-pull,
+      top: 0px,
+
+      t1 {
+        label {
+          contents: "design"
+        }
+      }
+
+      t2 {
+        label {
+          contents: "wip"
+        }
+      }
+    }
+  }
+}
+
+// Two pictures, side by side (squares).
+export postImages2 = frame : postImages {
+  title: "Images · 2",
+  left: 402px,
+  top: 1524px,
+
+  grid {
+    row {
+      s1 {
+        height: spc.controls.thumb-sq
+      }
+
+      s2 {
+        height: spc.controls.thumb-sq
+      }
+
+      s3 {
+        display: .none
+      }
+
+      layout.grid.columns: [1fr, 1fr]
+    }
+
+    big {
+      display: .none
+    }
+  }
+}
+
+// Three: i9 the big one on the left, two stacked beside it; from i10
+// (`postImages3I10`) the big one on top, two side by side under it.
+@variants(postImages3I10)
+export postImages3 = frame : postImages {
+  title: "Images · 1 + 2",
+  left: 804px,
+  top: 1524px,
+
+  grid {
+    big {
+      width: spc.controls.thumb-big-w
+    }
+
+    row {
+      width: spc.controls.thumb-side-w,
+
+      s1 {
+        height: spc.controls.thumb-half-h
+      }
+
+      s2 {
+        height: spc.controls.thumb-half-h
+      }
+
+      s3 {
+        display: .none
+      }
+
+      layout.grid.columns: 1fr,
+      layout.grid.row-gap: spc.layout.thumb-gap
+    }
+
+    layout.stack.direction: .row
+  }
+}
+
+@context(i10="on")
+export postImages3I10 = frame : postImages3 {
+  title: "Images · 1 + 2 · i10",
+  left: 1206px,
+  top: 1524px,
+
+  grid {
+    big {
+      width: 100%
+    }
+
+    row {
+      width: 100%,
+      layout.grid.columns: [1fr, 1fr]
+    }
+
+    layout.stack.direction: .column
+  }
+}
+
+// A GIF's badge (.ypost__gif): Micro on an ink pill, in a thumb's corner
+// (ignore-stack, one stack-tight in from the right and the bottom).
+export postGif = frame {
+  title: "Images · GIF badge",
+  left: 1608px,
+  top: 2108px,
+  layout: {stack: {justify-content: .center, align-items: .center}},
+  fill: col.roles.dark,
+  corner-radius: spc.radii.kbd,
+  padding: [spc.steps.s1, spc.layout.chip-gap],
+  children: gifWord,
+
+  gifWord = text : txt.micro {
+    contents: "GIF",
+    fill[0].color: col.roles.dark-fg
+  }
+}
+
+// ---- ranking (a mini felt board) ----------------------------------------------
+// A tier item (.ypost__item): a white chip, the tier's dot + the name.
+export postTierItem = frame {
+  title: "Ranking · item",
+  left: 1206px,
+  top: 2108px,
+  height: spc.controls.tier-item,
+  layout: {stack: {align-items: .center, item-gap: spc.layout.fact-gap}},
+  fill: col.roles.surface,
+  shadow: [
+    {
+      drop-shadow: {
+        color: pal.palette.stitch-btn,
+        offset: point(0px, 1px),
+        blur-radius: 0px
+      }
+    },
+    {
+      drop-shadow: {
+        color: pal.palette.shadow-1,
+        offset: point(0px, 1px),
+        blur-radius: 3px
+      }
+    }
+  ],
+  corner-radius: spc.radii.tier-item,
+  padding: [0px, spc.steps.s2],
+  children: [dot, name],
+
+  dot = frame {
+    width: spc.controls.tier-dot,
+    height: spc.controls.tier-dot,
+    fill: pal.palette.tier-s,
+    corner-radius: spc.radii.pill
+  }
+
+  name = text : txt.labelCard {
+    contents: "Helium",
+    font-size: typ.sizes.tier-item
+  }
+}
+
+// A tier row: the felt key (a square; `postTierNamed`: a tab sewn on top of
+// its tray) + the tray of items. Recolour: `key { fill[0].color: … }` and
+// each item's `dot`. Children: `key` (`keyStitch`, `letter`), `tray` (`i1`…
+// `i4`; hide the ones it doesn't hold).
+@variants(postTierNamed)
+export postTier = frame {
+  title: "Ranking · tier row",
+  left: 402px,
+  top: 2108px,
+  width: spc.controls.post-w,
+  layout: {grid: {columns: [34px, 1fr], column-gap: spc.steps.s1}},
+  children: [key, tray],
+
+  key = frame {
+    width: spc.controls.tier-key,
+    height: spc.controls.tier-key,
+    layout: {stack: {justify-content: .center, align-items: .center}},
+    fill: [
+      pal.palette.tier-s,
+      {image: {ref: twillTexture, sizing: {scale: 1, offset: [0px, 0px]}}}
+    ],
+    corner-radius: spc.radii.inner,
+    children: [keyStitch, letter],
+
+    keyStitch = frame : surf.stitch {
+      left: spc.steps.s1,
+      top: spc.steps.s1,
+      right: spc.steps.s1,
+      bottom: spc.steps.s1,
+      width: .nil,
+      height: .nil,
+      ignore-stack: .true,
+      corner-radius: spc.steps.s1,
+      border[0].color: pal.palette.stub-seam,
+      border[0].width: spc.layout.stitch-w-sm
+    }
+
+    letter = text : txt.titleCard {
+      contents: "S",
+      fill[0].color: col.roles.dark-fg
+    }
+  }
+
+  tray = frame {
+    width: 100%,
+    min-height: spc.controls.tier-key,
+    layout: {
+      stack: {
+        align-items: .center,
+        item-gap: spc.steps.s1,
+        wrap: .true,
+        line-gap: spc.steps.s1
+      }
+    },
+    fill: col.roles.recess,
+    shadow: {
+      inner-shadow: {
+        color: pal.palette.shadow-1,
+        offset: point(0px, 1px),
+        blur-radius: 2px
+      }
+    },
+    corner-radius: spc.radii.inner,
+    padding: spc.steps.s1,
+    children: [i1, i2, i3, i4],
+
+    i1 = frame : postTierItem {}
+
+    i2 = frame : postTierItem {
+      display: .none
+    }
+
+    i3 = frame : postTierItem {
+      display: .none
+    }
+
+    i4 = frame : postTierItem {
+      display: .none
+    }
+  }
+}
+
+// A named tier (a label longer than 3 characters): the key is a felt tab
+// on top of its tray; the tray takes a breath of the tier colour.
+export postTierNamed = frame : postTier {
+  title: "Ranking · named tier",
+  left: 804px,
+  top: 2108px,
+  layout.grid.column-gap: 0,
+  layout.grid.columns: 1fr,
+
+  key {
+    width: .auto,
+    height: .auto,
+
+    keyStitch {
+      display: .none
+    }
+
+    corner-radius: [spc.radii.tier-item, spc.radii.tier-item, 0px, 0px],
+
+    letter {
+      contents: "Ride or die",
+      font-size: typ.sizes.micro,
+      font-family: typ.faces.micro,
+      font-style: typ.faces.micro-style
+    }
+
+    padding-top: spc.steps.s1,
+    padding-left: spc.steps.s3,
+    padding-bottom: spc.steps.s1,
+    padding-right: spc.steps.s3
+  }
+
+  tray {
+    corner-radius: [0px, spc.radii.inner, spc.radii.inner, spc.radii.inner]
+  }
+}
+
+// A ranking: the mini board (Mine / Everyone), its write-up, + Add your
+// ranking (act: red in i9, neutral from i10) and the comments.
+// Children: `head` (`kicker`, `headline`), `view` (the segmented switch),
+// `tiers` (`rS`…`rD`), `writeup`, `actions` (`add`, `comments`), `foot`.
+export postRanking = frame : surf.patch {
+  title: "Ranking",
+  left: 0px,
+  top: 2108px,
+  width: spc.controls.post-w,
+  min-height: .nil,
+  layout.stack.item-gap: spc.layout.post-gap,
+  overrides: [
+    insert(head, after = surf.patch.patchStitch),
+    insert(view, after = head),
+    insert(tiers, after = view),
+    insert(writeup, after = tiers),
+    insert(actions, after = writeup),
+    insert(foot, after = actions)
+  ],
+
+  head = frame {
+    width: 100%,
+    layout: {stack: {direction: .column, item-gap: spc.layout.post-kick}},
+    children: [kicker, headline],
+
+    kicker = frame : postKicker {
+      width: 100%,
+
+      lead {
+        badge {
+          disc {
+            glyph {
+              contents: rankingIcon
+            }
+          }
+
+          kind {
+            contents: "RANKING"
+          }
+        }
+
+        extra {
+          x {
+            contents: "214 ranked"
+          }
+
+          xGlyph {
+            display: .visible
+          }
+        }
+      }
+
+      date {
+        contents: "Nov 2"
+      }
+    }
+
+    headline = text : txt.titleCard {
+      width: 100%,
+      contents: "My favorite browsers, ranked",
+      font-size: typ.sizes.post-title-list,
+      letter-spacing: typ.tracking.post-title
+    }
+  }
+
+  view = frame : segm.seg {
+    @with-variant(segm.segBtn)
+    grid {
+      glyph {
+        contents: everyoneIcon
+      }
+
+      label {
+        contents: "Everyone"
+      }
+    }
+
+    @with-variant(segm.segBtnPicked)
+    timeline {
+      glyph {
+        display: .none
+      }
+
+      label {
+        contents: "Mine"
+      }
+    }
+  }
+
+  tiers = frame {
+    width: 100%,
+    layout: {stack: {direction: .column, item-gap: spc.steps.s1}},
+    children: [rS, rA, rB, rC, rD],
+
+    rS = frame : postTier {
+      width: 100%
+    }
+
+    rA = frame : postTier {
+      width: 100%,
+
+      key {
+        fill[0].color: pal.palette.tier-a,
+
+        letter {
+          fill[0].color: col.roles.fg,
+          contents: "A"
+        }
+      }
+
+      tray {
+        i1 {
+          dot {
+            fill[0].color: pal.palette.tier-a
+          }
+
+          name {
+            contents: "Zen"
+          }
+        }
+
+        i2 {
+          dot {
+            fill[0].color: pal.palette.tier-a
+          }
+
+          name {
+            contents: "Arc"
+          }
+
+          display: .visible
+        }
+      }
+    }
+
+    rB = frame : postTier {
+      width: 100%,
+
+      key {
+        fill[0].color: pal.palette.tier-b,
+
+        letter {
+          fill[0].color: col.roles.fg,
+          contents: "B"
+        }
+      }
+
+      tray {
+        i1 {
+          dot {
+            fill[0].color: pal.palette.tier-b
+          }
+
+          name {
+            contents: "Firefox"
+          }
+        }
+
+        i2 {
+          dot {
+            fill[0].color: pal.palette.tier-b
+          }
+
+          name {
+            contents: "Safari"
+          }
+
+          display: .visible
+        }
+
+        i3 {
+          dot {
+            fill[0].color: pal.palette.tier-b
+          }
+
+          name {
+            contents: "Orion"
+          }
+
+          display: .visible
+        }
+      }
+    }
+
+    rC = frame : postTier {
+      width: 100%,
+
+      key {
+        fill[0].color: pal.palette.tier-c,
+
+        letter {
+          fill[0].color: col.roles.fg,
+          contents: "C"
+        }
+      }
+
+      tray {
+        i1 {
+          dot {
+            fill[0].color: pal.palette.tier-c
+          }
+
+          name {
+            contents: "Vivaldi"
+          }
+        }
+
+        i2 {
+          dot {
+            fill[0].color: pal.palette.tier-c
+          }
+
+          name {
+            contents: "Brave"
+          }
+
+          display: .visible
+        }
+      }
+    }
+
+    rD = frame : postTier {
+      width: 100%,
+
+      key {
+        fill[0].color: pal.palette.tier-d,
+
+        letter {
+          fill[0].color: col.roles.fg,
+          contents: "D"
+        }
+      }
+
+      tray {
+        i1 {
+          dot {
+            fill[0].color: pal.palette.tier-d
+          }
+
+          name {
+            contents: "Chrome"
+          }
+        }
+
+        i2 {
+          dot {
+            fill[0].color: pal.palette.tier-d
+          }
+
+          name {
+            contents: "Edge"
+          }
+
+          display: .visible
+        }
+      }
+    }
+  }
+
+  writeup = frame : postWriteup {
+    count {
+      contents: "3 min"
+    }
+  }
+
+  actions = frame {
+    width: 100%,
+    layout: {stack: {align-items: .center, item-gap: spc.steps.s2}},
+    children: [add, comments],
+
+    add = frame : btns.btnSm {
+      border[0].color: col.roles.act-line,
+      fill[0].color: col.roles.act-bg,
+
+      btnStitch {
+        border[0].color: col.roles.ctl-stitch-fill
+      }
+
+      glyph {
+        fill[0].color: col.roles.act-fg,
+        contents: plusIcon
+      }
+
+      label {
+        fill[0].color: col.roles.act-fg,
+        contents: "Add your ranking"
+      }
+    }
+
+    comments = frame : btns.btnGhost {
+      height: spc.controls.btn-sm,
+      padding-left: spc.layout.btn-sm-x,
+      padding-right: spc.layout.btn-sm-x,
+
+      glyph {
+        width: spc.controls.icon-sm,
+        height: spc.controls.icon-sm,
+        contents: commentIcon,
+        display: .visible
+      }
+
+      label {
+        contents: "4 comments",
+        font-size: typ.sizes.label-card
+      }
+    }
+  }
+
+  foot = frame {
+    width: 100%,
+    height: spc.controls.post-foot-h,
+    children: tags,
+
+    tags = frame : postTags {
+      left: spc.layout.tag-pull,
+      top: 0px,
+
+      t1 {
+        label {
+          contents: "browsers"
+        }
+      }
+
+      t2 {
+        label {
+          contents: "ranked"
+        }
+      }
+    }
+  }
+}
+
+// ==== states page (labels over the definitions, then the states boards: i9 · i10 · i11) ====
+lbl-postKicker = text : doc.specLabel {
+  left: 0px,
+  top: 0px,
+  contents: "postKicker"
+}
+
+note-postKicker = text : doc.specNote {
+  left: 0px,
+  top: 16px,
+  contents: "the kicker"
+}
+
+lbl-postAbout = text : doc.specLabel {
+  left: 402px,
+  top: 0px,
+  contents: "postAbout"
+}
+
+note-postAbout = text : doc.specNote {
+  left: 402px,
+  top: 16px,
+  contents: "the about pill"
+}
+
+lbl-postWriteup = text : doc.specLabel {
+  left: 804px,
+  top: 0px,
+  contents: "postWriteup"
+}
+
+note-postWriteup = text : doc.specNote {
+  left: 804px,
+  top: 16px,
+  contents: "the write-up pill"
+}
+
+lbl-postGo = text : doc.specLabel {
+  left: 1206px,
+  top: 0px,
+  contents: "postGo"
+}
+
+note-postGo = text : doc.specNote {
+  left: 1206px,
+  top: 16px,
+  contents: "a go-link"
+}
+
+lbl-postRibbon = text : doc.specLabel {
+  left: 1608px,
+  top: 0px,
+  contents: "postRibbon"
+}
+
+note-postRibbon = text : doc.specNote {
+  left: 1608px,
+  top: 16px,
+  contents: "the bookmark"
+}
+
+lbl-postTags = text : doc.specLabel {
+  left: 1747px,
+  top: 0px,
+  contents: "postTags"
+}
+
+note-postTags = text : doc.specNote {
+  left: 1747px,
+  top: 16px,
+  contents: "a card's tags"
+}
+
+lbl-postArticle = text : doc.specLabel {
+  left: 0px,
+  top: 160px,
+  contents: "postArticle"
+}
+
+note-postArticle = text : doc.specNote {
+  left: 0px,
+  top: 176px,
+  contents: "an article"
+}
+
+lbl-postArticleCover = text : doc.specLabel {
+  left: 402px,
+  top: 160px,
+  contents: "postArticleCover"
+}
+
+note-postArticleCover = text : doc.specNote {
+  left: 402px,
+  top: 176px,
+  contents: "with a cover"
+}
+
+lbl-postArticleI11 = text : doc.specLabel {
+  left: 804px,
+  top: 160px,
+  contents: "postArticleI11"
+}
+
+note-postArticleI11 = text : doc.specNote {
+  left: 804px,
+  top: 176px,
+  contents: "i11 · “Read →” cut"
+}
+
+lbl-postArticleCoverI11 = text : doc.specLabel {
+  left: 1206px,
+  top: 160px,
+  contents: "postArticleCoverI11"
+}
+
+note-postArticleCoverI11 = text : doc.specNote {
+  left: 1206px,
+  top: 176px,
+  contents: "i11 · cover, “Read →” cut"
+}
+
+lbl-postNote = text : doc.specLabel {
+  left: 0px,
+  top: 673px,
+  contents: "postNote"
+}
+
+note-postNote = text : doc.specNote {
+  left: 0px,
+  top: 689px,
+  contents: "a scratch (canary)"
+}
+
+lbl-postNotePink = text : doc.specLabel {
+  left: 402px,
+  top: 673px,
+  contents: "postNotePink"
+}
+
+note-postNotePink = text : doc.specNote {
+  left: 402px,
+  top: 689px,
+  contents: "pink"
+}
+
+lbl-postNoteMint = text : doc.specLabel {
+  left: 804px,
+  top: 673px,
+  contents: "postNoteMint"
+}
+
+note-postNoteMint = text : doc.specNote {
+  left: 804px,
+  top: 689px,
+  contents: "mint"
+}
+
+lbl-postNoteSky = text : doc.specLabel {
+  left: 1206px,
+  top: 673px,
+  contents: "postNoteSky"
+}
+
+note-postNoteSky = text : doc.specNote {
+  left: 1206px,
+  top: 689px,
+  contents: "sky"
+}
+
+lbl-postPick = text : doc.specLabel {
+  left: 0px,
+  top: 947px,
+  contents: "postPick"
+}
+
+note-postPick = text : doc.specNote {
+  left: 0px,
+  top: 963px,
+  contents: "a pick"
+}
+
+lbl-postPickI10 = text : doc.specLabel {
+  left: 402px,
+  top: 947px,
+  contents: "postPickI10"
+}
+
+note-postPickI10 = text : doc.specNote {
+  left: 402px,
+  top: 963px,
+  contents: "i10 · a link button"
+}
+
+lbl-postTrack = text : doc.specLabel {
+  left: 804px,
+  top: 947px,
+  contents: "postTrack"
+}
+
+note-postTrack = text : doc.specNote {
+  left: 804px,
+  top: 963px,
+  contents: "a playlist's track row"
+}
+
+lbl-postPlaylist = text : doc.specLabel {
+  left: 1206px,
+  top: 947px,
+  contents: "postPlaylist"
+}
+
+note-postPlaylist = text : doc.specNote {
+  left: 1206px,
+  top: 963px,
+  contents: "a playlist"
+}
+
+lbl-postImages = text : doc.specLabel {
+  left: 0px,
+  top: 1484px,
+  contents: "postImages"
+}
+
+note-postImages = text : doc.specNote {
+  left: 0px,
+  top: 1500px,
+  contents: "images · 1 + 3"
+}
+
+lbl-postImages2 = text : doc.specLabel {
+  left: 402px,
+  top: 1484px,
+  contents: "postImages2"
+}
+
+note-postImages2 = text : doc.specNote {
+  left: 402px,
+  top: 1500px,
+  contents: "2 side by side"
+}
+
+lbl-postImages3 = text : doc.specLabel {
+  left: 804px,
+  top: 1484px,
+  contents: "postImages3"
+}
+
+note-postImages3 = text : doc.specNote {
+  left: 804px,
+  top: 1500px,
+  contents: "1 + 2"
+}
+
+lbl-postImages3I10 = text : doc.specLabel {
+  left: 1206px,
+  top: 1484px,
+  contents: "postImages3I10"
+}
+
+note-postImages3I10 = text : doc.specNote {
+  left: 1206px,
+  top: 1500px,
+  contents: "i10 · 1 + 2"
+}
+
+lbl-postRanking = text : doc.specLabel {
+  left: 0px,
+  top: 2068px,
+  contents: "postRanking"
+}
+
+note-postRanking = text : doc.specNote {
+  left: 0px,
+  top: 2084px,
+  contents: "a ranking"
+}
+
+lbl-postTier = text : doc.specLabel {
+  left: 402px,
+  top: 2068px,
+  contents: "postTier"
+}
+
+note-postTier = text : doc.specNote {
+  left: 402px,
+  top: 2084px,
+  contents: "a tier row"
+}
+
+lbl-postTierNamed = text : doc.specLabel {
+  left: 804px,
+  top: 2068px,
+  contents: "postTierNamed"
+}
+
+note-postTierNamed = text : doc.specNote {
+  left: 804px,
+  top: 2084px,
+  contents: "a named tier"
+}
+
+lbl-postTierItem = text : doc.specLabel {
+  left: 1206px,
+  top: 2068px,
+  contents: "postTierItem"
+}
+
+note-postTierItem = text : doc.specNote {
+  left: 1206px,
+  top: 2084px,
+  contents: "a tier item"
+}
+
+lbl-postGif = text : doc.specLabel {
+  left: 1608px,
+  top: 2068px,
+  contents: "postGif"
+}
+
+note-postGif = text : doc.specNote {
+  left: 1608px,
+  top: 2084px,
+  contents: "the GIF mark"
+}
+
+@variants(postCardStatesI10)
+postCardStates = frame : doc.docBoard {
+  title: "Post cards · states · i9",
+  left: 0px,
+  top: 2734px,
+
+  body {
+    layout.stack.item-gap: 48px,
+    overrides: [
+      insert(row-1, after = .nil),
+      insert(row-2, after = row-1),
+      insert(row-3, after = row-2),
+      insert(row-4, after = row-3),
+      insert(row-5, after = row-4)
+    ]
+  }
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i9"
+      }
+    }
+
+    boardCaption {
+      contents: "Post cards · every state"
+    }
+  }
+
+  row-1 = frame : doc.specRow {
+    layout.stack.item-gap: 48px,
+    overrides: [
+      insert(st-postKicker, after = .nil),
+      insert(st-postAbout, after = st-postKicker),
+      insert(st-postWriteup, after = st-postAbout),
+      insert(st-postGo, after = st-postWriteup),
+      insert(st-postRibbon, after = st-postGo),
+      insert(st-postTags, after = st-postRibbon)
+    ]
+  }
+
+  row-2 = frame : doc.specRow {
+    layout.stack.item-gap: 48px,
+    overrides: [
+      insert(st-postArticle, after = .nil),
+      insert(st-postArticleCover, after = st-postArticle),
+      insert(st-postNote, after = st-postArticleCover),
+      insert(st-postNotePink, after = st-postNote),
+      insert(st-postNoteMint, after = st-postNotePink),
+      insert(st-postNoteSky, after = st-postNoteMint)
+    ]
+  }
+
+  row-3 = frame : doc.specRow {
+    layout.stack.item-gap: 48px,
+    overrides: [
+      insert(st-postPick, after = .nil),
+      insert(st-postPlaylist, after = st-postPick),
+      insert(st-postTrack, after = st-postPlaylist)
+    ]
+  }
+
+  row-4 = frame : doc.specRow {
+    layout.stack.item-gap: 48px,
+    overrides: [
+      insert(st-postImages, after = .nil),
+      insert(st-postImages2, after = st-postImages),
+      insert(st-postImages3, after = st-postImages2)
+    ]
+  }
+
+  row-5 = frame : doc.specRow {
+    layout.stack.item-gap: 48px,
+    overrides: [
+      insert(st-postRanking, after = .nil),
+      insert(st-postTier, after = st-postRanking),
+      insert(st-postTierNamed, after = st-postTier),
+      insert(st-postTierItem, after = st-postTierNamed),
+      insert(st-postGif, after = st-postTierItem)
+    ]
+  }
+
+  st-postKicker = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "postKicker"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "the kicker"
+    }
+
+    it = frame : postKicker {}
+  }
+
+  st-postAbout = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "postAbout"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "the about pill"
+    }
+
+    it = frame : postAbout {}
+  }
+
+  st-postWriteup = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "postWriteup"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "the write-up pill"
+    }
+
+    it = frame : postWriteup {}
+  }
+
+  st-postGo = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "postGo"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "a go-link"
+    }
+
+    it = frame : postGo {}
+  }
+
+  st-postRibbon = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "postRibbon"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "the bookmark"
+    }
+
+    it = frame : postRibbon {}
+  }
+
+  st-postTags = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "postTags"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "a card's tags"
+    }
+
+    it = frame : postTags {}
+  }
+
+  st-postArticle = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "postArticle"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "an article"
+    }
+
+    it = frame : postArticle {}
+  }
+
+  st-postArticleCover = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "postArticleCover"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "with a cover"
+    }
+
+    it = frame : postArticleCover {}
+  }
+
+  st-postNote = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "postNote"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "a scratch (canary)"
+    }
+
+    it = frame : postNote {}
+  }
+
+  st-postNotePink = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "postNotePink"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "pink"
+    }
+
+    it = frame : postNotePink {}
+  }
+
+  st-postNoteMint = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "postNoteMint"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "mint"
+    }
+
+    it = frame : postNoteMint {}
+  }
+
+  st-postNoteSky = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "postNoteSky"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "sky"
+    }
+
+    it = frame : postNoteSky {}
+  }
+
+  st-postPick = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "postPick"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "a pick"
+    }
+
+    it = frame : postPick {}
+  }
+
+  st-postPlaylist = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "postPlaylist"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "a playlist"
+    }
+
+    it = frame : postPlaylist {}
+  }
+
+  st-postTrack = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "postTrack"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "a playlist's track row"
+    }
+
+    it = frame : postTrack {}
+  }
+
+  st-postImages = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "postImages"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "images · 1 + 3"
+    }
+
+    it = frame : postImages {}
+  }
+
+  st-postImages2 = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "postImages2"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "2 side by side"
+    }
+
+    it = frame : postImages2 {}
+  }
+
+  st-postImages3 = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "postImages3"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "1 + 2"
+    }
+
+    it = frame : postImages3 {}
+  }
+
+  st-postRanking = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "postRanking"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "a ranking"
+    }
+
+    it = frame : postRanking {}
+  }
+
+  st-postTier = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "postTier"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "a tier row"
+    }
+
+    it = frame : postTier {}
+  }
+
+  st-postTierNamed = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "postTierNamed"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "a named tier"
+    }
+
+    it = frame : postTierNamed {}
+  }
+
+  st-postTierItem = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "postTierItem"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "a tier item"
+    }
+
+    it = frame : postTierItem {}
+  }
+
+  st-postGif = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "postGif"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "the GIF mark"
+    }
+
+    it = frame : postGif {}
+  }
+}
+
+@variants(postCardStatesI11)
+@context(i10="on")
+postCardStatesI10 = frame : postCardStates {
+  title: "Post cards · states · i10",
+  left: 2796px,
+  top: 2734px,
+
+  body {
+    row-4 {
+      st-postImages3 {
+        slot {
+          @with-variant(postImages3I10)
+          it {}
+        }
+
+        note {
+          contents: "i10 · 1 + 2"
+        }
+
+        label {
+          contents: "postImages3I10"
+        }
+      }
+    }
+
+    row-3 {
+      st-postPick {
+        slot {
+          @with-variant(postPickI10)
+          it {}
+        }
+
+        note {
+          contents: "i10 · a link button"
+        }
+
+        label {
+          contents: "postPickI10"
+        }
+      }
+    }
+  }
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i10"
+      }
+    }
+  }
+}
+
+@context(i10="on", i11="on")
+postCardStatesI11 = frame : postCardStatesI10 {
+  title: "Post cards · states · i11",
+  left: 5562px,
+  top: 2734px,
+
+  body {
+    row-2 {
+      st-postArticleCover {
+        slot {
+          @with-variant(postArticleCoverI11)
+          it {}
+        }
+
+        note {
+          contents: "i11 · cover, “Read →” cut"
+        }
+
+        label {
+          contents: "postArticleCoverI11"
+        }
+      }
+
+      st-postArticle {
+        slot {
+          @with-variant(postArticleI11)
+          it {}
+        }
+
+        note {
+          contents: "i11 · “Read →” cut"
+        }
+
+        label {
+          contents: "postArticleI11"
+        }
+      }
+    }
+  }
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i11"
+      }
+    }
+  }
+}

@@ -1,0 +1,707 @@
+import "tokens/color/roles.elyx" as col
+import "tokens/space/space.elyx" as spc
+import "tokens/type/type.elyx" as typ
+import "components/atoms/text.elyx" as txt
+import "components/atoms/surface.elyx" as surf
+import "assets/icons/bold/code.svg" as stackIcon
+import "components/atoms/doc.elyx" as doc
+import "assets/icons/stack/astro.svg" as astroLogo
+import "assets/icons/stack/svelte.svg" as svelteLogo
+import "assets/icons/stack/tailwind.svg" as tailwindLogo
+import "assets/icons/stack/cloudflare.svg" as cloudflareLogo
+
+// The kit's .ytag: a woven tag inside a card or row (topic hashtags,
+// stack tags). Quiet words at rest; a match (an active filter or a typed
+// hit, also a pressed tag) wears the in-card match chip (col.roles.chip)
+// with full-strength words. i9: Nunito 750; from i10 Meta (typ.*.fact).
+// Children: `hash` (the #, at .62), `glyph` (a stack's logo, hidden on a
+// hashtag), `label`. Override `label {contents: …}`, `glyph {contents: …}`.
+@variants(tagMatch, tagMore, tagStack, tagPress, tagHover, tagFocus)
+export tag = frame {
+  title: "Tag · rest",
+  left: 0px,
+  top: 40px,
+  height: spc.controls.tag,
+  layout: {stack: {align-items: .center}},
+  corner-radius: spc.radii.pill,
+  padding-left: spc.steps.s2,
+  padding-right: spc.steps.s2,
+  children: [hash, glyph, label],
+
+  hash = text : txt.metaCard {
+    opacity: 0.62,
+    contents: "#",
+    font-size: typ.sizes.fact,
+    font-family: typ.faces.fact,
+    font-style: typ.faces.fact-style
+  }
+
+  glyph = asset {
+    width: spc.controls.icon-sm,
+    height: spc.controls.icon-sm,
+    display: .none,
+    fill: col.roles.fg-3,
+    contents: stackIcon
+  }
+
+  label = text : txt.metaCard {
+    contents: "svelte",
+    font-size: typ.sizes.fact,
+    font-family: typ.faces.fact,
+    font-style: typ.faces.fact-style
+  }
+}
+
+// A match: an active filter, a typed-search hit, a pressed tag.
+@variants(tagMatchHover)
+export tagMatch = frame : tag {
+  title: "Tag · match",
+  left: 890px,
+  top: 40px,
+  fill[0].color: col.roles.chip,
+
+  label {
+    fill[0].color: col.roles.fg
+  }
+
+  hash {
+    fill[0].color: col.roles.fg
+  }
+}
+
+// The rest of a folded list ("+2").
+export tagMore = frame : tag {
+  title: "Tag · more",
+  left: 1359px,
+  top: 40px,
+
+  hash {
+    display: .none
+  }
+
+  label {
+    contents: "+2"
+  }
+}
+
+// A stack tag (.ytag--stk): the tool's logo where the # was.
+@variants(tagStackMatch)
+export tagStack = frame : tag {
+  title: "Tag · stack",
+  left: 0px,
+  top: 204px,
+  layout.stack.item-gap: spc.steps.s1,
+
+  hash {
+    display: .none
+  }
+
+  label {
+    contents: "Svelte"
+  }
+
+  glyph {
+    display: .visible
+  }
+}
+
+export tagStackMatch = frame : tagStack {
+  title: "Tag · stack match",
+  left: 275px,
+  top: 204px,
+  fill[0].color: col.roles.chip,
+
+  label {
+    fill[0].color: col.roles.fg
+  }
+
+  glyph {
+    fill[0].color: col.roles.fg
+  }
+}
+
+// A tag you can press (Thoughts' topic tags, a button): i9 / i10 the
+// same face as a fact; i11 a Label in a card (13 / 500) (typ.*.tag-btn).
+export tagPress = frame : tag {
+  title: "Tag · button (Thoughts)",
+  left: 659px,
+  top: 204px,
+
+  label {
+    contents: "shower",
+    font-size: typ.sizes.tag-btn,
+    font-family: typ.faces.tag-btn,
+    font-style: typ.faces.tag-btn-style
+  }
+
+  hash {
+    font-size: typ.sizes.tag-btn,
+    font-family: typ.faces.tag-btn,
+    font-style: typ.faces.tag-btn-style
+  }
+}
+
+// A card's tags: three, the rest folded into "+n" (Yarn.tags, max 3).
+export tagRow = frame {
+  title: "Tags · a card's row",
+  left: 0px,
+  top: 368px,
+  layout: {stack: {align-items: .center, item-gap: spc.steps.s1}},
+  children: [first, second, third, more],
+
+  first = frame : tag {}
+
+  second = frame : tagMatch {
+    label {
+      contents: "design"
+    }
+  }
+
+  third = frame : tag {
+    label {
+      contents: "tools"
+    }
+  }
+
+  more = frame : tagMore {}
+}
+
+// A project's stack (display only): up to five stack tags, the first logo
+// on the text edge, the rest folded into "+n" (`more`). One part wherever
+// a stack shows: a project card's bottom line, a timeline row, the item
+// page's "Built with" (each logo in its own colour: the glyph's tint is
+// off). Children: `t1`…`t5` (`t5` hidden), `more` (hidden). Override
+// `tN {glyph {contents: …} label {contents: …}}`.
+export tagStackRow = frame {
+  title: "Tags · a project's stack",
+  left: 275px,
+  top: 368px,
+  layout: {stack: {align-items: .center, item-gap: spc.layout.stitch-w}},
+  children: [t1, t2, t3, t4, t5, more],
+
+  t1 = frame : tagStack {
+    padding-left: 0px,
+
+    glyph {
+      fill[0].visible: .false,
+      contents: astroLogo
+    }
+
+    label {
+      contents: "Astro"
+    }
+  }
+
+  t2 = frame : tagStack {
+    glyph {
+      fill[0].visible: .false,
+      contents: svelteLogo
+    }
+
+    label {
+      contents: "Svelte"
+    }
+  }
+
+  t3 = frame : tagStack {
+    glyph {
+      fill[0].visible: .false,
+      contents: tailwindLogo
+    }
+
+    label {
+      contents: "Tailwind"
+    }
+  }
+
+  t4 = frame : tagStack {
+    glyph {
+      fill[0].visible: .false,
+      contents: cloudflareLogo
+    }
+
+    label {
+      contents: "Cloudflare"
+    }
+  }
+
+  t5 = frame : tagStack {
+    display: .none,
+
+    glyph {
+      fill[0].visible: .false
+    }
+  }
+
+  more = frame : tagMore {
+    display: .none
+  }
+}
+
+// ---- interaction states (the kit's tags table: rest · hover · focus ·
+// pressed · pressed + hover)
+// Hover (mouse): the match chip, full-strength words, the # at full
+// strength in the link colour.
+export tagHover = frame : tag {
+  title: "Tag · hover",
+  left: 275px,
+  top: 40px,
+  fill[0].color: col.roles.chip,
+
+  label {
+    fill[0].color: col.roles.fg
+  }
+
+  hash {
+    fill[0].color: col.roles.link,
+    opacity: 1
+  }
+}
+
+// Focus (keys only): the dark thread ring 3px outside.
+export tagFocus = frame : tag {
+  title: "Tag · focus",
+  left: 659px,
+  top: 40px,
+  overrides: [insert(tagFocusRing, after = tag.label)],
+
+  tagFocusRing = frame : surf.focusRing {
+    left: spc.layout.focus-out,
+    top: spc.layout.focus-out,
+    right: spc.layout.focus-out,
+    bottom: spc.layout.focus-out,
+    width: .nil,
+    height: .nil,
+    ignore-stack: .true
+  }
+}
+
+// Pressed + hover: the strike says a click clears the filter.
+export tagMatchHover = frame : tagMatch {
+  title: "Tag · match + hover",
+  left: 1134px,
+  top: 40px,
+
+  label {
+    strikethrough: .single
+  }
+}
+
+// ==== states page (labels over the definitions, then the states boards: i9 · i10 · i11) ====
+lbl-tag = text : doc.specLabel {
+  left: 0px,
+  top: 0px,
+  contents: "tag"
+}
+
+note-tag = text : doc.specNote {
+  left: 0px,
+  top: 16px,
+  contents: "rest: a hashtag"
+}
+
+lbl-tagHover = text : doc.specLabel {
+  left: 275px,
+  top: 0px,
+  contents: "tagHover"
+}
+
+note-tagHover = text : doc.specNote {
+  left: 275px,
+  top: 16px,
+  contents: "hover"
+}
+
+lbl-tagFocus = text : doc.specLabel {
+  left: 659px,
+  top: 0px,
+  contents: "tagFocus"
+}
+
+note-tagFocus = text : doc.specNote {
+  left: 659px,
+  top: 16px,
+  contents: "focus (keys)"
+}
+
+lbl-tagMatch = text : doc.specLabel {
+  left: 890px,
+  top: 0px,
+  contents: "tagMatch"
+}
+
+note-tagMatch = text : doc.specNote {
+  left: 890px,
+  top: 16px,
+  contents: "match: pressed / a typed hit"
+}
+
+lbl-tagMatchHover = text : doc.specLabel {
+  left: 1134px,
+  top: 0px,
+  contents: "tagMatchHover"
+}
+
+note-tagMatchHover = text : doc.specNote {
+  left: 1134px,
+  top: 16px,
+  contents: "match + hover: the strike"
+}
+
+lbl-tagMore = text : doc.specLabel {
+  left: 1359px,
+  top: 0px,
+  contents: "tagMore"
+}
+
+note-tagMore = text : doc.specNote {
+  left: 1359px,
+  top: 16px,
+  contents: "the rest of a folded list"
+}
+
+lbl-tagStack = text : doc.specLabel {
+  left: 0px,
+  top: 164px,
+  contents: "tagStack"
+}
+
+note-tagStack = text : doc.specNote {
+  left: 0px,
+  top: 180px,
+  contents: "a stack tag"
+}
+
+lbl-tagStackMatch = text : doc.specLabel {
+  left: 275px,
+  top: 164px,
+  contents: "tagStackMatch"
+}
+
+note-tagStackMatch = text : doc.specNote {
+  left: 275px,
+  top: 180px,
+  contents: "stack tag · match"
+}
+
+lbl-tagPress = text : doc.specLabel {
+  left: 659px,
+  top: 164px,
+  contents: "tagPress"
+}
+
+note-tagPress = text : doc.specNote {
+  left: 659px,
+  top: 180px,
+  contents: "a tag you press (Thoughts)"
+}
+
+lbl-tagRow = text : doc.specLabel {
+  left: 0px,
+  top: 328px,
+  contents: "tagRow"
+}
+
+note-tagRow = text : doc.specNote {
+  left: 0px,
+  top: 344px,
+  contents: "a row's tags"
+}
+
+lbl-tagStackRow = text : doc.specLabel {
+  left: 275px,
+  top: 328px,
+  contents: "tagStackRow"
+}
+
+note-tagStackRow = text : doc.specNote {
+  left: 275px,
+  top: 344px,
+  contents: "a project's stack"
+}
+
+@variants(tagStatesI10)
+tagStates = frame : doc.docBoard {
+  title: "Tag · states · i9",
+  left: 0px,
+  top: 556px,
+
+  body {
+    layout.stack.item-gap: 48px,
+    overrides: [
+      insert(row-1, after = .nil),
+      insert(row-2, after = row-1),
+      insert(row-3, after = row-2)
+    ]
+  }
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i9"
+      }
+    }
+
+    boardCaption {
+      contents: "Tag · every state"
+    }
+  }
+
+  row-1 = frame : doc.specRow {
+    layout.stack.item-gap: 48px,
+    overrides: [
+      insert(st-tag, after = .nil),
+      insert(st-tagHover, after = st-tag),
+      insert(st-tagFocus, after = st-tagHover),
+      insert(st-tagMatch, after = st-tagFocus),
+      insert(st-tagMatchHover, after = st-tagMatch),
+      insert(st-tagMore, after = st-tagMatchHover)
+    ]
+  }
+
+  row-2 = frame : doc.specRow {
+    layout.stack.item-gap: 48px,
+    overrides: [
+      insert(st-tagStack, after = .nil),
+      insert(st-tagStackMatch, after = st-tagStack),
+      insert(st-tagPress, after = st-tagStackMatch)
+    ]
+  }
+
+  row-3 = frame : doc.specRow {
+    layout.stack.item-gap: 48px,
+    overrides: [
+      insert(st-tagRow, after = .nil),
+      insert(st-tagStackRow, after = st-tagRow)
+    ]
+  }
+
+  st-tag = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "tag"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "rest: a hashtag"
+    }
+
+    it = frame : tag {}
+  }
+
+  st-tagHover = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "tagHover"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "hover"
+    }
+
+    it = frame : tagHover {}
+  }
+
+  st-tagFocus = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "tagFocus"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "focus (keys)"
+    }
+
+    it = frame : tagFocus {}
+  }
+
+  st-tagMatch = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "tagMatch"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "match: pressed / a typed hit"
+    }
+
+    it = frame : tagMatch {}
+  }
+
+  st-tagMatchHover = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "tagMatchHover"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "match + hover: the strike"
+    }
+
+    it = frame : tagMatchHover {}
+  }
+
+  st-tagMore = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "tagMore"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "the rest of a folded list"
+    }
+
+    it = frame : tagMore {}
+  }
+
+  st-tagStack = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "tagStack"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "a stack tag"
+    }
+
+    it = frame : tagStack {}
+  }
+
+  st-tagStackMatch = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "tagStackMatch"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "stack tag · match"
+    }
+
+    it = frame : tagStackMatch {}
+  }
+
+  st-tagPress = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "tagPress"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "a tag you press (Thoughts)"
+    }
+
+    it = frame : tagPress {}
+  }
+
+  st-tagRow = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "tagRow"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "a row's tags"
+    }
+
+    it = frame : tagRow {}
+  }
+
+  st-tagStackRow = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "tagStackRow"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "a project's stack"
+    }
+
+    it = frame : tagStackRow {}
+  }
+}
+
+@variants(tagStatesI11)
+@context(i10="on")
+tagStatesI10 = frame : tagStates {
+  title: "Tag · states · i10",
+  left: 1094px,
+  top: 556px,
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i10"
+      }
+    }
+  }
+}
+
+@context(i10="on", i11="on")
+tagStatesI11 = frame : tagStatesI10 {
+  title: "Tag · states · i11",
+  left: 2191px,
+  top: 556px,
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i11"
+      }
+    }
+  }
+}

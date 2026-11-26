@@ -1,0 +1,724 @@
+import "tokens/color/roles.elyx" as col
+import "tokens/color/palette.elyx" as pal
+import "tokens/space/space.elyx" as spc
+import "tokens/type/type.elyx" as typ
+import "components/atoms/text.elyx" as txt
+import "components/atoms/surface.elyx" as surf
+import "components/molecules/button.elyx" as btn
+import "components/atoms/doc.elyx" as doc
+import "assets/icons/bold/list-plus.svg" as queueIcon
+import "assets/icons/bold/broadcast.svg" as liveIcon
+import "assets/icons/bold/check.svg" as doneIcon
+import "assets/icons/bold/arrow-elbow-down-left.svg" as enterIcon
+
+// Feedback on the floating layer and in place of a list: the toast, the
+// hint (.ytip), the key hint (.yhint: a word + a key), the empty state and
+// the key (kbd).
+// ---- kbd: a small white key (`key` is its text; `glyph` its icon form).
+// i9 Maple Mono 600 in ink-2; i10 Numeric in ink-3; i11 Nunito Sans.
+@variants(kbdIcon)
+export kbd = frame {
+  title: "Key",
+  left: 0px,
+  top: 40px,
+  height: spc.controls.kbd,
+  min-width: spc.controls.kbd,
+  layout: {stack: {justify-content: .center, align-items: .center}},
+  fill: col.roles.surface,
+  border: {color: col.roles.line, position: .outside},
+  shadow: {
+    inner-shadow: {
+      color: pal.palette.stitch-soft,
+      offset: point(0px, -1.5px),
+      blur-radius: 0px
+    }
+  },
+  corner-radius: spc.radii.kbd,
+  padding: [0px, spc.steps.s1],
+  children: [key, glyph],
+
+  key = text : txt.numCard {
+    contents: "/"
+  }
+
+  glyph = asset {
+    width: spc.controls.kbd-icon,
+    height: spc.controls.kbd-icon,
+    display: .none,
+    fill: col.roles.fg-3,
+    contents: enterIcon
+  }
+}
+
+@variants(kbdDark)
+export kbdIcon = frame : kbd {
+  title: "Key · icon",
+  left: 672px,
+  top: 40px,
+
+  key {
+    display: .none
+  }
+
+  glyph {
+    display: .visible
+  }
+}
+
+// The chosen suggestion's key: ink, white glyph, no ring.
+export kbdDark = frame : kbdIcon {
+  title: "Key · dark",
+  left: 1344px,
+  top: 40px,
+  border[0].visible: .false,
+  fill[0].color: col.roles.dark,
+  shadow[0].inner-shadow.visible: .false,
+
+  glyph {
+    fill[0].color: col.roles.dark-fg
+  }
+}
+
+// ---- the key hint (.yhint): a Meta word + a key ("add ↵").
+export hint = frame {
+  title: "Key hint",
+  left: 2016px,
+  top: 40px,
+  layout: {stack: {align-items: .center, item-gap: spc.steps.s1}},
+  children: [word, key],
+
+  word = text : txt.meta {
+    contents: "add"
+  }
+
+  key = frame : kbdDark {}
+}
+
+// ---- the hint (.ytip): every icon-only control's name, on hover or key
+// focus. Ink, white words; i9 Nunito 700, i10 Micro 800, i11 Micro 500.
+export tip = frame {
+  title: "Hint",
+  left: 2142px,
+  top: 40px,
+  layout: {stack: {align-items: .center}},
+  fill: col.roles.dark,
+  shadow: {
+    drop-shadow: {
+      color: pal.palette.shadow-lift,
+      offset: point(0px, 6px),
+      blur-radius: 16px,
+      spread: -6px
+    }
+  },
+  corner-radius: spc.radii.tip,
+  padding: [spc.layout.tip-y, spc.layout.tip-x],
+  children: words,
+
+  words = text : txt.label {
+    contents: "Copy link",
+    font-size: typ.sizes.tip,
+    font-family: typ.faces.tip,
+    font-style: typ.faces.tip-style,
+    fill[0].color: col.roles.dark-fg
+  }
+}
+
+// ---- the toast: ink, a quiet stitch, a glyph (i9 red-hi, white from
+// i10), the words (the thing named in Label's face), Undo at the end.
+// Children: `toastStitch`, `glyph`, `words`, `action` (a small ghost .btn).
+@variants(toastAction, toastPlain)
+export toast = frame {
+  title: "Toast · undo",
+  left: 0px,
+  top: 198px,
+  layout: {stack: {align-items: .center, item-gap: spc.steps.s3}},
+  fill: col.roles.dark,
+  shadow: {
+    drop-shadow: {
+      color: pal.palette.shadow-pop,
+      offset: point(0px, 8px),
+      blur-radius: 24px
+    }
+  },
+  corner-radius: spc.radii.toast,
+  padding: [spc.steps.s2, spc.steps.s2, spc.steps.s2, spc.steps.s4],
+  children: [toastStitch, glyph, words, action],
+
+  toastStitch = frame : surf.stitch {
+    left: spc.steps.s1,
+    top: spc.steps.s1,
+    right: spc.steps.s1,
+    bottom: spc.steps.s1,
+    width: .nil,
+    height: .nil,
+    opacity: 0.3,
+    ignore-stack: .true,
+    corner-radius: spc.radii.card,
+    border[0].color: col.roles.dark-fg,
+    border[0].width: spc.layout.stitch-w-sm
+  }
+
+  glyph = asset {
+    width: spc.controls.icon,
+    height: spc.controls.icon,
+    fill: col.roles.toast-ic,
+    contents: queueIcon
+  }
+
+  words = text : txt.body {
+    contents: "combat is in the queue",
+    font-size: typ.sizes.toast,
+    font-style: typ.faces.toast-style,
+    fill[0].color: col.roles.dark-fg,
+    subrange[0].font-family: typ.faces.label,
+    subrange[0].font-style: typ.faces.label-style,
+    subrange[0].range: [0, 6]
+  }
+
+  action = frame : btn.btnSm {
+    border[0].visible: .false,
+    fill[0]: .nil,
+    shadow[0]: .nil,
+    shadow[1]: .nil,
+
+    btnStitch {
+      border[0].color: col.roles.ctl-stitch-fill,
+      opacity: 0.6
+    }
+
+    label {
+      fill[0].color: col.roles.dark-fg,
+      contents: "Undo"
+    }
+
+    glyph {
+      display: .none
+    }
+  }
+}
+
+export toastAction = frame : toast {
+  title: "Toast · action",
+  left: 672px,
+  top: 198px,
+
+  words {
+    subrange[0].range: [0, 8],
+    subrange[0].font-family: typ.faces.label,
+    subrange[0].font-style: typ.faces.label-style,
+    contents: "Live now blaqat.net/projects"
+  }
+
+  glyph {
+    contents: liveIcon
+  }
+
+  action {
+    label {
+      contents: "View"
+    }
+  }
+}
+
+export toastPlain = frame : toast {
+  title: "Toast · plain",
+  left: 1344px,
+  top: 198px,
+  padding-right: spc.steps.s4,
+
+  words {
+    subrange[0].font-family: typ.faces.body,
+    subrange[0].font-style: typ.faces.toast-style,
+    contents: "Copied the round-up"
+  }
+
+  action {
+    display: .none
+  }
+
+  glyph {
+    contents: doneIcon
+  }
+}
+
+// ---- the empty state: where the list would be. One line in Title, an
+// optional quiet Body line, an optional small action (↺ Clear filters).
+// Children: `heading`, `note`, `action`.
+@variants(emptyText, emptyQuiet)
+export empty = frame {
+  title: "Empty · action",
+  left: 0px,
+  top: 386px,
+  width: spc.controls.line-w,
+  layout: {
+    stack: {direction: .column, align-items: .center, item-gap: spc.steps.s3}
+  },
+  padding: [spc.steps.s7, spc.steps.s5],
+  children: [heading, note, action],
+
+  heading = text : txt.title {
+    contents: "No projects match",
+    align: .center
+  }
+
+  note = text : txt.body {
+    width: 100%,
+    display: .none,
+    contents: "Other pages link here with their tags; this one hasn't been posted about.",
+    align: .center
+  }
+
+  action = frame : btn.btnSm {}
+}
+
+export emptyText = frame : empty {
+  title: "Empty · text + action",
+  left: 672px,
+  top: 386px,
+
+  heading {
+    contents: "Nothing tagged #rust yet."
+  }
+
+  note {
+    display: .visible
+  }
+}
+
+export emptyQuiet = frame : empty {
+  title: "Empty · text",
+  left: 1344px,
+  top: 386px,
+
+  action {
+    display: .none
+  }
+
+  heading {
+    contents: "Still winding this one."
+  }
+
+  note {
+    display: .visible,
+    contents: "Picks for “Tools I like” will gather here."
+  }
+}
+
+// ==== states page (labels over the definitions, then the states boards: i9 · i10 · i11) ====
+lbl-kbd = text : doc.specLabel {
+  left: 0px,
+  top: 0px,
+  contents: "kbd"
+}
+
+note-kbd = text : doc.specNote {
+  left: 0px,
+  top: 16px,
+  contents: "a key"
+}
+
+lbl-kbdIcon = text : doc.specLabel {
+  left: 672px,
+  top: 0px,
+  contents: "kbdIcon"
+}
+
+note-kbdIcon = text : doc.specNote {
+  left: 672px,
+  top: 16px,
+  contents: "a key with a glyph"
+}
+
+lbl-kbdDark = text : doc.specLabel {
+  left: 1344px,
+  top: 0px,
+  contents: "kbdDark"
+}
+
+note-kbdDark = text : doc.specNote {
+  left: 1344px,
+  top: 16px,
+  contents: "a key on ink"
+}
+
+lbl-hint = text : doc.specLabel {
+  left: 2016px,
+  top: 0px,
+  contents: "hint"
+}
+
+note-hint = text : doc.specNote {
+  left: 2016px,
+  top: 16px,
+  contents: "a key hint"
+}
+
+lbl-tip = text : doc.specLabel {
+  left: 2142px,
+  top: 0px,
+  contents: "tip"
+}
+
+note-tip = text : doc.specNote {
+  left: 2142px,
+  top: 16px,
+  contents: "the hint (.ytip)"
+}
+
+lbl-toast = text : doc.specLabel {
+  left: 0px,
+  top: 158px,
+  contents: "toast"
+}
+
+note-toast = text : doc.specNote {
+  left: 0px,
+  top: 174px,
+  contents: "toast · Undo"
+}
+
+lbl-toastAction = text : doc.specLabel {
+  left: 672px,
+  top: 158px,
+  contents: "toastAction"
+}
+
+note-toastAction = text : doc.specNote {
+  left: 672px,
+  top: 174px,
+  contents: "toast · an action"
+}
+
+lbl-toastPlain = text : doc.specLabel {
+  left: 1344px,
+  top: 158px,
+  contents: "toastPlain"
+}
+
+note-toastPlain = text : doc.specNote {
+  left: 1344px,
+  top: 174px,
+  contents: "toast · words only"
+}
+
+lbl-empty = text : doc.specLabel {
+  left: 0px,
+  top: 346px,
+  contents: "empty"
+}
+
+note-empty = text : doc.specNote {
+  left: 0px,
+  top: 362px,
+  contents: "empty · title + action"
+}
+
+lbl-emptyText = text : doc.specLabel {
+  left: 672px,
+  top: 346px,
+  contents: "emptyText"
+}
+
+note-emptyText = text : doc.specNote {
+  left: 672px,
+  top: 362px,
+  contents: "empty · + a second line"
+}
+
+lbl-emptyQuiet = text : doc.specLabel {
+  left: 1344px,
+  top: 346px,
+  contents: "emptyQuiet"
+}
+
+note-emptyQuiet = text : doc.specNote {
+  left: 1344px,
+  top: 362px,
+  contents: "empty · quiet"
+}
+
+@variants(feedbackStatesI10)
+feedbackStates = frame : doc.docBoard {
+  title: "Toast · hint · empty · states · i9",
+  left: 0px,
+  top: 745px,
+
+  body {
+    layout.stack.item-gap: 48px,
+    overrides: [
+      insert(row-1, after = .nil),
+      insert(row-2, after = row-1),
+      insert(row-3, after = row-2)
+    ]
+  }
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i9"
+      }
+    }
+
+    boardCaption {
+      contents: "Toast · hint · empty · every state"
+    }
+  }
+
+  row-1 = frame : doc.specRow {
+    layout.stack.item-gap: 48px,
+    overrides: [
+      insert(st-kbd, after = .nil),
+      insert(st-kbdIcon, after = st-kbd),
+      insert(st-kbdDark, after = st-kbdIcon),
+      insert(st-hint, after = st-kbdDark),
+      insert(st-tip, after = st-hint)
+    ]
+  }
+
+  row-2 = frame : doc.specRow {
+    layout.stack.item-gap: 48px,
+    overrides: [
+      insert(st-toast, after = .nil),
+      insert(st-toastAction, after = st-toast),
+      insert(st-toastPlain, after = st-toastAction)
+    ]
+  }
+
+  row-3 = frame : doc.specRow {
+    layout.stack.item-gap: 48px,
+    overrides: [
+      insert(st-empty, after = .nil),
+      insert(st-emptyText, after = st-empty),
+      insert(st-emptyQuiet, after = st-emptyText)
+    ]
+  }
+
+  st-kbd = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "kbd"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "a key"
+    }
+
+    it = frame : kbd {}
+  }
+
+  st-kbdIcon = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "kbdIcon"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "a key with a glyph"
+    }
+
+    it = frame : kbdIcon {}
+  }
+
+  st-kbdDark = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "kbdDark"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "a key on ink"
+    }
+
+    it = frame : kbdDark {}
+  }
+
+  st-hint = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "hint"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "a key hint"
+    }
+
+    it = frame : hint {}
+  }
+
+  st-tip = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "tip"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "the hint (.ytip)"
+    }
+
+    it = frame : tip {}
+  }
+
+  st-toast = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "toast"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "toast · Undo"
+    }
+
+    it = frame : toast {}
+  }
+
+  st-toastAction = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "toastAction"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "toast · an action"
+    }
+
+    it = frame : toastAction {}
+  }
+
+  st-toastPlain = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "toastPlain"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "toast · words only"
+    }
+
+    it = frame : toastPlain {}
+  }
+
+  st-empty = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "empty"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "empty · title + action"
+    }
+
+    it = frame : empty {}
+  }
+
+  st-emptyText = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "emptyText"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "empty · + a second line"
+    }
+
+    it = frame : emptyText {}
+  }
+
+  st-emptyQuiet = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "emptyQuiet"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "empty · quiet"
+    }
+
+    it = frame : emptyQuiet {}
+  }
+}
+
+@variants(feedbackStatesI11)
+@context(i10="on")
+feedbackStatesI10 = frame : feedbackStates {
+  title: "Toast · hint · empty · states · i10",
+  left: 2208px,
+  top: 745px,
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i10"
+      }
+    }
+  }
+}
+
+@context(i10="on", i11="on")
+feedbackStatesI11 = frame : feedbackStatesI10 {
+  title: "Toast · hint · empty · states · i11",
+  left: 4416px,
+  top: 745px,
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i11"
+      }
+    }
+  }
+}

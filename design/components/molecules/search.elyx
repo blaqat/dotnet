@@ -1,0 +1,583 @@
+import "tokens/color/roles.elyx" as col
+import "tokens/color/palette.elyx" as pal
+import "tokens/space/space.elyx" as spc
+import "tokens/type/type.elyx" as typ
+import "components/atoms/text.elyx" as txt
+import "components/atoms/surface.elyx" as surf
+import "components/molecules/chip.elyx" as chips
+import "assets/icons/bold/hammer.svg" as wipIcon
+import "assets/icons/bold/piano-keys.svg" as pianoIcon
+import "assets/icons/bold/wave-sine.svg" as dawIcon
+import "components/atoms/doc.elyx" as doc
+import "components/molecules/feedback.elyx" as fb
+import "assets/icons/bold/magnifying-glass.svg" as findIcon
+import "assets/icons/bold/x.svg" as clearIcon
+
+// The kit's .ysearch: the full-width search line (52px). A magnifier, the
+// typed words (Body; the placeholder in fg-3), the `/` key at the end.
+// A known term becomes a token (an on chip) before the words; with a
+// value the key gives way to the clear button. i9: white knit + a dashed
+// stitch; i10 R9 calm: flat white + a 1px ring (col.roles.ctl-*). Focus =
+// the field's edge + halo (i9 red, i10 ink), never the rope.
+// Children: `searchStitch`, `lead` (`glyph` + `entry`: tokens + `query`),
+// `key` (fb.kbd), `clear`. Override `lead { entry { query {contents} } }`.
+@variants(searchFilled, searchFocus)
+export search = frame {
+  title: "Search · rest",
+  left: 0px,
+  top: 40px,
+  width: spc.controls.line-w,
+  height: spc.controls.field,
+  layout: {
+    stack: {
+      justify-content: .space-between,
+      align-items: .center,
+      item-gap: spc.steps.s3
+    }
+  },
+  fill: col.roles.surface,
+  border: col.roles.ctl-line,
+  shadow: [
+    {
+      inner-shadow: {
+        color: pal.palette.shadow-1,
+        offset: point(0px, 1px),
+        blur-radius: 3px
+      }
+    },
+    {
+      drop-shadow: {
+        color: col.roles.field-halo,
+        offset: point(0px, 0px),
+        blur-radius: 0px,
+        spread: spc.layout.stitch-in,
+        visible: .false
+      }
+    }
+  ],
+  corner-radius: spc.radii.search,
+  padding: [0px, spc.steps.s3, 0px, spc.steps.s4],
+  children: [searchStitch, lead, key, clear],
+
+  searchStitch = frame : surf.stitch {
+    left: spc.layout.stitch-in,
+    top: spc.layout.stitch-in,
+    right: spc.layout.stitch-in,
+    bottom: spc.layout.stitch-in,
+    width: .nil,
+    height: .nil,
+    ignore-stack: .true,
+    corner-radius: spc.steps.s3,
+    border[0].color: col.roles.ctl-stitch,
+    border[0].width: spc.layout.stitch-w-sm
+  }
+
+  lead = frame {
+    layout: {stack: {align-items: .center, item-gap: spc.steps.s3}},
+    children: [glyph, entry],
+
+    glyph = asset {
+      width: spc.controls.icon,
+      height: spc.controls.icon,
+      fill: col.roles.fg-3,
+      contents: findIcon
+    }
+
+    entry = frame {
+      layout: {stack: {align-items: .center, item-gap: spc.layout.chip-gap}},
+      children: query,
+
+      query = text : txt.body {
+        contents: "Search music and tracks… try “piano”",
+        font-size: typ.sizes.field,
+        font-style: typ.faces.field-style,
+        fill[0].color: col.roles.fg-3
+      }
+    }
+  }
+
+  key = frame : fb.kbd {}
+
+  clear = frame {
+    width: spc.controls.clear,
+    height: spc.controls.clear,
+    display: .none,
+    layout: {stack: {justify-content: .center, align-items: .center}},
+    fill: col.roles.recess,
+    corner-radius: spc.radii.pill,
+    children: clearGlyph,
+
+    clearGlyph = asset {
+      width: spc.controls.icon-sm,
+      height: spc.controls.icon-sm,
+      fill: col.roles.fg-2,
+      contents: clearIcon
+    }
+  }
+}
+
+// Two terms turned into tokens (on chips) + words being typed: the key
+// gives way to the clear button.
+export searchFilled = frame : search {
+  title: "Search · tokens + typed",
+  left: 672px,
+  top: 40px,
+
+  lead {
+    entry {
+      overrides: [
+        insert(firstToken, after = .nil),
+        insert(secondToken, after = firstToken)
+      ],
+
+      query {
+        fill[0].color: col.roles.fg,
+        contents: "gl"
+      }
+    }
+  }
+
+  key {
+    display: .none
+  }
+
+  clear {
+    display: .visible
+  }
+
+  firstToken = frame : chips.chipOn {
+    height: spc.controls.token,
+
+    glyph {
+      contents: pianoIcon
+    }
+
+    label {
+      contents: "Piano"
+    }
+  }
+
+  secondToken = frame : chips.chipOn {
+    height: spc.controls.token,
+
+    glyph {
+      contents: wipIcon
+    }
+
+    label {
+      contents: "WIP"
+    }
+  }
+}
+
+// Focus: the solid edge + a halo; the stitch and the key step away.
+export searchFocus = frame : search {
+  title: "Search · focus",
+  left: 1344px,
+  top: 40px,
+  border[0].color: col.roles.field-focus,
+  border[0].position: .outside,
+  border[0].width: spc.layout.ring-w,
+  shadow[0].inner-shadow.visible: .false,
+  shadow[1].drop-shadow.visible: .true,
+
+  lead {
+    entry {
+      query {
+        fill[0].color: col.roles.fg,
+        contents: "pi"
+      }
+    }
+  }
+
+  key {
+    display: .none
+  }
+
+  searchStitch {
+    display: .none
+  }
+}
+
+// ---- a suggestion (.ysearch__opt): the term as a small chip, its group
+// in Meta, the key hint at the end. The chosen one sits on the recess;
+// the others are bare. Children: `term` (a chip, 32 tall, Label size),
+// `facet`, `cue`.
+@variants(searchOptRest)
+export searchOpt = frame {
+  title: "Search · option (chosen)",
+  left: 0px,
+  top: 228px,
+  width: spc.controls.line-w,
+  height: spc.controls.opt,
+  layout: {
+    stack: {
+      justify-content: .space-between,
+      align-items: .center,
+      item-gap: spc.steps.s3
+    }
+  },
+  fill: col.roles.recess,
+  corner-radius: spc.radii.opt,
+  padding: [spc.steps.s1, spc.steps.s3],
+  children: [termGroup, cue],
+
+  termGroup = frame {
+    layout: {stack: {align-items: .center, item-gap: spc.steps.s3}},
+    children: [term, facet],
+
+    term = frame : chips.chip {
+      height: spc.controls.chip-sm,
+
+      glyph {
+        contents: pianoIcon
+      }
+
+      label {
+        contents: "Piano"
+      }
+    }
+
+    facet = text : txt.meta {
+      contents: "Instrument"
+    }
+  }
+
+  cue = frame : fb.hint {}
+}
+
+export searchOptRest = frame : searchOpt {
+  title: "Search · option",
+  left: 672px,
+  top: 228px,
+  fill[0]: .nil,
+
+  cue {
+    display: .none
+  }
+
+  termGroup {
+    term {
+      glyph {
+        contents: dawIcon
+      }
+
+      label {
+        contents: "DAW"
+      }
+    }
+  }
+}
+
+// ---- the suggestions popover (.ysearch__pop): under the line, the
+// options, then the note. i9 knit + a dashed stitch; i10 calm: no stitch.
+export searchPop = frame {
+  title: "Search · suggestions",
+  left: 1344px,
+  top: 228px,
+  width: spc.controls.line-w,
+  layout: {stack: {direction: .column, item-gap: spc.steps.s1}},
+  fill: col.roles.surface,
+  shadow: {
+    drop-shadow: {
+      color: pal.palette.shadow-pop,
+      offset: point(0px, 10px),
+      blur-radius: 28px
+    }
+  },
+  corner-radius: spc.radii.pop,
+  padding: spc.layout.pop-inset,
+  children: [popStitch, chosen, other, note],
+
+  popStitch = frame : surf.stitch {
+    left: spc.steps.s1,
+    top: spc.steps.s1,
+    right: spc.steps.s1,
+    bottom: spc.steps.s1,
+    width: .nil,
+    height: .nil,
+    ignore-stack: .true,
+    corner-radius: spc.steps.s3,
+    border[0].color: col.roles.ctl-stitch,
+    border[0].width: spc.layout.stitch-w-sm
+  }
+
+  chosen = frame : searchOpt {
+    width: 100%
+  }
+
+  other = frame : searchOptRest {
+    width: 100%
+  }
+
+  note = frame {
+    width: 100%,
+    layout: {stack: {}},
+    border: {
+      color: col.roles.line,
+      width: spc.layout.stitch-w-sm,
+      dash: [4px, 4px],
+      sides: .top
+    },
+    padding: [spc.steps.s2, spc.steps.s3, spc.steps.s1],
+    children: noteWords,
+
+    noteWords = text : txt.meta {
+      contents: "Enter, Tab or comma turns it into a filter · keep typing to search text"
+    }
+  }
+}
+
+// ==== states page (labels over the definitions, then the states boards: i9 · i10 · i11) ====
+lbl-search = text : doc.specLabel {
+  left: 0px,
+  top: 0px,
+  contents: "search"
+}
+
+note-search = text : doc.specNote {
+  left: 0px,
+  top: 16px,
+  contents: "rest: the placeholder"
+}
+
+lbl-searchFilled = text : doc.specLabel {
+  left: 672px,
+  top: 0px,
+  contents: "searchFilled"
+}
+
+note-searchFilled = text : doc.specNote {
+  left: 672px,
+  top: 16px,
+  contents: "filled: two tokens + typing"
+}
+
+lbl-searchFocus = text : doc.specLabel {
+  left: 1344px,
+  top: 0px,
+  contents: "searchFocus"
+}
+
+note-searchFocus = text : doc.specNote {
+  left: 1344px,
+  top: 16px,
+  contents: "focus: the edge + halo"
+}
+
+lbl-searchOpt = text : doc.specLabel {
+  left: 0px,
+  top: 188px,
+  contents: "searchOpt"
+}
+
+note-searchOpt = text : doc.specNote {
+  left: 0px,
+  top: 204px,
+  contents: "a suggestion · chosen"
+}
+
+lbl-searchOptRest = text : doc.specLabel {
+  left: 672px,
+  top: 188px,
+  contents: "searchOptRest"
+}
+
+note-searchOptRest = text : doc.specNote {
+  left: 672px,
+  top: 204px,
+  contents: "a suggestion · rest"
+}
+
+lbl-searchPop = text : doc.specLabel {
+  left: 1344px,
+  top: 188px,
+  contents: "searchPop"
+}
+
+note-searchPop = text : doc.specNote {
+  left: 1344px,
+  top: 204px,
+  contents: "the suggestions popover"
+}
+
+@variants(searchStatesI10)
+searchStates = frame : doc.docBoard {
+  title: "Search · states · i9",
+  left: 0px,
+  top: 528px,
+
+  body {
+    layout.stack.item-gap: 48px,
+    overrides: [insert(row-1, after = .nil), insert(row-2, after = row-1)]
+  }
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i9"
+      }
+    }
+
+    boardCaption {
+      contents: "Search · every state"
+    }
+  }
+
+  row-1 = frame : doc.specRow {
+    layout.stack.item-gap: 48px,
+    overrides: [
+      insert(st-search, after = .nil),
+      insert(st-searchFilled, after = st-search),
+      insert(st-searchFocus, after = st-searchFilled)
+    ]
+  }
+
+  row-2 = frame : doc.specRow {
+    layout.stack.item-gap: 48px,
+    overrides: [
+      insert(st-searchOpt, after = .nil),
+      insert(st-searchOptRest, after = st-searchOpt),
+      insert(st-searchPop, after = st-searchOptRest)
+    ]
+  }
+
+  st-search = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "search"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "rest: the placeholder"
+    }
+
+    it = frame : search {}
+  }
+
+  st-searchFilled = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "searchFilled"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "filled: two tokens + typing"
+    }
+
+    it = frame : searchFilled {}
+  }
+
+  st-searchFocus = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "searchFocus"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "focus: the edge + halo"
+    }
+
+    it = frame : searchFocus {}
+  }
+
+  st-searchOpt = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "searchOpt"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "a suggestion · chosen"
+    }
+
+    it = frame : searchOpt {}
+  }
+
+  st-searchOptRest = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "searchOptRest"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "a suggestion · rest"
+    }
+
+    it = frame : searchOptRest {}
+  }
+
+  st-searchPop = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "searchPop"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "the suggestions popover"
+    }
+
+    it = frame : searchPop {}
+  }
+}
+
+@variants(searchStatesI11)
+@context(i10="on")
+searchStatesI10 = frame : searchStates {
+  title: "Search · states · i10",
+  left: 2208px,
+  top: 528px,
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i10"
+      }
+    }
+  }
+}
+
+@context(i10="on", i11="on")
+searchStatesI11 = frame : searchStatesI10 {
+  title: "Search · states · i11",
+  left: 4416px,
+  top: 528px,
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i11"
+      }
+    }
+  }
+}

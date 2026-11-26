@@ -1,0 +1,199 @@
+import "components/atoms/doc.elyx" as doc
+import "components/molecules/media-thumb.elyx" as mt
+import "components/molecules/prose.elyx" as pr
+import "components/organisms/detail.elyx" as dt
+
+// The opened project on its own page (`item.html`, Yarn.detailPage): the
+// detail shell (detail.elyx) at the item size, with a project's content.
+// The top bar: ← Projects; the pager (‹ off at the first project, 1 / 12,
+// ›) and the copy-link disc. The head: the facts (type, status · how
+// long) over the title (i9 a Black 38.5; from i10 Display). The body: the
+// media strip (an image, a video the page can't play), then the prose at
+// the detail text's measure (pr.prosePSm). The closing row: BUILT WITH +
+// the stack; Visit site (the one primary: i9 red, ink from i10) and
+// Source. i11: Display 36 / 500, the media a section (48) above the prose.
+// Content inserted into the shell: `media` (dt.detailMedia) before
+// `column.body.prose`; `p1`, `p2` into the prose. Override them at their
+// tree position: `column { body { media { … } prose { p1 { … } } } }`.
+// i10 (`projectDetailI10`): the shell's I10 bar (the duotone copy disc).
+@variants(projectDetailI10)
+export projectDetail = frame : dt.detail {
+  title: "Project · item page",
+  left: 0px,
+  top: 40px,
+
+  column {
+    body {
+      overrides: [insert(media, after = .nil)],
+
+      prose {
+        overrides: [insert(p1, after = .nil), insert(p2, after = p1)]
+      }
+    }
+
+    bar {
+      pager {
+        @with-variant(dt.detailNavDiscOff)
+        prev {}
+      }
+
+      back {
+        backWord {
+          contents: "Projects"
+        }
+      }
+    }
+  }
+
+  media = frame : dt.detailMedia {
+    strip {
+      @with-variant(mt.mediaThumbMissing)
+      m2 {}
+    }
+  }
+
+  p1 = text : pr.prosePSm {
+    width: 100%,
+    contents: "My personal website, built with Astro and Svelte, showcasing my programming and music projects. It's designed to be feel somewhat playful while also being responsive."
+  }
+
+  p2 = text : pr.prosePSm {
+    width: 100%,
+    contents: "The main challenges faced in making this site (other than learning astro & svelte) was in designing the music page to both be functional and visually appealing with the temporary limitation of using 'cards' as the main interactive element. So exploring different ways to show the state of the music player between single songs and collections was a fun challenge."
+  }
+}
+
+// i10: the copy-link disc is the one duotone disc (R7).
+@context(i10="on")
+export projectDetailI10 = frame : projectDetail {
+  title: "Project · item page · i10",
+  left: 912px,
+  top: 40px,
+
+  column {
+    @with-variant(dt.detailBarI10)
+    bar {}
+  }
+}
+
+// ==== states page (labels over the definitions, then the states boards: i9 · i10 · i11) ====
+lbl-projectDetail = text : doc.specLabel {
+  left: 0px,
+  top: 0px,
+  contents: "projectDetail"
+}
+
+note-projectDetail = text : doc.specNote {
+  left: 0px,
+  top: 16px,
+  contents: "the detail shell + a project (i9)"
+}
+
+lbl-projectDetailI10 = text : doc.specLabel {
+  left: 912px,
+  top: 0px,
+  contents: "projectDetailI10"
+}
+
+note-projectDetailI10 = text : doc.specNote {
+  left: 912px,
+  top: 16px,
+  contents: "i10"
+}
+
+@variants(projectDetailStatesI10)
+projectDetailStates = frame : doc.docBoard {
+  title: "Project detail · states · i9",
+  left: 0px,
+  top: 860px,
+
+  body {
+    layout.stack.item-gap: 48px,
+    overrides: [insert(row-1, after = .nil)]
+  }
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i9"
+      }
+    }
+
+    boardCaption {
+      contents: "Project detail · every state"
+    }
+  }
+
+  row-1 = frame : doc.specRow {
+    layout.stack.item-gap: 48px,
+    overrides: [insert(st-projectDetail, after = .nil)]
+  }
+
+  st-projectDetail = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "projectDetail"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "the detail shell + a project (i9)"
+    }
+
+    it = frame : projectDetail {}
+  }
+}
+
+@variants(projectDetailStatesI11)
+@context(i10="on")
+projectDetailStatesI10 = frame : projectDetailStates {
+  title: "Project detail · states · i10",
+  left: 992px,
+  top: 860px,
+
+  body {
+    row-1 {
+      st-projectDetail {
+        slot {
+          @with-variant(projectDetailI10)
+          it {}
+        }
+
+        note {
+          contents: "i10"
+        }
+
+        label {
+          contents: "projectDetailI10"
+        }
+      }
+    }
+  }
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i10"
+      }
+    }
+  }
+}
+
+@context(i10="on", i11="on")
+projectDetailStatesI11 = frame : projectDetailStatesI10 {
+  title: "Project detail · states · i11",
+  left: 1984px,
+  top: 860px,
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i11"
+      }
+    }
+  }
+}

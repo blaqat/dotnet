@@ -1,0 +1,651 @@
+import "tokens/color/roles.elyx" as col
+import "tokens/color/palette.elyx" as pal
+import "tokens/color/sections.elyx" as sec
+import "tokens/space/space.elyx" as spc
+import "components/atoms/surface.elyx" as surf
+import "components/atoms/doc.elyx" as doc
+import "components/organisms/nav.elyx" as nav
+import "components/organisms/page-header.elyx" as head
+import "assets/textures/cord.svg" as cordTexture
+import "components/molecules/sound-tag.elyx" as snd
+
+// The page (`body.frame > main.sheet`): the section-coloured cord frame
+// (14px) around the cotton sheet (radius 22, its stitch 9px in), the nav
+// on top, then `page`: the content column (`.ypage`, 40px gutters, 6 above,
+// 56 below) with `section-gap` between its sections (i9/i10 24, i11 48).
+// A screen fills `paper.page`:
+//   paper { page { overrides: [insert(header, after = .nil), insert(list, after = header)] } }
+// The section's variant (`section=projects|music|thoughts`) puts the HERE
+// rope on its nav tab; a top-level instance picks it from the canvas.
+@variants(sheetProjects, sheetMusic, sheetThoughts, sheetPhone)
+export sheet = frame {
+  title: "Sheet · page template (Home: no tab here)",
+  left: 0px,
+  top: 40px,
+  width: 1440px,
+  layout: {stack: {direction: .column, align-items: .stretch}},
+  fill: [
+    sec.section.sec,
+    {image: {ref: cordTexture, sizing: {scale: 3.24, offset: [0px, 0px]}}}
+  ],
+  padding: spc.layout.frame,
+  children: paper,
+
+  // the cotton sheet
+  paper = frame {
+    layout: {stack: {direction: .column, align-items: .stretch}},
+    fill: col.roles.sheet,
+    shadow: [
+      {
+        inner-shadow: {
+          color: pal.palette.shadow-1,
+          offset: point(0px, 0px),
+          blur-radius: 0px,
+          spread: 1px
+        }
+      },
+      {
+        drop-shadow: {
+          color: pal.palette.shadow-lift,
+          offset: point(0px, 3px),
+          blur-radius: 10px
+        }
+      }
+    ],
+    corner-radius: spc.radii.page,
+    children: [paperStitch, sheetNav, page],
+
+    paperStitch = frame : surf.stitch {
+      left: spc.layout.sheet-stitch-in,
+      top: spc.layout.sheet-stitch-in,
+      right: spc.layout.sheet-stitch-in,
+      bottom: spc.layout.sheet-stitch-in,
+      width: .nil,
+      height: .nil,
+      ignore-stack: .true,
+      corner-radius: spc.radii.page-stitch,
+      border[0].color: col.roles.line
+    }
+
+    sheetNav = frame : nav.nav {
+      width: 100%
+    }
+
+    // the content column: insert the page's sections here, top to bottom
+    page = frame {
+      layout: {
+        stack: {
+          direction: .column,
+          align-items: .stretch,
+          item-gap: spc.layout.section-gap
+        }
+      },
+      padding: [spc.layout.page-top, spc.layout.page-x, spc.layout.page-bottom]
+    }
+  }
+}
+
+@context(section="projects")
+export sheetProjects = frame : sheet {
+  title: "Sheet · Projects",
+  left: 0px,
+  top: 361px,
+
+  paper {
+    @with-variant(nav.navProjects)
+    sheetNav {}
+  }
+}
+
+@context(section="music")
+export sheetMusic = frame : sheet {
+  title: "Sheet · Music",
+  left: 0px,
+  top: 643px,
+
+  paper {
+    @with-variant(nav.navMusic)
+    sheetNav {}
+  }
+}
+
+@context(section="thoughts")
+export sheetThoughts = frame : sheet {
+  title: "Sheet · Thoughts",
+  left: 0px,
+  top: 925px,
+
+  paper {
+    @with-variant(nav.navThoughts)
+    sheetNav {}
+  }
+}
+
+// Filled, as a screen fills it: the header, then two placeholder sections
+// (the tools line, the list) one section-gap apart. An instance, so it takes
+// the canvas's section (render with `--context section=music`).
+filledExample = frame : sheet {
+  title: "Sheet · filled (example; follows the canvas section)",
+  left: 0px,
+  top: 1207px,
+
+  paper {
+    page {
+      overrides: [
+        insert(exampleHeader, after = .nil),
+        insert(exampleTools, after = exampleHeader),
+        insert(exampleList, after = exampleTools)
+      ]
+    }
+  }
+
+  exampleHeader = frame : head.pageHeader {
+    width: .nil
+  }
+
+  exampleTools = frame {
+    height: spc.controls.field,
+    fill: col.roles.recess,
+    corner-radius: spc.radii.pill
+  }
+
+  exampleList = frame {
+    height: 360px,
+    fill: col.roles.recess,
+    corner-radius: spc.radii.card
+  }
+}
+
+// ---- phones (< 960) ----
+// The page on a 390 phone: the cord frame 7, the sheet's corners 16 (its
+// stitch 7), the nav down to the brand (`navPhone`: the sections live in
+// the floating layer, organisms/phone-nav.elyx), the sound tag hanging 14
+// in from the right edge, the page column 14 in (`page-x-phone`) with the
+// phone's section gap (i9 / i10 20, i11 32). One sheet for every section:
+// the frame's hue is the canvas's `section`. A phone frame sets the
+// sheet's height and lays the floating layer over it.
+// Children: as the sheet's, plus `soundRow` (`soundTag`).
+export sheetPhone = frame : sheet {
+  title: "Sheet · phone (390)",
+  left: 1728px,
+  top: 40px,
+  width: spc.controls.phone-w,
+  padding-top: spc.layout.frame-phone,
+  padding-left: spc.layout.frame-phone,
+  padding-bottom: spc.layout.frame-phone,
+  padding-right: spc.layout.frame-phone,
+
+  paper {
+    overrides: [insert(soundRow, after = sheet.paper.page)],
+
+    page {
+      layout.stack.item-gap: spc.layout.section-gap-phone,
+      padding-top: 0px,
+      padding-left: spc.layout.page-x-phone,
+      padding-bottom: spc.layout.page-bottom-phone,
+      padding-right: spc.layout.page-x-phone
+    }
+
+    corner-radius: spc.radii.page-phone,
+
+    @with-variant(nav.navPhone)
+    sheetNav {}
+
+    paperStitch {
+      corner-radius: spc.radii.page-stitch-phone
+    }
+  }
+
+  // the sound tag: top right on phones
+  soundRow = frame {
+    left: 0px,
+    top: 0px,
+    right: 0px,
+    ignore-stack: .true,
+    layout: {stack: {justify-content: .end}},
+    padding-right: spc.layout.sound-r-phone,
+    children: soundTag,
+
+    soundTag = frame : snd.soundTag {}
+  }
+}
+
+// ==== states page (labels over the definitions, then the states boards: i9 · i10 · i11) ====
+lbl-sheet = text : doc.specLabel {
+  left: 0px,
+  top: 0px,
+  contents: "sheet"
+}
+
+note-sheet = text : doc.specNote {
+  left: 0px,
+  top: 16px,
+  contents: "the cord frame + sheet (Home)"
+}
+
+lbl-sheetPhone = text : doc.specLabel {
+  left: 1728px,
+  top: 0px,
+  contents: "sheetPhone"
+}
+
+note-sheetPhone = text : doc.specNote {
+  left: 1728px,
+  top: 16px,
+  contents: "phones"
+}
+
+lbl-sheetProjects = text : doc.specLabel {
+  left: 0px,
+  top: 321px,
+  contents: "sheetProjects"
+}
+
+note-sheetProjects = text : doc.specNote {
+  left: 0px,
+  top: 337px,
+  contents: "section = projects"
+}
+
+lbl-sheetMusic = text : doc.specLabel {
+  left: 0px,
+  top: 603px,
+  contents: "sheetMusic"
+}
+
+note-sheetMusic = text : doc.specNote {
+  left: 0px,
+  top: 619px,
+  contents: "section = music"
+}
+
+lbl-sheetThoughts = text : doc.specLabel {
+  left: 0px,
+  top: 885px,
+  contents: "sheetThoughts"
+}
+
+note-sheetThoughts = text : doc.specNote {
+  left: 0px,
+  top: 901px,
+  contents: "section = thoughts"
+}
+
+lbl-filledExample = text : doc.specLabel {
+  left: 0px,
+  top: 1167px,
+  contents: "filledExample"
+}
+
+note-filledExample = text : doc.specNote {
+  left: 0px,
+  top: 1183px,
+  contents: "filled as a screen fills it (follows the section)"
+}
+
+@variants(
+  sheetStatesI10,
+  sheetStatesProjects,
+  sheetStatesMusic,
+  sheetStatesThoughts
+)
+sheetStates = frame : doc.docBoard {
+  title: "Sheet · states · i9",
+  left: 0px,
+  top: 2077px,
+
+  body {
+    layout.stack.item-gap: 48px,
+    overrides: [insert(row-1, after = .nil), insert(row-2, after = row-1)]
+  }
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i9"
+      }
+    }
+
+    boardCaption {
+      contents: "Sheet · every state"
+    }
+  }
+
+  row-1 = frame : doc.specRow {
+    layout.stack.item-gap: 48px,
+    overrides: [
+      insert(st-sheet, after = .nil),
+      insert(st-sheetPhone, after = st-sheet)
+    ]
+  }
+
+  row-2 = frame : doc.specRow {
+    layout.stack.item-gap: 48px,
+    overrides: [insert(st-filledExample, after = .nil)]
+  }
+
+  st-sheet = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "sheet"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "the cord frame + sheet (Home)"
+    }
+
+    it = frame : sheet {}
+  }
+
+  st-sheetPhone = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "sheetPhone"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "phones"
+    }
+
+    it = frame : sheetPhone {}
+  }
+
+  st-filledExample = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "filledExample"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "filled as a screen fills it (follows the section)"
+    }
+
+    it = frame : filledExample {}
+  }
+}
+
+@variants(sheetStatesI11)
+@context(i10="on")
+sheetStatesI10 = frame : sheetStates {
+  title: "Sheet · states · i10",
+  left: 2334px,
+  top: 2077px,
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i10"
+      }
+    }
+  }
+}
+
+@context(i10="on", i11="on")
+sheetStatesI11 = frame : sheetStatesI10 {
+  title: "Sheet · states · i11",
+  left: 4668px,
+  top: 2077px,
+
+  body {
+    row-2 {
+      st-filledExample {
+        slot {
+          it {
+            fill[1].image.sizing.scale: 3.47
+          }
+        }
+      }
+    }
+  }
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i11"
+      }
+    }
+  }
+}
+
+@variants(sheetStatesProjectsI10)
+@context(section="projects")
+sheetStatesProjects = frame : sheetStates {
+  title: "Sheet · projects · states · i9",
+  left: 0px,
+  top: 3486px,
+
+  body {
+    row-1 {
+      st-sheet {
+        slot {
+          @with-variant(sheetProjects)
+          it {}
+        }
+
+        note {
+          contents: "section = projects"
+        }
+
+        label {
+          contents: "sheetProjects"
+        }
+      }
+    }
+  }
+
+  boardHead {
+    boardCaption {
+      contents: "Sheet · section = projects"
+    }
+  }
+}
+
+@variants(sheetStatesProjectsI11)
+@context(i10="on", section="projects")
+sheetStatesProjectsI10 = frame : sheetStatesProjects {
+  title: "Sheet · projects · states · i10",
+  left: 2334px,
+  top: 3486px,
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i10"
+      }
+    }
+  }
+}
+
+@context(i10="on", i11="on", section="projects")
+sheetStatesProjectsI11 = frame : sheetStatesProjectsI10 {
+  title: "Sheet · projects · states · i11",
+  left: 4668px,
+  top: 3486px,
+
+  body {
+    row-2 {
+      st-filledExample {
+        slot {
+          it {
+            fill[1].image.sizing.scale: 3.47
+          }
+        }
+      }
+    }
+  }
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i11"
+      }
+    }
+  }
+}
+
+@variants(sheetStatesMusicI10)
+@context(section="music")
+sheetStatesMusic = frame : sheetStates {
+  title: "Sheet · music · states · i9",
+  left: 0px,
+  top: 4895px,
+
+  body {
+    row-1 {
+      st-sheet {
+        slot {
+          @with-variant(sheetMusic)
+          it {}
+        }
+
+        note {
+          contents: "section = music"
+        }
+
+        label {
+          contents: "sheetMusic"
+        }
+      }
+    }
+  }
+
+  boardHead {
+    boardCaption {
+      contents: "Sheet · section = music"
+    }
+  }
+}
+
+@variants(sheetStatesMusicI11)
+@context(i10="on", section="music")
+sheetStatesMusicI10 = frame : sheetStatesMusic {
+  title: "Sheet · music · states · i10",
+  left: 2334px,
+  top: 4895px,
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i10"
+      }
+    }
+  }
+}
+
+@context(i10="on", i11="on", section="music")
+sheetStatesMusicI11 = frame : sheetStatesMusicI10 {
+  title: "Sheet · music · states · i11",
+  left: 4668px,
+  top: 4895px,
+
+  body {
+    row-2 {
+      st-filledExample {
+        slot {
+          it {
+            fill[1].image.sizing.scale: 3.47
+          }
+        }
+      }
+    }
+  }
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i11"
+      }
+    }
+  }
+}
+
+@variants(sheetStatesThoughtsI10)
+@context(section="thoughts")
+sheetStatesThoughts = frame : sheetStates {
+  title: "Sheet · thoughts · states · i9",
+  left: 0px,
+  top: 6304px,
+
+  body {
+    row-1 {
+      st-sheet {
+        slot {
+          @with-variant(sheetThoughts)
+          it {}
+        }
+
+        note {
+          contents: "section = thoughts"
+        }
+
+        label {
+          contents: "sheetThoughts"
+        }
+      }
+    }
+  }
+
+  boardHead {
+    boardCaption {
+      contents: "Sheet · section = thoughts"
+    }
+  }
+}
+
+@variants(sheetStatesThoughtsI11)
+@context(i10="on", section="thoughts")
+sheetStatesThoughtsI10 = frame : sheetStatesThoughts {
+  title: "Sheet · thoughts · states · i10",
+  left: 2334px,
+  top: 6304px,
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i10"
+      }
+    }
+  }
+}
+
+@context(i10="on", i11="on", section="thoughts")
+sheetStatesThoughtsI11 = frame : sheetStatesThoughtsI10 {
+  title: "Sheet · thoughts · states · i11",
+  left: 4668px,
+  top: 6304px,
+
+  body {
+    row-2 {
+      st-filledExample {
+        slot {
+          it {
+            fill[1].image.sizing.scale: 3.47
+          }
+        }
+      }
+    }
+  }
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i11"
+      }
+    }
+  }
+}

@@ -1,0 +1,676 @@
+import "tokens/color/roles.elyx" as col
+import "tokens/color/palette.elyx" as pal
+import "tokens/color/sections.elyx" as sec
+import "tokens/space/space.elyx" as spc
+import "components/atoms/text.elyx" as txt
+import "components/atoms/surface.elyx" as surf
+import "assets/icons/bold/folder-simple.svg" as projectsIcon
+import "assets/icons/fill/folder-simple.svg" as projectsIconFill
+import "assets/icons/bold/music-notes.svg" as musicIcon
+import "assets/icons/fill/music-notes.svg" as musicIconFill
+import "assets/icons/bold/cloud.svg" as thoughtsIcon
+import "assets/icons/fill/cloud.svg" as thoughtsIconFill
+import "components/atoms/doc.elyx" as doc
+
+@with-context()
+file {}
+
+// A nav tab (`.ynav__tab`): a raised 46px pill, a felt dot in the tab's own
+// section hue, then its Label. i9: a knit pill with a dashed stitch and every
+// dot in its hue. i10 (L1, calm): a hairline ring, no stitch, and the other
+// tabs' dots grey until hover (`col.roles.dot-rest*`). An instance sets the
+// section: `dot { fill[0].color: sec.section.hue-music  glyph {contents: …} }`
+// and `label {contents: "Music"}`.
+@variants(navTabHover, navTabHere)
+export navTab = frame {
+  title: "Nav tab · rest",
+  left: 0px,
+  top: 40px,
+  height: spc.controls.tab,
+  layout: {stack: {align-items: .center, item-gap: spc.steps.s2}},
+  fill: col.roles.surface,
+  shadow: [
+    {
+      drop-shadow: {
+        color: col.roles.ctl-line,
+        offset: point(0px, 0px),
+        blur-radius: 0px,
+        spread: 1px
+      }
+    },
+    {
+      drop-shadow: {
+        color: col.roles.ctl-shadow,
+        offset: point(0px, 1px),
+        blur-radius: 0px
+      }
+    },
+    {
+      drop-shadow: {
+        color: col.roles.ctl-shadow,
+        offset: point(0px, 3px),
+        blur-radius: 8px,
+        spread: -2px
+      }
+    },
+    {
+      inner-shadow: {
+        color: col.roles.ctl-shadow,
+        offset: point(0px, -2px),
+        blur-radius: 0px
+      }
+    }
+  ],
+  corner-radius: spc.radii.pill,
+  padding: [0px, spc.layout.tab-r, 0px, spc.layout.tab-l],
+  children: [tabStitch, dot, label],
+
+  // the control's stitch (i9); clear from i10
+  tabStitch = frame : surf.stitch {
+    left: spc.layout.stitch-in,
+    top: spc.layout.stitch-in,
+    right: spc.layout.stitch-in,
+    bottom: spc.layout.stitch-in,
+    width: .nil,
+    height: .nil,
+    ignore-stack: .true,
+    corner-radius: spc.radii.pill,
+    border[0].color: col.roles.ctl-stitch,
+    border[0].width: spc.layout.stitch-w-sm
+  }
+
+  // the felt dot: the section's hue + a soft highlight; `dotRest` greys it
+  // at rest from i10 (clear in i9)
+  dot = frame : surf.disc {
+    border[0]: .nil,
+    fill[0].color: sec.section.hue-projects,
+    fill[1].radial-gradient.ellipse-scale: 1,
+    fill[1].radial-gradient.from: [34%, 28%],
+    fill[1].radial-gradient.to: [34%, -24%],
+    overrides: [
+      insert(dotRest, after = .nil),
+      insert(dotStitch, after = dotRest),
+      insert(glyph, after = dotStitch)
+    ],
+    shadow[0].drop-shadow.blur-radius: 2px,
+    shadow[0].drop-shadow.color: pal.palette.shadow-lift,
+    shadow[0].drop-shadow.offset: [0px, 1px],
+    shadow[1].inner-shadow.blur-radius: 3px,
+    shadow[1].inner-shadow.color: pal.palette.shadow-pop,
+    shadow[1].inner-shadow.offset: [0px, -2px],
+
+    dotRest = frame {
+      left: 0px,
+      top: 0px,
+      right: 0px,
+      bottom: 0px,
+      ignore-stack: .true,
+      fill: col.roles.dot-rest,
+      border: col.roles.ctl-line,
+      corner-radius: spc.radii.pill
+    }
+
+    dotStitch = frame : surf.stitch {
+      left: spc.layout.stitch-in-ctl,
+      top: spc.layout.stitch-in-ctl,
+      right: spc.layout.stitch-in-ctl,
+      bottom: spc.layout.stitch-in-ctl,
+      width: .nil,
+      height: .nil,
+      ignore-stack: .true,
+      corner-radius: spc.radii.pill,
+      border[0].color: col.roles.dot-rest-stitch,
+      border[0].dash: [3px, 2px],
+      border[0].width: 1
+    }
+
+    glyph = asset {
+      width: spc.controls.dot-icon,
+      height: spc.controls.dot-icon,
+      fill: col.roles.dot-rest-fg,
+      contents: projectsIcon
+    }
+  }
+
+  label = text : txt.label {
+    contents: "Projects",
+    fill[0].color: col.roles.fg-2
+  }
+}
+
+// Hover: it lifts; the dot takes its hue (i10), the Label goes ink.
+export navTabHover = frame : navTab {
+  title: "Nav tab · hover",
+  left: 186px,
+  top: 40px,
+  shadow[2].drop-shadow.blur-radius: 22px,
+  shadow[2].drop-shadow.color: pal.palette.shadow-lift,
+  shadow[2].drop-shadow.offset: [0px, 10px],
+  shadow[2].drop-shadow.spread: -4px,
+
+  label {
+    fill[0].color: col.roles.fg
+  }
+
+  dot {
+    glyph {
+      fill[0].color: col.roles.dot-fg
+    }
+
+    dotStitch {
+      border[0].color: col.roles.dot-stitch
+    }
+
+    dotRest {
+      display: .none
+    }
+  }
+}
+
+// Here (`aria-current="page"`): the HERE rope on its edge (i9 red; i10 the
+// page's section hue), the filled glyph, no stitch.
+export navTabHere = frame : navTab {
+  title: "Nav tab · here",
+  left: 372px,
+  top: 40px,
+  overrides: [insert(tabRope, after = navTab.label)],
+
+  label {
+    fill[0].color: col.roles.fg
+  }
+
+  dot {
+    glyph {
+      fill[0].color: col.roles.dot-fg,
+      contents: projectsIconFill
+    }
+
+    dotStitch {
+      border[0].color: col.roles.dot-stitch
+    }
+
+    dotRest {
+      display: .none
+    }
+  }
+
+  tabStitch {
+    display: .none
+  }
+
+  tabRope = frame : surf.ropeHere {
+    left: 0px,
+    top: 0px,
+    right: 0px,
+    bottom: 0px,
+    width: .nil,
+    height: .nil,
+    ignore-stack: .true
+  }
+}
+
+// Every section's tab, in each state (Home is the brand, not a tab).
+musicTab = frame : navTab {
+  title: "Music · rest",
+  left: 0px,
+  top: 222px,
+
+  dot {
+    fill[0].color: sec.section.hue-music,
+
+    glyph {
+      contents: musicIcon
+    }
+  }
+
+  label {
+    contents: "Music"
+  }
+}
+
+musicTabHover = frame : navTabHover {
+  title: "Music · hover",
+  left: 186px,
+  top: 222px,
+
+  dot {
+    fill[0].color: sec.section.hue-music,
+
+    glyph {
+      contents: musicIcon
+    }
+  }
+
+  label {
+    contents: "Music"
+  }
+}
+
+musicTabHere = frame : navTabHere {
+  title: "Music · here",
+  left: 372px,
+  top: 222px,
+
+  dot {
+    fill[0].color: sec.section.hue-music,
+
+    glyph {
+      contents: musicIconFill
+    }
+  }
+
+  label {
+    contents: "Music"
+  }
+}
+
+thoughtsTab = frame : navTab {
+  title: "Thoughts · rest",
+  left: 0px,
+  top: 404px,
+
+  dot {
+    fill[0].color: sec.section.hue-thoughts,
+
+    glyph {
+      contents: thoughtsIcon
+    }
+  }
+
+  label {
+    contents: "Thoughts"
+  }
+}
+
+thoughtsTabHover = frame : navTabHover {
+  title: "Thoughts · hover",
+  left: 186px,
+  top: 404px,
+
+  dot {
+    fill[0].color: sec.section.hue-thoughts,
+
+    glyph {
+      contents: thoughtsIcon
+    }
+  }
+
+  label {
+    contents: "Thoughts"
+  }
+}
+
+thoughtsTabHere = frame : navTabHere {
+  title: "Thoughts · here",
+  left: 372px,
+  top: 404px,
+
+  dot {
+    fill[0].color: sec.section.hue-thoughts,
+
+    glyph {
+      contents: thoughtsIconFill
+    }
+  }
+
+  label {
+    contents: "Thoughts"
+  }
+}
+
+// ==== states page (labels over the definitions, then the states boards: i9 · i10 · i11) ====
+lbl-navTab = text : doc.specLabel {
+  left: 0px,
+  top: 0px,
+  contents: "navTab"
+}
+
+note-navTab = text : doc.specNote {
+  left: 0px,
+  top: 16px,
+  contents: "rest"
+}
+
+lbl-navTabHover = text : doc.specLabel {
+  left: 186px,
+  top: 0px,
+  contents: "navTabHover"
+}
+
+note-navTabHover = text : doc.specNote {
+  left: 186px,
+  top: 16px,
+  contents: "hover"
+}
+
+lbl-navTabHere = text : doc.specLabel {
+  left: 372px,
+  top: 0px,
+  contents: "navTabHere"
+}
+
+note-navTabHere = text : doc.specNote {
+  left: 372px,
+  top: 16px,
+  contents: "here: the current section"
+}
+
+lbl-musicTab = text : doc.specLabel {
+  left: 0px,
+  top: 182px,
+  contents: "musicTab"
+}
+
+note-musicTab = text : doc.specNote {
+  left: 0px,
+  top: 198px,
+  contents: "Music · rest"
+}
+
+lbl-musicTabHover = text : doc.specLabel {
+  left: 186px,
+  top: 182px,
+  contents: "musicTabHover"
+}
+
+note-musicTabHover = text : doc.specNote {
+  left: 186px,
+  top: 198px,
+  contents: "Music · hover"
+}
+
+lbl-musicTabHere = text : doc.specLabel {
+  left: 372px,
+  top: 182px,
+  contents: "musicTabHere"
+}
+
+note-musicTabHere = text : doc.specNote {
+  left: 372px,
+  top: 198px,
+  contents: "Music · here"
+}
+
+lbl-thoughtsTab = text : doc.specLabel {
+  left: 0px,
+  top: 364px,
+  contents: "thoughtsTab"
+}
+
+note-thoughtsTab = text : doc.specNote {
+  left: 0px,
+  top: 380px,
+  contents: "Thoughts · rest"
+}
+
+lbl-thoughtsTabHover = text : doc.specLabel {
+  left: 186px,
+  top: 364px,
+  contents: "thoughtsTabHover"
+}
+
+note-thoughtsTabHover = text : doc.specNote {
+  left: 186px,
+  top: 380px,
+  contents: "Thoughts · hover"
+}
+
+lbl-thoughtsTabHere = text : doc.specLabel {
+  left: 372px,
+  top: 364px,
+  contents: "thoughtsTabHere"
+}
+
+note-thoughtsTabHere = text : doc.specNote {
+  left: 372px,
+  top: 380px,
+  contents: "Thoughts · here"
+}
+
+@variants(navTabStatesI10)
+navTabStates = frame : doc.docBoard {
+  title: "Nav tab · states · i9",
+  left: 0px,
+  top: 610px,
+
+  body {
+    layout.stack.item-gap: 48px,
+    overrides: [
+      insert(row-1, after = .nil),
+      insert(row-2, after = row-1),
+      insert(row-3, after = row-2)
+    ]
+  }
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i9"
+      }
+    }
+
+    boardCaption {
+      contents: "Nav tab · every state"
+    }
+  }
+
+  row-1 = frame : doc.specRow {
+    layout.stack.item-gap: 48px,
+    overrides: [
+      insert(st-navTab, after = .nil),
+      insert(st-navTabHover, after = st-navTab),
+      insert(st-navTabHere, after = st-navTabHover)
+    ]
+  }
+
+  row-2 = frame : doc.specRow {
+    layout.stack.item-gap: 48px,
+    overrides: [
+      insert(st-musicTab, after = .nil),
+      insert(st-musicTabHover, after = st-musicTab),
+      insert(st-musicTabHere, after = st-musicTabHover)
+    ]
+  }
+
+  row-3 = frame : doc.specRow {
+    layout.stack.item-gap: 48px,
+    overrides: [
+      insert(st-thoughtsTab, after = .nil),
+      insert(st-thoughtsTabHover, after = st-thoughtsTab),
+      insert(st-thoughtsTabHere, after = st-thoughtsTabHover)
+    ]
+  }
+
+  st-navTab = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "navTab"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "rest"
+    }
+
+    it = frame : navTab {}
+  }
+
+  st-navTabHover = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "navTabHover"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "hover"
+    }
+
+    it = frame : navTabHover {}
+  }
+
+  st-navTabHere = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "navTabHere"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "here: the current section"
+    }
+
+    it = frame : navTabHere {}
+  }
+
+  st-musicTab = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "musicTab"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "Music · rest"
+    }
+
+    it = frame : musicTab {}
+  }
+
+  st-musicTabHover = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "musicTabHover"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "Music · hover"
+    }
+
+    it = frame : musicTabHover {}
+  }
+
+  st-musicTabHere = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "musicTabHere"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "Music · here"
+    }
+
+    it = frame : musicTabHere {}
+  }
+
+  st-thoughtsTab = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "thoughtsTab"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "Thoughts · rest"
+    }
+
+    it = frame : thoughtsTab {}
+  }
+
+  st-thoughtsTabHover = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "thoughtsTabHover"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "Thoughts · hover"
+    }
+
+    it = frame : thoughtsTabHover {}
+  }
+
+  st-thoughtsTabHere = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "thoughtsTabHere"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "Thoughts · here"
+    }
+
+    it = frame : thoughtsTabHere {}
+  }
+}
+
+@variants(navTabStatesI11)
+@context(i10="on")
+navTabStatesI10 = frame : navTabStates {
+  title: "Nav tab · states · i10",
+  left: 710px,
+  top: 610px,
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i10"
+      }
+    }
+  }
+}
+
+@context(i10="on", i11="on")
+navTabStatesI11 = frame : navTabStatesI10 {
+  title: "Nav tab · states · i11",
+  left: 1402px,
+  top: 610px,
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i11"
+      }
+    }
+  }
+}

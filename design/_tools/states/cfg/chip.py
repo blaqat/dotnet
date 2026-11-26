@@ -1,0 +1,26 @@
+R = [["chip", "chipHover", "chipFocus", "chipOn", "chipOnHover", "chipPicked", "chipDisabled"],
+     ["chipSm", "chipCount", "chipAll", "chipAllOn"],
+     ["chipPiano", "chipBeepbox", "chipDaw", "chipPersonal", "chipWork", "chipSchool"],
+     ["chipPianoOn", "chipBeepboxOn", "chipDawOn", "chipPersonalOn", "chipWorkOn", "chipSchoolOn"]]
+CONFIG = {
+  "file": "components/molecules/chip.elyx",
+  "sections": [{"rows": R}],
+  "notes": {
+    "chip": "rest",
+    "chipHover": "hover: lifts",
+    "chipFocus": "focus (keys)",
+    "chipOn": "on: a toggle that's on",
+    "chipOnHover": "on + hover: the strike",
+    "chipPicked": "picked: a single choice",
+    "chipDisabled": "disabled: the zero facet",
+    "chipSm": "sm (32)",
+    "chipCount": "with a count",
+    "chipAll": "All · rest",
+    "chipAllOn": "All · on",
+    "chipPiano": "instrument · rest",
+    "chipPianoOn": "on: its own colour",
+    "chipPersonal": "project type · rest",
+    "chipPersonalOn": "on: its own colour",
+  },
+  "boards": [{"key": "chip", "caption": "Chip", "rows": R}],
+}

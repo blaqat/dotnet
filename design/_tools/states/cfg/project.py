@@ -1,0 +1,11 @@
+CONFIG = {"file": "components/organisms/project.elyx",
+  "sections": [{"rows": [["project", "projectI10", "projectText", "projectTextI10"], ["bankCard", "fishbowlCard"],
+                         ["projectRow", "projectRowPicked"], ["fitrRow", "bankRow", "fishbowlRow"], ["writeup", "writeupI10", "writeupMark"]]}],
+  "nolabel": ["bankCard", "fishbowlCard", "fitrRow", "bankRow", "fishbowlRow"],
+  "drop": ["projectLabel", "projectI10Label", "projectTextLabel", "projectTextI10Label", "projectRowLabel", "projectRowPickedLabel",
+           "writeupLabel", "writeupI10Label", "writeupMarkLabel"],
+  "notes": {"project": "a card · rest (the base, i9)", "projectI10": "i10 · duotone discs, write-up pill", "projectText": "no media",
+    "projectTextI10": "i10 · no media", "projectRow": "a row · rest", "projectRowPicked": "picked: on the stage",
+    "writeup": "the write-up link · i9", "writeupI10": "i10 · the pill", "writeupMark": "the row's mark"},
+  "boards": [{"key": "project", "caption": "Project", "rows": [["project", "projectText"], ["projectRow", "projectRowPicked"], ["writeup", "writeupMark"]],
+     "i10": {"project": "projectI10", "projectText": "projectTextI10", "writeup": "writeupI10"}}]}

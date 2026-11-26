@@ -1,0 +1,854 @@
+import "tokens/color/roles.elyx" as col
+import "tokens/space/space.elyx" as spc
+import "tokens/type/type.elyx" as typ
+import "components/atoms/text.elyx" as txt
+import "components/atoms/doc.elyx" as doc
+import "components/molecules/button.elyx" as btn
+import "components/molecules/fact.elyx" as fct
+import "components/molecules/field.elyx" as fld
+import "components/organisms/studio-parts.elyx" as prt
+import "components/organisms/studio-editor.elyx" as ed
+import "assets/art/studio/vgm-mixed.svg" as vgmSw
+import "components/organisms/studio-preview.elyx" as prv
+import "assets/art/studio/inst-beepbox.svg" as beepboxSw
+import "assets/art/studio/mixed-sine.svg" as mixedSineSw
+import "assets/art/studio/mixed-triangle.svg" as mixedTriangleSw
+import "assets/art/studio/mixed-saw.svg" as mixedSawSw
+import "assets/icons/bold/trash.svg" as trashIcon
+
+// Studio · a collection in the Music editor (?view=collection): the top
+// bar (← Music · History · Published), the head (Live · Saved 4:44 pm, the
+// title), then the form | the live preview. The form: Tracks (the folder:
+// one tab per track, the open track's fields: name, audio, yarn, details,
+// links, notes, Remove), then the collection's own: its yarn and details
+// (read from its tracks), its links, its notes. The preview: the folder
+// card "in the library", then the release's page.
+// The seed: VGM Class Final Project, its track "combat" open.
+// i10 (`musicEditorI10`): the preview's library card is i10's (+ and ▶),
+// its link discs duotone. i11 (`musicEditorI11`): the small caps become a
+// Title (the form's sections), a Label (the folder's) and Meta words (the
+// preview's).
+@variants(musicEditorI10)
+export musicEditor = frame {
+  title: "Studio · music editor · body",
+  left: 0px,
+  top: 40px,
+  width: 1332px,
+  layout: {stack: {direction: .column, align-items: .stretch}},
+  children: [bar, head, grid],
+
+  bar = frame : ed.edBar {
+    width: 100%
+  }
+
+  head = frame : ed.edHead {
+    width: 100%
+  }
+
+  grid = frame {
+    layout: {stack: {item-gap: spc.layout.st-ed-gap}},
+    padding-top: spc.layout.st-sec-gap,
+    children: [form, preview],
+
+    form = frame {
+      width: spc.controls.st-form-w,
+      layout: {stack: {direction: .column, align-items: .stretch}},
+      children: [tracks, dragHint, collYarn, collDetails, collLinks, collNotes],
+
+      // ---- the tracks: the folder, the open track's fields in it
+      tracks = frame : ed.formSec {
+        width: 100%,
+        padding-top: spc.steps.s1,
+        border[0].visible: .false,
+        overrides: [insert(folder, after = ed.formSec.headRow)],
+
+        headRow {
+          head {
+            meta {
+              display: .visible,
+              contents: "6 · the folder on the site"
+            }
+          }
+        }
+      }
+
+      dragHint = text : txt.meta {
+        contents: "Drag a tab to reorder. Each tab is a track; the folder is the collection."
+      }
+
+      // ---- the collection's own: its yarn (from its tracks)
+      collYarn = frame : ed.formSec {
+        width: 100%,
+        border[0].visible: .false,
+        overrides: [
+          insert(collInst, after = ed.formSec.headRow),
+          insert(collPattern, after = collInst)
+        ],
+
+        headRow {
+          head {
+            word {
+              contents: "YARN"
+            }
+
+            meta {
+              display: .visible,
+              contents: "the collection's art"
+            }
+          }
+        }
+      }
+
+      collDetails = frame : ed.formSec {
+        width: 100%,
+        overrides: [
+          insert(derived, after = ed.formSec.headRow),
+          insert(derivedHint, after = derived),
+          insert(onCard, after = derivedHint)
+        ],
+
+        headRow {
+          head {
+            word {
+              contents: "DETAILS"
+            }
+
+            meta {
+              display: .visible,
+              contents: "from its tracks"
+            }
+          }
+        }
+      }
+
+      collLinks = frame : ed.formSec {
+        width: 100%,
+        overrides: [insert(collAdd, after = ed.formSec.headRow)],
+
+        headRow {
+          head {
+            word {
+              contents: "LINKS"
+            }
+
+            meta {
+              display: .visible,
+              contents: "the whole collection: an album or a playlist"
+            }
+          }
+        }
+      }
+
+      collNotes = frame : ed.formSec {
+        width: 100%,
+        overrides: [insert(collAbout, after = ed.formSec.headRow)],
+
+        headRow {
+          head {
+            word {
+              contents: "NOTES"
+            }
+          }
+        }
+      }
+    }
+
+    preview = frame : prv.prevPane {
+      width: 100%,
+
+      box {
+        overrides: [insert(release, after = .nil)]
+      }
+    }
+  }
+
+  release = frame : prv.prevRelease {
+    width: 100%
+  }
+
+  // ---- the folder: the tabs, and the open track ("combat")
+  folder = frame : ed.folder {
+    width: 100%,
+
+    body {
+      overrides: [
+        insert(trackName, after = ed.folder.body.bodyStitch),
+        insert(audioSec, after = trackName),
+        insert(yarnSec, after = audioSec),
+        insert(detailsSec, after = yarnSec),
+        insert(linksSec, after = detailsSec),
+        insert(notesSec, after = linksSec),
+        insert(removeRow, after = notesSec)
+      ]
+    }
+  }
+
+  trackName = frame : ed.labeled {
+    width: 100%
+  }
+
+  audioSec = frame : ed.formSecSub {
+    width: 100%,
+    padding-top: spc.layout.fact-gap,
+    border[0].visible: .false,
+    overrides: [insert(audio, after = ed.formSec.headRow)]
+  }
+
+  audio = frame : ed.audioBox {
+    width: 100%
+  }
+
+  yarnSec = frame : ed.formSecSub {
+    width: 100%,
+    overrides: [
+      insert(instField, after = ed.formSec.headRow),
+      insert(patternField, after = instField)
+    ],
+
+    headRow {
+      head {
+        word {
+          contents: "YARN"
+        }
+      }
+    }
+  }
+
+  instField = frame {
+    layout: {
+      stack: {
+        direction: .column,
+        align-items: .stretch,
+        item-gap: spc.layout.st-lab-gap
+      }
+    },
+    children: [instLab, insts],
+
+    instLab = frame : ed.fieldLabel {
+      word {
+        contents: "Instrument"
+      }
+
+      note {
+        display: .visible
+      }
+    }
+
+    insts = frame {
+      layout: {stack: {item-gap: spc.steps.s2}},
+      children: [piano, beepbox, daw],
+
+      piano = frame : ed.instOpt {
+        width: 100%
+      }
+
+      beepbox = frame : ed.instOpt {
+        width: 100%,
+
+        sw {
+          fill[1].image.ref: beepboxSw
+        }
+
+        words {
+          name {
+            contents: "BeepBox"
+          }
+
+          look {
+            contents: "purple, circles"
+          }
+        }
+      }
+
+      daw = frame : ed.instOptPicked {
+        width: 100%
+      }
+    }
+  }
+
+  patternField = frame {
+    layout: {
+      stack: {
+        direction: .column,
+        align-items: .stretch,
+        item-gap: spc.layout.st-lab-gap
+      }
+    },
+    children: [patternLab, patterns],
+
+    patternLab = frame : ed.fieldLabel {
+      word {
+        contents: "Pattern"
+      }
+
+      note {
+        display: .visible,
+        contents: "auto picks one from the track"
+      }
+    }
+
+    patterns = frame : ed.motifRow {}
+  }
+
+  detailsSec = frame : ed.formSecSub {
+    width: 100%,
+    overrides: [
+      insert(statusField, after = ed.formSec.headRow),
+      insert(dates, after = statusField)
+    ],
+
+    headRow {
+      head {
+        word {
+          contents: "DETAILS"
+        }
+      }
+    }
+  }
+
+  statusField = frame {
+    layout: {
+      stack: {
+        direction: .column,
+        align-items: .stretch,
+        item-gap: spc.layout.st-lab-gap
+      }
+    },
+    children: [statusLab, statuses],
+
+    statusLab = frame : ed.fieldLabel {
+      word {
+        contents: "Status"
+      }
+    }
+
+    statuses = frame {
+      layout: {stack: {align-items: .center, item-gap: spc.steps.s2}},
+      children: [wip, complete, dropped],
+
+      wip = frame : ed.statusOpt {}
+
+      complete = frame : ed.statusOptPicked {}
+
+      dropped = frame : ed.statusOpt {
+        @with-variant(fct.factDropped)
+        opt {
+          label {
+            contents: "Dropped"
+          }
+        }
+      }
+    }
+  }
+
+  dates = frame {
+    layout: {stack: {item-gap: spc.steps.s3}},
+    children: [started, finished],
+
+    started = frame {
+      width: 100%,
+      layout: {
+        stack: {
+          direction: .column,
+          align-items: .stretch,
+          item-gap: spc.layout.st-lab-gap
+        }
+      },
+      children: [startedLab, startedRow],
+
+      startedLab = frame : ed.fieldLabel {
+        word {
+          contents: "Started"
+        }
+      }
+
+      startedRow = frame {
+        layout: {stack: {item-gap: spc.steps.s3}},
+        children: [startedMonth, startedYear],
+
+        startedMonth = frame : fld.fieldSelect {
+          width: 100%
+        }
+
+        startedYear = frame : fld.fieldSelect {
+          width: 100%,
+
+          value {
+            contents: "2021"
+          }
+        }
+      }
+    }
+
+    finished = frame {
+      width: 100%,
+      layout: {
+        stack: {
+          direction: .column,
+          align-items: .stretch,
+          item-gap: spc.layout.st-lab-gap
+        }
+      },
+      children: [finishedLab, finishedRow],
+
+      finishedLab = frame : ed.fieldLabel {
+        word {
+          contents: "Finished"
+        }
+      }
+
+      finishedRow = frame {
+        layout: {stack: {item-gap: spc.steps.s3}},
+        children: [finishedMonth, finishedYear],
+
+        finishedMonth = frame : fld.fieldSelect {
+          width: 100%
+        }
+
+        finishedYear = frame : fld.fieldSelect {
+          width: 100%,
+
+          value {
+            contents: "2021"
+          }
+        }
+      }
+    }
+  }
+
+  linksSec = frame : ed.formSecSub {
+    width: 100%,
+    overrides: [
+      insert(link1, after = ed.formSec.headRow),
+      insert(linkPaste, after = link1)
+    ],
+
+    headRow {
+      head {
+        word {
+          contents: "LINKS"
+        }
+      }
+    }
+  }
+
+  link1 = frame : ed.linkRow {
+    width: 100%
+  }
+
+  linkPaste = frame : ed.linkAdd {
+    width: 100%
+  }
+
+  notesSec = frame : ed.formSecSub {
+    width: 100%,
+    overrides: [insert(trackNotes, after = ed.formSec.headRow)],
+
+    headRow {
+      head {
+        word {
+          contents: "NOTES"
+        }
+      }
+    }
+  }
+
+  trackNotes = frame : ed.labeled {
+    width: 100%,
+
+    @with-variant(fld.fieldArea)
+    input {}
+
+    lab {
+      note {
+        contents: "0 / 400",
+        display: .visible
+      }
+
+      word {
+        contents: "About this track"
+      }
+    }
+  }
+
+  removeRow = frame {
+    layout: {stack: {}},
+    children: removeTrack,
+
+    removeTrack = frame : btn.btnGhostSm {
+      glyph {
+        contents: trashIcon
+      }
+
+      label {
+        contents: "Remove track"
+      }
+    }
+  }
+
+  // ---- the collection's own fields
+  collInst = frame {
+    layout: {
+      stack: {
+        direction: .column,
+        align-items: .stretch,
+        item-gap: spc.layout.st-lab-gap
+      }
+    },
+    children: [collInstLab, collMix],
+
+    collInstLab = frame : ed.fieldLabel {
+      word {
+        contents: "Instrument"
+      }
+
+      note {
+        display: .visible,
+        contents: "from its tracks"
+      }
+    }
+
+    collMix = frame : ed.instMix {
+      width: 100%
+    }
+  }
+
+  collPattern = frame {
+    layout: {
+      stack: {
+        direction: .column,
+        align-items: .stretch,
+        item-gap: spc.layout.st-lab-gap
+      }
+    },
+    children: [collPatternLab, collPatterns],
+
+    collPatternLab = frame : ed.fieldLabel {
+      word {
+        contents: "Pattern"
+      }
+
+      note {
+        display: .visible,
+        contents: "the DAW stripe; auto picks the others"
+      }
+    }
+
+    collPatterns = frame : ed.motifRow {
+      auto {
+        sw {
+          fill[1].image.ref: vgmSw
+        }
+      }
+
+      sine {
+        sw {
+          fill[1].image.ref: mixedSineSw
+        }
+      }
+
+      square {
+        sw {
+          fill[1].image.ref: vgmSw
+        }
+      }
+
+      triangle {
+        sw {
+          fill[1].image.ref: mixedTriangleSw
+        }
+      }
+
+      saw {
+        sw {
+          fill[1].image.ref: mixedSawSw
+        }
+      }
+    }
+  }
+
+  derived = frame {
+    layout: {stack: {item-gap: spc.steps.s3}},
+    children: [dStatus, dStarted, dFinished],
+
+    dStatus = frame : ed.derivedBox {
+      width: 100%
+    }
+
+    dStarted = frame : ed.derivedBoxDate {
+      width: 100%
+    }
+
+    dFinished = frame : ed.derivedBoxDate {
+      width: 100%,
+
+      dt {
+        word {
+          contents: "Finished"
+        }
+      }
+    }
+  }
+
+  derivedHint = text : txt.meta {
+    width: 100%,
+    contents: "WIP while any track is WIP, else Complete if any track is, else Dropped. It runs from the earliest start to the latest finish."
+  }
+
+  onCard = frame : ed.showsStrip {
+    width: 100%
+  }
+
+  collAdd = frame : ed.linkAdd {
+    width: 100%,
+
+    paste {
+      value {
+        contents: "Paste the album or playlist link"
+      }
+    }
+  }
+
+  collAbout = frame : ed.labeled {
+    width: 100%,
+
+    @with-variant(fld.fieldArea)
+    input {
+      value {
+        fill[0].color: col.roles.fg,
+        contents: "These are all stitched together since my ableton ran out before i got to export the full tracks so it might sound weird when they switch"
+      }
+    }
+
+    lab {
+      note {
+        contents: "136 / 400",
+        display: .visible
+      }
+
+      word {
+        contents: "About this collection"
+      }
+    }
+  }
+}
+
+@variants(musicEditorI11)
+@context(i10="on")
+export musicEditorI10 = frame : musicEditor {
+  title: "Studio · music editor · body · i10",
+  left: 1596px,
+  top: 40px,
+
+  grid {
+    preview {
+      box {
+        @with-variant(prv.prevReleaseI10)
+        release {}
+      }
+    }
+  }
+}
+
+// i11 · T1 rule 2 + T8: the small caps were headings in disguise. The
+// form's sections are Titles, the folder's sections Labels, "On the card"
+// and the preview's label Meta words (the link's kind too).
+@context(i10="on", i11="on")
+export musicEditorI11 = frame : musicEditorI10 {
+  title: "Studio · music editor · body · i11",
+  left: 3192px,
+  top: 40px,
+
+  grid {
+    preview {
+      box {
+        @with-variant(prv.prevReleaseI11)
+        release {}
+      }
+
+      @with-variant(prt.eyebrowQuiet)
+      head {
+        meta {
+          contents: "as on blaqat.net"
+        }
+
+        quiet {
+          contents: "Preview"
+        }
+      }
+    }
+
+    form {
+      collNotes {
+        headRow {
+          @with-variant(prt.eyebrowTitle)
+          head {
+            ttl {
+              contents: "Notes"
+            }
+          }
+        }
+      }
+
+      collLinks {
+        headRow {
+          @with-variant(prt.eyebrowTitle)
+          head {
+            ttl {
+              contents: "Links"
+            }
+          }
+        }
+      }
+
+      collDetails {
+        onCard {
+          @with-variant(prt.eyebrowQuiet)
+          head {
+            quiet {
+              contents: "On the card"
+            }
+          }
+        }
+
+        headRow {
+          @with-variant(prt.eyebrowTitle)
+          head {
+            ttl {
+              contents: "Details"
+            }
+          }
+        }
+      }
+
+      collYarn {
+        headRow {
+          @with-variant(prt.eyebrowTitle)
+          head {
+            ttl {
+              contents: "Yarn"
+            }
+          }
+        }
+      }
+
+      tracks {
+        folder {
+          body {
+            notesSec {
+              headRow {
+                @with-variant(prt.eyebrowLabel)
+                head {
+                  lab {
+                    contents: "Notes"
+                  }
+                }
+              }
+            }
+
+            linksSec {
+              link1 {
+                row {
+                  mark {
+                    kind {
+                      contents: "track",
+                      letter-spacing: typ.i10.i11.trackingI11.micro
+                    }
+                  }
+                }
+              }
+
+              headRow {
+                @with-variant(prt.eyebrowLabel)
+                head {
+                  lab {
+                    contents: "Links"
+                  }
+                }
+              }
+            }
+
+            detailsSec {
+              headRow {
+                @with-variant(prt.eyebrowLabel)
+                head {
+                  lab {
+                    contents: "Details"
+                  }
+                }
+              }
+            }
+
+            yarnSec {
+              headRow {
+                @with-variant(prt.eyebrowLabel)
+                head {
+                  lab {
+                    contents: "Yarn"
+                  }
+                }
+              }
+            }
+
+            audioSec {
+              headRow {
+                @with-variant(prt.eyebrowLabel)
+                head {
+                  lab {
+                    contents: "Audio"
+                  }
+                }
+              }
+            }
+          }
+        }
+
+        headRow {
+          @with-variant(prt.eyebrowTitle)
+          head {
+            ttl {
+              contents: "Tracks"
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+// ==== states page (labels over the definitions, then the states boards: i9 · i10 · i11) ====
+lbl-musicEditor = text : doc.specLabel {
+  left: 0px,
+  top: 0px,
+  contents: "musicEditor"
+}
+
+note-musicEditor = text : doc.specNote {
+  left: 0px,
+  top: 16px,
+  contents: "i9"
+}
+
+lbl-musicEditorI10 = text : doc.specLabel {
+  left: 1596px,
+  top: 0px,
+  contents: "musicEditorI10"
+}
+
+note-musicEditorI10 = text : doc.specNote {
+  left: 1596px,
+  top: 16px,
+  contents: "i10"
+}
+
+lbl-musicEditorI11 = text : doc.specLabel {
+  left: 3192px,
+  top: 0px,
+  contents: "musicEditorI11"
+}
+
+note-musicEditorI11 = text : doc.specNote {
+  left: 3192px,
+  top: 16px,
+  contents: "i11"
+}

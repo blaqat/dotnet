@@ -1,0 +1,11 @@
+CONFIG = {"file": "blocks/phone-music.elyx",
+  "sections": [{"rows": [["musicPhone", "musicPhoneI10", "musicPhoneI11", "musicPhonePlayer", "musicPhoneSearch", "musicPhoneMenu"],
+                         ["musicListPhone", "musicListPhoneI10", "musicListPhoneI11"]]}],
+  "drop": ["phoneLabel", "phoneI10Label", "phoneI11Label", "phonePlayerLabel", "listLabel", "listI10Label", "listI11Label", "searchLabel", "menuLabel"],
+  "notes": {"musicPhone": "i9 · the bar playing", "musicPhoneI10": "i10", "musicPhoneI11": "i11", "musicPhonePlayer": "the player's page open",
+    "musicPhoneSearch": "search open (example)", "musicPhoneMenu": "the sections menu open (example)", "musicListPhone": "the list · i9",
+    "musicListPhoneI10": "i10", "musicListPhoneI11": "i11"},
+  "boards": [{"key": "musicPhone", "caption": "Music · phone",
+     "rows": [["musicPhone", "musicPhonePlayer", "musicPhoneSearch", "musicPhoneMenu"], ["musicListPhone"]],
+     "i10": {"musicPhone": "musicPhoneI10", "musicListPhone": "musicListPhoneI10"},
+     "i11": {"musicPhone": "musicPhoneI11", "musicListPhone": "musicListPhoneI11"}}]}

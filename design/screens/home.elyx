@@ -1,0 +1,183 @@
+import "components/atoms/doc.elyx" as doc
+import "components/organisms/sheet.elyx" as sh
+import "components/molecules/sound-tag.elyx" as snd
+import "blocks/home-hero.elyx" as hero
+import "blocks/phone-home.elyx" as ph
+
+// Home: every iteration side by side, one row per screen (i9 | i10 | i11).
+// Each board is a local wrapper; its `…I10` / `…I11` contextual variants
+// render in their iteration (SYSTEM.md, "Iterations side by side on one
+// page"). Home differs between iterations only by tokens: the calm
+// controls and the text roles in i10 (R9), the upright tagline, the bio's
+// lead and the section gaps in i11 (P1, T1, T2, T5, T6).
+@with-context(section="home")
+file {}
+
+// ---- desktop · 1440 × 900 ----
+desktopHeading = text : doc.specHeading {
+  left: 32px,
+  top: 0px,
+  contents: "Home · desktop · 1440 × 900 (settled, ?skip)"
+}
+
+// i9 (the i8 site look): the lockup is the brand and the section buttons
+// are the nav, so the sheet's nav is gone; only the sound tag shows, sewn
+// into the sheet's top edge at its centre. The hero fills the sheet.
+@variants(desktopI10)
+desktop = frame : doc.docBoard {
+  title: "Home · desktop · i9",
+  left: 0px,
+  top: 72px,
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i9"
+      }
+    }
+
+    boardCaption {
+      contents: "Home · desktop · 1440"
+    }
+  }
+
+  body {
+    overrides: [insert(screen, after = .nil)]
+  }
+
+  screen = frame : sh.sheet {
+    height: 900px,
+
+    paper {
+      overrides: [
+        insert(soundRow, after = sh.sheet.paper.page),
+        remove(sh.sheet.paper.sheetNav)
+      ],
+      height: 100%,
+
+      page {
+        overrides: [insert(homeHero, after = .nil)],
+        height: 100%,
+        padding-top: 0px,
+        padding-left: 0px,
+        padding-bottom: 0px,
+        padding-right: 0px
+      }
+    }
+
+    homeHero = frame : hero.homeHero {
+      width: 100%,
+      height: 100%
+    }
+
+    soundRow = frame {
+      left: 0px,
+      top: 0px,
+      right: 0px,
+      ignore-stack: .true,
+      layout: {stack: {justify-content: .center}},
+      children: soundTag,
+
+      soundTag = frame : snd.soundTag {}
+    }
+  }
+}
+
+@variants(desktopI11)
+@context(i10="on")
+desktopI10 = frame : desktop {
+  title: "Home · desktop · i10",
+  left: 1840px,
+  top: 72px,
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i10"
+      }
+    }
+  }
+}
+
+@context(i10="on", i11="on")
+desktopI11 = frame : desktopI10 {
+  title: "Home · desktop · i11",
+  left: 3680px,
+  top: 72px,
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i11"
+      }
+    }
+  }
+}
+
+// ---- phone · 390 × 844 ----
+phoneHeading = text : doc.specHeading {
+  left: 32px,
+  top: 1360px,
+  contents: "Home · phone · 390 × 844 (settled, ?skip)"
+}
+
+// The phone frame (blocks/phone-home.elyx): the sheet at 390, the centred
+// hero, the floating row with the sections pill alone. Tokens only.
+@variants(phoneI10)
+phone = frame : doc.docBoard {
+  title: "Home · phone · i9",
+  left: 0px,
+  top: 1432px,
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i9"
+      }
+    }
+
+    boardCaption {
+      contents: "Home · phone · 390"
+    }
+  }
+
+  body {
+    overrides: [insert(screen, after = .nil)]
+  }
+
+  screen = frame : ph.homePhone {
+    left: 0px,
+    top: 0px
+  }
+}
+
+@variants(phoneI11)
+@context(i10="on")
+phoneI10 = frame : phone {
+  title: "Home · phone · i10",
+  left: 1840px,
+  top: 1432px,
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i10"
+      }
+    }
+  }
+}
+
+@context(i10="on", i11="on")
+phoneI11 = frame : phoneI10 {
+  title: "Home · phone · i11",
+  left: 3680px,
+  top: 1432px,
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i11"
+      }
+    }
+  }
+}

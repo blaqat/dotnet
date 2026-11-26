@@ -1,0 +1,348 @@
+import "tokens/space/space.elyx" as spc
+import "components/atoms/doc.elyx" as doc
+import "components/organisms/sheet.elyx" as sh
+import "components/organisms/page-header.elyx" as head
+import "components/molecules/sound-tag.elyx" as snd
+import "components/organisms/project-tools.elyx" as tools
+import "components/organisms/project-detail.elyx" as det
+import "components/molecules/segmented.elyx" as segs
+import "blocks/projects-grid.elyx" as blk
+import "blocks/phone-projects.elyx" as pp
+
+// Projects: every iteration side by side, one row per screen (i9 | i10 |
+// i11). Each board is a local wrapper; its `…I10` / `…I11` contextual
+// variants render in their iteration and pick the blocks' iteration
+// variants at their tree position (SYSTEM.md, "Iterations side by side on
+// one page").
+// Grid (?view=grid): the sheet on its blue cord with the Projects tab here;
+// the header ("Projects." + the Timeline / Grid switch, Grid picked) and,
+// under it, the tools line; a section under that, the twelve projects by
+// year. The sound tag hangs from the sheet's top edge. i10: tokens carry
+// the roles, the type roles, the card's padding 20 and the equal 24
+// gutters; the cards' structure changes (the shared 32px duotone discs, the
+// write-up pill): the grid block's I10. i11: i10's structure under i11's
+// tokens (T1–T6, T10: the card on its 16 inset, radius 24, media 8).
+// Item page (item.html?p=blaqat-net-this-site), 1440 × 1400: the opened
+// project's 760 column centred (no page header: the top bar's ← Projects
+// leads back). i10: the duotone copy-link disc (the detail's I10); Display
+// 40, the prose at Body 15 on a 612 measure are tokens. i11: Display 36 /
+// 500, the type at 400 / 500, the media a section (48) above the prose.
+@with-context(section="projects")
+file {}
+
+// ---- grid · 1440 ----
+gridHeading = text : doc.specHeading {
+  left: 32px,
+  top: 0px,
+  contents: "Projects · grid · 1440 (?view=grid, the whole page)"
+}
+
+@variants(gridI10)
+grid = frame : doc.docBoard {
+  title: "Projects · grid · 1440 · i9",
+  left: 0px,
+  top: 72px,
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i9"
+      }
+    }
+
+    boardCaption {
+      contents: "Projects · grid · 1440"
+    }
+  }
+
+  body {
+    overrides: [insert(screen, after = .nil)]
+  }
+
+  screen = frame : sh.sheetProjects {
+    paper {
+      overrides: [insert(soundRow, after = sh.sheet.paper.page)],
+
+      page {
+        overrides: [insert(top, after = .nil), insert(grid, after = top)]
+      }
+    }
+
+    // the header and the tools: one section, i9 14 apart (i11 48)
+    top = frame {
+      layout: {
+        stack: {
+          direction: .column,
+          align-items: .stretch,
+          item-gap: spc.layout.pj-head-gap
+        }
+      },
+      children: [header, toolsLine],
+
+      header = frame : head.pageHeader {
+        width: 100%,
+
+        headText {
+          headLine {
+            titleLine {
+              title {
+                contents: "Projects"
+              }
+            }
+          }
+        }
+
+        actions {
+          overrides: [insert(view, after = .nil)]
+        }
+      }
+
+      toolsLine = frame : tools.projectTools {
+        width: 100%
+      }
+    }
+
+    view = frame : segs.seg {}
+
+    grid = frame : blk.projectsGrid {
+      width: 100%
+    }
+
+    // the sound tag hangs from the sheet's top edge, centred
+    soundRow = frame {
+      left: 0px,
+      top: 0px,
+      right: 0px,
+      ignore-stack: .true,
+      layout: {stack: {justify-content: .center}},
+      children: soundTag,
+
+      soundTag = frame : snd.soundTag {}
+    }
+  }
+}
+
+@variants(gridI11)
+@context(i10="on")
+gridI10 = frame : grid {
+  title: "Projects · grid · 1440 · i10",
+  left: 1840px,
+  top: 72px,
+
+  body {
+    screen {
+      fill[1].image.sizing.scale: 0.94,
+
+      paper {
+        page {
+          @with-variant(blk.projectsGridI10)
+          grid {}
+        }
+      }
+    }
+  }
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i10"
+      }
+    }
+  }
+}
+
+@context(i10="on", i11="on")
+gridI11 = frame : gridI10 {
+  title: "Projects · grid · 1440 · i11",
+  left: 3680px,
+  top: 72px,
+
+  body {
+    screen {
+      fill[1].image.sizing.scale: 0.96
+    }
+  }
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i11"
+      }
+    }
+  }
+}
+
+// ---- item page · 1440 × 1400 ----
+itemHeading = text : doc.specHeading {
+  left: 32px,
+  top: 3280px,
+  contents: "Projects · item page · 1440 × 1400 (?p=blaqat-net-this-site)"
+}
+
+@variants(itemI10)
+item = frame : doc.docBoard {
+  title: "Projects · item page · i9",
+  left: 0px,
+  top: 3352px,
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i9"
+      }
+    }
+
+    boardCaption {
+      contents: "Projects · item page · 1440"
+    }
+  }
+
+  body {
+    overrides: [insert(screen, after = .nil)]
+  }
+
+  screen = frame : sh.sheetProjects {
+    height: 1400px,
+
+    paper {
+      height: 100%,
+      overrides: [insert(soundRow, after = sh.sheet.paper.page)],
+
+      page {
+        overrides: [insert(column, after = .nil)]
+      }
+    }
+
+    // the item's column, centred
+    column = frame {
+      layout: {stack: {justify-content: .center}},
+      children: detail,
+
+      detail = frame : det.projectDetail {}
+    }
+
+    // the sound tag hangs from the sheet's top edge, centred
+    soundRow = frame {
+      left: 0px,
+      top: 0px,
+      right: 0px,
+      ignore-stack: .true,
+      layout: {stack: {justify-content: .center}},
+      children: soundTag,
+
+      soundTag = frame : snd.soundTag {}
+    }
+  }
+}
+
+@variants(itemI11)
+@context(i10="on")
+itemI10 = frame : item {
+  title: "Projects · item page · i10",
+  left: 1840px,
+  top: 3352px,
+
+  body {
+    screen {
+      paper {
+        page {
+          column {
+            @with-variant(det.projectDetailI10)
+            detail {}
+          }
+        }
+      }
+    }
+  }
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i10"
+      }
+    }
+  }
+}
+
+@context(i10="on", i11="on")
+itemI11 = frame : itemI10 {
+  title: "Projects · item page · i11",
+  left: 3680px,
+  top: 3352px,
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i11"
+      }
+    }
+  }
+}
+
+// ---- phone · 390 × 844 ----
+phoneHeading = text : doc.specHeading {
+  left: 32px,
+  top: 5200px,
+  contents: "Projects · phone · 390 × 844 (grid)"
+}
+
+// blocks/phone-projects.elyx: the years with one column of phone cards;
+// every iteration is the same structure, the tokens differ.
+@variants(phoneI10)
+phone = frame : doc.docBoard {
+  title: "Projects · phone · i9",
+  left: 0px,
+  top: 5272px,
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i9"
+      }
+    }
+
+    boardCaption {
+      contents: "Projects · phone · grid"
+    }
+  }
+
+  body {
+    overrides: [insert(screen, after = .nil)]
+  }
+
+  screen = frame : pp.projectsPhone {
+    left: 0px,
+    top: 0px
+  }
+}
+
+@variants(phoneI11)
+@context(i10="on")
+phoneI10 = frame : phone {
+  title: "Projects · phone · i10",
+  left: 1840px,
+  top: 5272px,
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i10"
+      }
+    }
+  }
+}
+
+@context(i10="on", i11="on")
+phoneI11 = frame : phoneI10 {
+  title: "Projects · phone · i11",
+  left: 3680px,
+  top: 5272px,
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i11"
+      }
+    }
+  }
+}

@@ -1,0 +1,334 @@
+use "assets/fonts/NunitoSans[YTLC,opsz,wdth,wght].ttf"
+use "assets/fonts/Nunito[wght].ttf"
+
+import "tokens/color/palette.elyx" as pal
+
+// The label above a specimen: the symbol name (or state) in small grey.
+export specLabel = text {
+  title: "Spec label",
+  left: 0px,
+  top: 40px,
+  fill: pal.palette.ink-3,
+  contents: "playBtnLive",
+  font-size: 12,
+  font-family: "Nunito Sans",
+  font-style: "SemiBold",
+  line-height: 1.3
+}
+
+// An optional second line under the label: what the state means.
+export specNote = text : specLabel {
+  title: "Spec note",
+  left: 225px,
+  top: 40px,
+  contents: "playing: live fill, eq bars",
+  font-style: "Regular",
+  fill[0].color: pal.palette.ink-2
+}
+
+// One specimen: label on top, the thing below. Insert the specimen into
+// `slot`, set `label.contents`.
+//   x = frame : doc.spec {
+//     label {contents: "playBtnLive"}
+//     slot {overrides: [insert(thing)]}
+//     thing = frame : play.playBtnLive {}
+//   }
+export spec = frame {
+  title: "Spec",
+  left: 0px,
+  top: 186px,
+  layout: {stack: {direction: .column, item-gap: 8px}},
+  children: [label, slot],
+
+  label = text : specLabel {}
+
+  slot = frame {
+    layout: {stack: {}}
+  }
+}
+
+// A row of specimens (states left to right).
+export specRow = frame {
+  title: "Spec row",
+  left: 225px,
+  top: 186px,
+  min-width: 40px,
+  min-height: 40px,
+  layout: {stack: {item-gap: 40px}}
+}
+
+// A section heading on the library / a component's states board.
+export specHeading = text {
+  title: "Spec heading",
+  left: 0px,
+  top: 390px,
+  fill: pal.palette.ink,
+  contents: "Buttons",
+  font-size: 28,
+  font-family: "Nunito",
+  font-style: "Bold",
+  letter-spacing: -2%
+}
+
+// A sub-heading (a component's name inside a section).
+export specSubheading = text : specHeading {
+  title: "Spec subheading",
+  left: 225px,
+  top: 390px,
+  contents: "Play button",
+  font-size: 18
+}
+
+// The iteration header over a column / board: "i9", "i10", "i11".
+export iterTag = frame {
+  title: "Iteration tag",
+  left: 529px,
+  top: 40px,
+  layout: {stack: {align-items: .center}},
+  fill: pal.palette.ink,
+  corner-radius: 999px,
+  padding: [4px, 10px],
+  children: iterName,
+
+  iterName = text {
+    fill: pal.palette.white,
+    contents: "i9",
+    font-size: 13,
+    font-family: "Nunito Sans",
+    font-style: "Bold"
+  }
+}
+
+// A board: a titled panel that holds one iteration of a states sheet or a
+// screen. Heading row (iterTag + caption) then the content column `body`.
+export docBoard = frame {
+  title: "Board",
+  left: 0px,
+  top: 689px,
+  layout: {stack: {direction: .column, item-gap: 24px}},
+  fill: pal.palette.white,
+  border: pal.palette.hairline,
+  corner-radius: 20px,
+  padding: 32px,
+  children: [boardHead, body],
+
+  boardHead = frame {
+    layout: {stack: {align-items: .center, item-gap: 12px}},
+    children: [boardTag, boardCaption],
+
+    boardTag = frame : iterTag {}
+
+    boardCaption = text : specLabel {
+      contents: "base · the i9 kit",
+      font-size: 14
+    }
+  }
+
+  body = frame {
+    min-width: 40px,
+    min-height: 40px,
+    layout: {stack: {direction: .column, item-gap: 40px}}
+  }
+}
+
+// A paragraph on the library page (a section's intro, the page's header):
+// Regular, ink-2, wraps at its width.
+export specIntro = text : specLabel {
+  title: "Spec intro",
+  left: 0px,
+  top: 548px,
+  width: 960px,
+  contents: "What the section shows and how to read it, in a sentence or two.",
+  font-size: 14,
+  font-style: "Regular",
+  line-height: 1.5,
+  fill[0].color: pal.palette.ink-2
+}
+
+// A colour swatch: the chip (set `chip`'s fill to a token), the token's
+// name, and `refName`: what it points at (a palette name, a hex).
+//   x = frame : doc.specSwatch {
+//     chip {fill[0].color: col.roles.here-a}
+//     name {contents: "here-a"}
+//     refName {contents: "red"}
+//   }
+export specSwatch = frame {
+  title: "Spec swatch",
+  left: 529px,
+  top: 186px,
+  layout: {stack: {direction: .column, item-gap: 4px}},
+  children: [chip, name, refName],
+
+  chip = frame {
+    width: 96px,
+    height: 44px,
+    fill: pal.palette.white,
+    border: pal.palette.hairline,
+    corner-radius: 10px
+  }
+
+  name = text : specLabel {
+    contents: "here-a"
+  }
+
+  refName = text : specNote {
+    contents: "red"
+  }
+}
+
+// A group band on the library page ("Foundations", "Components",
+// "Patterns"): ink, the group's name and one line under it.
+export groupBand = frame {
+  title: "Group band",
+  left: 304px,
+  top: 689px,
+  layout: {stack: {direction: .column, item-gap: 8px}},
+  fill: pal.palette.ink,
+  corner-radius: 20px,
+  padding: [28px, 32px],
+  children: [bandTitle, bandNote],
+
+  bandTitle = text : specHeading {
+    contents: "Components",
+    font-size: 40,
+    fill[0].color: pal.palette.white
+  }
+
+  bandNote = text : specIntro {
+    contents: "The parts every page shares.",
+    fill[0].color: pal.palette.cotton-2
+  }
+}
+
+// ==== states page (labels over the definitions, then the states boards: i9 · i10 · i11) ====
+lbl-specLabel = text : specLabel {
+  left: 0px,
+  top: 0px,
+  contents: "specLabel"
+}
+
+note-specLabel = text : specNote {
+  left: 0px,
+  top: 16px,
+  contents: "the label over a specimen"
+}
+
+lbl-specNote = text : specLabel {
+  left: 225px,
+  top: 0px,
+  contents: "specNote"
+}
+
+note-specNote = text : specNote {
+  left: 225px,
+  top: 16px,
+  contents: "its second line: what the state means"
+}
+
+lbl-iterTag = text : specLabel {
+  left: 529px,
+  top: 0px,
+  contents: "iterTag"
+}
+
+note-iterTag = text : specNote {
+  left: 529px,
+  top: 16px,
+  contents: "the iteration tag"
+}
+
+lbl-spec = text : specLabel {
+  left: 0px,
+  top: 146px,
+  contents: "spec"
+}
+
+note-spec = text : specNote {
+  left: 0px,
+  top: 162px,
+  contents: "label + slot (a specimen)"
+}
+
+lbl-specRow = text : specLabel {
+  left: 225px,
+  top: 146px,
+  contents: "specRow"
+}
+
+note-specRow = text : specNote {
+  left: 225px,
+  top: 162px,
+  contents: "a row of specimens"
+}
+
+lbl-specSwatch = text : specLabel {
+  left: 529px,
+  top: 146px,
+  contents: "specSwatch"
+}
+
+note-specSwatch = text : specNote {
+  left: 529px,
+  top: 162px,
+  contents: "a colour swatch"
+}
+
+lbl-specHeading = text : specLabel {
+  left: 0px,
+  top: 350px,
+  contents: "specHeading"
+}
+
+note-specHeading = text : specNote {
+  left: 0px,
+  top: 366px,
+  contents: "a section heading"
+}
+
+lbl-specSubheading = text : specLabel {
+  left: 225px,
+  top: 350px,
+  contents: "specSubheading"
+}
+
+note-specSubheading = text : specNote {
+  left: 225px,
+  top: 366px,
+  contents: "a sub-heading"
+}
+
+lbl-specIntro = text : specLabel {
+  left: 0px,
+  top: 508px,
+  contents: "specIntro"
+}
+
+note-specIntro = text : specNote {
+  left: 0px,
+  top: 524px,
+  contents: "a paragraph on the library page"
+}
+
+lbl-docBoard = text : specLabel {
+  left: 0px,
+  top: 649px,
+  contents: "docBoard"
+}
+
+note-docBoard = text : specNote {
+  left: 0px,
+  top: 665px,
+  contents: "a board: tag + caption, then the body"
+}
+
+lbl-groupBand = text : specLabel {
+  left: 304px,
+  top: 649px,
+  contents: "groupBand"
+}
+
+note-groupBand = text : specNote {
+  left: 304px,
+  top: 665px,
+  contents: "a group band on the library page"
+}

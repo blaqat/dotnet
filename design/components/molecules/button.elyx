@@ -1,0 +1,883 @@
+import "tokens/color/roles.elyx" as col
+import "tokens/color/palette.elyx" as pal
+import "tokens/space/space.elyx" as spc
+import "components/atoms/text.elyx" as txt
+import "components/atoms/surface.elyx" as surf
+import "assets/icons/bold/shuffle.svg" as shuffleIcon
+import "assets/icons/bold/arrow-up-right.svg" as visitIcon
+import "assets/icons/bold/music-notes.svg" as liveIcon
+import "assets/icons/bold/arrow-counter-clockwise.svg" as resetIcon
+import "assets/icons/bold/github-logo.svg" as githubIcon
+import "components/atoms/doc.elyx" as doc
+
+// The kit's .btn: a pill with an optional leading glyph (`glyph`) and a
+// Label (`label`). Rest = the control at rest: i9 white knit with a dashed
+// stitch inside (`btnStitch`); i10 "calm" = flat white with a 1px ring
+// (the act look), no stitch. Both come from col.roles.ctl-* tokens.
+// Override `glyph {contents: …}` and `label {contents: …}`; hide the glyph
+// with `glyph {display: .none}` (`icon` is a reserved word).
+@variants(
+  btnPrimary,
+  btnLive,
+  btnGhost,
+  btnSm,
+  btnIcon,
+  btnD,
+  btnHover,
+  btnFocus,
+  btnDisabled
+)
+export btn = frame {
+  title: "Button · rest",
+  left: 0px,
+  top: 40px,
+  height: spc.controls.btn,
+  layout: {
+    stack: {
+      justify-content: .center,
+      align-items: .center,
+      item-gap: spc.layout.btn-gap
+    }
+  },
+  fill: col.roles.surface,
+  border: {color: col.roles.ctl-line, position: .outside},
+  shadow: [
+    {
+      drop-shadow: {
+        color: pal.palette.shadow-1,
+        offset: point(0px, 1px),
+        blur-radius: 0px
+      }
+    },
+    {
+      drop-shadow: {
+        color: col.roles.ctl-shadow,
+        offset: point(0px, 2px),
+        blur-radius: 6px
+      }
+    }
+  ],
+  corner-radius: spc.radii.pill,
+  padding-left: spc.layout.btn-x,
+  padding-right: spc.layout.btn-x,
+  children: [btnStitch, glyph, label],
+
+  btnStitch = frame : surf.stitch {
+    left: spc.layout.stitch-in-ctl,
+    top: spc.layout.stitch-in-ctl,
+    right: spc.layout.stitch-in-ctl,
+    bottom: spc.layout.stitch-in-ctl,
+    width: .nil,
+    height: .nil,
+    ignore-stack: .true,
+    corner-radius: spc.radii.pill,
+    border[0].color: col.roles.ctl-stitch
+  }
+
+  glyph = asset {
+    width: spc.controls.btn-icon,
+    height: spc.controls.btn-icon,
+    fill: col.roles.fg,
+    contents: shuffleIcon
+  }
+
+  label = text : txt.label {
+    contents: "Shuffle all"
+  }
+}
+
+// The ONE primary per view: red in i9, ink from i10.
+@variants(btnPrimaryHover, btnPrimaryFocus, btnPrimaryDisabled)
+export btnPrimary = frame : btn {
+  title: "Button · primary",
+  left: 0px,
+  top: 220px,
+  border[0].visible: .false,
+  fill[0].color: col.roles.primary-bg,
+  shadow[1].drop-shadow.color: pal.palette.shadow-1,
+
+  label {
+    fill[0].color: col.roles.primary-fg,
+    contents: "Visit site"
+  }
+
+  glyph {
+    fill[0].color: col.roles.primary-fg,
+    contents: visitIcon
+  }
+
+  btnStitch {
+    border[0].color: col.roles.ctl-stitch-fill
+  }
+}
+
+// Something live (playing): the live fill.
+export btnLive = frame : btn {
+  title: "Button · live",
+  left: 0px,
+  top: 400px,
+  border[0].visible: .false,
+  fill[0].color: col.roles.live,
+  shadow[1].drop-shadow.color: pal.palette.shadow-1,
+
+  label {
+    fill[0].color: col.roles.live-fg,
+    contents: "Now playing"
+  }
+
+  glyph {
+    fill[0].color: col.roles.live-fg,
+    contents: liveIcon
+  }
+
+  btnStitch {
+    border[0].color: col.roles.ctl-stitch-fill
+  }
+}
+
+// Ghost: no fill, no shadow; the stitch (i9) or the ring (i10) only.
+@variants(btnGhostSm)
+export btnGhost = frame : btn {
+  title: "Button · ghost",
+  left: 231px,
+  top: 400px,
+  border[0].position: .inside,
+  fill[0]: .nil,
+  shadow[0]: .nil,
+  shadow[1]: .nil,
+
+  glyph {
+    display: .none
+  }
+
+  label {
+    contents: "Cancel"
+  }
+}
+
+// Small (36): dense rows, toolbars.
+export btnSm = frame : btn {
+  title: "Button · sm",
+  left: 0px,
+  top: 580px,
+  height: spc.controls.btn-sm,
+  padding-left: spc.layout.btn-sm-x,
+  padding-right: spc.layout.btn-sm-x,
+
+  @with-variant(txt.labelCard)
+  label {
+    left: .nil,
+    contents: "Clear filters"
+  }
+
+  glyph {
+    width: spc.controls.icon-sm,
+    height: spc.controls.icon-sm,
+    contents: resetIcon
+  }
+}
+
+// Icon-only: a 44 circle; the name stays in aria-label.
+@variants(btnIconSm)
+export btnIcon = frame : btn {
+  title: "Button · icon",
+  left: 231px,
+  top: 580px,
+  width: spc.controls.btn,
+  padding-left: 0px,
+  padding-right: 0px,
+
+  label {
+    display: .none
+  }
+}
+
+// The link button (kit .btn--d, Yarn.dlink): glyph + site name, 40 tall.
+export btnD = frame : btn {
+  title: "Button · link (d)",
+  left: 653px,
+  top: 580px,
+  height: spc.controls.btn-d,
+  padding-left: spc.layout.btn-d-l,
+  padding-right: spc.layout.btn-d-r,
+  layout.stack.item-gap: spc.layout.btn-d-gap,
+
+  @with-variant(txt.labelCard)
+  label {
+    left: .nil,
+    contents: "GitHub"
+  }
+
+  glyph {
+    width: spc.controls.btn-d-icon,
+    height: spc.controls.btn-d-icon,
+    contents: githubIcon
+  }
+}
+
+// Ghost, small (.btn--ghost.btn--sm, 36): quiet actions beside a field or
+// in a toolbar (Replace, Remove track, Import from Notion, View site).
+export btnGhostSm = frame : btnGhost {
+  title: "Button · ghost sm",
+  left: 422px,
+  top: 400px,
+  height: spc.controls.btn-sm,
+  padding-left: spc.layout.btn-sm-x,
+  padding-right: spc.layout.btn-sm-x,
+
+  @with-variant(txt.labelCard)
+  label {
+    left: .nil,
+    contents: "Replace"
+  }
+
+  glyph {
+    width: spc.controls.icon-sm,
+    height: spc.controls.icon-sm,
+    contents: resetIcon,
+    display: .visible
+  }
+}
+
+// Icon-only, small (.btn--icon.btn--sm): a 36 circle (a card's +).
+export btnIconSm = frame : btnIcon {
+  title: "Button · icon sm",
+  left: 422px,
+  top: 580px,
+  width: spc.controls.btn-sm,
+  height: spc.controls.btn-sm,
+
+  glyph {
+    width: spc.controls.icon-sm,
+    height: spc.controls.icon-sm
+  }
+}
+
+// ---- interaction states (the kit's buttons table: rest · hover · focus ·
+// disabled). Pressed is a .97 dip, the same face.
+// Hover (mouse): lifts with the lift shadow (.btn:hover).
+export btnHover = frame : btn {
+  title: "Button · hover",
+  left: 231px,
+  top: 40px,
+  shadow[0].drop-shadow.offset: [0px, 2px],
+  shadow[1].drop-shadow.blur-radius: 22px,
+  shadow[1].drop-shadow.color: pal.palette.shadow-lift,
+  shadow[1].drop-shadow.offset: [0px, 10px],
+  shadow[1].drop-shadow.spread: -4px
+}
+
+// Focus (keys only): the dark thread ring 3px outside.
+export btnFocus = frame : btn {
+  title: "Button · focus",
+  left: 422px,
+  top: 40px,
+  overrides: [insert(btnRing, after = btn.label)],
+
+  btnRing = frame : surf.focusRing {
+    left: spc.layout.focus-out,
+    top: spc.layout.focus-out,
+    right: spc.layout.focus-out,
+    bottom: spc.layout.focus-out,
+    width: .nil,
+    height: .nil,
+    ignore-stack: .true
+  }
+}
+
+// Disabled: flat and quiet but readable (.5, no shadow).
+export btnDisabled = frame : btn {
+  title: "Button · disabled",
+  left: 653px,
+  top: 40px,
+  opacity: 0.5,
+  shadow[0].drop-shadow.visible: .false,
+  shadow[1].drop-shadow.visible: .false
+}
+
+export btnPrimaryHover = frame : btnPrimary {
+  title: "Button · primary hover",
+  left: 231px,
+  top: 220px,
+  shadow[0].drop-shadow.offset: [0px, 2px],
+  shadow[1].drop-shadow.blur-radius: 22px,
+  shadow[1].drop-shadow.color: pal.palette.shadow-lift,
+  shadow[1].drop-shadow.offset: [0px, 10px],
+  shadow[1].drop-shadow.spread: -4px
+}
+
+export btnPrimaryFocus = frame : btnPrimary {
+  title: "Button · primary focus",
+  left: 422px,
+  top: 220px,
+  overrides: [insert(btnRing, after = btn.label)],
+
+  btnRing = frame : surf.focusRing {
+    left: spc.layout.focus-out,
+    top: spc.layout.focus-out,
+    right: spc.layout.focus-out,
+    bottom: spc.layout.focus-out,
+    width: .nil,
+    height: .nil,
+    ignore-stack: .true
+  }
+}
+
+export btnPrimaryDisabled = frame : btnPrimary {
+  title: "Button · primary disabled",
+  left: 653px,
+  top: 220px,
+  opacity: 0.5,
+  shadow[0].drop-shadow.visible: .false,
+  shadow[1].drop-shadow.visible: .false
+}
+
+// ==== states page (labels over the definitions, then the states boards: i9 · i10 · i11) ====
+lbl-btn = text : doc.specLabel {
+  left: 0px,
+  top: 0px,
+  contents: "btn"
+}
+
+note-btn = text : doc.specNote {
+  left: 0px,
+  top: 16px,
+  contents: "rest (i10: calm, the ring)"
+}
+
+lbl-btnHover = text : doc.specLabel {
+  left: 231px,
+  top: 0px,
+  contents: "btnHover"
+}
+
+note-btnHover = text : doc.specNote {
+  left: 231px,
+  top: 16px,
+  contents: "hover: lifts"
+}
+
+lbl-btnFocus = text : doc.specLabel {
+  left: 422px,
+  top: 0px,
+  contents: "btnFocus"
+}
+
+note-btnFocus = text : doc.specNote {
+  left: 422px,
+  top: 16px,
+  contents: "focus (keys): the ink ring"
+}
+
+lbl-btnDisabled = text : doc.specLabel {
+  left: 653px,
+  top: 0px,
+  contents: "btnDisabled"
+}
+
+note-btnDisabled = text : doc.specNote {
+  left: 653px,
+  top: 16px,
+  contents: "disabled: .5, flat"
+}
+
+lbl-btnPrimary = text : doc.specLabel {
+  left: 0px,
+  top: 180px,
+  contents: "btnPrimary"
+}
+
+note-btnPrimary = text : doc.specNote {
+  left: 0px,
+  top: 196px,
+  contents: "primary (one per view)"
+}
+
+lbl-btnPrimaryHover = text : doc.specLabel {
+  left: 231px,
+  top: 180px,
+  contents: "btnPrimaryHover"
+}
+
+note-btnPrimaryHover = text : doc.specNote {
+  left: 231px,
+  top: 196px,
+  contents: "primary · hover"
+}
+
+lbl-btnPrimaryFocus = text : doc.specLabel {
+  left: 422px,
+  top: 180px,
+  contents: "btnPrimaryFocus"
+}
+
+note-btnPrimaryFocus = text : doc.specNote {
+  left: 422px,
+  top: 196px,
+  contents: "primary · focus"
+}
+
+lbl-btnPrimaryDisabled = text : doc.specLabel {
+  left: 653px,
+  top: 180px,
+  contents: "btnPrimaryDisabled"
+}
+
+note-btnPrimaryDisabled = text : doc.specNote {
+  left: 653px,
+  top: 196px,
+  contents: "primary · disabled"
+}
+
+lbl-btnLive = text : doc.specLabel {
+  left: 0px,
+  top: 360px,
+  contents: "btnLive"
+}
+
+note-btnLive = text : doc.specNote {
+  left: 0px,
+  top: 376px,
+  contents: "live: something playing"
+}
+
+lbl-btnGhost = text : doc.specLabel {
+  left: 231px,
+  top: 360px,
+  contents: "btnGhost"
+}
+
+note-btnGhost = text : doc.specNote {
+  left: 231px,
+  top: 376px,
+  contents: "ghost: no fill"
+}
+
+lbl-btnGhostSm = text : doc.specLabel {
+  left: 422px,
+  top: 360px,
+  contents: "btnGhostSm"
+}
+
+note-btnGhostSm = text : doc.specNote {
+  left: 422px,
+  top: 376px,
+  contents: "ghost · sm (36)"
+}
+
+lbl-btnSm = text : doc.specLabel {
+  left: 0px,
+  top: 540px,
+  contents: "btnSm"
+}
+
+note-btnSm = text : doc.specNote {
+  left: 0px,
+  top: 556px,
+  contents: "sm (36)"
+}
+
+lbl-btnIcon = text : doc.specLabel {
+  left: 231px,
+  top: 540px,
+  contents: "btnIcon"
+}
+
+note-btnIcon = text : doc.specNote {
+  left: 231px,
+  top: 556px,
+  contents: "icon only (44)"
+}
+
+lbl-btnIconSm = text : doc.specLabel {
+  left: 422px,
+  top: 540px,
+  contents: "btnIconSm"
+}
+
+note-btnIconSm = text : doc.specNote {
+  left: 422px,
+  top: 556px,
+  contents: "icon only · sm (36)"
+}
+
+lbl-btnD = text : doc.specLabel {
+  left: 653px,
+  top: 540px,
+  contents: "btnD"
+}
+
+note-btnD = text : doc.specNote {
+  left: 653px,
+  top: 556px,
+  contents: "link button (.btn--d, 40)"
+}
+
+@variants(btnStatesI10)
+btnStates = frame : doc.docBoard {
+  title: "Button · states · i9",
+  left: 0px,
+  top: 784px,
+
+  body {
+    layout.stack.item-gap: 48px,
+    overrides: [
+      insert(row-1, after = .nil),
+      insert(row-2, after = row-1),
+      insert(row-3, after = row-2),
+      insert(row-4, after = row-3)
+    ]
+  }
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i9"
+      }
+    }
+
+    boardCaption {
+      contents: "Button · every state"
+    }
+  }
+
+  row-1 = frame : doc.specRow {
+    layout.stack.item-gap: 48px,
+    overrides: [
+      insert(st-btn, after = .nil),
+      insert(st-btnHover, after = st-btn),
+      insert(st-btnFocus, after = st-btnHover),
+      insert(st-btnDisabled, after = st-btnFocus)
+    ]
+  }
+
+  row-2 = frame : doc.specRow {
+    layout.stack.item-gap: 48px,
+    overrides: [
+      insert(st-btnPrimary, after = .nil),
+      insert(st-btnPrimaryHover, after = st-btnPrimary),
+      insert(st-btnPrimaryFocus, after = st-btnPrimaryHover),
+      insert(st-btnPrimaryDisabled, after = st-btnPrimaryFocus)
+    ]
+  }
+
+  row-3 = frame : doc.specRow {
+    layout.stack.item-gap: 48px,
+    overrides: [
+      insert(st-btnLive, after = .nil),
+      insert(st-btnGhost, after = st-btnLive),
+      insert(st-btnGhostSm, after = st-btnGhost)
+    ]
+  }
+
+  row-4 = frame : doc.specRow {
+    layout.stack.item-gap: 48px,
+    overrides: [
+      insert(st-btnSm, after = .nil),
+      insert(st-btnIcon, after = st-btnSm),
+      insert(st-btnIconSm, after = st-btnIcon),
+      insert(st-btnD, after = st-btnIconSm)
+    ]
+  }
+
+  st-btn = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "btn"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "rest (i10: calm, the ring)"
+    }
+
+    it = frame : btn {}
+  }
+
+  st-btnHover = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "btnHover"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "hover: lifts"
+    }
+
+    it = frame : btnHover {}
+  }
+
+  st-btnFocus = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "btnFocus"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "focus (keys): the ink ring"
+    }
+
+    it = frame : btnFocus {}
+  }
+
+  st-btnDisabled = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "btnDisabled"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "disabled: .5, flat"
+    }
+
+    it = frame : btnDisabled {}
+  }
+
+  st-btnPrimary = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "btnPrimary"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "primary (one per view)"
+    }
+
+    it = frame : btnPrimary {}
+  }
+
+  st-btnPrimaryHover = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "btnPrimaryHover"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "primary · hover"
+    }
+
+    it = frame : btnPrimaryHover {}
+  }
+
+  st-btnPrimaryFocus = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "btnPrimaryFocus"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "primary · focus"
+    }
+
+    it = frame : btnPrimaryFocus {}
+  }
+
+  st-btnPrimaryDisabled = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "btnPrimaryDisabled"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "primary · disabled"
+    }
+
+    it = frame : btnPrimaryDisabled {}
+  }
+
+  st-btnLive = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "btnLive"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "live: something playing"
+    }
+
+    it = frame : btnLive {}
+  }
+
+  st-btnGhost = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "btnGhost"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "ghost: no fill"
+    }
+
+    it = frame : btnGhost {}
+  }
+
+  st-btnGhostSm = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "btnGhostSm"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "ghost · sm (36)"
+    }
+
+    it = frame : btnGhostSm {}
+  }
+
+  st-btnSm = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "btnSm"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "sm (36)"
+    }
+
+    it = frame : btnSm {}
+  }
+
+  st-btnIcon = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "btnIcon"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "icon only (44)"
+    }
+
+    it = frame : btnIcon {}
+  }
+
+  st-btnIconSm = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "btnIconSm"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "icon only · sm (36)"
+    }
+
+    it = frame : btnIconSm {}
+  }
+
+  st-btnD = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "btnD"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "link button (.btn--d, 40)"
+    }
+
+    it = frame : btnD {}
+  }
+}
+
+@variants(btnStatesI11)
+@context(i10="on")
+btnStatesI10 = frame : btnStates {
+  title: "Button · states · i10",
+  left: 908px,
+  top: 784px,
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i10"
+      }
+    }
+  }
+}
+
+@context(i10="on", i11="on")
+btnStatesI11 = frame : btnStatesI10 {
+  title: "Button · states · i11",
+  left: 1776px,
+  top: 784px,
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i11"
+      }
+    }
+  }
+}

@@ -1,0 +1,106 @@
+// i10 · equal gutters on an 8px grid, card padding 20 (folder card 16).
+import "./space.elyx" as base
+import "./space-i11.elyx" as i11
+
+@context(i10=on)
+file {}
+
+@variants(i11.layoutI11)
+export layoutI10 = tokens : base.layout {
+  section-gap: 24px,
+  gutter-x: 24px,
+  gutter-y: 24px,
+  gutter-phone: 16px,
+  inset-x: 20px,
+  inset-y: 20px,
+  inset-phone: 16px,
+  folder-inset: 16px,
+  // buttons: the same em insets at Label 13.5
+  btn-x: 16px,
+  btn-gap: 7px,
+  btn-d-r: 14px,
+  play-l-l: 13px,
+  play-l-r: 16px,
+  play-l-gap: 6px,
+  play-l-sm-l: 11px,
+  play-l-sm-gap: 6px,
+  // a toggle that's on gets a 1px ring (L1); facts at Meta 13.5 (L3)
+  on-ring-w: 1px,
+  fact-gap: 5px,
+  match-x: 4px,
+  // Thoughts
+  post-gutter: 24px,
+  month-gap: 32px,
+  post-gap: 12px,
+  post-kick: 8px,
+  post-dek: 4px,
+  tag-pull: -8px,
+  note-top: 20px,
+  note-x: 20px,
+  note-bottom: 20px,
+  pick-y: 20px,
+  pick-r: 20px,
+  pick-l: 54px,
+  coll-x: 0px,
+  // Projects: the card's padding 20 all round, text 8 apart, 16 above the
+  // foot, 24 beside the media; the foot's parts 12 apart; 24 down; years 32
+  pj-pad-t: 20px,
+  pj-pad-x: 20px,
+  pj-pad-b: 20px,
+  pj-stack: 8px,
+  pj-row-gap: 16px,
+  pj-col-gap: 24px,
+  pj-foot-gap: 12px,
+  pj-grid-y: 24px,
+  pj-group-gap: 32px,
+  pj-desc-top: 4px,
+  pj-row-y: 12px,
+  pj-row-l: 12px,
+  // Home: a stack badge's em insets at Label 13.5
+  stk-l: 7px,
+  stk-r: 9.5px,
+  stk-gap: 5.5px,
+  // Music: the folder card 16 all round, its parts 12 apart (§6); the tabs'
+  // room only on a row with a collection (20); year groups 32 apart
+  folder-inset-y: 16px,
+  folder-gap: 12px,
+  folder-head-gap: 16px,
+  folder-tt-gap: 4px,
+  folder-links-gap: 8px,
+  folder-room: 20px,
+  folder-tabs-top: -8px,
+  group-gap: 32px,
+  results-gap: 16px
+}
+
+@variants(i11.radiiI11)
+export radiiI10 = tokens : base.radii {}
+
+@variants(i11.controlsI11)
+export controlsI10 = tokens : base.controls {
+  btn-icon: 15px,
+  btn-d-icon: 15px,
+  linkdisc-icon: 18px,
+  // a status fact is a bare 15px glyph (L3)
+  fact: 15px,
+  fact-glyph: 14px,
+  fact-wip-glyph: 12px,
+  kick-badge: 20px,
+  cover-h: 158px,
+  thumb-h: 165px,
+  thumb-sm-h: 70px,
+  post-w: 333px,
+  post-foot-h: 32px,
+  thumb-sq: 145px,
+  thumb-half-h: 108px,
+  // Projects: the card's foot (36) and its discs (the shared 32 disc); the
+  // item's prose measure
+  pj-foot: 36px,
+  pj-disc: 32px,
+  pj-disc-icon: 18px,
+  pj-facts: 24px,
+  pj-desc-max: 90px,
+  prose-w: 612px,
+  // Music: the folder card's description clamps to 2 lines (§6)
+  folder-desc-h: 45px
+}

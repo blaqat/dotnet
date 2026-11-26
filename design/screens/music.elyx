@@ -1,0 +1,821 @@
+import "tokens/space/space.elyx" as spc
+import "components/atoms/doc.elyx" as doc
+import "components/organisms/sheet.elyx" as sh
+import "components/organisms/page-header.elyx" as head
+import "components/molecules/button.elyx" as btn
+import "assets/icons/bold/shuffle.svg" as shuffleIcon
+import "components/molecules/segmented.elyx" as segm
+import "components/organisms/music-tools.elyx" as mt
+import "components/organisms/player.elyx" as pl
+import "blocks/music-grid.elyx" as mg
+import "blocks/phone-music.elyx" as pm
+
+// Music: every iteration side by side, one row per screen (i9 | i10 | i11).
+// Each board is a local wrapper; its `…I10` / `…I11` contextual variants
+// render in their iteration and pick the blocks' iteration variants at
+// their tree position (SYSTEM.md, "Iterations side by side on one page").
+// The grid: glooming shadows (Alphabet City Collection) playing, the
+// player bar showing; the window is 1440 × 1400 and the page runs on under
+// the player, which floats 30 above the window's bottom.
+// i9 = the frozen i8 site: the counts in the header's Meta, "Shuffle all"
+// beside the Timeline / Grid switch, no results line. i10: the counts
+// leave the header for the results line (§7), so the header keeps only
+// Timeline / Grid ("Shuffle all" became the line's ⤮ Shuffle); colour
+// roles, type roles, equal gutters, calm controls and purple live are
+// tokens. i11: the list's i11 variant (the playing card's "more" is cut,
+// T8); T1–T10 are tokens.
+// The owner's width (1000): two columns, the description on 3 lines; the
+// tools drop their chips' glyphs (Browse becomes its glyph) and the
+// search its hint; the player's who column narrows.
+@with-context(section="music")
+file {}
+
+// ---- grid · 1440 ----
+gridHeading = text : doc.specHeading {
+  left: 32px,
+  top: 0px,
+  contents: "Music · grid · 1440 × 1400 (glooming shadows playing)"
+}
+
+@variants(gridI10, grid1000)
+grid = frame : doc.docBoard {
+  title: "Music · grid · 1440 · i9",
+  left: 0px,
+  top: 72px,
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i9"
+      }
+    }
+
+    boardCaption {
+      contents: "Music · grid · 1440"
+    }
+  }
+
+  body {
+    overrides: [insert(screen, after = .nil)]
+  }
+
+  screen = frame {
+    width: 1440px,
+    height: 1400px,
+    overflow: .clip,
+    children: [sheet, dock],
+
+    sheet = frame : sh.sheetMusic {
+      left: 0px,
+      top: 0px,
+      width: 100%,
+
+      paper {
+        page {
+          overrides: [
+            insert(header, after = .nil),
+            insert(tools, after = header),
+            insert(list, after = tools)
+          ]
+        }
+      }
+
+      header = frame : head.pageHeaderMeta {
+        width: .nil,
+
+        actions {
+          layout.stack.align-items: .center,
+          overrides: [
+            insert(shuffleAll, after = .nil),
+            insert(view, after = shuffleAll)
+          ]
+        }
+
+        headText {
+          headLine {
+            meta {
+              contents: "26 releases · 52 tracks"
+            }
+          }
+        }
+
+        shuffleAll = frame : btn.btnSm {
+          glyph {
+            contents: shuffleIcon
+          }
+
+          label {
+            contents: "Shuffle all"
+          }
+        }
+
+        view = frame : segm.seg {}
+      }
+
+      tools = frame : mt.musicTools {
+        width: .nil
+      }
+
+      list = frame : mg.musicList {
+        width: .nil
+      }
+    }
+
+    // the player floats over the page, centred, 30 above the window's bottom
+    dock = frame {
+      left: 0px,
+      right: 0px,
+      bottom: spc.layout.player-bottom,
+      layout: {stack: {justify-content: .center}},
+      padding: [0px, spc.layout.player-side],
+      children: player,
+
+      player = frame : pl.player {
+        width: 100%,
+        max-width: spc.controls.player-w
+      }
+    }
+  }
+}
+
+@variants(gridI11)
+@context(i10="on")
+gridI10 = frame : grid {
+  title: "Music · grid · 1440 · i10",
+  left: 1840px,
+  top: 72px,
+
+  body {
+    screen {
+      sheet {
+        fill[1].image.sizing.scale: 1.0155,
+
+        paper {
+          page {
+            @with-variant(mg.musicListI10)
+            list {}
+
+            header {
+              actions {
+                shuffleAll {
+                  display: .none
+                }
+              }
+
+              headText {
+                headLine {
+                  meta {
+                    display: .none
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i10"
+      }
+    }
+  }
+}
+
+@context(i10="on", i11="on")
+gridI11 = frame : gridI10 {
+  title: "Music · grid · 1440 · i11",
+  left: 3680px,
+  top: 72px,
+
+  body {
+    screen {
+      sheet {
+        fill[1].image.sizing.scale: 1.06,
+
+        paper {
+          page {
+            @with-variant(mg.musicListI11)
+            list {}
+          }
+        }
+      }
+    }
+  }
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i11"
+      }
+    }
+  }
+}
+
+// ---- grid · 1000 (the owner's width) ----
+grid1000Heading = text : doc.specHeading {
+  left: 0px,
+  top: 1920px,
+  contents: "Music · grid · 1000 × 1400 (the owner's width: two columns)"
+}
+
+@variants(grid1000I10)
+grid1000 = frame : grid {
+  title: "Music · grid · 1000 · i9",
+  left: 0px,
+  top: 1992px,
+
+  body {
+    screen {
+      width: 1000px,
+
+      sheet {
+        paper {
+          page {
+            list {
+              groups {
+                first {
+                  grid {
+                    aikisu {
+                      tabs {
+                        strip {
+                          after1 {
+                            after2 {
+                              aikisuTab7 {
+                                width: spc.controls.folder-tab-w-wide
+                              }
+
+                              aikisuTab6 {
+                                width: spc.controls.folder-tab-w-wide
+                              }
+
+                              aikisuTab5 {
+                                width: spc.controls.folder-tab-w-wide
+                              }
+
+                              tab4 {
+                                width: spc.controls.folder-tab-w-wide
+                              }
+
+                              tab3 {
+                                width: spc.controls.folder-tab-w-wide
+                              }
+
+                              layout.stack.item-gap: spc.layout.folder-tab-overlap-wide-7
+                            }
+
+                            tab2 {
+                              width: spc.controls.folder-tab-w-wide
+                            }
+
+                            layout.stack.item-gap: spc.layout.folder-tab-overlap-wide-7
+                          }
+
+                          tab1 {
+                            width: spc.controls.folder-tab-w-wide
+                          }
+
+                          layout.stack.item-gap: spc.layout.folder-tab-overlap-wide-7
+                        }
+                      }
+
+                      card {
+                        top {
+                          face {
+                            max-height: spc.controls.folder-desc-h3
+                          }
+                        }
+                      }
+                    }
+
+                    alphabetCity {
+                      tabs {
+                        strip {
+                          after1 {
+                            after2 {
+                              tab4 {
+                                width: spc.controls.folder-tab-w-wide
+                              }
+
+                              tab3 {
+                                width: spc.controls.folder-tab-w-wide
+                              }
+
+                              layout.stack.item-gap: spc.layout.folder-tab-overlap-wide
+                            }
+
+                            tab2 {
+                              width: spc.controls.folder-tab-w-wide
+                            }
+
+                            layout.stack.item-gap: spc.layout.folder-tab-overlap-wide
+                          }
+
+                          tab1 {
+                            width: spc.controls.folder-tab-w-wide
+                          }
+
+                          layout.stack.item-gap: spc.layout.folder-tab-overlap-wide
+                        }
+                      }
+
+                      card {
+                        top {
+                          face {
+                            max-height: spc.controls.folder-desc-h3
+                          }
+                        }
+                      }
+                    }
+
+                    revealed {
+                      tabs {
+                        strip {
+                          after1 {
+                            after2 {
+                              tab4 {
+                                width: spc.controls.folder-tab-w-wide
+                              }
+
+                              tab3 {
+                                width: spc.controls.folder-tab-w-wide
+                              }
+
+                              layout.stack.item-gap: spc.layout.folder-tab-overlap-wide
+                            }
+
+                            tab2 {
+                              width: spc.controls.folder-tab-w-wide
+                            }
+
+                            layout.stack.item-gap: spc.layout.folder-tab-overlap-wide
+                          }
+
+                          tab1 {
+                            width: spc.controls.folder-tab-w-wide
+                          }
+
+                          layout.stack.item-gap: spc.layout.folder-tab-overlap-wide
+                        }
+                      }
+
+                      card {
+                        top {
+                          face {
+                            max-height: spc.controls.folder-desc-h3
+                          }
+                        }
+                      }
+                    }
+
+                    gleamingShadows {
+                      card {
+                        top {
+                          face {
+                            max-height: spc.controls.folder-desc-h3
+                          }
+                        }
+                      }
+                    }
+
+                    lofiSongSolo {
+                      card {
+                        top {
+                          face {
+                            max-height: spc.controls.folder-desc-h3
+                          }
+                        }
+                      }
+                    }
+
+                    ofTheStars {
+                      card {
+                        top {
+                          face {
+                            max-height: spc.controls.folder-desc-h3
+                          }
+                        }
+                      }
+                    }
+
+                    layout.grid.columns: [1fr, 1fr]
+                  }
+                }
+
+                second {
+                  grid {
+                    layout.grid.columns: [1fr, 1fr]
+                  }
+                }
+              }
+            }
+
+            tools {
+              filters {
+                browse {
+                  label {
+                    display: .none
+                  }
+                }
+
+                scroll {
+                  status {
+                    dropped {
+                      glyph {
+                        display: .none
+                      }
+                    }
+
+                    wip {
+                      glyph {
+                        display: .none
+                      }
+                    }
+
+                    complete {
+                      glyph {
+                        display: .none
+                      }
+                    }
+                  }
+
+                  inst {
+                    daw {
+                      glyph {
+                        display: .none
+                      }
+                    }
+
+                    beepbox {
+                      glyph {
+                        display: .none
+                      }
+                    }
+
+                    piano {
+                      glyph {
+                        display: .none
+                      }
+                    }
+                  }
+                }
+              }
+
+              search {
+                lead {
+                  entry {
+                    query {
+                      contents: "Search music"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+
+      dock {
+        player {
+          layout.grid.columns: [260px, 1fr, .auto, .auto, .auto, 66px]
+        }
+      }
+    }
+  }
+
+  boardHead {
+    boardCaption {
+      contents: "Music · grid · 1000"
+    }
+  }
+}
+
+@variants(grid1000I11)
+@context(i10="on")
+grid1000I10 = frame : grid1000 {
+  title: "Music · grid · 1000 · i10",
+  left: 1840px,
+  top: 1992px,
+
+  body {
+    screen {
+      sheet {
+        paper {
+          page {
+            @with-variant(mg.musicListI10)
+            list {}
+
+            header {
+              actions {
+                shuffleAll {
+                  display: .none
+                }
+              }
+
+              headText {
+                headLine {
+                  meta {
+                    display: .none
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i10"
+      }
+    }
+  }
+}
+
+@context(i10="on", i11="on")
+grid1000I11 = frame : grid1000I10 {
+  title: "Music · grid · 1000 · i11",
+  left: 3680px,
+  top: 1992px,
+
+  body {
+    screen {
+      sheet {
+        fill[1].image.sizing.scale: 1.0864,
+
+        paper {
+          page {
+            @with-variant(mg.musicListI11)
+            list {
+              groups {
+                first {
+                  grid {
+                    gleamingShadows {
+                      card {
+                        top {
+                          face {
+                            max-height: spc.i10.i11.controlsI11.folder-desc-h3
+                          }
+                        }
+                      }
+                    }
+
+                    lofiSongSolo {
+                      card {
+                        top {
+                          face {
+                            max-height: spc.i10.i11.controlsI11.folder-desc-h3
+                          }
+                        }
+                      }
+                    }
+
+                    aikisu {
+                      card {
+                        top {
+                          face {
+                            max-height: spc.i10.i11.controlsI11.folder-desc-h3
+                          }
+                        }
+                      }
+                    }
+
+                    alphabetCity {
+                      card {
+                        top {
+                          face {
+                            max-height: spc.i10.i11.controlsI11.folder-desc-h3
+                          }
+                        }
+                      }
+                    }
+
+                    revealed {
+                      card {
+                        top {
+                          face {
+                            max-height: spc.i10.i11.controlsI11.folder-desc-h3
+                          }
+                        }
+                      }
+                    }
+
+                    ofTheStars {
+                      card {
+                        top {
+                          face {
+                            max-height: spc.i10.i11.controlsI11.folder-desc-h3
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i11"
+      }
+    }
+  }
+}
+
+// ---- phone · grid ----
+phoneHeading = text : doc.specHeading {
+  left: 32px,
+  top: 3840px,
+  contents: "Music · phone · 390 × 844 (the player's bar in the slot)"
+}
+
+// blocks/phone-music.elyx: one column of phone cards by year; i10 the
+// results line and the cards' i10 variants, i11 the playing card's i11.
+@variants(phoneI10, phonePlayer)
+phone = frame : doc.docBoard {
+  title: "Music · phone · i9",
+  left: 0px,
+  top: 3912px,
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i9"
+      }
+    }
+
+    boardCaption {
+      contents: "Music · phone · grid"
+    }
+  }
+
+  body {
+    overrides: [insert(screen, after = .nil)]
+  }
+
+  screen = frame : pm.musicPhone {
+    left: 0px,
+    top: 0px
+  }
+}
+
+@variants(phoneI11)
+@context(i10="on")
+phoneI10 = frame : phone {
+  title: "Music · phone · i10",
+  left: 1840px,
+  top: 3912px,
+
+  body {
+    @with-variant(pm.musicPhoneI10)
+    screen {
+      left: 0px
+    }
+  }
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i10"
+      }
+    }
+  }
+}
+
+@context(i10="on", i11="on")
+phoneI11 = frame : phoneI10 {
+  title: "Music · phone · i11",
+  left: 3680px,
+  top: 3912px,
+
+  body {
+    @with-variant(pm.musicPhoneI11)
+    screen {}
+  }
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i11"
+      }
+    }
+  }
+}
+
+// ---- phone · the player open ----
+phonePlayerHeading = text : doc.specHeading {
+  left: 32px,
+  top: 5120px,
+  contents: "Music · phone · the player open (its page over a scrim)"
+}
+
+// `musicPhonePlayer` (the bar dragged up); i10 / i11 pick the list and the
+// header the way `musicPhoneI10` / `musicPhoneI11` do, under the scrim.
+@variants(phonePlayerI10)
+phonePlayer = frame : phone {
+  title: "Music · phone · player open · i9",
+  left: 0px,
+  top: 5192px,
+
+  body {
+    @with-variant(pm.musicPhonePlayer)
+    screen {
+      left: 0px
+    }
+  }
+
+  boardHead {
+    boardCaption {
+      contents: "Music · phone · player open"
+    }
+  }
+}
+
+@variants(phonePlayerI11)
+@context(i10="on")
+phonePlayerI10 = frame : phonePlayer {
+  title: "Music · phone · player open · i10",
+  left: 1840px,
+  top: 5192px,
+
+  body {
+    screen {
+      sheet {
+        fill[1].image.sizing.scale: 3.26,
+
+        paper {
+          page {
+            @with-variant(pm.musicListPhoneI10)
+            list {}
+
+            header {
+              actions {
+                shuffleAll {
+                  display: .none
+                }
+              }
+
+              headText {
+                headLine {
+                  meta {
+                    display: .none
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i10"
+      }
+    }
+  }
+}
+
+@context(i10="on", i11="on")
+phonePlayerI11 = frame : phonePlayerI10 {
+  title: "Music · phone · player open · i11",
+  left: 3680px,
+  top: 5192px,
+
+  body {
+    screen {
+      sheet {
+        fill[1].image.sizing.scale: 3.4163,
+
+        paper {
+          page {
+            @with-variant(pm.musicListPhoneI11)
+            list {}
+          }
+        }
+      }
+    }
+  }
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i11"
+      }
+    }
+  }
+}

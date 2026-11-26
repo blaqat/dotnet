@@ -1,0 +1,197 @@
+import "tokens/space/space.elyx" as spc
+import "components/organisms/home-intro.elyx" as intro
+import "components/atoms/doc.elyx" as doc
+import "components/organisms/home-links.elyx" as links
+
+// Home's one block (`.hero`): everything centred in the sheet, top to bottom:
+// the intro (lockup + tagline), the bio, the section buttons, the contact
+// row. i9's gaps follow the viewport (3.4vh / 4.2vh at 900 tall); i11 T6
+// puts a section (48) before the bio and before the buttons, 24 before the
+// contacts (spc.layout.lead-gap / hnav-gap / contact-top). The bio's last
+// paragraph keeps its 8px margin (lead-line-gap) under it.
+// It hugs its content here; a screen sizes it to the sheet (`width: 100%`,
+// `height: 100%`) and the column centres in it.
+@variants(homeHeroPhone)
+export homeHero = frame {
+  title: "Home hero · desktop",
+  left: 0px,
+  top: 40px,
+  width: .auto,
+  height: .auto,
+  layout: {
+    stack: {direction: .column, justify-content: .center, align-items: .center}
+  },
+  padding: [spc.layout.hero-top, spc.layout.hero-x, spc.layout.hero-bottom],
+  children: [heroIntro, heroBio, heroNav, heroContact],
+
+  heroIntro = frame : intro.intro {}
+
+  heroBio = frame : intro.bio {
+    padding-top: spc.layout.lead-gap,
+    padding-left: 0px,
+    padding-bottom: spc.layout.lead-line-gap,
+    padding-right: 0px
+  }
+
+  heroNav = frame : links.sectionNav {
+    padding-top: spc.layout.hnav-gap
+  }
+
+  heroContact = frame : links.contactRow {
+    padding-top: spc.layout.contact-top
+  }
+}
+
+// Phones (390): the same centred column (24 above, 32 below, 16 at the
+// sides); no section buttons (the bottom bar is the nav); the bio wraps
+// (`bioPhone`); the contacts are icon circles a section under it.
+export homeHeroPhone = frame : homeHero {
+  title: "Home hero · phone",
+  left: 900px,
+  top: 40px,
+  padding-top: spc.layout.hero-top-phone,
+  padding-left: spc.layout.hero-x-phone,
+  padding-bottom: spc.layout.hero-bottom-phone,
+  padding-right: spc.layout.hero-x-phone,
+  overrides: [
+    insert(heroBioPhone, after = homeHero.heroIntro),
+    remove(homeHero.heroNav),
+    remove(homeHero.heroBio)
+  ],
+
+  @with-variant(links.contactRowPhone)
+  heroContact {
+    padding-top: spc.layout.contact-top-phone
+  }
+
+  @with-variant(intro.introPhone)
+  heroIntro {}
+
+  heroBioPhone = frame : intro.bioPhone {
+    padding-top: spc.layout.lead-gap-phone
+  }
+}
+
+// ==== states page (labels over the definitions, then the states boards: i9 · i10 · i11) ====
+lbl-homeHero = text : doc.specLabel {
+  left: 0px,
+  top: 0px,
+  contents: "homeHero"
+}
+
+note-homeHero = text : doc.specNote {
+  left: 0px,
+  top: 16px,
+  contents: "desktop: intro + section buttons + bio"
+}
+
+lbl-homeHeroPhone = text : doc.specLabel {
+  left: 900px,
+  top: 0px,
+  contents: "homeHeroPhone"
+}
+
+note-homeHeroPhone = text : doc.specNote {
+  left: 900px,
+  top: 16px,
+  contents: "phones"
+}
+
+@variants(homeHeroStatesI10)
+homeHeroStates = frame : doc.docBoard {
+  title: "Home hero · states · i9",
+  left: 0px,
+  top: 888px,
+
+  body {
+    layout.stack.item-gap: 48px,
+    overrides: [insert(row-1, after = .nil)]
+  }
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i9"
+      }
+    }
+
+    boardCaption {
+      contents: "Home hero · every state"
+    }
+  }
+
+  row-1 = frame : doc.specRow {
+    layout.stack.item-gap: 48px,
+    overrides: [
+      insert(st-homeHero, after = .nil),
+      insert(st-homeHeroPhone, after = st-homeHero)
+    ]
+  }
+
+  st-homeHero = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "homeHero"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "desktop: intro + section buttons + bio"
+    }
+
+    it = frame : homeHero {}
+  }
+
+  st-homeHeroPhone = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "homeHeroPhone"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "phones"
+    }
+
+    it = frame : homeHeroPhone {}
+  }
+}
+
+@variants(homeHeroStatesI11)
+@context(i10="on")
+homeHeroStatesI10 = frame : homeHeroStates {
+  title: "Home hero · states · i10",
+  left: 1518px,
+  top: 888px,
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i10"
+      }
+    }
+  }
+}
+
+@context(i10="on", i11="on")
+homeHeroStatesI11 = frame : homeHeroStatesI10 {
+  title: "Home hero · states · i11",
+  left: 3036px,
+  top: 888px,
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i11"
+      }
+    }
+  }
+}

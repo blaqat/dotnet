@@ -1,0 +1,1575 @@
+import "tokens/space/space.elyx" as spc
+import "components/molecules/year-pill.elyx" as yp
+import "components/atoms/doc.elyx" as doc
+import "components/molecules/fact.elyx" as fct
+import "components/molecules/folder-tab.elyx" as ft
+import "components/molecules/link-disc.elyx" as lnk
+import "components/molecules/add-button.elyx" as addb
+import "components/organisms/folder-card.elyx" as fc
+import "assets/art/revealed.svg" as revealedCover
+import "assets/art/aikisus-shorts.svg" as aikisuCover
+import "assets/art/peppy-snowday.svg" as peppyCover
+import "assets/art/farewell-my-star.svg" as farewellCover
+import "assets/art/gleaming-shadows.svg" as gleamingCover
+import "components/organisms/results-line.elyx" as rl
+import "assets/art/of-the-stars.svg" as ofTheStarsCover
+import "assets/art/marmalade-cafe.svg" as marmaladeCover
+import "assets/art/lofi-song-solo.svg" as lofiCover
+import "assets/art/winterland-dream.svg" as winterlandCover
+import "assets/art/layers-of-elegance.svg" as layersCover
+import "assets/art/the-5th-beepbox-tournament.svg" as fifthTournamentCover
+import "assets/art/gentle-orbit.svg" as gentleOrbitCover
+import "assets/art/vgm-class-final-project.svg" as vgmCover
+import "assets/art/cat-with-pants.svg" as catPantsCover
+import "assets/art/home-region-ambient.svg" as homeRegionCover
+import "assets/art/cat-walt-3.svg" as catWaltCover
+import "assets/art/village-night-symphony-cover.svg" as villageNightCover
+
+// Music's grid (view=grid): a year group = its year pill + a dashed rule
+// across the column, 16 above four columns of folder cards with one
+// gutter across and down (i9 20 + every row keeps the tabs' 22 room; i10
+// 24 / 24, the room only on a row with a collection). Real content
+// (kit/data.js, i11's order), glooming shadows (Alphabet City Collection)
+// playing.
+// i10 variants pick each card's i10 variant (the count joins the facts,
+// duotone link discs, the live tint) and drop the room on rows without a
+// collection; i11 picks the playing card's i11 variant ("more" cut).
+// `musicList` is the list under the tools: the results line (i10+; i9 has
+// none) one gutter above the year groups, the groups `group-gap` apart.
+@variants(yearGroup2022I10)
+export yearGroup2022 = frame {
+  title: "Year group · 2022 – 2026",
+  left: 0px,
+  top: 40px,
+  width: 1332px,
+  layout: {
+    stack: {direction: .column, align-items: .stretch, item-gap: spc.steps.s2}
+  },
+  children: [head, grid],
+
+  // the pill starts the group (no space above it)
+  head = frame : yp.yearHeader {
+    width: 100%,
+    padding-top: 0px,
+
+    pill {
+      year {
+        contents: "2022 – 2026"
+      }
+
+      count {
+        contents: "10 releases"
+      }
+    }
+  }
+
+  // 16 under the pill (the header's own 8 + 8); four columns, one gutter
+  // across and down; every card in a row as tall
+  // as the tallest (the foot on the bottom edge)
+  grid = frame {
+    layout: {
+      grid: {
+        columns: [1fr, 1fr, 1fr, 1fr],
+        column-gap: spc.layout.gutter-x,
+        row-gap: spc.layout.gutter-x,
+        align-items: .stretch
+      }
+    },
+    children: [
+      ofTheStars,
+      revealed,
+      alphabetCity,
+      aikisu,
+      castAdrift,
+      peppySnowday,
+      marmaladeCafe,
+      farewellMyStar,
+      lofiSongSolo,
+      gleamingShadows
+    ],
+
+    ofTheStars = frame : fc.folderCardSingle {
+      width: 100%,
+
+      card {
+        foot {
+          links {
+            @with-variant(lnk.linkDiscBeepbox)
+            link1 {}
+          }
+        }
+
+        top {
+          face {
+            desc {
+              contents: "Revealed but different... The original song of this was for a 1 hour composition competition which eventually got expanded into this, but also diverged into the piano iteration."
+            }
+          }
+
+          head {
+            tt {
+              @with-variant(fct.factWip)
+              facts {
+                label {
+                  contents: "WIP since Jun 2021"
+                }
+              }
+
+              nameRow {
+                name {
+                  subrange[0].range: [12, 13],
+                  subrange[0].font-family: "Apple Color Emoji",
+                  contents: "of.the.stars✨"
+                }
+              }
+            }
+
+            art {
+              fill[1].image.ref: ofTheStarsCover
+            }
+          }
+        }
+      }
+    }
+
+    revealed = frame : fc.folderCard {
+      width: 100%,
+
+      tabs {
+        strip {
+          after1 {
+            after2 {
+              tab4 {
+                name {
+                  contents: "revealed"
+                }
+              }
+
+              tab3 {
+                name {
+                  contents: "prelude"
+                }
+              }
+            }
+
+            tab2 {
+              name {
+                contents: "libterrene"
+              }
+            }
+          }
+
+          tab1 {
+            name {
+              contents: "seeds you planted"
+            }
+          }
+        }
+      }
+
+      card {
+        top {
+          face {
+            desc {
+              contents: "A short piano EP about finding what your place is in the vast universe around you. Currently Contains Unfinished Planning Tracks"
+            }
+          }
+
+          head {
+            tt {
+              @with-variant(fct.factWip)
+              facts {}
+
+              nameRow {
+                name {
+                  contents: "Revealed"
+                }
+              }
+            }
+
+            art {
+              fill[1].image.ref: revealedCover
+            }
+          }
+        }
+      }
+    }
+
+    alphabetCity = frame : fc.folderCardLive {
+      width: 100%
+    }
+
+    aikisu = frame : fc.folderCard {
+      width: 100%,
+
+      tabs {
+        strip {
+          layout.stack.item-gap: spc.layout.folder-tab-overlap-7,
+
+          after1 {
+            layout.stack.item-gap: spc.layout.folder-tab-overlap-7,
+
+            after2 {
+              layout.stack.item-gap: spc.layout.folder-tab-overlap-7,
+              overrides: [
+                insert(
+                  aikisuTab5,
+                  after = ft.folderTabs.strip.after1.after2.tab4
+                ),
+                insert(aikisuTab6, after = aikisuTab5),
+                insert(aikisuTab7, after = aikisuTab6)
+              ],
+
+              tab3 {
+                number {
+                  contents: "03"
+                }
+
+                name {
+                  contents: "VS 10% Remaining"
+                }
+              }
+
+              tab4 {
+                number {
+                  contents: "04"
+                }
+
+                name {
+                  contents: "melón parfait"
+                }
+              }
+            }
+
+            tab2 {
+              number {
+                contents: "02"
+              }
+
+              name {
+                contents: "Wall Staring Contest"
+              }
+            }
+          }
+
+          tab1 {
+            number {
+              contents: "01"
+            }
+
+            name {
+              contents: "Jumper and Lily"
+            }
+          }
+        }
+      }
+
+      card {
+        top {
+          head {
+            art {
+              fill[1].image.ref: aikisuCover
+            }
+
+            tt {
+              nameRow {
+                name {
+                  contents: "aikisu's shorts"
+                }
+
+                count {
+                  contents: "(7 tracks)"
+                }
+              }
+
+              facts {
+                label {
+                  contents: "Completed Jul 2025"
+                }
+
+                sub {
+                  contents: "· 7 tracks"
+                }
+              }
+            }
+          }
+
+          face {
+            desc {
+              contents: "A collection of short cute chippy songs made in Beepbox using the 'moon.honey' instruments. \"Aikisu\" means 'Amai Tsuki Mitsu' or 'Sweet Moon Honey'."
+            }
+          }
+        }
+      }
+
+      aikisuTab5 = frame : ft.folderTab {
+        number {
+          contents: "05"
+        }
+
+        name {
+          contents: "kakiguava island heatwave"
+        }
+      }
+
+      aikisuTab6 = frame : ft.folderTab {
+        number {
+          contents: "06"
+        }
+
+        name {
+          contents: "kakiguava paradise"
+        }
+      }
+
+      aikisuTab7 = frame : ft.folderTab {
+        number {
+          contents: "07"
+        }
+
+        name {
+          contents: "helpless cat blues (dramatic)"
+        }
+      }
+    }
+
+    castAdrift = frame : fc.folderCardSingle {
+      width: 100%,
+
+      card {
+        foot {
+          acts {
+            @with-variant(addb.addBtnAdded)
+            add {}
+          }
+
+          links {
+            overrides: [
+              insert(
+                castAdriftLink2,
+                after = fc.folderCard.card.foot.links.link1
+              )
+            ]
+          }
+        }
+      }
+
+      castAdriftLink2 = frame : lnk.linkDiscYoutube {}
+    }
+
+    peppySnowday = frame : fc.folderCardSingle {
+      width: 100%,
+
+      card {
+        foot {
+          links {
+            @with-variant(lnk.linkDiscYoutube)
+            link1 {}
+          }
+        }
+
+        top {
+          head {
+            art {
+              fill[1].image.ref: peppyCover
+            }
+
+            tt {
+              facts {
+                label {
+                  contents: "Completed Jan 2023"
+                }
+              }
+
+              nameRow {
+                name {
+                  contents: "peppy snowday"
+                }
+              }
+            }
+          }
+
+          face {
+            desc {
+              contents: "joy and fun"
+            }
+          }
+        }
+      }
+    }
+
+    marmaladeCafe = frame : fc.folderCardSingle {
+      width: 100%,
+
+      card {
+        foot {
+          acts {
+            @with-variant(addb.addBtnAdded)
+            add {}
+          }
+
+          links {
+            overrides: [
+              insert(
+                marmaladeCafeLink2,
+                after = fc.folderCard.card.foot.links.link1
+              )
+            ],
+
+            @with-variant(lnk.linkDiscYoutube)
+            link1 {}
+          }
+        }
+
+        top {
+          head {
+            art {
+              fill[1].image.ref: marmaladeCover
+            }
+
+            tt {
+              facts {
+                label {
+                  contents: "Completed Dec 2022"
+                }
+              }
+
+              nameRow {
+                name {
+                  contents: "marmalade cafe"
+                }
+              }
+            }
+          }
+
+          face {
+            desc {
+              contents: "sip sip mmmm"
+            }
+          }
+        }
+      }
+
+      marmaladeCafeLink2 = frame : lnk.linkDiscSoundcloud {}
+    }
+
+    farewellMyStar = frame : fc.folderCardSingle {
+      width: 100%,
+
+      card {
+        foot {
+          acts {
+            @with-variant(addb.addBtnAdded)
+            add {}
+          }
+
+          links {
+            link1 {
+              display: .none
+            }
+          }
+        }
+
+        top {
+          head {
+            art {
+              fill[1].image.ref: farewellCover
+            }
+
+            tt {
+              facts {
+                label {
+                  contents: "Completed Apr 2022"
+                }
+              }
+
+              nameRow {
+                name {
+                  contents: "farewell my star"
+                }
+              }
+            }
+          }
+
+          face {
+            display: .none
+          }
+        }
+      }
+    }
+
+    lofiSongSolo = frame : fc.folderCardSingle {
+      width: 100%,
+
+      card {
+        foot {
+          links {
+            link1 {
+              display: .none
+            }
+          }
+        }
+
+        top {
+          face {
+            desc {
+              contents: "Dont know what happened to the full song unfortunately, but I really liked the ending"
+            }
+          }
+
+          head {
+            tt {
+              @with-variant(fct.factDropped)
+              facts {
+                label {
+                  contents: "Dropped, started Mar 2022"
+                }
+              }
+
+              nameRow {
+                name {
+                  contents: "lofi song solo"
+                }
+              }
+            }
+
+            art {
+              fill[1].image.ref: lofiCover
+            }
+          }
+        }
+      }
+    }
+
+    gleamingShadows = frame : fc.folderCardSingle {
+      width: 100%,
+
+      card {
+        foot {
+          acts {
+            @with-variant(addb.addBtnAdded)
+            add {}
+          }
+
+          links {
+            overrides: [
+              insert(
+                gleamingShadowsLink2,
+                after = fc.folderCard.card.foot.links.link1
+              )
+            ]
+          }
+        }
+
+        top {
+          head {
+            art {
+              fill[1].image.ref: gleamingCover
+            }
+
+            tt {
+              facts {
+                label {
+                  contents: "Completed Feb 2022"
+                }
+              }
+
+              nameRow {
+                name {
+                  contents: "gleaming shadows"
+                }
+              }
+            }
+          }
+
+          face {
+            desc {
+              contents: "An adventurer explores the depths of a dark cavern and stumbles upon beautiful fluorescent lights illuminating the new world around them. A remake of a track I made for the 4th Beepbox Tournament"
+            }
+          }
+        }
+      }
+
+      gleamingShadowsLink2 = frame : lnk.linkDiscBeepbox {}
+    }
+  }
+}
+
+@variants(yearGroup2021I10)
+export yearGroup2021 = frame {
+  title: "Year group · 2021",
+  left: 0px,
+  top: 994px,
+  width: 1332px,
+  layout: {
+    stack: {direction: .column, align-items: .stretch, item-gap: spc.steps.s2}
+  },
+  children: [head, grid],
+
+  // the pill starts the group (no space above it)
+  head = frame : yp.yearHeader {
+    width: 100%,
+    padding-top: 0px,
+
+    pill {
+      year {
+        contents: "2021"
+      }
+
+      count {
+        contents: "9 releases"
+      }
+    }
+  }
+
+  // 16 under the pill (the header's own 8 + 8); four columns, one gutter
+  // across and down; every card in a row as tall
+  // as the tallest (the foot on the bottom edge)
+  grid = frame {
+    layout: {
+      grid: {
+        columns: [1fr, 1fr, 1fr, 1fr],
+        column-gap: spc.layout.gutter-x,
+        row-gap: spc.layout.gutter-x,
+        align-items: .stretch
+      }
+    },
+    children: [
+      winterlandDream,
+      layersOfElegance,
+      fifthTournament,
+      gentleOrbit,
+      vgmFinal,
+      catWithPants,
+      homeRegionAmbient,
+      catWalt,
+      villageNight
+    ],
+
+    winterlandDream = frame : fc.folderCardSingle {
+      width: 100%,
+
+      card {
+        top {
+          head {
+            art {
+              fill[1].image.ref: winterlandCover
+            }
+
+            tt {
+              nameRow {
+                name {
+                  contents: "winterland dream"
+                }
+              }
+
+              facts {
+                label {
+                  contents: "Completed Nov 2021"
+                }
+              }
+            }
+          }
+
+          face {
+            desc {
+              contents: "Originally thought of for round 7 of the 4th beepbox tournament, but gave up on it. I did like some of the ideas so I recorded it on piano for safe keeping :3"
+            }
+          }
+        }
+
+        foot {
+          links {
+            @with-variant(lnk.linkDiscSoundcloud)
+            link1 {}
+          }
+        }
+      }
+    }
+
+    layersOfElegance = frame : fc.folderCardSingle {
+      width: 100%,
+
+      card {
+        top {
+          head {
+            art {
+              fill[1].image.ref: layersCover
+            }
+
+            tt {
+              nameRow {
+                name {
+                  contents: "layers of elegance"
+                }
+              }
+
+              facts {
+                label {
+                  contents: "Completed Oct 2021"
+                }
+              }
+            }
+          }
+
+          face {
+            desc {
+              contents: "Piano version of layers of elegance, composed for the third beepbox tournament."
+            }
+          }
+        }
+
+        foot {
+          links {
+            @with-variant(lnk.linkDiscSoundcloud)
+            link1 {}
+          }
+        }
+      }
+    }
+
+    fifthTournament = frame : fc.folderCard {
+      width: 100%,
+
+      tabs {
+        strip {
+          after1 {
+            tab2 {
+              name {
+                subrange[0].range: [0, 4],
+                subrange[0].font-family: "Apple Color Emoji",
+                contents: "🙅‍♂️ no shot she got kidnapped again🤦‍♂️"
+              }
+
+              number {
+                contents: "03"
+              }
+            }
+
+            layout.stack.item-gap: spc.layout.folder-tab-overlap-5,
+
+            after2 {
+              layout.stack.item-gap: spc.layout.folder-tab-overlap-5,
+              overrides: [
+                insert(
+                  fifthTournamentTab5,
+                  after = ft.folderTabs.strip.after1.after2.tab4
+                )
+              ],
+
+              tab3 {
+                number {
+                  contents: "04"
+                }
+
+                name {
+                  contents: "waaaterrfront"
+                }
+              }
+
+              tab4 {
+                number {
+                  contents: "05"
+                }
+
+                name {
+                  contents: "a wish for humanity"
+                }
+              }
+            }
+          }
+
+          layout.stack.item-gap: spc.layout.folder-tab-overlap-5,
+
+          tab1 {
+            number {
+              contents: "01"
+            }
+
+            name {
+              contents: "Land of Sugar and Spice"
+            }
+          }
+        }
+      }
+
+      card {
+        top {
+          head {
+            art {
+              fill[1].image.ref: fifthTournamentCover
+            }
+
+            tt {
+              nameRow {
+                name {
+                  width: 100%,
+                  contents: "The 5th Beepbox Tournament"
+                }
+
+                layout.stack.direction: .column,
+
+                count {
+                  contents: "(6 tracks)"
+                }
+
+                layout.stack.align-items: .start,
+                layout.stack.item-gap: 0
+              }
+
+              facts {
+                label {
+                  contents: "Completed Oct 2021"
+                }
+
+                sub {
+                  contents: "· 6 tracks"
+                }
+              }
+            }
+          }
+
+          face {
+            desc {
+              contents: "A collection of entries from the 5th Beepbox Tournament."
+            }
+          }
+        }
+      }
+
+      fifthTournamentTab5 = frame : ft.folderTab {
+        number {
+          contents: "06"
+        }
+
+        name {
+          contents: "peacefulliment"
+        }
+      }
+    }
+
+    gentleOrbit = frame : fc.folderCardSingle {
+      width: 100%,
+
+      card {
+        top {
+          head {
+            art {
+              fill[1].image.ref: gentleOrbitCover
+            }
+
+            tt {
+              nameRow {
+                name {
+                  subrange[0].range: [12, 13],
+                  subrange[1].range: [13, 15],
+                  subrange[0].font-family: "Zapf Dingbats",
+                  subrange[1].font-family: "Hiragino Sans",
+                  contents: "gentle orbit✧･ﾟ: *"
+                }
+              }
+
+              facts {
+                label {
+                  contents: "Completed Jul 2021"
+                }
+              }
+            }
+          }
+
+          face {
+            desc {
+              contents: "Space song short collab with Tomas Praestholm"
+            }
+          }
+        }
+
+        foot {
+          links {
+            overrides: [
+              insert(
+                gentleOrbitLink2,
+                after = fc.folderCard.card.foot.links.link1
+              )
+            ],
+
+            @with-variant(lnk.linkDiscSoundcloud)
+            link1 {}
+          }
+        }
+      }
+
+      gentleOrbitLink2 = frame : lnk.linkDiscBeepbox {}
+    }
+
+    vgmFinal = frame : fc.folderCard {
+      width: 100%,
+
+      tabs {
+        strip {
+          layout.stack.item-gap: spc.layout.folder-tab-overlap-6,
+
+          after1 {
+            layout.stack.item-gap: spc.layout.folder-tab-overlap-6,
+
+            after2 {
+              layout.stack.item-gap: spc.layout.folder-tab-overlap-6,
+              overrides: [
+                insert(
+                  vgmFinalTab5,
+                  after = ft.folderTabs.strip.after1.after2.tab4
+                ),
+                insert(vgmFinalTab6, after = vgmFinalTab5)
+              ],
+
+              tab3 {
+                number {
+                  contents: "03"
+                }
+
+                name {
+                  contents: "boss"
+                }
+              }
+
+              tab4 {
+                number {
+                  contents: "04"
+                }
+
+                name {
+                  contents: "death"
+                }
+              }
+            }
+
+            tab2 {
+              number {
+                contents: "02"
+              }
+
+              name {
+                contents: "combat"
+              }
+            }
+          }
+
+          tab1 {
+            number {
+              contents: "01"
+            }
+
+            name {
+              contents: "explore (piano)"
+            }
+          }
+        }
+      }
+
+      card {
+        top {
+          head {
+            art {
+              fill[1].image.ref: vgmCover
+            }
+
+            tt {
+              nameRow {
+                name {
+                  contents: "VGM Class Final Project"
+                }
+
+                count {
+                  contents: "(6 tracks)"
+                }
+              }
+
+              facts {
+                label {
+                  contents: "Completed May 2021"
+                }
+
+                sub {
+                  contents: "· 6 tracks"
+                }
+              }
+            }
+          }
+
+          face {
+            desc {
+              contents: "These are all stitched together since my ableton ran out before i got to export the full tracks so it might sound weird when they switch"
+            }
+          }
+        }
+      }
+
+      vgmFinalTab5 = frame : ft.folderTab {
+        number {
+          contents: "05"
+        }
+
+        name {
+          contents: "victory"
+        }
+      }
+
+      vgmFinalTab6 = frame : ft.folderTab {
+        number {
+          contents: "06"
+        }
+
+        name {
+          contents: "explore"
+        }
+      }
+    }
+
+    catWithPants = frame : fc.folderCardSingle {
+      width: 100%,
+
+      card {
+        top {
+          head {
+            art {
+              fill[1].image.ref: catPantsCover
+            }
+
+            tt {
+              nameRow {
+                name {
+                  contents: "cat with pants"
+                }
+              }
+
+              facts {
+                label {
+                  contents: "Completed Mar 2021"
+                }
+              }
+            }
+          }
+
+          face {
+            desc {
+              contents: "a compelling story about a cat with pants"
+            }
+          }
+        }
+
+        foot {
+          links {
+            overrides: [
+              insert(
+                catWithPantsLink2,
+                after = fc.folderCard.card.foot.links.link1
+              )
+            ],
+
+            @with-variant(lnk.linkDiscSoundcloud)
+            link1 {}
+          }
+        }
+      }
+
+      catWithPantsLink2 = frame : lnk.linkDiscYoutube {}
+    }
+
+    homeRegionAmbient = frame : fc.folderCardSingle {
+      width: 100%,
+
+      card {
+        top {
+          head {
+            art {
+              fill[1].image.ref: homeRegionCover
+            }
+
+            tt {
+              nameRow {
+                name {
+                  contents: "home region ambient"
+                }
+              }
+
+              facts {
+                label {
+                  contents: "Completed Mar 2021"
+                }
+              }
+            }
+          }
+
+          face {
+            desc {
+              contents: "for vgm class... really like how this turned out esp near the end"
+            }
+          }
+        }
+
+        foot {
+          links {
+            @with-variant(lnk.linkDiscSoundcloud)
+            link1 {}
+          }
+        }
+      }
+    }
+
+    catWalt = frame : fc.folderCardSingle {
+      width: 100%,
+
+      card {
+        top {
+          head {
+            art {
+              fill[1].image.ref: catWaltCover
+            }
+
+            tt {
+              nameRow {
+                name {
+                  contents: "cat walt :3"
+                }
+              }
+
+              facts {
+                label {
+                  contents: "Completed Feb 2021"
+                }
+              }
+            }
+          }
+
+          face {
+            display: .none
+          }
+        }
+
+        foot {
+          links {
+            @with-variant(lnk.linkDiscSoundcloud)
+            link1 {}
+          }
+        }
+      }
+    }
+
+    villageNight = frame : fc.folderCardSingle {
+      width: 100%,
+
+      card {
+        top {
+          head {
+            art {
+              fill[1].image.ref: villageNightCover
+            }
+
+            tt {
+              nameRow {
+                name {
+                  contents: "Village Night Symphony (cover)"
+                }
+              }
+
+              facts {
+                label {
+                  contents: "Completed Feb 2021"
+                }
+              }
+            }
+          }
+
+          face {
+            desc {
+              contents: "A piano cover of Village Night by _jackov"
+            }
+          }
+        }
+
+        foot {
+          links {
+            link1 {
+              display: .none
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+// ---- i10 · the cards' i10 variants; a row without a collection has no room ----
+@variants(yearGroup2022I11)
+@context(i10="on")
+export yearGroup2022I10 = frame : yearGroup2022 {
+  title: "Year group · 2022 – 2026 · i10",
+  left: 1596px,
+  top: 40px,
+
+  grid {
+    gleamingShadows {
+      padding-top: 0px,
+
+      card {
+        foot {
+          links {
+            @with-variant(lnk.linkDiscBeepboxI10)
+            gleamingShadowsLink2 {}
+
+            @with-variant(lnk.linkDiscSoundcloudI10)
+            link1 {}
+          }
+        }
+      }
+    }
+
+    lofiSongSolo {
+      padding-top: 0px
+    }
+
+    farewellMyStar {
+      padding-top: 0px
+    }
+
+    marmaladeCafe {
+      padding-top: 0px,
+
+      card {
+        foot {
+          links {
+            @with-variant(lnk.linkDiscSoundcloudI10)
+            marmaladeCafeLink2 {}
+
+            @with-variant(lnk.linkDiscYoutubeI10)
+            link1 {}
+          }
+        }
+      }
+    }
+
+    peppySnowday {
+      padding-top: 0px,
+
+      card {
+        foot {
+          links {
+            @with-variant(lnk.linkDiscYoutubeI10)
+            link1 {}
+          }
+        }
+      }
+    }
+
+    castAdrift {
+      padding-top: 0px,
+
+      card {
+        foot {
+          links {
+            @with-variant(lnk.linkDiscYoutubeI10)
+            castAdriftLink2 {}
+
+            @with-variant(lnk.linkDiscSoundcloudI10)
+            link1 {}
+          }
+        }
+      }
+    }
+
+    @with-variant(fc.folderCardI10)
+    aikisu {}
+
+    @with-variant(fc.folderCardLiveI10)
+    alphabetCity {}
+
+    @with-variant(fc.folderCardI10)
+    revealed {}
+
+    ofTheStars {
+      card {
+        foot {
+          links {
+            @with-variant(lnk.linkDiscBeepboxI10)
+            link1 {}
+          }
+        }
+      }
+    }
+  }
+}
+
+@context(i10="on")
+export yearGroup2021I10 = frame : yearGroup2021 {
+  title: "Year group · 2021 · i10",
+  left: 1596px,
+  top: 994px,
+
+  grid {
+    villageNight {
+      padding-top: 0px
+    }
+
+    catWalt {
+      card {
+        foot {
+          links {
+            @with-variant(lnk.linkDiscSoundcloudI10)
+            link1 {}
+          }
+        }
+      }
+    }
+
+    homeRegionAmbient {
+      card {
+        foot {
+          links {
+            @with-variant(lnk.linkDiscSoundcloudI10)
+            link1 {}
+          }
+        }
+      }
+    }
+
+    catWithPants {
+      card {
+        foot {
+          links {
+            @with-variant(lnk.linkDiscYoutubeI10)
+            catWithPantsLink2 {}
+
+            @with-variant(lnk.linkDiscSoundcloudI10)
+            link1 {}
+          }
+        }
+      }
+    }
+
+    @with-variant(fc.folderCardI10)
+    vgmFinal {}
+
+    gentleOrbit {
+      card {
+        foot {
+          links {
+            @with-variant(lnk.linkDiscBeepboxI10)
+            gentleOrbitLink2 {}
+
+            @with-variant(lnk.linkDiscSoundcloudI10)
+            link1 {}
+          }
+        }
+      }
+    }
+
+    @with-variant(fc.folderCardI10)
+    fifthTournament {}
+
+    layersOfElegance {
+      card {
+        foot {
+          links {
+            @with-variant(lnk.linkDiscSoundcloudI10)
+            link1 {}
+          }
+        }
+      }
+    }
+
+    winterlandDream {
+      card {
+        foot {
+          links {
+            @with-variant(lnk.linkDiscSoundcloudI10)
+            link1 {}
+          }
+        }
+      }
+    }
+  }
+}
+
+// ---- i11 · the playing card's "more" is cut ----
+@context(i10="on", i11="on")
+export yearGroup2022I11 = frame : yearGroup2022I10 {
+  title: "Year group · 2022 – 2026 · i11",
+  left: 3192px,
+  top: 40px,
+
+  grid {
+    @with-variant(fc.folderCardLiveI11)
+    alphabetCity {}
+  }
+}
+
+// ---- the list under the tools ----
+@variants(musicListI10)
+export musicList = frame {
+  title: "Music · list (results line + year groups)",
+  left: 0px,
+  top: 1962px,
+  width: 1332px,
+  layout: {
+    stack: {
+      direction: .column,
+      align-items: .stretch,
+      item-gap: spc.layout.results-gap
+    }
+  },
+  children: [results, groups],
+
+  // i10+: the counts and Play / Shuffle; i9 shows its counts in the header
+  results = frame : rl.resultsLine {
+    width: .nil,
+    display: .none
+  }
+
+  groups = frame {
+    layout: {
+      stack: {
+        direction: .column,
+        align-items: .stretch,
+        item-gap: spc.layout.group-gap
+      }
+    },
+    children: [first, second],
+
+    first = frame : yearGroup2022 {
+      width: .nil
+    }
+
+    second = frame : yearGroup2021 {
+      width: .nil
+    }
+  }
+}
+
+@variants(musicListI11)
+@context(i10="on")
+export musicListI10 = frame : musicList {
+  title: "Music · list · i10",
+  left: 1596px,
+  top: 1962px,
+
+  groups {
+    @with-variant(yearGroup2021I10)
+    second {}
+
+    @with-variant(yearGroup2022I10)
+    first {}
+  }
+
+  results {
+    display: .visible
+  }
+}
+
+@context(i10="on", i11="on")
+export musicListI11 = frame : musicListI10 {
+  title: "Music · list · i11",
+  left: 3192px,
+  top: 1962px,
+
+  groups {
+    @with-variant(yearGroup2022I11)
+    first {}
+  }
+}
+
+// ==== states page (labels over the definitions, then the states boards: i9 · i10 · i11) ====
+lbl-yearGroup2022 = text : doc.specLabel {
+  left: 0px,
+  top: 0px,
+  contents: "yearGroup2022"
+}
+
+note-yearGroup2022 = text : doc.specNote {
+  left: 0px,
+  top: 16px,
+  contents: "a year group · i9"
+}
+
+lbl-yearGroup2022I10 = text : doc.specLabel {
+  left: 1596px,
+  top: 0px,
+  contents: "yearGroup2022I10"
+}
+
+note-yearGroup2022I10 = text : doc.specNote {
+  left: 1596px,
+  top: 16px,
+  contents: "i10"
+}
+
+lbl-yearGroup2022I11 = text : doc.specLabel {
+  left: 3192px,
+  top: 0px,
+  contents: "yearGroup2022I11"
+}
+
+note-yearGroup2022I11 = text : doc.specNote {
+  left: 3192px,
+  top: 16px,
+  contents: "i11"
+}
+
+lbl-yearGroup2021 = text : doc.specLabel {
+  left: 0px,
+  top: 954px,
+  contents: "yearGroup2021"
+}
+
+note-yearGroup2021 = text : doc.specNote {
+  left: 0px,
+  top: 970px,
+  contents: "a year group · i9"
+}
+
+lbl-yearGroup2021I10 = text : doc.specLabel {
+  left: 1596px,
+  top: 954px,
+  contents: "yearGroup2021I10"
+}
+
+note-yearGroup2021I10 = text : doc.specNote {
+  left: 1596px,
+  top: 970px,
+  contents: "i10 (i11 = tokens)"
+}
+
+lbl-musicList = text : doc.specLabel {
+  left: 0px,
+  top: 1922px,
+  contents: "musicList"
+}
+
+note-musicList = text : doc.specNote {
+  left: 0px,
+  top: 1938px,
+  contents: "the list view · i9"
+}
+
+lbl-musicListI10 = text : doc.specLabel {
+  left: 1596px,
+  top: 1922px,
+  contents: "musicListI10"
+}
+
+note-musicListI10 = text : doc.specNote {
+  left: 1596px,
+  top: 1938px,
+  contents: "i10"
+}
+
+lbl-musicListI11 = text : doc.specLabel {
+  left: 3192px,
+  top: 1922px,
+  contents: "musicListI11"
+}
+
+note-musicListI11 = text : doc.specNote {
+  left: 3192px,
+  top: 1938px,
+  contents: "i11"
+}

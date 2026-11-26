@@ -1,0 +1,209 @@
+// Type roles (DESIGN-i10 §5, DESIGN-i11 T1–T9). Components never write a
+// size, family, weight or tracking: they read a role here.
+// Roles: display · heading · title · body · meta · label · micro · num.
+// `-card` members are the same role inside a card or row (i11 rule 5:
+// 1px smaller there). i9 is the base; i10 / i11 are context layers.
+// font-size is a plain number (pt = px); tracking is % of the size.
+import "./type-i10.elyx" as i10
+
+@variants(i10.sizesI10)
+export sizes = tokens {
+  display: 44,
+  display-phone: 34,
+  heading: 28,
+  heading-phone: 24,
+  title: 17.5,
+  title-card: 17.5,
+  body: 15,
+  body-card: 15,
+  meta: 12,
+  meta-card: 12,
+  label: 15,
+  label-card: 13.5,
+  label-sm: 13.5,
+  micro: 11.5,
+  num: 12,
+  num-card: 12,
+  // parts whose i9 size isn't a role's (from i10 they read a role's size):
+  // a chip / segment's label (Label), a small chip's, a fact or tag in a
+  // card (Meta), a text field's value (Body), the year pill (Title, i11
+  // Heading), the toast (Meta), the hint (Micro)
+  chip: 13.5,
+  chip-sm: 12.5,
+  fact: 12.5,
+  field: 16,
+  field-sm: 14.5,
+  year: 15.5,
+  toast: 14.5,
+  tip: 12,
+  // Thoughts' post cards: a post's title (i9: 22, bigger than a card's
+  // Title), a scratch's quote, the kicker's read time + date (i9 Maple Mono)
+  post-title: 22,
+  // i9's other post titles: a pick's, a playlist's / ranking's, an images
+  // post's (one size from i10); a tier item's name
+  post-title-pick: 21,
+  post-title-list: 19,
+  post-title-images: 18.5,
+  tier-item: 12.5,
+  // an opened article (thoughts' article view): its title, its dek, the
+  // prose's h2 / h3 / quote / words (17 in every iteration)
+  article-title: 49.5,
+  article-dek: 19,
+  prose-h2: 26.5,
+  prose-h3: 20,
+  prose-quote: 19,
+  article-prose: 17,
+  quote: 18,
+  kick-x: 11.5,
+  // a tag you can press (Thoughts' topics): a fact's face until i11,
+  // then a Label in a card
+  tag-btn: 12.5,
+  // a playlist's track name (Label; from i10 Label in a card)
+  track: 14.5,
+  // Projects: a project card's title (i9: 1.28rem Black, bigger than a
+  // card's Title; from i10 the card Title), the opened item's title (i9
+  // 2.4rem; from i10 Display) and its prose (i9 16 in ink at 1.65)
+  title-project: 20.5,
+  title-item: 38.5,
+  prose: 16,
+  // a fact on the page (the item page; i11 rule 5: Meta 13, a card's 12)
+  fact-page: 12.5,
+  // Home: the bio (the hero's lead: i9 18 at 1.7, i11 T5 17 = Title's size
+  // in Body's face), the line under the lockup (i9 an italic 700 of its own;
+  // i11 Body), a stack badge's name (i9 .76rem; from i10 Label)
+  lead: 18,
+  tagline: 15.84,
+  stk: 12.16,
+  // Studio: a section card's name (i9 1.3rem 900; i11 a card Title), a
+  // list row's title, a quiet line in a card ("Last touched …"), the
+  // editor's title field (2.4rem; from i10 Display), a field's label (.8rem
+  // 800; i11 Label), a track tab's name, an option's second line (i9 a
+  // .68rem mono; i11 Meta in a card)
+  st-tile: 20.8,
+  st-row: 16,
+  st-note: 14,
+  st-title: 38.4,
+  st-lab: 12.8,
+  st-tab: 12.16,
+  st-small: 10.88,
+  // the small year pill (a timeline's day: .88rem 850; i10 Label)
+  year-sm: 14,
+  // Music: the player's title (i9 15.5; from i10 a card Title)
+  player: 15.5,
+  // Studio · a section card's words (Home's line in its fan: i9 1rem 800;
+  // i11 Body in a card)
+  st-words: 16,
+  // Studio · a change in Recently (.92rem; i11 Body)
+  st-act: 14.7,
+  // Studio · an h2 in the block editor (1.45rem 850; i10 22, i11 Heading)
+  st-doc-h2: 23.2,
+  // phones: the player bar's title (i9 14.5; from i10 Label)
+  player-phone: 14.5
+}
+
+@variants(i10.facesI10)
+export faces = tokens {
+  display: "Nunito",
+  display-style: "Black",
+  heading: "Nunito",
+  heading-style: "ExtraBold",
+  title: "Nunito",
+  title-style: "ExtraBold",
+  body: "Nunito Sans",
+  body-style: "Regular",
+  body-bold: "SemiBold",
+  meta: "Maple Mono",
+  meta-style: "Medium",
+  label: "Nunito",
+  label-style: "ExtraBold",
+  micro: "Nunito",
+  micro-style: "ExtraBold",
+  num: "Maple Mono",
+  num-style: "Medium",
+  code: "Maple Mono",
+  code-style: "Regular",
+  // the same parts' faces: i9 facts + tags are Nunito 750 (Meta from i10),
+  // a field 500, the toast 600, the hint Nunito 700
+  fact: "Nunito",
+  fact-style: "Bold",
+  field-style: "Medium",
+  field-sm-style: "SemiBold",
+  toast-style: "SemiBold",
+  tip: "Nunito",
+  tip-style: "Bold",
+  // the kicker's read time + date: i9 Maple Mono, i10 Micro caps
+  kick-x: "Maple Mono",
+  tag-btn: "Nunito",
+  // an opened article's title (i9 Black), its dek (i9 Nunito 600; from
+  // i10 Body), its quote (i9 Bold; T2/T3: i11 500, upright)
+  article-title-style: "Black",
+  article-dek: "Nunito",
+  article-dek-style: "SemiBold",
+  prose-quote-style: "Bold",
+  tag-btn-style: "Bold",
+  kick-x-style: "Medium",
+  // Projects: the card's title and the opened item's title (i9 Black)
+  title-project-style: "Black",
+  title-item-style: "Black",
+  // Home: the bio + its bold words (i9 750; i11 T2 500), the tagline (i9
+  // Nunito 700 italic; i11 Body)
+  lead: "Nunito Sans",
+  lead-style: "Regular",
+  lead-bold: "Bold",
+  tagline: "Nunito",
+  tagline-style: "Bold Italic",
+  // Studio: a section card's name; the bold words in a quiet line
+  st-tile-style: "Black",
+  st-strong-style: "ExtraBold",
+  // an emoji in a title (the owner's ✨)
+  emoji: "Apple Color Emoji"
+}
+
+@variants(i10.trackingI10)
+export tracking = tokens {
+  display: -4%,
+  heading: -2%,
+  title: -1.2%,
+  body: 0%,
+  meta: 0%,
+  label: -0.5%,
+  micro: 12%,
+  num: 0%,
+  // caps (the post kicker's words), the kicker's read time + date, a
+  // post's title
+  caps: 12%,
+  kick-x: 0%,
+  post-title: -2.2%,
+  // Projects: the card's title, the opened item's title
+  title-project: -2%,
+  title-item: -3%
+}
+
+@variants(i10.leadingI10)
+export leading = tokens {
+  display: 0.95,
+  heading: 1.1,
+  title: 1.15,
+  body: 1.5,
+  meta: 1.3,
+  label: 1,
+  micro: 1,
+  num: 1.3,
+  // a scratch's quote
+  quote: 1.32,
+  // Projects: the card's title, the opened item's title, its prose
+  title-project: 1.15,
+  title-item: 1.04,
+  prose: 1.65,
+  // Home: the bio (i9 1.7; i11 Body's 1.5), the tagline
+  lead: 1.7,
+  tagline: 1.2,
+  // Studio · a quiet line in a card and a change in Recently (1.35; i11 Body)
+  st-quiet: 1.35,
+  // an opened article's title; the prose's words (17 / 29)
+  article-title: 1.02,
+  article-prose: 1.72,
+  // Studio · the editor's title field (1.08; from i10 Display's), a field's label (1.2)
+  st-title: 1.08,
+  st-lab: 1.2
+}

@@ -1,0 +1,17 @@
+import "./roles-i10.elyx" as base
+import "./palette.elyx" as p
+
+@context(i10=on, section=music)
+file {}
+
+export rolesI10Music = tokens : base.rolesI10 {
+  here-a: p.palette.purple,
+  here-b: p.palette.purple-deep,
+  on-bg: p.palette.purple-soft,
+  on-fg: p.palette.purple-deep,
+  now: p.palette.purple,
+  now-deep: p.palette.purple-deep,
+  now-soft: p.palette.purple-soft,
+  link-hover: p.palette.purple-deep,
+  deco: p.palette.purple
+}

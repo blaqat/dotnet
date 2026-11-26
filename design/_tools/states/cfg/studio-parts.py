@@ -1,0 +1,11 @@
+CONFIG = {"file": "components/organisms/studio-parts.elyx",
+  "sections": [{"rows": [["secDot", "secDotRow", "secDotAct"], ["eyebrow"], ["eyebrowHeading", "eyebrowTitle", "eyebrowLabel", "eyebrowQuiet"]]}],
+  "notes": {"secDot": "a section dot", "secDotRow": "in a row", "secDotAct": "in the activity list", "eyebrow": "an eyebrow (i9 · i10)",
+    "eyebrowHeading": "i11 · the Heading role", "eyebrowTitle": "i11 · the Title role", "eyebrowLabel": "i11 · the Label role",
+    "eyebrowQuiet": "i11 · quiet"},
+  "boards": [{"key": "studioParts", "caption": "Studio parts",
+     "rows": [["secDot", "secDotRow", "secDotAct"], ["eyebrow-heading", "eyebrow-title", "eyebrow-label", "eyebrow-quiet"]],
+     "ref": {"eyebrow-heading": "eyebrow", "eyebrow-title": "eyebrow", "eyebrow-label": "eyebrow", "eyebrow-quiet": "eyebrow"},
+     "labels": {"eyebrow-heading": "eyebrow", "eyebrow-title": "eyebrow", "eyebrow-label": "eyebrow", "eyebrow-quiet": "eyebrow"},
+     "notes": {"eyebrow-heading": "i11 → eyebrowHeading", "eyebrow-title": "i11 → eyebrowTitle", "eyebrow-label": "i11 → eyebrowLabel", "eyebrow-quiet": "i11 → eyebrowQuiet"},
+     "i11": {"eyebrow-heading": "eyebrowHeading", "eyebrow-title": "eyebrowTitle", "eyebrow-label": "eyebrowLabel", "eyebrow-quiet": "eyebrowQuiet"}}]}

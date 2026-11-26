@@ -1,0 +1,553 @@
+import "tokens/color/roles.elyx" as col
+import "tokens/space/space.elyx" as spc
+import "tokens/type/type.elyx" as typ
+import "components/atoms/text.elyx" as txt
+import "components/atoms/doc.elyx" as doc
+import "components/molecules/nav-tab.elyx" as tab
+import "assets/icons/bold/folder-simple.svg" as projectsIcon
+import "assets/icons/bold/eye.svg" as eyeIcon
+
+// Small parts every Studio screen shares.
+// ---- the felt section dot (.ydot): the nav tab's dot in its section's
+// hue, never greyed (a section card 44, a list row 38, an activity line
+// 16 with no stitch). Set the section with
+// `fill[0].color: sec.section.hue-music` and `glyph {contents: …}`.
+@variants(secDotRow, secDotAct)
+export secDot = frame : tab.navTab.dot {
+  title: "Section dot · card (44)",
+  left: 0px,
+  top: 40px,
+  width: spc.controls.st-dot,
+  height: spc.controls.st-dot,
+
+  dotStitch {
+    border[0].color: col.roles.dot-stitch
+  }
+
+  glyph {
+    fill[0].color: col.roles.dot-fg,
+    width: spc.controls.st-dot-icon,
+    height: spc.controls.st-dot-icon,
+    contents: projectsIcon
+  }
+
+  dotRest {
+    display: .none
+  }
+}
+
+// A list row's dot (38).
+export secDotRow = frame : secDot {
+  title: "Section dot · row (38)",
+  left: 205px,
+  top: 40px,
+  width: spc.controls.st-dot-row,
+  height: spc.controls.st-dot-row,
+
+  glyph {
+    width: spc.controls.st-dot-row-icon,
+    height: spc.controls.st-dot-row-icon
+  }
+}
+
+// An activity line's dot (16): no stitch.
+export secDotAct = frame : secDot {
+  title: "Section dot · activity (16)",
+  left: 397px,
+  top: 40px,
+  width: spc.controls.st-dot-act,
+  height: spc.controls.st-dot-act,
+
+  glyph {
+    width: spc.controls.st-dot-act-icon,
+    height: spc.controls.st-dot-act-icon
+  }
+
+  dotStitch {
+    display: .none
+  }
+}
+
+// ---- the eyebrow (Studio's small-caps heads: SECTIONS, TRACKS, AUDIO,
+// PREVIEW): Micro caps in fg-3, an optional glyph before it and an
+// optional Meta after it (`meta`). Write the words in capitals in `word`.
+// i11 (T1 rule 2 + T8): they were headings in disguise, so each becomes a
+// role, written in sentence case: a dashboard pane's head a Heading
+// (`eyebrowHeading`), a form section a Title (`eyebrowTitle`), a section
+// inside the folder a Label (`eyebrowLabel`), the preview's labels Meta
+// words (`eyebrowQuiet`). An I11 block picks one with @with-variant and
+// sets the words on its visible text.
+// Children: `glyph`, `word`, `big` (Heading), `ttl` (Title), `lab`
+// (Label), `quiet` (Meta, fg-3), `meta`.
+@variants(eyebrowHeading, eyebrowTitle, eyebrowLabel, eyebrowQuiet)
+export eyebrow = frame {
+  title: "Eyebrow",
+  left: 0px,
+  top: 204px,
+  layout: {stack: {align-items: .center, item-gap: spc.layout.fact-gap}},
+  children: [glyph, word, big, ttl, lab, quiet, meta],
+
+  glyph = asset {
+    width: spc.controls.kbd-icon,
+    height: spc.controls.kbd-icon,
+    display: .none,
+    fill: col.roles.fg-3,
+    contents: eyeIcon
+  }
+
+  word = text : txt.micro {
+    contents: "SECTIONS",
+    letter-spacing: typ.tracking.caps,
+    fill[0].color: col.roles.fg-3
+  }
+
+  big = text : txt.heading {
+    display: .none,
+    contents: "Sections"
+  }
+
+  ttl = text : txt.title {
+    display: .none,
+    contents: "Sections"
+  }
+
+  lab = text : txt.label {
+    display: .none,
+    contents: "Sections"
+  }
+
+  quiet = text : txt.meta {
+    display: .none,
+    contents: "Sections"
+  }
+
+  meta = text : txt.meta {
+    display: .none,
+    contents: "8 unpublished"
+  }
+}
+
+// i11 · a dashboard pane's head: Heading 22, ink.
+@context(i10="on", i11="on")
+export eyebrowHeading = frame : eyebrow {
+  title: "Eyebrow · i11 Heading",
+  left: 0px,
+  top: 336px,
+
+  word {
+    display: .none
+  }
+
+  big {
+    display: .visible
+  }
+}
+
+// i11 · a form section's head: Title 17, ink.
+@context(i10="on", i11="on")
+export eyebrowTitle = frame : eyebrow {
+  title: "Eyebrow · i11 Title",
+  left: 205px,
+  top: 336px,
+
+  word {
+    display: .none
+  }
+
+  ttl {
+    display: .visible
+  }
+}
+
+// i11 · a section inside the folder: Label 14, ink.
+@context(i10="on", i11="on")
+export eyebrowLabel = frame : eyebrow {
+  title: "Eyebrow · i11 Label",
+  left: 397px,
+  top: 336px,
+
+  word {
+    display: .none
+  }
+
+  lab {
+    display: .visible
+  }
+}
+
+// i11 · the preview's labels: Meta words in fg-3.
+@context(i10="on", i11="on")
+export eyebrowQuiet = frame : eyebrow {
+  title: "Eyebrow · i11 Meta",
+  left: 589px,
+  top: 336px,
+
+  word {
+    display: .none
+  }
+
+  quiet {
+    display: .visible
+  }
+}
+
+// ==== states page (labels over the definitions, then the states boards: i9 · i10 · i11) ====
+lbl-secDot = text : doc.specLabel {
+  left: 0px,
+  top: 0px,
+  contents: "secDot"
+}
+
+note-secDot = text : doc.specNote {
+  left: 0px,
+  top: 16px,
+  contents: "a section dot"
+}
+
+lbl-secDotRow = text : doc.specLabel {
+  left: 205px,
+  top: 0px,
+  contents: "secDotRow"
+}
+
+note-secDotRow = text : doc.specNote {
+  left: 205px,
+  top: 16px,
+  contents: "in a row"
+}
+
+lbl-secDotAct = text : doc.specLabel {
+  left: 397px,
+  top: 0px,
+  contents: "secDotAct"
+}
+
+note-secDotAct = text : doc.specNote {
+  left: 397px,
+  top: 16px,
+  contents: "in the activity list"
+}
+
+lbl-eyebrow = text : doc.specLabel {
+  left: 0px,
+  top: 164px,
+  contents: "eyebrow"
+}
+
+note-eyebrow = text : doc.specNote {
+  left: 0px,
+  top: 180px,
+  contents: "an eyebrow (i9 · i10)"
+}
+
+lbl-eyebrowHeading = text : doc.specLabel {
+  left: 0px,
+  top: 296px,
+  contents: "eyebrowHeading"
+}
+
+note-eyebrowHeading = text : doc.specNote {
+  left: 0px,
+  top: 312px,
+  contents: "i11 · the Heading role"
+}
+
+lbl-eyebrowTitle = text : doc.specLabel {
+  left: 205px,
+  top: 296px,
+  contents: "eyebrowTitle"
+}
+
+note-eyebrowTitle = text : doc.specNote {
+  left: 205px,
+  top: 312px,
+  contents: "i11 · the Title role"
+}
+
+lbl-eyebrowLabel = text : doc.specLabel {
+  left: 397px,
+  top: 296px,
+  contents: "eyebrowLabel"
+}
+
+note-eyebrowLabel = text : doc.specNote {
+  left: 397px,
+  top: 312px,
+  contents: "i11 · the Label role"
+}
+
+lbl-eyebrowQuiet = text : doc.specLabel {
+  left: 589px,
+  top: 296px,
+  contents: "eyebrowQuiet"
+}
+
+note-eyebrowQuiet = text : doc.specNote {
+  left: 589px,
+  top: 312px,
+  contents: "i11 · quiet"
+}
+
+@variants(studioPartsStatesI10)
+studioPartsStates = frame : doc.docBoard {
+  title: "Studio parts · states · i9",
+  left: 0px,
+  top: 505px,
+
+  body {
+    layout.stack.item-gap: 48px,
+    overrides: [insert(row-1, after = .nil), insert(row-2, after = row-1)]
+  }
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i9"
+      }
+    }
+
+    boardCaption {
+      contents: "Studio parts · every state"
+    }
+  }
+
+  row-1 = frame : doc.specRow {
+    layout.stack.item-gap: 48px,
+    overrides: [
+      insert(st-secDot, after = .nil),
+      insert(st-secDotRow, after = st-secDot),
+      insert(st-secDotAct, after = st-secDotRow)
+    ]
+  }
+
+  row-2 = frame : doc.specRow {
+    layout.stack.item-gap: 48px,
+    overrides: [
+      insert(st-eyebrow-heading, after = .nil),
+      insert(st-eyebrow-title, after = st-eyebrow-heading),
+      insert(st-eyebrow-label, after = st-eyebrow-title),
+      insert(st-eyebrow-quiet, after = st-eyebrow-label)
+    ]
+  }
+
+  st-secDot = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "secDot"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "a section dot"
+    }
+
+    it = frame : secDot {}
+  }
+
+  st-secDotRow = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "secDotRow"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "in a row"
+    }
+
+    it = frame : secDotRow {}
+  }
+
+  st-secDotAct = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "secDotAct"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "in the activity list"
+    }
+
+    it = frame : secDotAct {}
+  }
+
+  st-eyebrow-heading = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "eyebrow"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "i11 → eyebrowHeading"
+    }
+
+    it = frame : eyebrow {}
+  }
+
+  st-eyebrow-title = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "eyebrow"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "i11 → eyebrowTitle"
+    }
+
+    it = frame : eyebrow {}
+  }
+
+  st-eyebrow-label = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "eyebrow"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "i11 → eyebrowLabel"
+    }
+
+    it = frame : eyebrow {}
+  }
+
+  st-eyebrow-quiet = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "eyebrow"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "i11 → eyebrowQuiet"
+    }
+
+    it = frame : eyebrow {}
+  }
+}
+
+@variants(studioPartsStatesI11)
+@context(i10="on")
+studioPartsStatesI10 = frame : studioPartsStates {
+  title: "Studio parts · states · i10",
+  left: 824px,
+  top: 505px,
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i10"
+      }
+    }
+  }
+}
+
+@context(i10="on", i11="on")
+studioPartsStatesI11 = frame : studioPartsStatesI10 {
+  title: "Studio parts · states · i11",
+  left: 1648px,
+  top: 505px,
+
+  body {
+    row-2 {
+      st-eyebrow-quiet {
+        slot {
+          @with-variant(eyebrowQuiet)
+          it {}
+        }
+
+        note {
+          contents: "i11 · quiet"
+        }
+
+        label {
+          contents: "eyebrowQuiet"
+        }
+      }
+
+      st-eyebrow-label {
+        slot {
+          @with-variant(eyebrowLabel)
+          it {}
+        }
+
+        note {
+          contents: "i11 · the Label role"
+        }
+
+        label {
+          contents: "eyebrowLabel"
+        }
+      }
+
+      st-eyebrow-title {
+        slot {
+          @with-variant(eyebrowTitle)
+          it {}
+        }
+
+        note {
+          contents: "i11 · the Title role"
+        }
+
+        label {
+          contents: "eyebrowTitle"
+        }
+      }
+
+      st-eyebrow-heading {
+        slot {
+          @with-variant(eyebrowHeading)
+          it {}
+        }
+
+        note {
+          contents: "i11 · the Heading role"
+        }
+
+        label {
+          contents: "eyebrowHeading"
+        }
+      }
+    }
+  }
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i11"
+      }
+    }
+  }
+}

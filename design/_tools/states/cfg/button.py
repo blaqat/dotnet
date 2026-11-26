@@ -1,0 +1,26 @@
+R = [["btn", "btnHover", "btnFocus", "btnDisabled"],
+     ["btnPrimary", "btnPrimaryHover", "btnPrimaryFocus", "btnPrimaryDisabled"],
+     ["btnLive", "btnGhost", "btnGhostSm"],
+     ["btnSm", "btnIcon", "btnIconSm", "btnD"]]
+CONFIG = {
+  "file": "components/molecules/button.elyx",
+  "sections": [{"rows": R}],
+  "notes": {
+    "btn": "rest (i10: calm, the ring)",
+    "btnHover": "hover: lifts",
+    "btnFocus": "focus (keys): the ink ring",
+    "btnDisabled": "disabled: .5, flat",
+    "btnPrimary": "primary (one per view)",
+    "btnPrimaryHover": "primary · hover",
+    "btnPrimaryFocus": "primary · focus",
+    "btnPrimaryDisabled": "primary · disabled",
+    "btnLive": "live: something playing",
+    "btnGhost": "ghost: no fill",
+    "btnGhostSm": "ghost · sm (36)",
+    "btnSm": "sm (36)",
+    "btnIcon": "icon only (44)",
+    "btnIconSm": "icon only · sm (36)",
+    "btnD": "link button (.btn--d, 40)",
+  },
+  "boards": [{"key": "btn", "caption": "Button", "rows": R}],
+}

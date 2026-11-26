@@ -1,0 +1,113 @@
+// i10 · text roles, not sizes (DESIGN-i10 §5): six sizes, four weights,
+// mono only for numbers that line up.
+import "./type.elyx" as base
+import "./type-i11.elyx" as i11
+
+@context(i10=on)
+file {}
+
+@variants(i11.sizesI11)
+export sizesI10 = tokens : base.sizes {
+  display: 40,
+  display-phone: 30,
+  heading: 22,
+  heading-phone: 20,
+  title: 17,
+  title-card: 17,
+  body: 15,
+  body-card: 15,
+  meta: 13.5,
+  meta-card: 13.5,
+  label: 13.5,
+  label-card: 13.5,
+  label-sm: 13.5,
+  micro: 12,
+  num: 12,
+  num-card: 12,
+  chip: 13.5,
+  chip-sm: 12,
+  fact: 13.5,
+  field: 16,
+  year: 17,
+  toast: 13.5,
+  tip: 12,
+  post-title: 17,
+  post-title-pick: 17,
+  post-title-list: 17,
+  post-title-images: 17,
+  tier-item: 13.5,
+  article-title: 40,
+  article-dek: 17,
+  prose-h2: 22,
+  prose-h3: 17,
+  prose-quote: 17,
+  quote: 17,
+  kick-x: 12,
+  tag-btn: 13.5,
+  track: 13.5,
+  title-project: 17,
+  title-item: 40,
+  prose: 15,
+  fact-page: 13.5,
+  stk: 13.5,
+  st-title: 40,
+  year-sm: 13.5,
+  player: 17,
+  st-doc-h2: 22,
+  player-phone: 13.5
+}
+
+@variants(i11.facesI11)
+export facesI10 = tokens : base.faces {
+  display-style: "Black",
+  heading-style: "ExtraBold",
+  title-style: "ExtraBold",
+  meta: "Nunito Sans",
+  meta-style: "SemiBold",
+  label: "Nunito",
+  label-style: "ExtraBold",
+  micro-style: "ExtraBold",
+  fact: "Nunito Sans",
+  fact-style: "SemiBold",
+  field-style: "Medium",
+  toast-style: "SemiBold",
+  tip: "Nunito",
+  tip-style: "ExtraBold",
+  kick-x: "Nunito",
+  tag-btn: "Nunito Sans",
+  tag-btn-style: "SemiBold",
+  article-dek: "Nunito Sans",
+  article-dek-style: "Regular",
+  prose-quote-style: "ExtraBold",
+  kick-x-style: "ExtraBold",
+  title-project-style: "ExtraBold",
+  title-item-style: "Black"
+}
+
+@variants(i11.trackingI11)
+export trackingI10 = tokens : base.tracking {
+  display: -3%,
+  heading: -2%,
+  title: -1.2%,
+  label: -0.3%,
+  micro: 1%,
+  caps: 8%,
+  kick-x: 8%,
+  post-title: -1.2%,
+  title-project: -1.2%,
+  title-item: -3%
+}
+
+@variants(i11.leadingI11)
+export leadingI10 = tokens : base.leading {
+  display: 1,
+  heading: 1.1,
+  title: 1.25,
+  meta: 1.4,
+  quote: 1.25,
+  title-project: 1.25,
+  title-item: 1,
+  prose: 1.5,
+  article-title: 1,
+  st-title: 1
+}

@@ -1,0 +1,224 @@
+import "tokens/color/roles.elyx" as col
+import "tokens/color/palette.elyx" as pal
+import "tokens/space/space.elyx" as spc
+import "assets/icons/bold/speaker-simple-slash.svg" as offIcon
+import "assets/icons/bold/speaker-simple-high.svg" as onIcon
+import "components/atoms/doc.elyx" as doc
+
+// The sound tag (`button.ysound--tag`): a woven care label sewn into the
+// sheet's top edge (top centre on desktop, top right on phones), 42 × 34,
+// its bottom corners round. Off: white cloth, a cotton-2 woven border 3px
+// in, a running stitch across its top, the speaker-slash in ink. On: the on
+// role (i9 the red fill, white speaker; i10 L1 the section's soft tint, its
+// deep glyph), no stitch. Place it at the sheet's top (top 0) with
+// `ignore-stack`. Children: `weave` (the woven border), `runStitch`, `glyph`.
+@variants(soundTagOn)
+export soundTag = frame {
+  title: "Sound tag · off",
+  left: 0px,
+  top: 40px,
+  width: spc.controls.sound-w,
+  height: spc.controls.sound-h,
+  layout: {stack: {justify-content: .center, align-items: .center}},
+  fill: col.roles.surface,
+  shadow: [
+    {
+      drop-shadow: {
+        color: pal.palette.hairline,
+        offset: point(0px, 1px),
+        blur-radius: 0px
+      }
+    },
+    {
+      drop-shadow: {
+        color: pal.palette.shadow-pop,
+        offset: point(0px, 4px),
+        blur-radius: 10px,
+        spread: -4px
+      }
+    }
+  ],
+  corner-radius: [0px, 0px, spc.radii.sound, spc.radii.sound],
+  padding-top: 2px,
+  children: [weave, runStitch, glyph],
+
+  weave = frame {
+    left: 3px,
+    top: 3px,
+    right: 3px,
+    bottom: 3px,
+    ignore-stack: .true,
+    border: {color: col.roles.recess, width: 1.5px},
+    corner-radius: [0px, 0px, spc.steps.s1, spc.steps.s1]
+  }
+
+  runStitch = frame {
+    left: 5px,
+    top: spc.steps.s1,
+    right: 5px,
+    height: 2px,
+    ignore-stack: .true,
+    border: {
+      color: col.roles.stitch,
+      width: 1.5px,
+      dash: [3px, 3px],
+      sides: .top
+    }
+  }
+
+  glyph = asset {
+    left: 12px,
+    top: 9px,
+    width: spc.controls.icon,
+    height: spc.controls.icon,
+    fill: col.roles.fg,
+    contents: offIcon
+  }
+}
+
+// On: the on role (a toggle), the speaker.
+export soundTagOn = frame : soundTag {
+  title: "Sound tag · on",
+  left: 218px,
+  top: 40px,
+  padding-left: 0px,
+  fill[0].color: col.roles.on-bg,
+
+  glyph {
+    fill[0].color: col.roles.on-fg,
+    top: 12px,
+    contents: onIcon
+  }
+
+  runStitch {
+    display: .none
+  }
+
+  weave {
+    display: .none
+  }
+}
+
+// ==== states page (labels over the definitions, then the states boards: i9 · i10 · i11) ====
+lbl-soundTag = text : doc.specLabel {
+  left: 0px,
+  top: 0px,
+  contents: "soundTag"
+}
+
+note-soundTag = text : doc.specNote {
+  left: 0px,
+  top: 16px,
+  contents: "muted (always starts so)"
+}
+
+lbl-soundTagOn = text : doc.specLabel {
+  left: 218px,
+  top: 0px,
+  contents: "soundTagOn"
+}
+
+note-soundTagOn = text : doc.specNote {
+  left: 218px,
+  top: 16px,
+  contents: "on"
+}
+
+@variants(soundTagStatesI10)
+soundTagStates = frame : doc.docBoard {
+  title: "Sound tag · states · i9",
+  left: 0px,
+  top: 234px,
+
+  body {
+    layout.stack.item-gap: 48px,
+    overrides: [insert(row-1, after = .nil)]
+  }
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i9"
+      }
+    }
+
+    boardCaption {
+      contents: "Sound tag · every state"
+    }
+  }
+
+  row-1 = frame : doc.specRow {
+    layout.stack.item-gap: 48px,
+    overrides: [
+      insert(st-soundTag, after = .nil),
+      insert(st-soundTagOn, after = st-soundTag)
+    ]
+  }
+
+  st-soundTag = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "soundTag"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "muted (always starts so)"
+    }
+
+    it = frame : soundTag {}
+  }
+
+  st-soundTagOn = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "soundTagOn"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "on"
+    }
+
+    it = frame : soundTagOn {}
+  }
+}
+
+@variants(soundTagStatesI11)
+@context(i10="on")
+soundTagStatesI10 = frame : soundTagStates {
+  title: "Sound tag · states · i10",
+  left: 475px,
+  top: 234px,
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i10"
+      }
+    }
+  }
+}
+
+@context(i10="on", i11="on")
+soundTagStatesI11 = frame : soundTagStatesI10 {
+  title: "Sound tag · states · i11",
+  left: 950px,
+  top: 234px,
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i11"
+      }
+    }
+  }
+}

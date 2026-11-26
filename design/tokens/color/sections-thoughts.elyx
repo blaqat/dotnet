@@ -1,0 +1,11 @@
+import "./sections.elyx" as base
+import "./palette.elyx" as p
+
+@context(section=thoughts)
+file {}
+
+export thoughtsSection = tokens : base.section {
+  sec: p.palette.gold,
+  sec-deep: p.palette.gold-deep,
+  sec-soft: p.palette.gold-soft
+}

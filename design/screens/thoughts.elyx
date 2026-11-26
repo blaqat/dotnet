@@ -1,0 +1,299 @@
+import "components/atoms/doc.elyx" as doc
+import "components/organisms/sheet.elyx" as sh
+import "components/organisms/article.elyx" as art
+import "blocks/thoughts-feed.elyx" as feed
+import "blocks/phone-thoughts.elyx" as pt
+
+// Thoughts: every iteration side by side, one row per screen (i9 | i10 |
+// i11). Each board is a local wrapper; its `…I10` / `…I11` contextual
+// variants render in their iteration and pick the blocks' iteration
+// variants at their tree position (SYSTEM.md, "Iterations side by side on
+// one page").
+// Feed: the stitched feed at 1440, the rail (the title, search, filters)
+// beside the posts by month; the Thoughts tab wears the HERE rope, the cord
+// frame is Thoughts' gold. i10: the feed's i10 variant (the kicker in Micro
+// caps, the pick's link button, the 1 + 2 images stacked, the masonry with
+// i10's taller cards); Thoughts' accent is ink (tokens), bookmarks stay
+// red. i11: the feed's i11 variant (T8: no "Read →" on an article, no TYPE /
+// TAGS / YEAR eyebrows in the rail); the type scale, 500 weights, 16 insets,
+// nested radii and 48 between months are tokens.
+// Article (stitched.html?view=article&id=a1): the facts column, the 760
+// column (bar, kicker, title, dek, cover, the prose), the contents rail.
+// i9 is the base article (red deco, the felt copy disc); i10 the
+// article's I10 (the duotone copy disc, the kicker in caps, the title in
+// two lines at Display 40, Thoughts' ink deco); i11 its I11 (T8: the
+// posted / reading time facts cut; the upright quote, Display 36 / 500).
+@with-context(section="thoughts")
+file {}
+
+// ---- feed · 1440 ----
+feedHeading = text : doc.specHeading {
+  left: 32px,
+  top: 0px,
+  contents: "Thoughts · feed · 1440 (stitched, the whole page)"
+}
+
+@variants(feedI10)
+feedBoard = frame : doc.docBoard {
+  title: "Thoughts · feed · 1440 · i9",
+  left: 0px,
+  top: 72px,
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i9"
+      }
+    }
+
+    boardCaption {
+      contents: "Thoughts · feed · 1440"
+    }
+  }
+
+  body {
+    overrides: [insert(screen, after = .nil)]
+  }
+
+  screen = frame : sh.sheetThoughts {
+    paper {
+      page {
+        overrides: [insert(stitched, after = .nil)]
+      }
+    }
+
+    stitched = frame : feed.thoughtsFeed {}
+  }
+}
+
+@variants(feedI11)
+@context(i10="on")
+feedI10 = frame : feedBoard {
+  title: "Thoughts · feed · 1440 · i10",
+  left: 1840px,
+  top: 72px,
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i10"
+      }
+    }
+  }
+
+  body {
+    screen {
+      fill[1].image.sizing.scale: 1.1861,
+
+      paper {
+        page {
+          @with-variant(feed.thoughtsFeedI10)
+          stitched {}
+        }
+      }
+    }
+  }
+}
+
+@context(i10="on", i11="on")
+feedI11 = frame : feedI10 {
+  title: "Thoughts · feed · 1440 · i11",
+  left: 3680px,
+  top: 72px,
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i11"
+      }
+    }
+  }
+
+  body {
+    screen {
+      fill[1].image.sizing.scale: 1.06,
+
+      paper {
+        page {
+          @with-variant(feed.thoughtsFeedI11)
+          stitched {}
+        }
+      }
+    }
+  }
+}
+
+// ---- article · 1440 ----
+articleHeading = text : doc.specHeading {
+  left: 32px,
+  top: 4480px,
+  contents: "Thoughts · an opened article · 1440 (?view=article&id=a1)"
+}
+
+@variants(articleI10)
+article = frame : doc.docBoard {
+  title: "Thoughts · article · 1440 · i9",
+  left: 0px,
+  top: 4552px,
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i9"
+      }
+    }
+
+    boardCaption {
+      contents: "Thoughts · article · 1440"
+    }
+  }
+
+  body {
+    overrides: [insert(screen, after = .nil)]
+  }
+
+  screen = frame : sh.sheetThoughts {
+    paper {
+      page {
+        overrides: [insert(opened, after = .nil)]
+      }
+    }
+
+    opened = frame : art.articlePage {}
+  }
+}
+
+@variants(articleI11)
+@context(i10="on")
+articleI10 = frame : article {
+  title: "Thoughts · article · 1440 · i10",
+  left: 1840px,
+  top: 4552px,
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i10"
+      }
+    }
+  }
+
+  body {
+    screen {
+      fill[1].image.sizing.scale: 0.9485,
+
+      paper {
+        page {
+          @with-variant(art.articlePageI10)
+          opened {}
+        }
+      }
+    }
+  }
+}
+
+@context(i10="on", i11="on")
+articleI11 = frame : articleI10 {
+  title: "Thoughts · article · 1440 · i11",
+  left: 3680px,
+  top: 4552px,
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i11"
+      }
+    }
+  }
+
+  body {
+    screen {
+      fill[1].image.sizing.scale: 0.9075,
+
+      paper {
+        page {
+          @with-variant(art.articlePageI11)
+          opened {}
+        }
+      }
+    }
+  }
+}
+
+// ---- phone · 390 × 844 ----
+phoneHeading = text : doc.specHeading {
+  left: 32px,
+  top: 7080px,
+  contents: "Thoughts · phone · 390 × 844 (the feed, November)"
+}
+
+// blocks/phone-thoughts.elyx: the posts newest first in one column under
+// each month's pill; i10 / i11 pick the month's iteration variants.
+@variants(phoneI10)
+phone = frame : doc.docBoard {
+  title: "Thoughts · phone · i9",
+  left: 0px,
+  top: 7152px,
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i9"
+      }
+    }
+
+    boardCaption {
+      contents: "Thoughts · phone · feed"
+    }
+  }
+
+  body {
+    overrides: [insert(screen, after = .nil)]
+  }
+
+  screen = frame : pt.thoughtsPhone {
+    left: 0px,
+    top: 0px
+  }
+}
+
+@variants(phoneI11)
+@context(i10="on")
+phoneI10 = frame : phone {
+  title: "Thoughts · phone · i10",
+  left: 1840px,
+  top: 7152px,
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i10"
+      }
+    }
+  }
+
+  body {
+    @with-variant(pt.thoughtsPhoneI10)
+    screen {}
+  }
+}
+
+@context(i10="on", i11="on")
+phoneI11 = frame : phoneI10 {
+  title: "Thoughts · phone · i11",
+  left: 3680px,
+  top: 7152px,
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i11"
+      }
+    }
+  }
+
+  body {
+    @with-variant(pt.thoughtsPhoneI11)
+    screen {}
+  }
+}

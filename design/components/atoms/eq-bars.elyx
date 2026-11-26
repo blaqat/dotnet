@@ -1,0 +1,285 @@
+import "tokens/color/roles.elyx" as col
+import "tokens/space/space.elyx" as spc
+import "components/atoms/doc.elyx" as doc
+
+// The playing equalizer (kit .yeq): three bars on one baseline in the live
+// colour, frozen mid-bounce. Idle = all three at 35% (the kit's rest scale).
+// Inside a play button use `eqBarsOnLive` (white bars, sized for ▶).
+@variants(eqBarsIdle, eqBarsOnLive)
+export eqBars = frame {
+  title: "Eq bars · playing",
+  left: 0px,
+  top: 40px,
+  width: spc.controls.eq-w,
+  height: spc.controls.eq-h,
+  layout: {
+    grid: {
+      columns: [1fr, 1fr, 1fr],
+      rows: 1fr,
+      column-gap: spc.controls.eq-gap,
+      align-items: .end
+    }
+  },
+  children: [bar1, bar2, bar3],
+
+  bar1 = frame {
+    width: 100%,
+    height: 60%,
+    fill: col.roles.live,
+    corner-radius: spc.radii.eq
+  }
+
+  bar2 = frame {
+    width: 100%,
+    height: 35%,
+    fill: col.roles.live,
+    corner-radius: spc.radii.eq
+  }
+
+  bar3 = frame {
+    width: 100%,
+    height: 100%,
+    fill: col.roles.live,
+    corner-radius: spc.radii.eq
+  }
+}
+
+// Not playing: the bars rest low (scaleY .35).
+export eqBarsIdle = frame : eqBars {
+  title: "Eq bars · idle",
+  left: 106px,
+  top: 40px,
+
+  bar1 {
+    height: 35%
+  }
+
+  bar3 {
+    height: 35%
+  }
+}
+
+// White bars inside ▶ while it plays (14 × 13: .8em × .74em of the glyph).
+export eqBarsOnLive = frame : eqBars {
+  title: "Eq bars · in ▶",
+  left: 251px,
+  top: 40px,
+  width: spc.controls.eq-play-w,
+  height: spc.controls.eq-play-h,
+
+  bar3 {
+    fill[0].color: col.roles.live-fg
+  }
+
+  bar2 {
+    fill[0].color: col.roles.live-fg
+  }
+
+  bar1 {
+    fill[0].color: col.roles.live-fg
+  }
+}
+
+// (specimen only) the white bars on the live fill they're made for
+eqOnLiveSample = frame {
+  title: "Eq bars · in ▶ (on live)",
+  left: 403px,
+  top: 40px,
+  width: spc.controls.play,
+  height: spc.controls.play,
+  layout: {stack: {justify-content: .center, align-items: .center}},
+  fill: col.roles.live,
+  corner-radius: spc.radii.pill,
+  children: sample,
+
+  sample = frame : eqBarsOnLive {
+    left: 0px,
+    top: 0px
+  }
+}
+
+// ==== states page (labels over the definitions, then the states boards: i9 · i10 · i11) ====
+lbl-eqBars = text : doc.specLabel {
+  left: 0px,
+  top: 0px,
+  contents: "eqBars"
+}
+
+note-eqBars = text : doc.specNote {
+  left: 0px,
+  top: 16px,
+  contents: "playing"
+}
+
+lbl-eqBarsIdle = text : doc.specLabel {
+  left: 106px,
+  top: 0px,
+  contents: "eqBarsIdle"
+}
+
+note-eqBarsIdle = text : doc.specNote {
+  left: 106px,
+  top: 16px,
+  contents: "idle (paused)"
+}
+
+lbl-eqBarsOnLive = text : doc.specLabel {
+  left: 251px,
+  top: 0px,
+  contents: "eqBarsOnLive"
+}
+
+note-eqBarsOnLive = text : doc.specNote {
+  left: 251px,
+  top: 16px,
+  contents: "on a live fill"
+}
+
+lbl-eqOnLiveSample = text : doc.specLabel {
+  left: 403px,
+  top: 0px,
+  contents: "eqOnLiveSample"
+}
+
+note-eqOnLiveSample = text : doc.specNote {
+  left: 403px,
+  top: 16px,
+  contents: "in a live ▶"
+}
+
+@variants(eqBarsStatesI10)
+eqBarsStates = frame : doc.docBoard {
+  title: "EQ bars · states · i9",
+  left: 0px,
+  top: 244px,
+
+  body {
+    layout.stack.item-gap: 48px,
+    overrides: [insert(row-1, after = .nil)]
+  }
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i9"
+      }
+    }
+
+    boardCaption {
+      contents: "EQ bars · every state"
+    }
+  }
+
+  row-1 = frame : doc.specRow {
+    layout.stack.item-gap: 48px,
+    overrides: [
+      insert(st-eqBars, after = .nil),
+      insert(st-eqBarsIdle, after = st-eqBars),
+      insert(st-eqBarsOnLive, after = st-eqBarsIdle),
+      insert(st-eqOnLiveSample, after = st-eqBarsOnLive)
+    ]
+  }
+
+  st-eqBars = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "eqBars"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "playing"
+    }
+
+    it = frame : eqBars {}
+  }
+
+  st-eqBarsIdle = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "eqBarsIdle"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "idle (paused)"
+    }
+
+    it = frame : eqBarsIdle {}
+  }
+
+  st-eqBarsOnLive = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "eqBarsOnLive"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "on a live fill"
+    }
+
+    it = frame : eqBarsOnLive {}
+  }
+
+  st-eqOnLiveSample = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "eqOnLiveSample"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "in a live ▶"
+    }
+
+    it = frame : eqOnLiveSample {}
+  }
+}
+
+@variants(eqBarsStatesI11)
+@context(i10="on")
+eqBarsStatesI10 = frame : eqBarsStates {
+  title: "EQ bars · states · i10",
+  left: 649px,
+  top: 244px,
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i10"
+      }
+    }
+  }
+}
+
+@context(i10="on", i11="on")
+eqBarsStatesI11 = frame : eqBarsStatesI10 {
+  title: "EQ bars · states · i11",
+  left: 1298px,
+  top: 244px,
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i11"
+      }
+    }
+  }
+}

@@ -1,0 +1,139 @@
+// Raw yarn colours (kit/yarn.css :root). Never varies by context.
+// Components use roles (tokens/color/roles.elyx) and sections
+// (tokens/color/sections.elyx), not these, except for content colours
+// (project types, instruments, tiers), which are facts, not accents.
+export palette = tokens {
+  // base trio
+  ink: #1f1e1e,
+  ink-2: #4a4646,
+  ink-3: #625c5c,
+  cotton: #fbf8f3,
+  cotton-2: #f3eee6,
+  // the folder's back cover (a step darker than its tabs)
+  cotton-3: #ddd2c1,
+  white: #ffffff,
+  red: #d62f38,
+  red-deep: #b4202b,
+  red-soft: #f7d9d6,
+  red-hi: #ff7a82,
+  tog-red: #bb2d36,
+
+  // section hues
+  blue: #3a74cf,
+  blue-deep: #24518f,
+  blue-soft: #dbe7f8,
+  purple: #8a4fc6,
+  purple-deep: #5f2f93,
+  purple-soft: #ece0f8,
+  gold: #d9a21b,
+  gold-deep: #8a5f0c,
+  gold-soft: #f8ecc8,
+  brown: #7a4e2d,
+  brown-deep: #4e301a,
+  brown-soft: #c9a07a,
+  orange: #e07a1f,
+  orange-deep: #a4520c,
+  thoughts-tint: #e6dfd4,
+
+  // content colours: project types (ink text on all three)
+  pt-personal: #5eb0e5,
+  pt-work: #f2c230,
+  pt-school: #f39a52,
+  // their soft tints + deep shades (i10: a type chip that's on, its glyph)
+  pt-personal-soft: #dcedf9,
+  pt-personal-deep: #16679c,
+  pt-work-soft: #fcf0c6,
+  pt-work-deep: #7a5b00,
+  pt-school-soft: #fce3cf,
+  pt-school-deep: #9a4a0a,
+
+  // content colours: instruments (white text on all three)
+  inst-piano: #2b2828,
+  inst-piano-soft: #e3ded9,
+  inst-piano-deep: #1f1e1e,
+  inst-beepbox: #7444b6,
+  inst-beepbox-soft: #ebe1f8,
+  inst-beepbox-deep: #5a2e98,
+  inst-daw: #2f62b3,
+  inst-daw-soft: #dce7f8,
+  inst-daw-deep: #1e4d97,
+
+  // lines, stitches and shadows (ink at an alpha)
+  line: #1f1e1e33,
+  hairline: #1f1e1e1f,
+  stitch: #1f1e1e2e,
+  stitch-soft: #1f1e1e29,
+  shadow-1: #1f1e1e14,
+  shadow-lift: #1f1e1e33,
+  shadow-pop: #1f1e1e38,
+  on-dark-stitch: #ffffff66,
+
+  // controls (buttons, ▶, discs): the i9 stitch inside a control, the faint
+  // ring of i10's link disc, and nothing (a stitch / ring that's gone)
+  stitch-btn: #1f1e1e38,
+  stitch-on-fill: #ffffffa6,
+  hairline-soft: #1f1e1e0d,
+  clear: #ffffff00,
+  // a segment under the mouse (white at .6)
+  white-60: #ffffff99,
+  // the glow under a playing ▶ from i10 (the live purple at .7)
+  purple-glow: #8a4fc6b3,
+
+  // ---- Thoughts (kit/posts.js) ----
+  // content colours: a sticky note's paper + its words (fg-2, fg-3 on it)
+  note-canary: #ffe27a,
+  note-canary-fg: #3d3210,
+  note-canary-fg-3: #5c4a14,
+  note-pink: #ffc9d5,
+  note-pink-fg: #4a1e2a,
+  note-pink-fg-3: #6e2f42,
+  note-mint: #c9edd5,
+  note-mint-fg: #1d3d29,
+  note-mint-fg-3: #2f5a3d,
+  note-sky: #cfe4fb,
+  note-sky-fg: #1b3550,
+  note-sky-fg-3: #2b4f73,
+  // the note's lift + its tape (paper at .9)
+  note-edge: #50380024,
+  note-drop: #5038006b,
+  tape: #fdfbf6e6,
+  // content colours: a pick's stub (tan knit; ink, red, blue twill) + its
+  // dashed seam (dark on tan, white on the rest)
+  stub-tan: #e4d5ba,
+  stub-ink: #2b2828,
+  stub-tan-seam: #6e501e57,
+  stub-seam: #ffffff8c,
+  // content colours: a ranking's tier felts
+  tier-s: #d22f3a,
+  tier-a: #ef7d4e,
+  tier-b: #f0b63f,
+  tier-c: #9cb86b,
+  tier-d: #8aa3c8,
+  // the owner's named tiers' felts + their trays (13% of the felt on
+  // cotton-2)
+  tier-teal: #5fb3a6,
+  tier-lilac: #b59ad8,
+  tray-red: #efd5d0,
+  tray-teal: #e0e6de,
+  tray-lilac: #ebe3e4,
+  tray-ink: #d9d4cd,
+  // the gold shelf pill's stitch (gold-deep at .35); a go-link's underline
+  // (ink at .3)
+  gold-stitch: #8a5f0c59,
+  underline: #1f1e1e4d,
+  // a sticky note's chips (the kicker's disc): white at .5
+  note-chip: #ffffff80,
+  // an article's code block (the kit's dark well) and its syntax colours
+  code-bg: #232121,
+  code-fg: #f4efe8,
+  code-dim: #f4efe8b3,
+  code-chip: #ffffff1a,
+  code-dot: #f4efe84d,
+  code-comment: #9a928a,
+  code-key: #ff8a8a,
+  code-type: #c4a6f2,
+  code-str: #f2cf6b,
+  code-fn: #79cfc4,
+  // phones: the scrim under the player's page (ink at .42)
+  scrim: #1f1e1e6b
+}

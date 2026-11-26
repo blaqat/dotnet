@@ -1,0 +1,325 @@
+import "tokens/space/space.elyx" as spc
+import "components/atoms/text.elyx" as txt
+import "components/atoms/doc.elyx" as doc
+import "components/molecules/button.elyx" as btn
+import "assets/icons/bold/shuffle.svg" as shuffleIcon
+import "assets/icons/fill/play.svg" as playIcon
+
+// The results line (DESIGN-i10 §7; i10 and later: i9 has none, its counts
+// sit in the page header's Meta). Between the tools and the list, in
+// Meta: "26 releases · 52 tracks" (with a search: "3 releases · 5 tracks
+// for “shadow”") on the left; ▶ Play and ⤮ Shuffle (small outlined
+// buttons) on the right. They play exactly what's shown. One gutter above
+// the list it heads (`results-gap`: i10 16, i11 24).
+// Children: `count`, `acts` (`playAll`, `shuffle`).
+@variants(resultsLineI10, resultsLinePhone)
+export resultsLine = frame {
+  title: "Results line",
+  left: 0px,
+  top: 40px,
+  width: 1332px,
+  height: spc.controls.btn-sm,
+  layout: {stack: {justify-content: .space-between, align-items: .center}},
+  children: [count, acts],
+
+  count = text : txt.meta {
+    contents: "26 releases · 52 tracks"
+  }
+
+  acts = frame {
+    layout: {stack: {align-items: .center, item-gap: spc.steps.s2}},
+    children: [playAll, shuffle],
+
+    playAll = frame : btn.btnSm {
+      glyph {
+        contents: playIcon
+      }
+
+      label {
+        contents: "Play"
+      }
+    }
+
+    shuffle = frame : btn.btnSm {
+      glyph {
+        contents: shuffleIcon
+      }
+
+      label {
+        contents: "Shuffle"
+      }
+    }
+  }
+}
+
+// The line as it ships (i10): calm outlined buttons, Meta in Nunito Sans.
+@variants(resultsLineI11)
+@context(i10="on")
+export resultsLineI10 = frame : resultsLine {
+  title: "Results line · i10",
+  left: 0px,
+  top: 196px
+}
+
+// i11: the same parts on T1's sizes (Meta 13, Label 14).
+@context(i10="on", i11="on")
+export resultsLineI11 = frame : resultsLineI10 {
+  title: "Results line · i11",
+  left: 0px,
+  top: 352px
+}
+
+// With a search: the count names what it found.
+resultsSearched = frame : resultsLine {
+  title: "Results line · searched (example)",
+  left: 0px,
+  top: 508px,
+
+  count {
+    contents: "3 releases · 5 tracks for “shadow”"
+  }
+}
+
+// Phones (< 960): the same line in the 348 column; ▶ and ⤮ go icon-only
+// (.btn--m-icon: 36 circles, named for screen readers).
+export resultsLinePhone = frame : resultsLine {
+  title: "Results line · phone",
+  left: 0px,
+  top: 664px,
+  width: spc.controls.page-w-phone,
+
+  acts {
+    @with-variant(btn.btnIconSm)
+    shuffle {}
+
+    @with-variant(btn.btnIconSm)
+    playAll {}
+  }
+}
+
+// ==== states page (labels over the definitions, then the states boards: i9 · i10 · i11) ====
+lbl-resultsLine = text : doc.specLabel {
+  left: 0px,
+  top: 0px,
+  contents: "resultsLine"
+}
+
+note-resultsLine = text : doc.specNote {
+  left: 0px,
+  top: 16px,
+  contents: "i9 has none (counts in the header); the base"
+}
+
+lbl-resultsLineI10 = text : doc.specLabel {
+  left: 0px,
+  top: 156px,
+  contents: "resultsLineI10"
+}
+
+note-resultsLineI10 = text : doc.specNote {
+  left: 0px,
+  top: 172px,
+  contents: "i10 · calm outlined buttons"
+}
+
+lbl-resultsLineI11 = text : doc.specLabel {
+  left: 0px,
+  top: 312px,
+  contents: "resultsLineI11"
+}
+
+note-resultsLineI11 = text : doc.specNote {
+  left: 0px,
+  top: 328px,
+  contents: "i11 · T1 sizes"
+}
+
+lbl-resultsSearched = text : doc.specLabel {
+  left: 0px,
+  top: 468px,
+  contents: "resultsSearched"
+}
+
+note-resultsSearched = text : doc.specNote {
+  left: 0px,
+  top: 484px,
+  contents: "with a search"
+}
+
+lbl-resultsLinePhone = text : doc.specLabel {
+  left: 0px,
+  top: 624px,
+  contents: "resultsLinePhone"
+}
+
+note-resultsLinePhone = text : doc.specNote {
+  left: 0px,
+  top: 640px,
+  contents: "phones · icon-only actions"
+}
+
+@variants(resultsLineStatesI10)
+resultsLineStates = frame : doc.docBoard {
+  title: "Results line · states · i9",
+  left: 0px,
+  top: 844px,
+
+  body {
+    layout.stack.item-gap: 48px,
+    overrides: [
+      insert(row-1, after = .nil),
+      insert(row-2, after = row-1),
+      insert(row-3, after = row-2)
+    ]
+  }
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i9"
+      }
+    }
+
+    boardCaption {
+      contents: "Results line · every state"
+    }
+  }
+
+  row-1 = frame : doc.specRow {
+    layout.stack.item-gap: 48px,
+    overrides: [insert(st-resultsLine, after = .nil)]
+  }
+
+  row-2 = frame : doc.specRow {
+    layout.stack.item-gap: 48px,
+    overrides: [insert(st-resultsSearched, after = .nil)]
+  }
+
+  row-3 = frame : doc.specRow {
+    layout.stack.item-gap: 48px,
+    overrides: [insert(st-resultsLinePhone, after = .nil)]
+  }
+
+  st-resultsLine = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "resultsLine"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "i9 has none (counts in the header); the base"
+    }
+
+    it = frame : resultsLine {}
+  }
+
+  st-resultsSearched = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "resultsSearched"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "with a search"
+    }
+
+    it = frame : resultsSearched {}
+  }
+
+  st-resultsLinePhone = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "resultsLinePhone"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "phones · icon-only actions"
+    }
+
+    it = frame : resultsLinePhone {}
+  }
+}
+
+@variants(resultsLineStatesI11)
+@context(i10="on")
+resultsLineStatesI10 = frame : resultsLineStates {
+  title: "Results line · states · i10",
+  left: 1676px,
+  top: 844px,
+
+  body {
+    row-1 {
+      st-resultsLine {
+        slot {
+          @with-variant(resultsLineI10)
+          it {}
+        }
+
+        note {
+          contents: "i10 · calm outlined buttons"
+        }
+
+        label {
+          contents: "resultsLineI10"
+        }
+      }
+    }
+  }
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i10"
+      }
+    }
+  }
+}
+
+@context(i10="on", i11="on")
+resultsLineStatesI11 = frame : resultsLineStatesI10 {
+  title: "Results line · states · i11",
+  left: 3352px,
+  top: 844px,
+
+  body {
+    row-1 {
+      st-resultsLine {
+        slot {
+          @with-variant(resultsLineI11)
+          it {}
+        }
+
+        note {
+          contents: "i11 · T1 sizes"
+        }
+
+        label {
+          contents: "resultsLineI11"
+        }
+      }
+    }
+  }
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i11"
+      }
+    }
+  }
+}

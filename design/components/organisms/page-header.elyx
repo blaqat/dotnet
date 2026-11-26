@@ -1,0 +1,326 @@
+import "tokens/color/roles.elyx" as col
+import "tokens/space/space.elyx" as spc
+import "components/atoms/text.elyx" as txt
+import "components/atoms/doc.elyx" as doc
+
+// The page header (`.yhead`, Yarn.header): the page's Display title and its
+// period, then an optional Meta, on the header's top line; actions on its
+// right, on its bottom line (min 48 tall, so every page's next section starts
+// at the same y). The period is `now` (i9: red; i10: the page's own accent,
+// e.g. Music's purple). Set the title with
+// `headText { headLine { titleLine { title {contents: "Projects"} } } }`.
+// Insert actions into `actions` (e.g. the Timeline / Grid switch):
+// `actions { overrides: [insert(viewSwitch, after = .nil)] }`.
+@variants(pageHeaderMeta, pageHeaderPhone)
+export pageHeader = frame {
+  title: "Page header",
+  left: 0px,
+  top: 40px,
+  width: 1332px,
+  min-height: spc.steps.s7,
+  layout: {
+    stack: {
+      justify-content: .space-between,
+      align-items: .stretch,
+      item-gap: spc.steps.s4
+    }
+  },
+  children: [headText, actions],
+
+  // the header's top line: Display + its period (+ Meta)
+  headText = frame {
+    layout: {stack: {direction: .column}},
+    children: headLine,
+
+    headLine = frame {
+      layout: {stack: {align-items: .end, item-gap: spc.layout.stack-loose}},
+      children: titleLine,
+
+      titleLine = frame {
+        layout: {stack: {align-items: .end}},
+        children: [title, period],
+
+        // (the display role's own period range is neutralised: the period is
+        // its own layer, so any title length works)
+        title = text : txt.display {
+          contents: "Music",
+          subrange[0].fill[0].color: col.roles.fg
+        }
+
+        period = text : txt.display {
+          contents: ".",
+          fill[0].color: col.roles.now,
+          subrange[0].fill[0].color: col.roles.now
+        }
+      }
+    }
+  }
+
+  // the actions slot: empty; a page inserts its controls here
+  actions = frame {
+    layout: {stack: {align-items: .end, item-gap: spc.steps.s2}}
+  }
+}
+
+// With a Meta line beside the title (i9 Music: "26 releases · 58 tracks";
+// from i10 the counts moved to the results line).
+@variants(pageHeaderMetaPhone)
+export pageHeaderMeta = frame : pageHeader {
+  title: "Page header · meta",
+  left: 0px,
+  top: 208px,
+
+  headText {
+    headLine {
+      overrides: [insert(meta, after = pageHeader.headText.headLine.titleLine)]
+    }
+  }
+
+  meta = text : txt.meta {
+    contents: "26 releases · 58 tracks"
+  }
+}
+
+// ---- phones (< 960) ----
+// The header on a phone: Display at its phone size, no least height (the
+// next section follows the title), the column's 348 (390 − 2 × 7 − 2 × 14).
+// Actions stay on the right of the title's line, icon-only.
+export pageHeaderPhone = frame : pageHeader {
+  title: "Page header · phone",
+  left: 1596px,
+  top: 40px,
+  width: spc.controls.page-w-phone,
+  min-height: 0px,
+
+  headText {
+    headLine {
+      titleLine {
+        @with-variant(txt.displayPhone)
+        period {}
+
+        @with-variant(txt.displayPhone)
+        title {}
+      }
+    }
+  }
+}
+
+// With a Meta beside the title (i9 Music's counts, Thoughts' "22 posts ·
+// since Jun 2023", Studio's greeting).
+export pageHeaderMetaPhone = frame : pageHeaderMeta {
+  title: "Page header · meta · phone",
+  left: 1596px,
+  top: 208px,
+  width: spc.controls.page-w-phone,
+  min-height: 0px,
+
+  headText {
+    headLine {
+      titleLine {
+        @with-variant(txt.displayPhone)
+        period {}
+
+        @with-variant(txt.displayPhone)
+        title {}
+      }
+    }
+  }
+}
+
+// ==== states page (labels over the definitions, then the states boards: i9 · i10 · i11) ====
+lbl-pageHeader = text : doc.specLabel {
+  left: 0px,
+  top: 0px,
+  contents: "pageHeader"
+}
+
+note-pageHeader = text : doc.specNote {
+  left: 0px,
+  top: 16px,
+  contents: "title + actions"
+}
+
+lbl-pageHeaderPhone = text : doc.specLabel {
+  left: 1596px,
+  top: 0px,
+  contents: "pageHeaderPhone"
+}
+
+note-pageHeaderPhone = text : doc.specNote {
+  left: 1596px,
+  top: 16px,
+  contents: "phones"
+}
+
+lbl-pageHeaderMeta = text : doc.specLabel {
+  left: 0px,
+  top: 168px,
+  contents: "pageHeaderMeta"
+}
+
+note-pageHeaderMeta = text : doc.specNote {
+  left: 0px,
+  top: 184px,
+  contents: "with Meta (i9: the counts)"
+}
+
+lbl-pageHeaderMetaPhone = text : doc.specLabel {
+  left: 1596px,
+  top: 168px,
+  contents: "pageHeaderMetaPhone"
+}
+
+note-pageHeaderMetaPhone = text : doc.specNote {
+  left: 1596px,
+  top: 184px,
+  contents: "phones · with Meta"
+}
+
+@variants(pageHeaderStatesI10)
+pageHeaderStates = frame : doc.docBoard {
+  title: "Page header · states · i9",
+  left: 0px,
+  top: 400px,
+
+  body {
+    layout.stack.item-gap: 48px,
+    overrides: [
+      insert(row-1, after = .nil),
+      insert(row-2, after = row-1),
+      insert(row-3, after = row-2)
+    ]
+  }
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i9"
+      }
+    }
+
+    boardCaption {
+      contents: "Page header · every state"
+    }
+  }
+
+  row-1 = frame : doc.specRow {
+    layout.stack.item-gap: 48px,
+    overrides: [insert(st-pageHeader, after = .nil)]
+  }
+
+  row-2 = frame : doc.specRow {
+    layout.stack.item-gap: 48px,
+    overrides: [insert(st-pageHeaderMeta, after = .nil)]
+  }
+
+  row-3 = frame : doc.specRow {
+    layout.stack.item-gap: 48px,
+    overrides: [
+      insert(st-pageHeaderPhone, after = .nil),
+      insert(st-pageHeaderMetaPhone, after = st-pageHeaderPhone)
+    ]
+  }
+
+  st-pageHeader = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "pageHeader"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "title + actions"
+    }
+
+    it = frame : pageHeader {}
+  }
+
+  st-pageHeaderMeta = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "pageHeaderMeta"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "with Meta (i9: the counts)"
+    }
+
+    it = frame : pageHeaderMeta {}
+  }
+
+  st-pageHeaderPhone = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "pageHeaderPhone"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "phones"
+    }
+
+    it = frame : pageHeaderPhone {}
+  }
+
+  st-pageHeaderMetaPhone = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "pageHeaderMetaPhone"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "phones · with Meta"
+    }
+
+    it = frame : pageHeaderMetaPhone {}
+  }
+}
+
+@variants(pageHeaderStatesI11)
+@context(i10="on")
+pageHeaderStatesI10 = frame : pageHeaderStates {
+  title: "Page header · states · i10",
+  left: 1676px,
+  top: 400px,
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i10"
+      }
+    }
+  }
+}
+
+@context(i10="on", i11="on")
+pageHeaderStatesI11 = frame : pageHeaderStatesI10 {
+  title: "Page header · states · i11",
+  left: 3352px,
+  top: 400px,
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i11"
+      }
+    }
+  }
+}

@@ -1,0 +1,1161 @@
+import "tokens/color/roles.elyx" as col
+import "tokens/space/space.elyx" as spc
+import "tokens/type/type.elyx" as typ
+import "components/atoms/text.elyx" as txt
+import "components/atoms/doc.elyx" as doc
+import "components/atoms/surface.elyx" as surf
+import "components/molecules/fact.elyx" as fct
+import "components/molecules/tag.elyx" as tg
+import "components/molecules/link-disc.elyx" as lnk
+import "components/molecules/media-thumb.elyx" as mt
+import "assets/icons/bold/scroll.svg" as scrollIcon
+import "assets/icons/bold/arrow-right.svg" as goIcon
+import "assets/icons/stack/nextjs.svg" as nextLogo
+import "assets/icons/stack/supabase.svg" as supabaseLogo
+import "assets/icons/stack/c.svg" as cLogo
+import "assets/icons/stack/stm32.svg" as stmLogo
+import "assets/icons/bold/cpu.svg" as cpuIcon
+import "redesign/v3-yarn-11/media/bankresult.png" as bankShot
+import "redesign/v3-yarn-11/media/fitr-redesign.gif" as fitrShot
+
+// A project: one component, shown as a card (Projects' grid, `.pj-card`,
+// the base) or as a row (the timeline, `.yrow.pj-row`: `projectRow`).
+// Both layouts are the same parts; the row only rearranges and hides them.
+// Children: `cols` (a grid), holding
+//   `info`: `main` (`heading`, `facts` = `kind` `status`, `descBox` >
+//     `desc`), then `stack` (tg.tagStackRow: `t1`…`t5`, `more`, the first
+//     logo on the text edge; `more` folds the rest into "+n");
+//   `side`: `media` (mt.mediaThumb), then `foot` > `links` (`wu` the
+//     write-up, `disc1`, `disc2` the GitHub / ↗ discs);
+// and `wuMark` (the row's write-up mark, top-right).
+// The card: the words on the left, the media top-right, and on the card's
+// bottom line the stack (left) and the links (right): `info` and `side`
+// are grids whose second row is that line, so cards in a row (the grid
+// stretches them) end on one line. The stack may run on under the media.
+// The row (`projectRow`): `side` moves first (the thumb, 96 × 64, radius
+// art), `foot` and `descBox` are hidden, the words are the Title, the
+// facts and one line of tags. `projectRowPicked`: the pick rope (the
+// project on the stage; i9 red, ink from i10).
+// States an instance sets: a write-up (a card: `wu {display: .visible}`;
+// a row: `wuMark {display: .visible}`, cut in i11 T8: its size token is 0),
+// no links (`links {display: .none}`), the media (`media
+// {fill[1].image.ref: …}`, `@with-variant(mt.mediaThumbFelt)` for a video;
+// a row with no media: `@with-variant(mt.mediaThumbMono)`), the status
+// (`@with-variant(fct.fact) status {label {contents: …}}`).
+// `projectText`: a card with no media (the words across the card, the
+// links on the bottom line's right).
+// Iterations: i9 20 / 22 / 16 padding, a Black 20.5 title, felt type
+// discs, 44px discs and a quiet "write-up" in Meta. i10 (`projectI10`,
+// `projectTextI10`): the card Title, the shared 32px duotone discs and
+// the write-up pill. i11: the same structure; the tokens give the inset
+// 16, radius 24, Title 16 / Body 14 / Meta 12, the media radius 8, the row
+// pair 8 all round.
+// ---- the write-up: i9 a quiet Meta "write-up" with its scroll; i10 the
+// pill a Thoughts pick uses (`.yabout--wu`): cotton-2, a ring, Label words
+// and a →; `writeupMark`: the row's mark, the scroll alone on a cotton-2
+// disc. Children: `wuGlyph`, `wuMeta` (i9), `wuWord` (i10), `wuGo`.
+@variants(writeupI10, writeupMark)
+export writeup = frame {
+  title: "Write-up · i9",
+  left: 0px,
+  top: 1192px,
+  layout: {stack: {align-items: .center, item-gap: spc.steps.s1}},
+  border: {color: col.roles.line, visible: .false},
+  corner-radius: spc.radii.pill,
+  children: [wuGlyph, wuMeta, wuWord, wuGo],
+
+  wuGlyph = asset {
+    width: spc.steps.s4,
+    height: spc.steps.s4,
+    fill: col.roles.fg-3,
+    contents: scrollIcon
+  }
+
+  wuMeta = text : txt.metaCard {
+    contents: "write-up"
+  }
+
+  wuWord = text : txt.labelCard {
+    display: .none,
+    contents: "Write-up"
+  }
+
+  wuGo = asset {
+    width: spc.steps.s3,
+    height: spc.steps.s3,
+    display: .none,
+    fill: col.roles.fg,
+    contents: goIcon
+  }
+}
+
+@context(i10="on")
+export writeupI10 = frame : writeup {
+  title: "Write-up · i10 (the pill)",
+  left: 784px,
+  top: 1192px,
+  height: spc.controls.chip-sm,
+  padding-top: 0px,
+  padding-left: spc.layout.chip-sm-x,
+  padding-bottom: 0px,
+  padding-right: spc.layout.chip-sm-x,
+  border[0].visible: .true,
+  fill[0].color: col.roles.recess,
+  layout.stack.item-gap: spc.i10.layoutI10.fact-gap,
+
+  wuGlyph {
+    fill[0].color: col.roles.fg,
+    width: spc.steps.s3,
+    height: spc.steps.s3
+  }
+
+  wuMeta {
+    display: .none
+  }
+
+  wuGo {
+    display: .visible
+  }
+
+  wuWord {
+    display: .visible
+  }
+}
+
+// The row's mark: a cotton-2 disc, the scroll alone (i11 T8 cuts it).
+export writeupMark = frame : writeup {
+  title: "Write-up · the row's mark",
+  left: 1568px,
+  top: 1192px,
+  width: spc.controls.pj-wu-mark,
+  height: spc.controls.pj-wu-mark,
+  fill[0].color: col.roles.chip,
+  layout.stack.justify-content: .center,
+
+  wuGlyph {
+    width: spc.controls.pj-wu-mark-icon,
+    height: spc.controls.pj-wu-mark-icon
+  }
+
+  wuMeta {
+    display: .none
+  }
+}
+
+// ---- the project (the card is the base)
+@variants(projectI10, projectText, projectRow)
+export project = frame : surf.patch {
+  title: "Project · card (grid)",
+  left: 0px,
+  top: 40px,
+  width: 656px,
+  min-height: .nil,
+  padding-top: spc.layout.pj-pad-t,
+  padding-left: spc.layout.pj-pad-x,
+  padding-bottom: spc.layout.pj-pad-b,
+  padding-right: spc.layout.pj-pad-x,
+  layout.stack.item-gap: 0,
+  overrides: [insert(cols, after = .nil), insert(wuMark, after = cols)],
+
+  // the words | the media; each column ends on the bottom line
+  cols = frame {
+    width: 100%,
+    min-height: 100%,
+    layout: {
+      grid: {
+        columns: [1fr, .auto],
+        rows: 1fr,
+        column-gap: spc.layout.pj-col-gap
+      }
+    },
+    children: [info, side],
+
+    // the words, then the stack on the bottom line (the gap above it is
+    // a grid gap, so a card that hugs keeps it)
+    info = frame {
+      width: 100%,
+      height: 100%,
+      layout: {
+        grid: {columns: 1fr, rows: [1fr, .auto], row-gap: spc.layout.pj-row-gap}
+      },
+      children: [main, stack],
+
+      main = frame {
+        width: 100%,
+        layout: {stack: {direction: .column, item-gap: spc.layout.pj-stack}},
+        children: [heading, facts, descBox],
+
+        heading = text : txt.titleCard {
+          width: 100%,
+          contents: "blaqat.net (this site)",
+          font-size: typ.sizes.title-project,
+          font-style: typ.faces.title-project-style,
+          line-height: typ.leading.title-project,
+          letter-spacing: typ.tracking.title-project
+        }
+
+        // the facts line (from i10 the description sits 4 further under it)
+        facts = frame {
+          height: spc.controls.pj-facts,
+          layout: {
+            stack: {align-items: .center, item-gap: spc.layout.facts-gap}
+          },
+          padding-bottom: spc.layout.pj-desc-top,
+          children: [kind, status],
+
+          kind = frame : fct.factPersonal {
+            height: .auto
+          }
+
+          // (its words come from the status variant an instance picks: a
+          // card-level label would leak into every other status)
+          status = frame : fct.factWip {
+            height: .auto,
+
+            sub {
+              display: .none
+            }
+          }
+        }
+
+        // the description, clamped (i9: six lines on a text-only card; from
+        // i10 four): a clipping box, since a grid measures a text unclipped
+        descBox = frame {
+          width: 100%,
+          max-height: spc.controls.pj-desc-max,
+          layout: {stack: {direction: .column}},
+          overflow: .clip,
+          children: desc,
+
+          desc = text : txt.bodyCard {
+            width: 100%,
+            contents: "My personal website, built with Astro and Svelte, showcasing my programming and music projects. It's designed to be feel somewhat playful while also being responsive. The main challenges faced in making this…"
+          }
+        }
+      }
+
+      // the stack (tg.tagStackRow): display only; the first logo sits on
+      // the text edge
+      stack = frame : tg.tagStackRow {
+        min-height: spc.controls.pj-foot
+      }
+    }
+
+    // the media, then the links on the bottom line's right (`foot` keeps
+    // the line's height when a project has no links)
+    side = frame {
+      height: 100%,
+      layout: {
+        grid: {
+          rows: [1fr, .auto],
+          row-gap: spc.layout.pj-row-gap,
+          justify-items: .end
+        }
+      },
+      children: [media, foot],
+
+      media = frame : mt.mediaThumb {}
+
+      foot = frame {
+        min-height: spc.controls.pj-foot,
+        layout: {stack: {align-items: .center}},
+        children: links,
+
+        links = frame {
+          layout: {stack: {align-items: .center, item-gap: spc.steps.s2}},
+          children: [wu, disc1, disc2],
+
+          wu = frame : writeup {
+            display: .none
+          }
+
+          disc1 = frame : lnk.linkDiscGithub {
+            width: spc.controls.pj-disc,
+            height: spc.controls.pj-disc,
+
+            glyph {
+              width: spc.controls.pj-disc-icon,
+              height: spc.controls.pj-disc-icon
+            }
+          }
+
+          disc2 = frame : lnk.linkDiscExternal {
+            width: spc.controls.pj-disc,
+            height: spc.controls.pj-disc,
+
+            glyph {
+              width: spc.controls.pj-disc-icon,
+              height: spc.controls.pj-disc-icon
+            }
+          }
+        }
+      }
+    }
+  }
+
+  // the row's write-up mark, in the corner on the title's line
+  wuMark = frame : writeupMark {
+    top: spc.steps.s2,
+    right: spc.steps.s2,
+    display: .none,
+    ignore-stack: .true
+  }
+}
+
+// i10: the write-up pill and the duotone discs (R7). A card instance whose
+// discs are other kinds re-picks them the same way.
+@context(i10="on")
+export projectI10 = frame : project {
+  title: "Project · card · i10",
+  left: 784px,
+  top: 40px,
+
+  cols {
+    side {
+      foot {
+        links {
+          @with-variant(lnk.linkDiscExternalI10)
+          disc2 {}
+
+          @with-variant(lnk.linkDiscGithubI10)
+          disc1 {}
+
+          @with-variant(writeupI10)
+          wu {}
+        }
+      }
+    }
+  }
+}
+
+// A card with no media: the words across the card; the links (if any) on
+// the bottom line's right, pinned there.
+@variants(projectTextI10)
+export projectText = frame : project {
+  title: "Project · card · text only",
+  left: 1568px,
+  top: 40px,
+
+  cols {
+    layout.grid.columns: 1fr,
+
+    side {
+      overrides: [remove(project.cols.side.media)],
+      top: 0px,
+      right: 0px,
+      bottom: 0px,
+      ignore-stack: .true,
+      layout.grid.rows: 1fr,
+      layout.grid.align-items: .end
+    }
+  }
+}
+
+@context(i10="on")
+export projectTextI10 = frame : projectText {
+  title: "Project · card · text only · i10",
+  left: 2352px,
+  top: 40px,
+
+  cols {
+    side {
+      foot {
+        links {
+          @with-variant(lnk.linkDiscExternalI10)
+          disc2 {}
+
+          @with-variant(lnk.linkDiscGithubI10)
+          disc1 {}
+
+          @with-variant(writeupI10)
+          wu {}
+        }
+      }
+    }
+  }
+}
+
+// The row (the timeline, `.yrow.pj-row`): a white row patch (radius row),
+// the thumb first, then the words: the Title, the facts, one line of tags
+// (display only). i9 padding 11 / 16 / 11 / 11 · i10 12 · i11 8 all round.
+@variants(projectRowPicked)
+export projectRow = frame : project {
+  title: "Project · row (timeline)",
+  left: 0px,
+  top: 768px,
+  width: 462px,
+  corner-radius: spc.radii.row,
+  padding-top: spc.layout.pj-row-y,
+  padding-left: spc.layout.pj-row-l,
+  padding-bottom: spc.layout.pj-row-y,
+  padding-right: spc.layout.pj-row-r,
+
+  patchStitch {
+    border[0].width: spc.layout.stitch-w-sm
+  }
+
+  cols {
+    height: .auto,
+    layout.grid.columns: [.auto, 1fr],
+    layout.grid.column-gap: spc.layout.pj-row-in,
+    layout.grid.align-items: .center,
+    overrides: [move(project.cols.side, after = .nil)],
+
+    side {
+      media {
+        width: spc.controls.pj-row-thumb-w,
+        height: spc.controls.pj-row-thumb-h,
+        corner-radius: spc.radii.art
+      }
+
+      height: .auto,
+
+      foot {
+        display: .none
+      }
+
+      layout.grid.rows: 1fr,
+      layout.grid.row-gap: 0
+    }
+
+    info {
+      height: .auto,
+
+      main {
+        facts {
+          height: .auto,
+          padding-bottom: 0px
+        }
+
+        descBox {
+          display: .none
+        }
+
+        layout.stack.item-gap: spc.steps.s2,
+
+        heading {
+          font-size: typ.sizes.title-card,
+          font-style: typ.faces.title-style,
+          line-height: typ.leading.title,
+          letter-spacing: typ.tracking.title
+        }
+      }
+
+      stack {
+        t1 {
+          height: spc.steps.s5
+        }
+
+        t2 {
+          height: spc.steps.s5
+        }
+
+        t3 {
+          height: spc.steps.s5
+        }
+
+        t4 {
+          height: spc.steps.s5
+        }
+
+        t5 {
+          height: spc.steps.s5
+        }
+
+        more {
+          height: spc.steps.s5
+        }
+
+        min-height: 0px
+      }
+
+      layout.grid.row-gap: spc.steps.s2
+    }
+  }
+}
+
+// The chosen row (the project on the stage): the pick rope on its edge.
+export projectRowPicked = frame : projectRow {
+  title: "Project · row · picked (on the stage)",
+  left: 784px,
+  top: 768px,
+  overrides: [insert(rowRope, after = project.wuMark)],
+
+  patchStitch {
+    display: .none
+  }
+
+  rowRope = frame : surf.rope {
+    left: 0px,
+    top: 0px,
+    right: 0px,
+    bottom: 0px,
+    width: .nil,
+    height: .nil,
+    ignore-stack: .true,
+    corner-radius: spc.radii.row
+  }
+}
+
+// ---- examples
+bankCard = frame : doc.spec {
+  left: 0px,
+  top: 372px,
+
+  label {
+    contents: "project · a write-up + GitHub"
+  }
+
+  slot {
+    overrides: [insert(card, after = .nil)]
+  }
+
+  card = frame : project {
+    cols {
+      side {
+        media {
+          fill[1].image.ref: bankShot
+        }
+
+        foot {
+          links {
+            disc2 {
+              display: .none
+            }
+
+            wu {
+              display: .visible
+            }
+          }
+        }
+      }
+
+      info {
+        main {
+          descBox {
+            desc {
+              contents: "Developed a FreeRTOS-based real-time simulation of a bank environment, leveraging a multifunction shield on a STM32 microcontroller for displaying and managing customer queues and teller operations on an LCD…."
+            }
+          }
+
+          facts {
+            @with-variant(fct.fact)
+            status {
+              label {
+                contents: "Completed Apr 2024"
+              }
+            }
+
+            @with-variant(fct.factSchool)
+            kind {}
+          }
+
+          heading {
+            contents: "Bank Simulation"
+          }
+        }
+      }
+    }
+  }
+}
+
+fishbowlCard = frame : doc.spec {
+  left: 784px,
+  top: 372px,
+
+  label {
+    contents: "projectText · no media, no links"
+  }
+
+  slot {
+    overrides: [insert(card, after = .nil)]
+  }
+
+  card = frame : projectText {
+    cols {
+      side {
+        foot {
+          links {
+            display: .none
+          }
+        }
+      }
+
+      info {
+        main {
+          descBox {
+            desc {
+              contents: "Engaged in customer discovery to identify market needs, testing the viability and user interaction level of AI and computer vision integrated solutions, enabling further research and potential development for the client."
+            }
+          }
+
+          facts {
+            @with-variant(fct.fact)
+            status {
+              label {
+                contents: "Completed Dec 2023"
+              }
+            }
+
+            @with-variant(fct.factWork)
+            kind {}
+          }
+
+          heading {
+            contents: "Fishbowl AI Assistant"
+          }
+        }
+      }
+    }
+  }
+}
+
+fitrRow = frame : doc.spec {
+  left: 0px,
+  top: 948px,
+
+  label {
+    contents: "projectRow · stack folded (+2)"
+  }
+
+  slot {
+    overrides: [insert(row, after = .nil)]
+  }
+
+  row = frame : projectRow {
+    cols {
+      info {
+        stack {
+          t4 {
+            display: .none
+          }
+
+          t2 {
+            glyph {
+              contents: supabaseLogo
+            }
+
+            label {
+              contents: "Supabase"
+            }
+          }
+
+          t1 {
+            glyph {
+              contents: nextLogo
+            }
+
+            label {
+              contents: "Next.js"
+            }
+          }
+
+          more {
+            display: .visible
+          }
+        }
+
+        main {
+          facts {
+            @with-variant(fct.fact)
+            status {
+              label {
+                contents: "WIP since Sep 2025"
+              }
+            }
+
+            @with-variant(fct.factSchool)
+            kind {}
+          }
+
+          heading {
+            contents: "FiTR Skills Career Roadmaps"
+          }
+        }
+      }
+
+      side {
+        media {
+          fill[1].image.ref: fitrShot
+        }
+      }
+    }
+  }
+}
+
+bankRow = frame : doc.spec {
+  left: 784px,
+  top: 948px,
+
+  label {
+    contents: "projectRow · has a write-up (the mark)"
+  }
+
+  slot {
+    overrides: [insert(row, after = .nil)]
+  }
+
+  row = frame : projectRow {
+    cols {
+      info {
+        stack {
+          t3 {
+            glyph {
+              fill[0].visible: .true,
+              contents: cpuIcon
+            }
+
+            label {
+              contents: "FreeRTOS"
+            }
+          }
+
+          t4 {
+            display: .none
+          }
+
+          t2 {
+            glyph {
+              contents: stmLogo
+            }
+
+            label {
+              contents: "STM32"
+            }
+          }
+
+          t1 {
+            glyph {
+              contents: cLogo
+            }
+
+            label {
+              contents: "C"
+            }
+          }
+        }
+
+        main {
+          facts {
+            @with-variant(fct.fact)
+            status {
+              label {
+                contents: "Completed Apr 2024"
+              }
+            }
+
+            @with-variant(fct.factSchool)
+            kind {}
+          }
+
+          heading {
+            contents: "Bank Simulation"
+          }
+        }
+      }
+
+      side {
+        media {
+          fill[1].image.ref: bankShot
+        }
+      }
+    }
+
+    wuMark {
+      display: .visible
+    }
+  }
+}
+
+fishbowlRow = frame : doc.spec {
+  left: 1568px,
+  top: 948px,
+
+  label {
+    contents: "projectRow · no media (monogram)"
+  }
+
+  slot {
+    overrides: [insert(row, after = .nil)]
+  }
+
+  row = frame : projectRow {
+    cols {
+      info {
+        main {
+          facts {
+            @with-variant(fct.fact)
+            status {
+              label {
+                contents: "Completed Dec 2023"
+              }
+            }
+
+            @with-variant(fct.factWork)
+            kind {}
+          }
+
+          heading {
+            contents: "Fishbowl AI Assistant"
+          }
+        }
+      }
+
+      side {
+        @with-variant(mt.mediaThumbMono)
+        media {}
+      }
+    }
+  }
+}
+
+// ==== states page (labels over the definitions, then the states boards: i9 · i10 · i11) ====
+lbl-project = text : doc.specLabel {
+  left: 0px,
+  top: 0px,
+  contents: "project"
+}
+
+note-project = text : doc.specNote {
+  left: 0px,
+  top: 16px,
+  contents: "a card · rest (the base, i9)"
+}
+
+lbl-projectI10 = text : doc.specLabel {
+  left: 784px,
+  top: 0px,
+  contents: "projectI10"
+}
+
+note-projectI10 = text : doc.specNote {
+  left: 784px,
+  top: 16px,
+  contents: "i10 · duotone discs, write-up pill"
+}
+
+lbl-projectText = text : doc.specLabel {
+  left: 1568px,
+  top: 0px,
+  contents: "projectText"
+}
+
+note-projectText = text : doc.specNote {
+  left: 1568px,
+  top: 16px,
+  contents: "no media"
+}
+
+lbl-projectTextI10 = text : doc.specLabel {
+  left: 2352px,
+  top: 0px,
+  contents: "projectTextI10"
+}
+
+note-projectTextI10 = text : doc.specNote {
+  left: 2352px,
+  top: 16px,
+  contents: "i10 · no media"
+}
+
+lbl-projectRow = text : doc.specLabel {
+  left: 0px,
+  top: 728px,
+  contents: "projectRow"
+}
+
+note-projectRow = text : doc.specNote {
+  left: 0px,
+  top: 744px,
+  contents: "a row · rest"
+}
+
+lbl-projectRowPicked = text : doc.specLabel {
+  left: 784px,
+  top: 728px,
+  contents: "projectRowPicked"
+}
+
+note-projectRowPicked = text : doc.specNote {
+  left: 784px,
+  top: 744px,
+  contents: "picked: on the stage"
+}
+
+lbl-writeup = text : doc.specLabel {
+  left: 0px,
+  top: 1152px,
+  contents: "writeup"
+}
+
+note-writeup = text : doc.specNote {
+  left: 0px,
+  top: 1168px,
+  contents: "the write-up link · i9"
+}
+
+lbl-writeupI10 = text : doc.specLabel {
+  left: 784px,
+  top: 1152px,
+  contents: "writeupI10"
+}
+
+note-writeupI10 = text : doc.specNote {
+  left: 784px,
+  top: 1168px,
+  contents: "i10 · the pill"
+}
+
+lbl-writeupMark = text : doc.specLabel {
+  left: 1568px,
+  top: 1152px,
+  contents: "writeupMark"
+}
+
+note-writeupMark = text : doc.specNote {
+  left: 1568px,
+  top: 1168px,
+  contents: "the row's mark"
+}
+
+@variants(projectStatesI10)
+projectStates = frame : doc.docBoard {
+  title: "Project · states · i9",
+  left: 0px,
+  top: 1368px,
+
+  body {
+    layout.stack.item-gap: 48px,
+    overrides: [
+      insert(row-1, after = .nil),
+      insert(row-2, after = row-1),
+      insert(row-3, after = row-2)
+    ]
+  }
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i9"
+      }
+    }
+
+    boardCaption {
+      contents: "Project · every state"
+    }
+  }
+
+  row-1 = frame : doc.specRow {
+    layout.stack.item-gap: 48px,
+    overrides: [
+      insert(st-project, after = .nil),
+      insert(st-projectText, after = st-project)
+    ]
+  }
+
+  row-2 = frame : doc.specRow {
+    layout.stack.item-gap: 48px,
+    overrides: [
+      insert(st-projectRow, after = .nil),
+      insert(st-projectRowPicked, after = st-projectRow)
+    ]
+  }
+
+  row-3 = frame : doc.specRow {
+    layout.stack.item-gap: 48px,
+    overrides: [
+      insert(st-writeup, after = .nil),
+      insert(st-writeupMark, after = st-writeup)
+    ]
+  }
+
+  st-project = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "project"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "a card · rest (the base, i9)"
+    }
+
+    it = frame : project {}
+  }
+
+  st-projectText = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "projectText"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "no media"
+    }
+
+    it = frame : projectText {}
+  }
+
+  st-projectRow = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "projectRow"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "a row · rest"
+    }
+
+    it = frame : projectRow {}
+  }
+
+  st-projectRowPicked = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "projectRowPicked"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "picked: on the stage"
+    }
+
+    it = frame : projectRowPicked {}
+  }
+
+  st-writeup = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "writeup"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "the write-up link · i9"
+    }
+
+    it = frame : writeup {}
+  }
+
+  st-writeupMark = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "writeupMark"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "the row's mark"
+    }
+
+    it = frame : writeupMark {}
+  }
+}
+
+@variants(projectStatesI11)
+@context(i10="on")
+projectStatesI10 = frame : projectStates {
+  title: "Project · states · i10",
+  left: 1712px,
+  top: 1368px,
+
+  body {
+    row-3 {
+      st-writeup {
+        slot {
+          @with-variant(writeupI10)
+          it {}
+        }
+
+        note {
+          contents: "i10 · the pill"
+        }
+
+        label {
+          contents: "writeupI10"
+        }
+      }
+    }
+
+    row-1 {
+      st-projectText {
+        slot {
+          @with-variant(projectTextI10)
+          it {}
+        }
+
+        note {
+          contents: "i10 · no media"
+        }
+
+        label {
+          contents: "projectTextI10"
+        }
+      }
+
+      st-project {
+        slot {
+          @with-variant(projectI10)
+          it {}
+        }
+
+        note {
+          contents: "i10 · duotone discs, write-up pill"
+        }
+
+        label {
+          contents: "projectI10"
+        }
+      }
+    }
+  }
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i10"
+      }
+    }
+  }
+}
+
+@context(i10="on", i11="on")
+projectStatesI11 = frame : projectStatesI10 {
+  title: "Project · states · i11",
+  left: 3424px,
+  top: 1368px,
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i11"
+      }
+    }
+  }
+}

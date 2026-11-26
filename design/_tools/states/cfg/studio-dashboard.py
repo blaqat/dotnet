@@ -1,0 +1,10 @@
+CONFIG = {"file": "components/organisms/studio-dashboard.elyx",
+  "sections": [{"rows": [["siteStrip"], ["print", "printSwatch", "printIcon", "fan", "fanSwatches", "fanIcons", "fanWords"],
+     ["secCard", "secCardMusic", "secCardThoughts", "secCardHome"], ["draftRow", "actItem", "actDay"]]}],
+  "notes": {"siteStrip": "the site strip", "print": "a print · words", "printSwatch": "a swatch", "printIcon": "an icon",
+    "fan": "a fan of prints", "fanSwatches": "swatches", "fanIcons": "icons", "fanWords": "words",
+    "secCard": "a section card · Projects", "secCardMusic": "Music", "secCardThoughts": "Thoughts", "secCardHome": "Home",
+    "draftRow": "a draft row", "actItem": "an activity item", "actDay": "an activity day"},
+  "boards": [{"key": "studioDashboard", "caption": "Studio · dashboard parts",
+     "rows": [["siteStrip"], ["print", "printSwatch", "printIcon"], ["fan", "fanSwatches", "fanIcons", "fanWords"],
+              ["secCard", "secCardMusic"], ["secCardThoughts", "secCardHome"], ["draftRow"], ["actItem", "actDay"]]}]}

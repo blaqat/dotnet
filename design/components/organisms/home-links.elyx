@@ -1,0 +1,293 @@
+import "tokens/space/space.elyx" as spc
+import "components/molecules/section-button.elyx" as secb
+import "components/atoms/doc.elyx" as doc
+import "components/molecules/button.elyx" as btn
+import "assets/icons/bold/github-logo.svg" as githubIcon
+import "assets/icons/bold/instagram-logo.svg" as instagramIcon
+import "assets/icons/bold/x-logo.svg" as xIcon
+import "assets/icons/bold/discord-logo.svg" as discordIcon
+
+// Where Home leads: the three section buttons (Home's nav on desktop: the
+// lockup is the brand, these are the tabs; phones use the bottom bar
+// instead) and the contact row (the original contact page: a small link
+// button per site, its glyph + the username; phones: the glyph alone in a
+// 44 circle, the name kept for assistive tech).
+// .hnav: Projects · Music · Thoughts, 16 apart
+export sectionNav = frame {
+  title: "Section buttons",
+  left: 0px,
+  top: 40px,
+  layout: {stack: {align-items: .center, item-gap: spc.steps.s4}},
+  children: [projects, music, thoughts],
+
+  projects = frame : secb.secBtn {}
+
+  music = frame : secb.secBtnMusic {}
+
+  thoughts = frame : secb.secBtnThoughts {}
+}
+
+// .contact: GitHub · Instagram · X · Discord (btn--sm link buttons)
+@variants(contactRowPhone)
+export contactRow = frame {
+  title: "Contact row",
+  left: 0px,
+  top: 220px,
+  layout: {stack: {align-items: .center, item-gap: spc.layout.contact-gap}},
+  children: [github, instagram, x, discord],
+
+  github = frame : btn.btnSm {
+    glyph {
+      contents: githubIcon
+    }
+
+    label {
+      contents: "blaqat"
+    }
+  }
+
+  instagram = frame : btn.btnSm {
+    glyph {
+      contents: instagramIcon
+    }
+
+    label {
+      contents: "@blaqat_ag"
+    }
+  }
+
+  x = frame : btn.btnSm {
+    glyph {
+      contents: xIcon
+    }
+
+    label {
+      contents: "@blaqat_ag"
+    }
+  }
+
+  discord = frame : btn.btnSm {
+    glyph {
+      contents: discordIcon
+    }
+
+    label {
+      contents: "blaqat"
+    }
+  }
+}
+
+// Phones: icon-only circles (44), one centred row.
+export contactRowPhone = frame : contactRow {
+  title: "Contact row · phone",
+  left: 660px,
+  top: 220px,
+  layout.stack.item-gap: spc.layout.contact-gap-phone,
+
+  @with-variant(btn.btnIcon)
+  discord {
+    width: spc.controls.contact-sm,
+
+    glyph {
+      width: spc.controls.contact-sm-icon,
+      height: spc.controls.contact-sm-icon
+    }
+
+    height: spc.controls.contact-sm
+  }
+
+  @with-variant(btn.btnIcon)
+  x {
+    width: spc.controls.contact-sm,
+
+    glyph {
+      width: spc.controls.contact-sm-icon,
+      height: spc.controls.contact-sm-icon
+    }
+
+    height: spc.controls.contact-sm
+  }
+
+  @with-variant(btn.btnIcon)
+  instagram {
+    width: spc.controls.contact-sm,
+
+    glyph {
+      width: spc.controls.contact-sm-icon,
+      height: spc.controls.contact-sm-icon
+    }
+
+    height: spc.controls.contact-sm
+  }
+
+  @with-variant(btn.btnIcon)
+  github {
+    width: spc.controls.contact-sm,
+
+    glyph {
+      width: spc.controls.contact-sm-icon,
+      height: spc.controls.contact-sm-icon
+    }
+
+    height: spc.controls.contact-sm
+  }
+}
+
+// ==== states page (labels over the definitions, then the states boards: i9 · i10 · i11) ====
+lbl-sectionNav = text : doc.specLabel {
+  left: 0px,
+  top: 0px,
+  contents: "sectionNav"
+}
+
+note-sectionNav = text : doc.specNote {
+  left: 0px,
+  top: 16px,
+  contents: "the section buttons"
+}
+
+lbl-contactRow = text : doc.specLabel {
+  left: 0px,
+  top: 180px,
+  contents: "contactRow"
+}
+
+note-contactRow = text : doc.specNote {
+  left: 0px,
+  top: 196px,
+  contents: "the contact links"
+}
+
+lbl-contactRowPhone = text : doc.specLabel {
+  left: 660px,
+  top: 180px,
+  contents: "contactRowPhone"
+}
+
+note-contactRowPhone = text : doc.specNote {
+  left: 660px,
+  top: 196px,
+  contents: "phones"
+}
+
+@variants(homeLinksStatesI10)
+homeLinksStates = frame : doc.docBoard {
+  title: "Home links · states · i9",
+  left: 0px,
+  top: 408px,
+
+  body {
+    layout.stack.item-gap: 48px,
+    overrides: [insert(row-1, after = .nil), insert(row-2, after = row-1)]
+  }
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i9"
+      }
+    }
+
+    boardCaption {
+      contents: "Home links · every state"
+    }
+  }
+
+  row-1 = frame : doc.specRow {
+    layout.stack.item-gap: 48px,
+    overrides: [insert(st-sectionNav, after = .nil)]
+  }
+
+  row-2 = frame : doc.specRow {
+    layout.stack.item-gap: 48px,
+    overrides: [
+      insert(st-contactRow, after = .nil),
+      insert(st-contactRowPhone, after = st-contactRow)
+    ]
+  }
+
+  st-sectionNav = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "sectionNav"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "the section buttons"
+    }
+
+    it = frame : sectionNav {}
+  }
+
+  st-contactRow = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "contactRow"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "the contact links"
+    }
+
+    it = frame : contactRow {}
+  }
+
+  st-contactRowPhone = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "contactRowPhone"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "phones"
+    }
+
+    it = frame : contactRowPhone {}
+  }
+}
+
+@variants(homeLinksStatesI11)
+@context(i10="on")
+homeLinksStatesI10 = frame : homeLinksStates {
+  title: "Home links · states · i10",
+  left: 948px,
+  top: 408px,
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i10"
+      }
+    }
+  }
+}
+
+@context(i10="on", i11="on")
+homeLinksStatesI11 = frame : homeLinksStatesI10 {
+  title: "Home links · states · i11",
+  left: 1892px,
+  top: 408px,
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i11"
+      }
+    }
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "defaults": {
+    "text": {
+      "fontSize": 12
+    }
+  },
+  "assets": {
+    "include": [
+      "assets",
+      "redesign"
+    ]
+  },
+  "fonts": {
+    "include": [
+      "assets/fonts",
+      "redesign"
+    ]
+  },
+  "dependencies": {
+    "public-assets": "../public",
+    "site-assets": "../src"
+  }
+}

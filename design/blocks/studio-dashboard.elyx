@@ -1,0 +1,747 @@
+import "tokens/space/space.elyx" as spc
+import "tokens/type/type.elyx" as typ
+import "components/molecules/button.elyx" as btn
+import "components/atoms/doc.elyx" as doc
+import "assets/icons/bold/music-notes.svg" as musicIcon
+import "components/molecules/fact.elyx" as fct
+import "components/organisms/page-header.elyx" as head
+import "components/organisms/studio-parts.elyx" as prt
+import "tokens/color/sections.elyx" as sec
+import "components/organisms/studio-dashboard.elyx" as dsh
+import "assets/icons/bold/plus.svg" as plusIcon
+import "assets/icons/bold/scribble-loop.svg" as scratchIcon
+import "assets/icons/bold/article.svg" as articleIcon
+import "assets/icons/bold/ranking.svg" as rankingIcon
+import "assets/icons/bold/arrow-square-in.svg" as importIcon
+import "assets/icons/bold/images-square.svg" as mediaIcon
+
+// Studio's dashboard, the page's content (it fills a Studio sheet's
+// `page`): the header ("Studio." · hi aiden · Import from Notion · New),
+// the site strip, then two columns: Sections (the four section cards) over
+// On the needles (the eight unpublished things) | Recently (the activity,
+// by day). The seed's real content.
+// Spacing: header → strip `st-head-gap` (i9 14, i11 48), strip → the panes
+// `st-pane-gap` (i9 30, i11 52), a pane's head → its content
+// `st-pane-head` (10 / 16). i11 (`dashBodyI11`): the panes' heads are
+// Headings (prt.eyebrowHeading).
+@variants(dashBodyI11)
+export dashBody = frame {
+  title: "Studio dashboard · body",
+  left: 0px,
+  top: 40px,
+  width: 1332px,
+  layout: {
+    stack: {
+      direction: .column,
+      align-items: .stretch,
+      item-gap: spc.layout.st-head-gap
+    }
+  },
+  children: [header, body],
+
+  header = frame : head.pageHeaderMeta {
+    width: .nil,
+
+    headText {
+      headLine {
+        titleLine {
+          title {
+            contents: "Studio"
+          }
+        }
+
+        meta {
+          contents: "hi aiden · Nov 10, 2026"
+        }
+      }
+    }
+
+    actions {
+      overrides: [
+        insert(importBtn, after = .nil),
+        insert(newBtn, after = importBtn)
+      ]
+    }
+  }
+
+  importBtn = frame : btn.btn {
+    glyph {
+      contents: importIcon
+    }
+
+    label {
+      contents: "Import from Notion"
+    }
+  }
+
+  newBtn = frame : btn.btnPrimary {
+    glyph {
+      contents: plusIcon
+    }
+
+    label {
+      contents: "New"
+    }
+  }
+
+  body = frame {
+    layout: {
+      stack: {
+        direction: .column,
+        align-items: .stretch,
+        item-gap: spc.layout.st-pane-gap
+      }
+    },
+    children: [strip, cols],
+
+    strip = frame : dsh.siteStrip {
+      width: .nil
+    }
+
+    cols = frame {
+      layout: {stack: {item-gap: spc.layout.st-col-gap}},
+      children: [main, recent],
+
+      main = frame {
+        width: 100%,
+        layout: {
+          stack: {
+            direction: .column,
+            align-items: .stretch,
+            item-gap: spc.layout.st-pane-gap
+          }
+        },
+        children: [sections, needles],
+
+        sections = frame {
+          layout: {
+            stack: {direction: .column, item-gap: spc.layout.st-pane-head}
+          },
+          children: [secHead, secRows],
+
+          secHead = frame : prt.eyebrow {}
+
+          secRows = frame {
+            layout: {
+              stack: {direction: .column, item-gap: spc.layout.st-tile-gap}
+            },
+            children: [secRow1, secRow2],
+
+            secRow1 = frame {
+              layout: {
+                stack: {align-items: .stretch, item-gap: spc.layout.st-tile-gap}
+              },
+              children: [projectsCard, musicCard],
+
+              projectsCard = frame : dsh.secCard {}
+
+              musicCard = frame : dsh.secCardMusic {}
+            }
+
+            secRow2 = frame {
+              layout: {
+                stack: {align-items: .stretch, item-gap: spc.layout.st-tile-gap}
+              },
+              children: [thoughtsCard, homeCard],
+
+              thoughtsCard = frame : dsh.secCardThoughts {}
+
+              homeCard = frame : dsh.secCardHome {}
+            }
+          }
+        }
+
+        needles = frame {
+          layout: {
+            stack: {
+              direction: .column,
+              align-items: .stretch,
+              item-gap: spc.layout.st-pane-head
+            }
+          },
+          children: [needHead, rows],
+
+          needHead = frame : prt.eyebrow {
+            word {
+              contents: "ON THE NEEDLES"
+            }
+
+            meta {
+              display: .visible
+            }
+          }
+
+          rows = frame {
+            layout: {
+              stack: {
+                direction: .column,
+                align-items: .stretch,
+                item-gap: spc.layout.st-list-gap
+              }
+            },
+            children: [r1, r2, r3, r4, r5, r6, r7, r8],
+
+            r1 = frame : dsh.draftRow {
+              width: .nil
+            }
+
+            r2 = frame : dsh.draftRow {
+              width: .nil,
+
+              lead {
+                dot {
+                  fill[0].color: sec.section.hue-thoughts,
+
+                  glyph {
+                    contents: articleIcon
+                  }
+                }
+
+                main {
+                  sub {
+                    kind {
+                      disc {
+                        glyph {
+                          contents: articleIcon
+                        }
+                      }
+
+                      label {
+                        contents: "Article"
+                      }
+                    }
+
+                    stamp {
+                      contents: "autosaved 12 min ago"
+                    }
+                  }
+
+                  name {
+                    contents: "Building the Studio"
+                  }
+                }
+              }
+            }
+
+            r3 = frame : dsh.draftRow {
+              width: .nil,
+
+              lead {
+                dot {
+                  fill[0].color: sec.section.hue-thoughts,
+
+                  glyph {
+                    contents: scratchIcon
+                  }
+                }
+
+                main {
+                  sub {
+                    kind {
+                      disc {
+                        glyph {
+                          contents: scratchIcon
+                        }
+                      }
+
+                      label {
+                        contents: "Scratch"
+                      }
+                    }
+
+                    stamp {
+                      contents: "autosaved 34 min ago"
+                    }
+                  }
+
+                  name {
+                    contents: "drafts are just thoughts that haven't left the house yet"
+                  }
+                }
+              }
+            }
+
+            r4 = frame : dsh.draftRow {
+              width: .nil,
+
+              lead {
+                dot {
+                  fill[0].color: sec.section.hue-music,
+
+                  glyph {
+                    contents: musicIcon
+                  }
+                }
+
+                main {
+                  sub {
+                    kind {
+                      disc {
+                        glyph {
+                          contents: musicIcon
+                        }
+                      }
+
+                      label {
+                        contents: "Music"
+                      }
+                    }
+
+                    stamp {
+                      contents: "autosaved 46 min ago"
+                    }
+                  }
+
+                  name {
+                    contents: "couch demo 4"
+                  }
+                }
+              }
+            }
+
+            r5 = frame : dsh.draftRow {
+              width: .nil,
+
+              lead {
+                main {
+                  sub {
+                    stamp {
+                      contents: "edited 2 h ago"
+                    }
+
+                    @with-variant(fct.factEdits)
+                    state {}
+                  }
+
+                  name {
+                    contents: "Sonata"
+                  }
+                }
+              }
+            }
+
+            r6 = frame : dsh.draftRow {
+              width: .nil,
+
+              lead {
+                dot {
+                  fill[0].color: sec.section.hue-thoughts,
+
+                  glyph {
+                    contents: rankingIcon
+                  }
+                }
+
+                main {
+                  sub {
+                    kind {
+                      disc {
+                        glyph {
+                          contents: rankingIcon
+                        }
+                      }
+
+                      label {
+                        contents: "Ranking"
+                      }
+                    }
+
+                    stamp {
+                      contents: "autosaved 16 h ago"
+                    }
+                  }
+
+                  name {
+                    contents: "Code editors, ranked"
+                  }
+                }
+              }
+            }
+
+            r7 = frame : dsh.draftRow {
+              width: .nil,
+
+              lead {
+                main {
+                  sub {
+                    kind {
+                      disc {
+                        glyph {
+                          contents: musicIcon
+                        }
+                      }
+
+                      label {
+                        contents: "Music"
+                      }
+                    }
+
+                    stamp {
+                      contents: "edited yesterday, 12:32 pm"
+                    }
+
+                    @with-variant(fct.factEdits)
+                    state {}
+                  }
+
+                  name {
+                    subrange[0].range: [12, 13],
+                    subrange[0].font-family: typ.faces.emoji,
+                    contents: "of.the.stars✨"
+                  }
+                }
+
+                dot {
+                  fill[0].color: sec.section.hue-music,
+
+                  glyph {
+                    contents: musicIcon
+                  }
+                }
+              }
+            }
+
+            r8 = frame : dsh.draftRow {
+              width: .nil,
+
+              lead {
+                main {
+                  sub {
+                    kind {
+                      disc {
+                        glyph {
+                          contents: musicIcon
+                        }
+                      }
+
+                      label {
+                        contents: "Music"
+                      }
+                    }
+
+                    stamp {
+                      contents: "edited Nov 7"
+                    }
+
+                    @with-variant(fct.factEdits)
+                    state {}
+                  }
+
+                  name {
+                    contents: "Revealed"
+                  }
+                }
+
+                dot {
+                  fill[0].color: sec.section.hue-music,
+
+                  glyph {
+                    contents: musicIcon
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+
+      recent = frame {
+        width: spc.controls.st-recent-w,
+        layout: {stack: {direction: .column, item-gap: spc.layout.st-pane-head}},
+        children: [recentHead, days],
+
+        recentHead = frame : prt.eyebrow {
+          word {
+            contents: "RECENTLY"
+          }
+        }
+
+        days = frame {
+          layout: {stack: {direction: .column}},
+          children: [today, yesterday, nov8],
+
+          today = frame : dsh.actDay {
+            changes {
+              overrides: [
+                insert(t1, after = .nil),
+                insert(t2, after = t1),
+                insert(t3, after = t2),
+                insert(t4, after = t3),
+                insert(t5, after = t4)
+              ]
+            }
+          }
+
+          yesterday = frame : dsh.actDay {
+            pill {
+              year {
+                contents: "Yesterday"
+              }
+
+              count {
+                contents: "2 changes"
+              }
+            }
+
+            changes {
+              overrides: [insert(y1, after = .nil), insert(y2, after = y1)]
+            }
+          }
+
+          nov8 = frame : dsh.actDay {
+            pill {
+              year {
+                contents: "Nov 8"
+              }
+
+              count {
+                contents: "2 changes"
+              }
+            }
+
+            changes {
+              overrides: [insert(n1, after = .nil), insert(n2, after = n1)]
+            }
+          }
+        }
+      }
+    }
+  }
+
+  // ---- the changes (Recently), newest first
+  t1 = frame : dsh.actItem {}
+
+  t2 = frame : dsh.actItem {
+    body {
+      words {
+        subrange[0].range: [21, 40],
+        contents: "Imported from Notion Building the Studio"
+      }
+
+      stamp {
+        dot {
+          fill[0].color: sec.section.hue-thoughts,
+
+          glyph {
+            contents: articleIcon
+          }
+        }
+
+        time {
+          contents: "2:20 pm"
+        }
+      }
+    }
+  }
+
+  t3 = frame : dsh.actItem {
+    body {
+      words {
+        subrange[0].range: [25, 37],
+        contents: "Uploaded a voice memo to couch demo 4"
+      }
+
+      stamp {
+        dot {
+          fill[0].color: sec.section.hue-music,
+
+          glyph {
+            contents: musicIcon
+          }
+        }
+
+        time {
+          contents: "1:46 pm"
+        }
+      }
+    }
+  }
+
+  t4 = frame : dsh.actItem {
+    body {
+      words {
+        subrange[0].range: [7, 13],
+        contents: "Edited Sonata"
+      }
+
+      stamp {
+        time {
+          contents: "12:18 pm"
+        }
+      }
+    }
+  }
+
+  t5 = frame : dsh.actItem {
+    body {
+      words {
+        subrange[0].range: [10, 50],
+        contents: "Published what if every website had a little cat…"
+      }
+
+      stamp {
+        dot {
+          fill[0].color: sec.section.hue-thoughts,
+
+          glyph {
+            contents: scratchIcon
+          }
+        }
+
+        time {
+          contents: "9:32 am · live"
+        }
+      }
+    }
+  }
+
+  y1 = frame : dsh.actItem {
+    body {
+      words {
+        subrange[0].range: [20, 32],
+        subrange[1].range: [32, 33],
+        subrange[1].font-family: typ.faces.emoji,
+        subrange[0].font-style: typ.faces.st-strong-style,
+        contents: "Reordered tracks in of.the.stars✨"
+      }
+
+      stamp {
+        dot {
+          fill[0].color: sec.section.hue-music,
+
+          glyph {
+            contents: musicIcon
+          }
+        }
+
+        time {
+          contents: "12:32 pm"
+        }
+      }
+    }
+  }
+
+  y2 = frame : dsh.actItem {
+    body {
+      words {
+        subrange[0].range: [28, 33],
+        contents: "Removed 2 unused files from Media"
+      }
+
+      stamp {
+        dot {
+          fill[0].color: sec.section.hue-studio,
+
+          glyph {
+            contents: mediaIcon
+          }
+        }
+
+        time {
+          contents: "8:32 am"
+        }
+      }
+    }
+  }
+
+  n1 = frame : dsh.actItem {
+    body {
+      words {
+        subrange[0].range: [10, 38],
+        contents: "Published My favorite browsers, ranked"
+      }
+
+      stamp {
+        dot {
+          fill[0].color: sec.section.hue-thoughts,
+
+          glyph {
+            contents: rankingIcon
+          }
+        }
+
+        time {
+          contents: "11:32 am · live"
+        }
+      }
+    }
+  }
+
+  n2 = frame : dsh.actItem {
+    body {
+      words {
+        subrange[0].range: [29, 56],
+        contents: "Restored an older version of Code Editor Theme Generator"
+      }
+
+      stamp {
+        time {
+          contents: "9:32 am"
+        }
+      }
+    }
+  }
+}
+
+// i11 · the panes' heads are Headings (T1 rule 2: the cards' names, 16,
+// sit under them), in sentence case.
+@context(i10="on", i11="on")
+export dashBodyI11 = frame : dashBody {
+  title: "Studio dashboard · body · i11",
+  left: 1652px,
+  top: 40px,
+
+  body {
+    cols {
+      recent {
+        @with-variant(prt.eyebrowHeading)
+        recentHead {
+          big {
+            contents: "Recently"
+          }
+        }
+      }
+
+      main {
+        needles {
+          @with-variant(prt.eyebrowHeading)
+          needHead {
+            big {
+              contents: "On the needles"
+            }
+          }
+        }
+
+        sections {
+          @with-variant(prt.eyebrowHeading)
+          secHead {}
+        }
+      }
+    }
+  }
+}
+
+// ==== states page (labels over the definitions, then the states boards: i9 · i10 · i11) ====
+lbl-dashBody = text : doc.specLabel {
+  left: 0px,
+  top: 0px,
+  contents: "dashBody"
+}
+
+note-dashBody = text : doc.specNote {
+  left: 0px,
+  top: 16px,
+  contents: "i9 (i10 = tokens)"
+}
+
+lbl-dashBodyI11 = text : doc.specLabel {
+  left: 1652px,
+  top: 0px,
+  contents: "dashBodyI11"
+}
+
+note-dashBodyI11 = text : doc.specNote {
+  left: 1652px,
+  top: 16px,
+  contents: "i11"
+}

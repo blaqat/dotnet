@@ -1,0 +1,175 @@
+// Colour roles: every accent in a component goes through one of these.
+// i9 (the base, = i8's "red everywhere" look): red has seven jobs.
+// i10 (`roles-i10.elyx`, context i10=on) re-points them: "a colour is a
+// word" + the state ladder (rest neutral → pick rope → on tint → live fill).
+// Section-dependent i10 roles live in roles-i10-<section>.elyx.
+// Aliases in Elyx resolve statically, so every variant restates the
+// members it changes instead of aliasing a contextual token.
+import "./palette.elyx" as p
+import "./roles-i10.elyx" as i10
+
+@variants(i10.rolesI10)
+export roles = tokens {
+  // surfaces + text
+  sheet: p.palette.cotton,
+  recess: p.palette.cotton-2,
+  surface: p.palette.white,
+  fg: p.palette.ink,
+  fg-2: p.palette.ink-2,
+  fg-3: p.palette.ink-3,
+  chip: p.palette.cotton-2,
+  line: p.palette.line,
+  stitch: p.palette.stitch,
+  focus: p.palette.ink,
+
+  // brand: the logo's dot, the title's period
+  brand: p.palette.red,
+  // here: where you are (the nav's current tab rope)
+  here-a: p.palette.red,
+  here-b: p.palette.red-deep,
+  // pick: a chosen single option (the rope)
+  pick-a: p.palette.red,
+  pick-b: p.palette.red-deep,
+  // on: a toggle that's on (fill + text)
+  on-bg: p.palette.tog-red,
+  on-fg: p.palette.white,
+  // primary: the one primary action per view
+  primary-bg: p.palette.red,
+  primary-fg: p.palette.white,
+  // act: a repeated action at rest (every ▶, the +)
+  act-bg: p.palette.red,
+  act-fg: p.palette.white,
+  act-line: p.palette.red,
+  // act-current: the ▶ of the loaded, paused item (i9: it stays white on red)
+  act-current: p.palette.white,
+  // added: the + once its item is in the queue (the ✓)
+  added: p.palette.red-deep,
+  added-line: p.palette.stitch-soft,
+  // disc-line: the hairline round a plain white disc (the +, utilities)
+  disc-line: p.palette.hairline,
+  // ctl: a control's chrome at rest. i9: a dashed stitch inside, a soft
+  // shadow under; i10 (calm): a 1px ring instead, no stitch
+  ctl-line: p.palette.clear,
+  ctl-stitch: p.palette.stitch-btn,
+  ctl-stitch-fill: p.palette.stitch-on-fill,
+  ctl-shadow: p.palette.shadow-1,
+  // linkdisc: an outside link's disc (i9: white, ink glyph; i10 R7: the one
+  // cotton-2 disc, the duotone glyph in ink-3)
+  linkdisc-bg: p.palette.white,
+  linkdisc-fg: p.palette.ink,
+  linkdisc-line: p.palette.hairline,
+  linkdisc-shadow: p.palette.shadow-1,
+  // dot: a felt disc in a section's hue (the nav tabs). Its glyph + stitch;
+  // dot-rest-*: the nav's other tabs at rest (i10 L1: grey until hover)
+  dot-fg: p.palette.white,
+  dot-stitch: p.palette.stitch-on-fill,
+  dot-rest: p.palette.clear,
+  dot-rest-fg: p.palette.white,
+  dot-rest-stitch: p.palette.stitch-on-fill,
+  // current-fg: text on the loaded, paused part (the chosen folder tab)
+  current-fg: p.palette.red-deep,
+  // fold: the folder's back cover, peeking behind its tabs
+  fold: p.palette.cotton-3,
+  // live: what's playing
+  live: p.palette.red,
+  live-deep: p.palette.red-deep,
+  live-soft: p.palette.red-soft,
+  live-fg: p.palette.white,
+  // live-glow: the soft glow under a playing ▶ (i9: just the usual shadow)
+  live-glow: p.palette.shadow-1,
+  // now: "now" that isn't music (reading bar, ranking drop)
+  now: p.palette.red,
+  now-deep: p.palette.red-deep,
+  now-soft: p.palette.red-soft,
+  // link: inline text links, "more"
+  link: p.palette.red-deep,
+  link-hover: p.palette.red,
+  // deco: prose bullets, a quote's bar
+  deco: p.palette.red,
+  // bookmark: article ribbon, pick's yarn
+  mark: p.palette.red,
+  mark-deep: p.palette.red-deep,
+  // status
+  wip: p.palette.gold,
+  wip-deep: p.palette.gold-deep,
+  // fact: a status fact's words, glyph and disc (i9: a felt disc per
+  // status; i10 L3: a bare glyph in ink-3, no disc; WIP keeps its gold)
+  fact-fg: p.palette.ink-2,
+  fact-ic: p.palette.white,
+  fact-done: p.palette.ink,
+  fact-paused: p.palette.ink-3,
+  fact-dropped: p.palette.red,
+  // on-<content>: a type / instrument toggle that's on (i9: its solid
+  // colour; i10 L1: its soft tint, the glyph in its deep shade, ink words)
+  on-personal: p.palette.pt-personal,
+  on-personal-ic: p.palette.ink,
+  on-work: p.palette.pt-work,
+  on-work-ic: p.palette.ink,
+  on-school: p.palette.pt-school,
+  on-school-ic: p.palette.ink,
+  on-piano: p.palette.inst-piano,
+  on-piano-ic: p.palette.white,
+  on-beepbox: p.palette.inst-beepbox,
+  on-beepbox-ic: p.palette.white,
+  on-daw: p.palette.inst-daw,
+  on-daw-ic: p.palette.white,
+  on-inst-fg: p.palette.white,
+  // a text field's focus edge + halo (i9 red; i10 L1 ink), an invalid edge
+  field-focus: p.palette.red,
+  field-halo: p.palette.red-soft,
+  invalid: p.palette.red-deep,
+  // the toast's glyph (i9 red-hi; i10 L1: no accent on a toast)
+  toast-ic: p.palette.red-hi,
+  // dark: an ink surface (the toast, the hint, a pressed key) + its words
+  dark: p.palette.ink,
+  dark-fg: p.palette.white,
+  // Thoughts' post cards: the kicker's type word (i9 ink-2, i10 ink-3); the
+  // pick's shelf link (i9 a gold pill: Thoughts' identity; i10 a plain link);
+  // a go-link's underline (i9 none, i10 ink at .3)
+  kick: p.palette.ink-2,
+  coll-bg: p.palette.gold-soft,
+  coll-fg: p.palette.gold-deep,
+  coll-stitch: p.palette.gold-stitch,
+  go-line: p.palette.clear,
+  // the · between the kicker's words (i9 none: a gap)
+  kick-sep: p.palette.clear,
+  // fact-<type>: a project type's fact disc + glyph (i9: a felt disc in the
+  // type's colour, an ink glyph; i10 L3: a bare glyph in its deep shade)
+  fact-personal: p.palette.pt-personal,
+  fact-personal-ic: p.palette.ink,
+  fact-work: p.palette.pt-work,
+  fact-work-ic: p.palette.ink,
+  fact-school: p.palette.pt-school,
+  fact-school-ic: p.palette.ink,
+  // the dashed stitch inside a project's media (white, every iteration)
+  media-stitch: p.palette.stitch-on-fill,
+  // Studio: the publish state (Yarn.fact.pub: live = an ink disc, edits =
+  // a red disc, draft = a dashed ring on white; from i10 bare glyphs: live
+  // ink, edits the WIP gold's deep shade, draft the ring alone) and a quiet
+  // fact's chip disc (a type, a date, "Saved")
+  pub-live-ic: p.palette.white,
+  pub-edits: p.palette.red,
+  pub-edits-ic: p.palette.white,
+  pub-draft: p.palette.white,
+  pub-draft-ic: p.palette.ink-2,
+  fact-chip: p.palette.cotton-2,
+  fact-chip-ic: p.palette.ink-2,
+  fact-chip-line: p.palette.hairline,
+  // Music: the playing card's face (i9 stays white; i10 the live tint), a
+  // level on a slider (the player's volume: i9 red, i10 ink)
+  live-card: p.palette.white,
+  level: p.palette.red,
+  // the rope round a playing track row (i9 the live red; from i10 none:
+  // the row takes the live tint instead)
+  live-rope-a: p.palette.red,
+  live-rope-b: p.palette.red-deep,
+  // Studio's nav: the tab that's here wears the rope in its own section's
+  // hue whatever the page (Studio's section is ink): i9 red like every
+  // here; from i10 Music's purple, Thoughts' gold
+  here-music-a: p.palette.red,
+  here-music-b: p.palette.red-deep,
+  here-thoughts-a: p.palette.red,
+  here-thoughts-b: p.palette.red-deep,
+  // phones: the scrim under the player's page
+  scrim: p.palette.scrim
+}

@@ -1,0 +1,1030 @@
+import "tokens/space/space.elyx" as spc
+import "tokens/color/sections.elyx" as sec
+import "components/atoms/doc.elyx" as doc
+import "components/molecules/button.elyx" as btn
+import "assets/icons/bold/shuffle.svg" as shuffleIcon
+import "components/organisms/sheet.elyx" as sh
+import "assets/icons/fill/music-notes.svg" as musicIcon
+import "components/organisms/page-header.elyx" as head
+import "components/organisms/results-line.elyx" as rl
+import "components/organisms/phone-nav.elyx" as nv
+import "components/organisms/player-phone.elyx" as pp
+import "blocks/music-grid.elyx" as mg
+
+@with-context(section="music")
+file {}
+
+// Music · grid on a phone (390 × 844), glooming shadows (Alphabet City
+// Collection) playing, the player's bar in the slot. The list is one column
+// of phone cards grouped by year (each year a ruled pill): the card's art
+// top-left, its name / facts and two lines of notes beside it, + and ▶
+// closing the text column on the right (?phrow=card); a collection's tabs
+// share the card's width. No tools line: search and the filters live in
+// the floating layer's knob (?msearch=fab).
+// i9: the counts in the header's Meta, ⤮ icon-only on its right. i10: the
+// results line (counts · ▶ ⤮ icon-only) under the header, the cards' i10
+// variants (duotone discs, the live tint), a single card drops the tabs'
+// room. i11: the playing card's i11 variant; the rest is tokens (Display
+// 28, the phone's section gap 32, the cards' 12 inset).
+// Place `musicPhone` on a screen page; its iteration variants switch with
+// the canvas (i10 / i11), or wrap it in local contextual variants.
+// ---- the list (one column) ----
+@variants(musicListPhoneI10)
+export musicListPhone = frame {
+  title: "Music · phone list (i9)",
+  left: 0px,
+  top: 1092px,
+  width: spc.controls.page-w-phone,
+  layout: {
+    stack: {
+      direction: .column,
+      align-items: .stretch,
+      item-gap: spc.layout.gutter-phone
+    }
+  },
+  children: [results, groups],
+
+  // i10+: the counts and ▶ ⤮ (icon-only); i9 shows its counts in the header
+  results = frame : rl.resultsLinePhone {
+    width: 100%,
+    display: .none
+  }
+
+  groups = frame {
+    layout: {
+      stack: {
+        direction: .column,
+        align-items: .stretch,
+        item-gap: spc.layout.group-gap-phone
+      }
+    },
+    children: [g2026, g2025],
+
+    // 2026: of.the.stars, Revealed
+    g2026 = frame : mg.yearGroup2022 {
+      width: 100%,
+
+      grid {
+        revealed {
+          tabs {
+            strip {
+              left: spc.layout.folder-inset-phone,
+              right: spc.layout.folder-inset-phone,
+
+              tab1 {
+                width: spc.controls.folder-tab-w-phone
+              }
+
+              after1 {
+                tab2 {
+                  width: spc.controls.folder-tab-w-phone
+                }
+
+                after2 {
+                  tab3 {
+                    width: spc.controls.folder-tab-w-phone
+                  }
+
+                  tab4 {
+                    width: spc.controls.folder-tab-w-phone
+                  }
+
+                  layout.stack.item-gap: spc.layout.folder-tab-overlap-phone
+                }
+
+                layout.stack.item-gap: spc.layout.folder-tab-overlap-phone
+              }
+
+              layout.stack.item-gap: spc.layout.folder-tab-overlap-phone
+            }
+          }
+
+          card {
+            top {
+              head {
+                art {
+                  width: spc.controls.art-phone,
+                  height: spc.controls.art-phone
+                }
+
+                layout.grid.columns: [.auto, 1fr],
+                layout.grid.column-gap: spc.layout.folder-head-gap-phone
+              }
+
+              face {
+                max-height: spc.controls.folder-desc-h-phone,
+                padding-left: spc.layout.folder-text-l-phone
+              }
+
+              layout.stack.item-gap: 0
+            }
+
+            foot {
+              links {
+                display: .none
+              }
+
+              layout.stack.justify-content: .end,
+              padding-top: spc.steps.s2
+            }
+
+            padding-top: spc.layout.folder-inset-phone,
+            padding-left: spc.layout.folder-inset-phone,
+            padding-bottom: spc.layout.folder-inset-phone,
+            padding-right: spc.layout.folder-inset-phone
+          }
+        }
+
+        ofTheStars {
+          card {
+            top {
+              head {
+                art {
+                  width: spc.controls.art-phone,
+                  height: spc.controls.art-phone
+                }
+
+                layout.grid.columns: [.auto, 1fr],
+                layout.grid.column-gap: spc.layout.folder-head-gap-phone
+              }
+
+              face {
+                max-height: spc.controls.folder-desc-h-phone,
+                padding-left: spc.layout.folder-text-l-phone
+              }
+
+              layout.stack.item-gap: 0
+            }
+
+            foot {
+              links {
+                display: .none
+              }
+
+              layout.stack.justify-content: .end,
+              padding-top: spc.steps.s2
+            }
+
+            padding-top: spc.layout.folder-inset-phone,
+            padding-left: spc.layout.folder-inset-phone,
+            padding-bottom: spc.layout.folder-inset-phone,
+            padding-right: spc.layout.folder-inset-phone
+          }
+        }
+
+        alphabetCity {
+          display: .none
+        }
+
+        aikisu {
+          display: .none
+        }
+
+        castAdrift {
+          display: .none
+        }
+
+        peppySnowday {
+          display: .none
+        }
+
+        marmaladeCafe {
+          display: .none
+        }
+
+        farewellMyStar {
+          display: .none
+        }
+
+        lofiSongSolo {
+          display: .none
+        }
+
+        gleamingShadows {
+          display: .none
+        }
+
+        layout.grid.columns: 1fr,
+        layout.grid.row-gap: spc.layout.gutter-phone
+      }
+
+      head {
+        pill {
+          year {
+            contents: "2026"
+          }
+
+          count {
+            contents: "2 releases"
+          }
+        }
+      }
+    }
+
+    // 2025: Alphabet City Collection (playing), aikisu's shorts
+    g2025 = frame : mg.yearGroup2022 {
+      width: 100%,
+
+      grid {
+        alphabetCity {
+          tabs {
+            strip {
+              left: spc.layout.folder-inset-phone,
+              right: spc.layout.folder-inset-phone,
+
+              tab1 {
+                width: spc.controls.folder-tab-w-phone
+              }
+
+              after1 {
+                tab2 {
+                  width: spc.controls.folder-tab-w-phone
+                }
+
+                after2 {
+                  tab3 {
+                    width: spc.controls.folder-tab-w-phone
+                  }
+
+                  tab4 {
+                    width: spc.controls.folder-tab-w-phone
+                  }
+
+                  layout.stack.item-gap: spc.layout.folder-tab-overlap-phone
+                }
+
+                layout.stack.item-gap: spc.layout.folder-tab-overlap-phone
+              }
+
+              layout.stack.item-gap: spc.layout.folder-tab-overlap-phone
+            }
+          }
+
+          card {
+            top {
+              head {
+                art {
+                  width: spc.controls.art-phone,
+                  height: spc.controls.art-phone
+                }
+
+                layout.grid.columns: [.auto, 1fr],
+                layout.grid.column-gap: spc.layout.folder-head-gap-phone
+              }
+
+              face {
+                max-height: spc.controls.folder-desc-h-phone,
+                padding-left: spc.layout.folder-text-l-phone
+              }
+
+              layout.stack.item-gap: 0
+            }
+
+            foot {
+              links {
+                display: .none
+              }
+
+              layout.stack.justify-content: .end,
+              padding-top: spc.steps.s2
+            }
+
+            padding-top: spc.layout.folder-inset-phone,
+            padding-left: spc.layout.folder-inset-phone,
+            padding-bottom: spc.layout.folder-inset-phone,
+            padding-right: spc.layout.folder-inset-phone
+          }
+        }
+
+        aikisu {
+          card {
+            top {
+              head {
+                art {
+                  width: spc.controls.art-phone,
+                  height: spc.controls.art-phone
+                }
+
+                layout.grid.columns: [.auto, 1fr],
+                layout.grid.column-gap: spc.layout.folder-head-gap-phone
+              }
+
+              face {
+                max-height: spc.controls.folder-desc-h-phone,
+                padding-left: spc.layout.folder-text-l-phone
+              }
+
+              layout.stack.item-gap: 0
+            }
+
+            foot {
+              links {
+                display: .none
+              }
+
+              layout.stack.justify-content: .end,
+              padding-top: spc.steps.s2
+            }
+
+            padding-top: spc.layout.folder-inset-phone,
+            padding-left: spc.layout.folder-inset-phone,
+            padding-bottom: spc.layout.folder-inset-phone,
+            padding-right: spc.layout.folder-inset-phone
+          }
+        }
+
+        ofTheStars {
+          display: .none
+        }
+
+        revealed {
+          display: .none
+        }
+
+        castAdrift {
+          display: .none
+        }
+
+        peppySnowday {
+          display: .none
+        }
+
+        marmaladeCafe {
+          display: .none
+        }
+
+        farewellMyStar {
+          display: .none
+        }
+
+        lofiSongSolo {
+          display: .none
+        }
+
+        gleamingShadows {
+          display: .none
+        }
+
+        layout.grid.columns: 1fr,
+        layout.grid.row-gap: spc.layout.gutter-phone
+      }
+
+      head {
+        pill {
+          year {
+            contents: "2025"
+          }
+
+          count {
+            contents: "2 releases"
+          }
+        }
+      }
+    }
+  }
+}
+
+// i10: the results line; the cards' i10 variants; a single on its own row
+// drops the tabs' room.
+@variants(musicListPhoneI11)
+@context(i10="on")
+export musicListPhoneI10 = frame : musicListPhone {
+  title: "Music · phone list · i10",
+  left: 470px,
+  top: 1092px,
+
+  groups {
+    @with-variant(mg.yearGroup2022I10)
+    g2025 {}
+
+    @with-variant(mg.yearGroup2022I10)
+    g2026 {
+      grid {
+        ofTheStars {
+          padding-top: 0px
+        }
+      }
+    }
+  }
+
+  results {
+    display: .visible
+  }
+}
+
+// i11: the playing card's i11 variant ("more" cut).
+@context(i10="on", i11="on")
+export musicListPhoneI11 = frame : musicListPhoneI10 {
+  title: "Music · phone list · i11",
+  left: 940px,
+  top: 1092px,
+
+  groups {
+    @with-variant(mg.yearGroup2022I11)
+    g2025 {}
+  }
+}
+
+// ---- the phone frame ----
+// The sheet (header + list) under the floating layer: the Music pill and
+// the search knob wait on the up line while the player's bar holds the
+// slot. Children: `sheet` (`header`, `list`), `layer`.
+@variants(musicPhoneI10, musicPhonePlayer)
+export musicPhone = frame {
+  title: "Music · grid · phone (i9)",
+  left: 0px,
+  top: 40px,
+  width: spc.controls.phone-w,
+  height: spc.controls.phone-h,
+  overflow: .clip,
+  children: [sheet, layer, page],
+
+  sheet = frame : sh.sheetPhone {
+    left: 0px,
+    top: 0px,
+    width: 100%,
+
+    paper {
+      page {
+        overrides: [insert(header, after = .nil), insert(list, after = header)]
+      }
+    }
+
+    // i9: the counts beside the title, ⤮ icon-only on the right
+    header = frame : head.pageHeaderMetaPhone {
+      width: spc.controls.page-w-phone,
+
+      actions {
+        layout.stack.align-items: .center,
+        overrides: [insert(shuffleAll, after = .nil)]
+      }
+
+      headText {
+        headLine {
+          meta {
+            contents: "26 releases · 52 tracks"
+          }
+        }
+      }
+
+      shuffleAll = frame : btn.btnIcon {
+        glyph {
+          contents: shuffleIcon
+        }
+      }
+    }
+
+    list = frame : musicListPhone {
+      width: spc.controls.page-w-phone
+    }
+  }
+
+  // the floating layer: the player's bar playing, Music's pill on the up line
+  layer = frame : nv.phoneLayerBar {
+    left: 0px,
+    top: 0px,
+
+    dock {
+      up {
+        upPill {
+          dot {
+            fill[0].color: sec.section.hue-music,
+
+            glyph {
+              contents: musicIcon
+            }
+          }
+
+          label {
+            contents: "Music"
+          }
+        }
+      }
+    }
+  }
+
+  // the player's page (open): only in `musicPhonePlayer`
+  page = frame : pp.playerPage {
+    left: 0px,
+    top: 0px,
+    display: .none
+  }
+}
+
+// i10: the counts move to the results line; the header keeps the title.
+@variants(musicPhoneI11)
+@context(i10="on")
+export musicPhoneI10 = frame : musicPhone {
+  title: "Music · grid · phone (i10)",
+  left: 470px,
+  top: 40px,
+
+  sheet {
+    fill[1].image.sizing.scale: 3.27,
+
+    paper {
+      page {
+        @with-variant(musicListPhoneI10)
+        list {}
+
+        header {
+          actions {
+            shuffleAll {
+              display: .none
+            }
+          }
+
+          headText {
+            headLine {
+              meta {
+                display: .none
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+@context(i10="on", i11="on")
+export musicPhoneI11 = frame : musicPhoneI10 {
+  title: "Music · grid · phone (i11)",
+  left: 940px,
+  top: 40px,
+
+  sheet {
+    fill[1].image.sizing.scale: 3.508,
+
+    paper {
+      page {
+        @with-variant(musicListPhoneI11)
+        list {}
+      }
+    }
+  }
+}
+
+// The player opened (the bar dragged up): its page over a scrim, the floating
+// layer under it. Follows the canvas's iteration through its tokens; for the
+// i10 / i11 list under the scrim, pick `musicPhoneI10`'s list as above.
+export musicPhonePlayer = frame : musicPhone {
+  title: "Music · phone · the player open",
+  left: 1410px,
+  top: 40px,
+
+  page {
+    display: .visible
+  }
+}
+
+// Search open (no song loaded): the search bar in the slot, Music's chip
+// row on the up line, the pill stepped away.
+musicPhoneSearch = frame : musicPhone {
+  title: "Music · phone · search open",
+  left: 1880px,
+  top: 40px,
+
+  @with-variant(nv.phoneLayerSearch)
+  layer {}
+}
+
+// The pill unspooled: the sections menu (Music here) over the page.
+musicPhoneMenu = frame : musicPhone {
+  title: "Music · phone · sections menu open",
+  left: 2350px,
+  top: 40px,
+
+  @with-variant(nv.phoneLayerMenu)
+  layer {
+    dock {
+      row {
+        spool {
+          @with-variant(nv.sectionsMenuMusic)
+          menu {
+            left: 0px
+          }
+
+          pill {
+            dot {
+              fill[0].color: sec.section.hue-music,
+
+              glyph {
+                contents: musicIcon
+              }
+            }
+
+            label {
+              contents: "Music"
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+// ==== states page (labels over the definitions, then the states boards: i9 · i10 · i11) ====
+lbl-musicPhone = text : doc.specLabel {
+  left: 0px,
+  top: 0px,
+  contents: "musicPhone"
+}
+
+note-musicPhone = text : doc.specNote {
+  left: 0px,
+  top: 16px,
+  contents: "i9 · the bar playing"
+}
+
+lbl-musicPhoneI10 = text : doc.specLabel {
+  left: 470px,
+  top: 0px,
+  contents: "musicPhoneI10"
+}
+
+note-musicPhoneI10 = text : doc.specNote {
+  left: 470px,
+  top: 16px,
+  contents: "i10"
+}
+
+lbl-musicPhoneI11 = text : doc.specLabel {
+  left: 940px,
+  top: 0px,
+  contents: "musicPhoneI11"
+}
+
+note-musicPhoneI11 = text : doc.specNote {
+  left: 940px,
+  top: 16px,
+  contents: "i11"
+}
+
+lbl-musicPhonePlayer = text : doc.specLabel {
+  left: 1410px,
+  top: 0px,
+  contents: "musicPhonePlayer"
+}
+
+note-musicPhonePlayer = text : doc.specNote {
+  left: 1410px,
+  top: 16px,
+  contents: "the player's page open"
+}
+
+lbl-musicPhoneSearch = text : doc.specLabel {
+  left: 1880px,
+  top: 0px,
+  contents: "musicPhoneSearch"
+}
+
+note-musicPhoneSearch = text : doc.specNote {
+  left: 1880px,
+  top: 16px,
+  contents: "search open (example)"
+}
+
+lbl-musicPhoneMenu = text : doc.specLabel {
+  left: 2350px,
+  top: 0px,
+  contents: "musicPhoneMenu"
+}
+
+note-musicPhoneMenu = text : doc.specNote {
+  left: 2350px,
+  top: 16px,
+  contents: "the sections menu open (example)"
+}
+
+lbl-musicListPhone = text : doc.specLabel {
+  left: 0px,
+  top: 1052px,
+  contents: "musicListPhone"
+}
+
+note-musicListPhone = text : doc.specNote {
+  left: 0px,
+  top: 1068px,
+  contents: "the list · i9"
+}
+
+lbl-musicListPhoneI10 = text : doc.specLabel {
+  left: 470px,
+  top: 1052px,
+  contents: "musicListPhoneI10"
+}
+
+note-musicListPhoneI10 = text : doc.specNote {
+  left: 470px,
+  top: 1068px,
+  contents: "i10"
+}
+
+lbl-musicListPhoneI11 = text : doc.specLabel {
+  left: 940px,
+  top: 1052px,
+  contents: "musicListPhoneI11"
+}
+
+note-musicListPhoneI11 = text : doc.specNote {
+  left: 940px,
+  top: 1068px,
+  contents: "i11"
+}
+
+@variants(musicPhoneStatesI10)
+musicPhoneStates = frame : doc.docBoard {
+  title: "Music · phone · states · i9",
+  left: 0px,
+  top: 2356px,
+
+  body {
+    layout.stack.item-gap: 48px,
+    overrides: [insert(row-1, after = .nil), insert(row-2, after = row-1)]
+  }
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i9"
+      }
+    }
+
+    boardCaption {
+      contents: "Music · phone · every state"
+    }
+  }
+
+  row-1 = frame : doc.specRow {
+    layout.stack.item-gap: 48px,
+    overrides: [
+      insert(st-musicPhone, after = .nil),
+      insert(st-musicPhonePlayer, after = st-musicPhone),
+      insert(st-musicPhoneSearch, after = st-musicPhonePlayer),
+      insert(st-musicPhoneMenu, after = st-musicPhoneSearch)
+    ]
+  }
+
+  row-2 = frame : doc.specRow {
+    layout.stack.item-gap: 48px,
+    overrides: [insert(st-musicListPhone, after = .nil)]
+  }
+
+  st-musicPhone = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "musicPhone"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "i9 · the bar playing"
+    }
+
+    it = frame : musicPhone {}
+  }
+
+  st-musicPhonePlayer = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "musicPhonePlayer"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "the player's page open"
+    }
+
+    it = frame : musicPhonePlayer {}
+  }
+
+  st-musicPhoneSearch = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "musicPhoneSearch"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "search open (example)"
+    }
+
+    it = frame : musicPhoneSearch {}
+  }
+
+  st-musicPhoneMenu = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "musicPhoneMenu"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "the sections menu open (example)"
+    }
+
+    it = frame : musicPhoneMenu {}
+  }
+
+  st-musicListPhone = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "musicListPhone"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "the list · i9"
+    }
+
+    it = frame : musicListPhone {}
+  }
+}
+
+@variants(musicPhoneStatesI11)
+@context(i10="on")
+musicPhoneStatesI10 = frame : musicPhoneStates {
+  title: "Music · phone · states · i10",
+  left: 2120px,
+  top: 2356px,
+
+  body {
+    row-2 {
+      st-musicListPhone {
+        slot {
+          @with-variant(musicListPhoneI10)
+          it {}
+        }
+
+        note {
+          contents: "i10"
+        }
+
+        label {
+          contents: "musicListPhoneI10"
+        }
+      }
+    }
+
+    row-1 {
+      st-musicPhoneMenu {
+        slot {
+          it {
+            sheet {
+              fill[1].image.sizing.scale: 3.25
+            }
+          }
+        }
+      }
+
+      st-musicPhoneSearch {
+        slot {
+          it {
+            sheet {
+              fill[1].image.sizing.scale: 3.25
+            }
+          }
+        }
+      }
+
+      st-musicPhonePlayer {
+        slot {
+          it {
+            sheet {
+              fill[1].image.sizing.scale: 3.25
+            }
+          }
+        }
+      }
+
+      st-musicPhone {
+        slot {
+          @with-variant(musicPhoneI10)
+          it {
+            sheet {
+              fill[1].image.sizing.scale: 3.27
+            }
+          }
+        }
+
+        note {
+          contents: "i10"
+        }
+
+        label {
+          contents: "musicPhoneI10"
+        }
+      }
+    }
+  }
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i10"
+      }
+    }
+  }
+}
+
+@context(i10="on", i11="on")
+musicPhoneStatesI11 = frame : musicPhoneStatesI10 {
+  title: "Music · phone · states · i11",
+  left: 4240px,
+  top: 2356px,
+
+  body {
+    row-2 {
+      st-musicListPhone {
+        slot {
+          @with-variant(musicListPhoneI11)
+          it {}
+        }
+
+        note {
+          contents: "i11"
+        }
+
+        label {
+          contents: "musicListPhoneI11"
+        }
+      }
+    }
+
+    row-1 {
+      st-musicPhoneMenu {
+        slot {
+          it {
+            sheet {
+              fill[1].image.sizing.scale: 3.36
+            }
+          }
+        }
+      }
+
+      st-musicPhoneSearch {
+        slot {
+          it {
+            sheet {
+              fill[1].image.sizing.scale: 3.36
+            }
+          }
+        }
+      }
+
+      st-musicPhonePlayer {
+        slot {
+          it {
+            sheet {
+              fill[1].image.sizing.scale: 3.36
+            }
+          }
+        }
+      }
+
+      st-musicPhone {
+        slot {
+          @with-variant(musicPhoneI11)
+          it {}
+        }
+
+        note {
+          contents: "i11"
+        }
+
+        label {
+          contents: "musicPhoneI11"
+        }
+      }
+    }
+  }
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i11"
+      }
+    }
+  }
+}

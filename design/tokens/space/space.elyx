@@ -1,0 +1,821 @@
+// Spacing, insets, radii and control sizes. i9 is the base; i10 / i11
+// are context layers (DESIGN-i10 §6, DESIGN-i11 T6 + T10).
+// i11 rule 13: a nested surface's radius = outer radius − the inset
+// between them (min 4). Circles and pills are exempt.
+import "./space-i10.elyx" as i10
+
+// the 4 · 8 · 12 · 16 · 24 · 32 · 48 · 64 step scale (fixed)
+export steps = tokens {
+  s1: 4px,
+  s2: 8px,
+  s3: 12px,
+  s4: 16px,
+  s5: 24px,
+  s6: 32px,
+  s7: 48px,
+  s8: 64px
+}
+
+@variants(i10.layoutI10)
+export layout = tokens {
+  // the page
+  page-x: 40px,
+  page-x-phone: 14px,
+  frame: 14px,
+  section-gap: 24px,
+  section-gap-phone: 20px,
+  // the nav (18 above, 8 below, 10 between tabs) and the page column
+  // under it (6 above, 56 below); the sheet's stitch sits 9px in
+  nav-top: 18px,
+  nav-bottom: 8px,
+  nav-gap: 10px,
+  page-top: 6px,
+  page-bottom: 56px,
+  sheet-stitch-in: 9px,
+  // a nav tab: 7px before its dot, about 1em after its label
+  tab-l: 7px,
+  tab-r: 15px,
+  // between cards, across / down
+  gutter-x: 20px,
+  gutter-y: 42px,
+  gutter-phone: 14px,
+  // a card's inset (i9: 16 top/bottom, 18 sides)
+  inset-x: 18px,
+  inset-y: 16px,
+  inset-phone: 12px,
+  // music's folder card
+  folder-inset: 16px,
+  folder-tab-h: 20px,
+  // folder tabs: 10px each side of the label, 22px under the next tab; the
+  // back cover peeks 7px above the card, 6px in from its sides
+  folder-tab-x: 10px,
+  folder-tab-overlap: -22px,
+  fold-in: 6px,
+  fold-peek: 7px,
+  // rows (track rows, list rows)
+  row-inset-x: 14px,
+  row-inset-y: 8px,
+  row-min-h: 56px,
+  // popovers + fields
+  pop-inset: 8px,
+  field-inset: 4px,
+  sheet-inset: 16px,
+  panel-inset: 24px,
+  // inside a section
+  stack-tight: 4px,
+  stack: 8px,
+  stack-loose: 12px,
+  // stitch: dashed line drawn inset from an edge
+  stitch-w: 2px,
+  stitch-in: 6px,
+  // controls: the stitch sits 3–5px in (outline −5px); the live ring on ▶
+  stitch-in-ctl: 3px,
+  ring-w: 2.5px,
+  // the focus ring (keys only): a 3px ink thread, 3px outside the control
+  focus-w: 3px,
+  focus-out: -6px,
+  // button insets + gaps (the kit's em values at each iteration's label size)
+  btn-x: 18px,
+  btn-sm-x: 13px,
+  btn-gap: 8px,
+  btn-d-l: 12px,
+  btn-d-r: 15px,
+  btn-d-gap: 6px,
+  // the labelled ▶ pill (i9: a red .btn; i10: .btn--play-l)
+  play-l-l: 18px,
+  play-l-r: 18px,
+  play-l-gap: 8px,
+  play-l-sm-l: 13px,
+  play-l-sm-r: 13px,
+  play-l-sm-gap: 7px,
+  // chips + segments: the inline inset ((height − 1em) / 2 from i11 T10),
+  // the gap after the glyph; a thin 1.5px stitch on small controls
+  chip-x: 13px,
+  chip-sm-x: 9px,
+  chip-gap: 6px,
+  seg-x: 13px,
+  seg-gap: 3px,
+  stitch-w-sm: 1.5px,
+  // the ring round a toggle that's on (i10 L1; i9 has none)
+  on-ring-w: 0px,
+  // the year pill (i11: .45em on all four sides)
+  pill-x: 16px,
+  pill-y: 8px,
+  pill-gap: 8px,
+  // a text field's sides (i11 T10: 12 all round)
+  field-x: 16px,
+  // a fact: glyph → words; the in-card match chip's inset
+  fact-gap: 6px,
+  match-x: 6px,
+  // the hint (.ytip)
+  tip-x: 10px,
+  tip-y: 5px,
+  // ---- Thoughts (stitched feed + kit/posts.js) ----
+  // the feed: the rail (250 wide, 36 to the feed), its sections, its chip
+  // wraps; the post grid's gutter (i9 16); a month heading → its cards;
+  // the last card → the next month
+  rail-w: 250px,
+  rail-gap: 36px,
+  rail-section: 20px,
+  rail-intro: 18px,
+  rail-chips-x: 5px,
+  rail-chips-y: 6px,
+  // a type row's sides (its swatch sits 8 in; i11 the chip's 13)
+  type-row-l: 8px,
+  type-row-r: 11px,
+  post-gutter: 16px,
+  month-head: 14px,
+  month-gap: 32px,
+  // a post card: between its parts; kicker → title; title → dek; the
+  // kicker's type word → its read time; tags pulled out by their own inset
+  // (from i10 the # lines up with the words above)
+  post-gap: 10px,
+  post-kick: 9px,
+  post-dek: 7px,
+  kick-x-gap: 6px,
+  tag-pull: 0px,
+  // the kicker keeps clear of the bookmark (34) which hangs 22 from the edge
+  kick-clear: 34px,
+  ribbon-r: 22px,
+  // an article's cover (i9 flush at the top, 8 in; i11 on the inset)
+  cover-top: 0px,
+  cover-x: 8px,
+  // a sticky note's insets (i11 T10: the inset all round)
+  note-top: 20px,
+  note-x: 17px,
+  note-bottom: 13px,
+  // a pick (a hang tag): its inset, its text edge past the 34px stub
+  pick-y: 13px,
+  pick-r: 16px,
+  pick-l: 50px,
+  // the shelf link's sides (i9 a pill; i10 plain words)
+  coll-x: 10px,
+  // a playlist's track rows: their inset (i11: the row reaches 8 past
+  // the text edge, so its art and words sit on it) and gap
+  track-y: 5px,
+  track-l: 6px,
+  track-r: 12px,
+  track-gap: 11px,
+  // a note's tape hangs 10 above its top edge
+  tape-top: -10px,
+  quote-y: 18px,
+  quote-x: 22px,
+  quote-l: 26px,
+  // the images card's grid
+  thumb-gap: 6px,
+  // ---- Projects ----
+  // the grid card (i9: 20 top, 22 sides, 16 bottom; its text 10 apart, 14
+  // above the foot, 20 beside the media; facts 14 apart; the foot's parts
+  // 10 apart); the grid's gap down (i9 20: no folder tabs); one year group
+  // to the next (i9 34); the page header to the tools (i9 14)
+  pj-pad-t: 20px,
+  pj-pad-x: 22px,
+  pj-pad-b: 16px,
+  pj-stack: 10px,
+  pj-row-gap: 14px,
+  pj-col-gap: 20px,
+  facts-gap: 14px,
+  pj-foot-gap: 10px,
+  pj-grid-y: 20px,
+  pj-group-gap: 34px,
+  pj-head-gap: 14px,
+  // the opened item (item page): its body's padding (22 above the media,
+  // 22 under the prose), the gap between the media and the prose
+  pj-item-pad: 22px,
+  pj-item-gap: 26px,
+  // a card's description sits this much further under its facts (i10 4)
+  pj-desc-top: 0px,
+  // a timeline row (i9: 11 top / bottom / left, 16 right; i10 12; i11 T10
+  // the row pair 8 all round); its thumb → its words
+  pj-row-y: 11px,
+  pj-row-l: 11px,
+  pj-row-r: 16px,
+  pj-row-in: 16px,
+  // a filter strip's chips (6 apart in every iteration)
+  filter-gap: 6px,
+  // Home's hero, centred in the sheet (i9 7vh / 8vh at 900 tall; phones
+  // 24 / 32): the lockup → its tagline, → the bio (the lead), → the section
+  // buttons, → the contact row; between the bio's lines; between contacts
+  hero-top: 63px,
+  hero-bottom: 72px,
+  hero-x: 24px,
+  hero-top-phone: 24px,
+  hero-bottom-phone: 32px,
+  hero-x-phone: 20px,
+  tagline-gap: 14px,
+  tagline-gap-phone: 12px,
+  lead-gap: 31px,
+  lead-gap-phone: 24px,
+  lead-line-gap: 8px,
+  lead-line-gap-phone: 16px,
+  hnav-gap: 38px,
+  contact-top: 22px,
+  contact-top-phone: 28px,
+  contact-gap: 10px,
+  contact-gap-phone: 12px,
+  // a section button's right inset (8 elsewhere: its dot sits in the pill)
+  secbtn-r: 22px,
+  // a stack badge's insets (.5em / .7em) + gap (.42em) at its size
+  stk-l: 6px,
+  stk-r: 8.5px,
+  stk-gap: 5px,
+  // a keyword's scribble: 2px past each end, its bottom under the line's
+  scribble-out: -2px,
+  scribble-drop: -3px,
+  // phones (< 960): the cord frame 7; the room the sheet keeps under its
+  // content for the bottom bar; the sound tag 14 in from the right edge;
+  // the sections pill (.yspool__btn): its insets + gap, 8 from the sheet's
+  // left edge, 16 from its bottom
+  frame-phone: 7px,
+  bar-room-phone: 33px,
+  sound-r-phone: 14px,
+  spool-l: 9px,
+  spool-r: 16px,
+  spool-gap: 9px,
+  spool-x: 8px,
+  spool-bottom: 16px,
+  // ---- Studio (the owner's admin app) ----
+  // the page: the header → the first pane (i9 14), a pane → the next
+  // pane's heading (26 + the strip's 4), a heading → its pane; the
+  // dashboard's two columns (main · Recently); the section cards' gap;
+  // a list's rows
+  st-head-gap: 14px,
+  st-pane-gap: 30px,
+  st-pane-head: 10px,
+  st-col-gap: 34px,
+  st-tile-gap: 14px,
+  st-list-gap: 10px,
+  // a section card (16 all round, 14 at the foot), a list row (10 · 14 ·
+  // 10 · 10), the site strip (12 · 18, 22 between its parts), a timeline
+  // item's text indent and the gap between items
+  st-tile-x: 16px,
+  st-tile-b: 14px,
+  st-row-l: 10px,
+  st-row-r: 14px,
+  st-row-y: 10px,
+  st-strip-x: 18px,
+  st-strip-y: 12px,
+  st-strip-gap: 22px,
+  st-act-indent: 54px,
+  st-act-gap: 14px,
+  // the editor: form | preview; a form section's padding and gap; a field's
+  // label → its input; the folder body's inset; the preview pane's inset
+  // (--inset-pane: i9 22 at the sides; i11 T10 16 all round) and the
+  // preview's rows
+  st-ed-gap: 28px,
+  st-sec-y: 18px,
+  st-sec-gap: 10px,
+  st-lab-gap: 6px,
+  st-folder-inset: 18px,
+  pane-inset: 22px,
+  pane-inset-y: 18px,
+  // ---- Music ----
+  // the folder card (i8's): 14 top / bottom (folder-inset at the sides), 10
+  // between head, description and foot; art → title 14; title → its
+  // facts 6; the link discs 6 apart. The tabs' room above a card in a row
+  // with a collection (i9 every row: 22), the tab strip's top (room − 28),
+  // the space between year groups, the results line → its list
+  folder-inset-y: 14px,
+  folder-gap: 10px,
+  folder-head-gap: 14px,
+  folder-tt-gap: 6px,
+  folder-links-gap: 6px,
+  folder-room: 22px,
+  folder-tabs-top: -6px,
+  group-gap: 34px,
+  results-gap: 16px,
+  // a collection with more than 4 songs: its tabs share the strip (the
+  // overlap = 84 − (283 − 84) / (n − 1))
+  folder-tab-overlap-5: -34px,
+  folder-tab-overlap-6: -44px,
+  folder-tab-overlap-7: -51px,
+  // the owner's 1000 (two columns): the tabs widen to 117 (31% of the
+  // strip); 4 tabs overlap 30, 7 share the strip (−69)
+  folder-tab-overlap-wide: -30px,
+  folder-tab-overlap-wide-7: -69px,
+  // the "more" link's fade in front of it
+  more-l: 26px,
+  // the player bar: its inset (left), its columns' gap, the who button's
+  // insets, the scrub's gap, its distance from the window's bottom + sides
+  player-inset: 14px,
+  player-gap: 10px,
+  player-who-l: 10px,
+  player-who-r: 12px,
+  player-bottom: 30px,
+  player-side: 30px,
+  // a track row (Music's release page): number → art → words → actions
+  trk-gap: 12px,
+  // the small year pill (a timeline's day: .ytl--sm .yyear)
+  pill-sm-x: 14px,
+  pill-sm-y: 7px,
+  // Studio · a section card's fan: its first print's inset (i9 6; i11 T10
+  // one inset in, less the overlap) and the overlap between prints; a
+  // timeline's thread (21 in) and knots (14 in, 5 down)
+  st-fan-l: 6px,
+  st-fan-overlap: -8px,
+  st-thread-x: 21px,
+  st-knot-x: 14px,
+  st-knot-y: 5px,
+  // Studio · the editor: the track tabs' strip (10 in, a tab's sides 10 /
+  // 6, its foot tucked 6 under the folder's body); a folder's sections (14
+  // apart); a link's inputs (14 at the sides); an option row's insets
+  // (6 · 14 · 6 · 6); the audio box's inset
+  st-tabs-l: 10px,
+  st-tab-x: 10px,
+  st-tab-l: 6px,
+  st-tab-tuck: -6px,
+  st-sub-gap: 14px,
+  st-in-x: 14px,
+  st-opt-l: 6px,
+  st-opt-r: 14px,
+  st-box: 14px,
+  // Studio · the block editor's sheet: the blocks 60 in from its left (each
+  // block's + and handle), 26 under the last
+  st-doc-l: 60px,
+  st-doc-b: 26px,
+  // ---- phones (< 960) · the floating layer (kit §21, yarn.css BOTTOM
+  // CHROME) ----
+  // the slot: 15 in from each screen edge (frame 7 + 8), its lower edge 17
+  // up from the screen's bottom (frame 7 + 2 + 8); the up line one gap
+  // above it; the search knob 9 further in when no disc is there; the knob
+  // → the disc's rim
+  slot-side: 15px,
+  slot-bottom: 17px,
+  slot-gap: 8px,
+  knob-r: 9px,
+  knob-gap: 12px,
+  // the sections menu (.yspool__menu): 8 above the pill, its list's inset
+  // (9) and its rows' gap (4); a row's insets (8 · 14), its dot → name (11);
+  // the pill waiting on the up line (.846 of its insets and gap)
+  spool-menu-gap: 8px,
+  spool-menu-in: 9px,
+  spool-rows-gap: 4px,
+  spool-row-l: 8px,
+  spool-row-r: 14px,
+  spool-row-gap: 11px,
+  spool-up-l: 8px,
+  spool-up-r: 13.5px,
+  spool-up-gap: 7.5px,
+  // the search bar in the slot: 6 before the field, 62 after it (the
+  // knob's room at its right end)
+  fab-l: 6px,
+  fab-r: 62px,
+  // the phone player · the bar: 6 before who, who's insets (8 · 4); its
+  // thread 18 in, 74 from the right, 5 up · its page: 8 from the screen's
+  // top, its sides 20, the header row's sides 12, the hero's gaps 16, the
+  // notes 18 under the links, the big controls 22 below (20 under their
+  // rule), the queue 24 below (18 under its rule), the transport row's
+  // sides 16 and foot 6, the queue's rows 4 apart
+  pbar-l: 6px,
+  pbar-who-x: 8px,
+  pbar-who-y: 4px,
+  pbar-thread-l: 18px,
+  pbar-thread-r: 74px,
+  pbar-thread-b: 5px,
+  psheet-top: 8px,
+  psheet-x: 20px,
+  psheet-head-x: 12px,
+  psheet-gap: 16px,
+  psheet-notes: 18px,
+  psheet-big: 22px,
+  psheet-rule: 20px,
+  psheet-queue: 24px,
+  psheet-queue-rule: 18px,
+  ptx-x: 16px,
+  ptx-b: 6px,
+  q-gap: 4px,
+  // ---- phones · page frames ----
+  // the nav (14 above, 4 below; its sides = page-x-phone); the page's foot
+  // (28 + the floating row's room); year groups apart (i9 / i10 24, i11
+  // the section gap 32); the folder card's art → text (12) and its text
+  // column's indent (56 + 12)
+  nav-top-phone: 14px,
+  nav-bottom-phone: 4px,
+  page-bottom-phone: 125px,
+  group-gap-phone: 24px,
+  folder-head-gap-phone: 12px,
+  folder-text-l-phone: 68px,
+  // the sections menu's foot above the pill's (52 + 8)
+  spool-menu-b: 60px,
+  // the search knob, open, at the search bar's right end (14 in, 4 after
+  // the field); waiting on the up line, 6 in from the slot's right edge
+  fab-knob-r: 14px,
+  fab-knob-gap: 4px,
+  knob-up-r: 6px,
+  // a collection's tabs on a phone card: 4 share the 324 strip (31% wide,
+  // 100; overlapping 25)
+  folder-tab-overlap-phone: -25px,
+  // the folder card's one inset on a phone (12 in every iteration)
+  folder-inset-phone: 12px,
+  // a phone nav with controls on its right keeps clear of the sound tag
+  // (14 + 42 + 9)
+  nav-sound-room-phone: 65px,
+  // Projects on a phone: a card's thumb → its words
+  pj-row-in-phone: 12px
+}
+
+@variants(i10.radiiI10)
+export radii = tokens {
+  inner: 8px,
+  card: 16px,
+  row: 14px,
+  pop: 16px,
+  field: 14px,
+  sheet: 22px,
+  pane: 22px,
+  panel: 24px,
+  art: 10px,
+  pill: 999px,
+  // the page sheet (22 in every iteration) and its stitch (22 − 9), a folder
+  // tab's top corners, the folder's back cover
+  page: 22px,
+  page-stitch: 13px,
+  folder-tab: 11px,
+  fold: 15px,
+  // an equalizer bar's round top
+  eq: 1.5px,
+  // the search line, a popover's option row, the hint, the toast, a key
+  search: 18px,
+  opt: 11px,
+  tip: 9px,
+  toast: 20px,
+  kbd: 6px,
+  // Thoughts: a sticky note (2, its curled corner 12); a track row; a photo
+  // thumb; a tier item
+  note: 2px,
+  note-curl: 12px,
+  track: 12px,
+  thumb: 12px,
+  tier-item: 6px,
+  // Projects: a card's media (i11: 24 − 16 = 8), the opened item's media
+  pj-thumb: 12px,
+  pj-media: 12px,
+  // the white stitch inside a card's media (4 in: i9 12 − 4; i11 8 − 4)
+  pj-thumb-in: 8px,
+  // the sound tag's bottom corners (it hangs from the sheet's top edge)
+  sound: 7px,
+  // phones: the page sheet (16) and its stitch (16 − 9)
+  page-phone: 16px,
+  page-stitch-phone: 7px,
+  // Studio: the site strip; a track tab's top corners and the folder
+  // body's corner tucked under them; the folder body; the editor's
+  // toolbar + its buttons; the woven STUDIO tag
+  st-strip: 18px,
+  st-tab: 10px,
+  st-tuck: 4px,
+  st-folder: 18px,
+  st-bar: 14px,
+  st-tb: 10px,
+  st-woven: 4px,
+  // ---- Music ----
+  // a card's stitch (the card's radius − its 6px stitch-in); the folder
+  // card's art (i8 12; i11 the card's 24 − its inset 16); the player bar
+  // and its stitch (6 in); a track row's art
+  card-stitch: 10px,
+  folder-art: 12px,
+  player: 22px,
+  player-stitch: 16px,
+  trk-art: 10px,
+  // Studio · a pattern swatch (+ its rope), a track tab's swatch
+  st-motif: 12px,
+  st-tab-sw: 5px,
+  // phones: the sections menu (22; its stitch 5 in: 17) and its rows (14);
+  // the search bar in the slot (20; its stitch 6 in: 14); the player's page
+  // (24 at its top corners), its art (22; its stitch 8 in: 14), a queue
+  // row (13), its swatch (9)
+  spool-menu: 22px,
+  spool-menu-stitch: 17px,
+  spool-row: 14px,
+  slot: 20px,
+  slot-stitch: 14px,
+  psheet: 24px,
+  psheet-art: 22px,
+  psheet-art-stitch: 14px,
+  q-row: 13px,
+  q-sw: 9px
+}
+
+// control heights (pills and discs are exempt from the radius formula)
+@variants(i10.controlsI10)
+export controls = tokens {
+  btn: 44px,
+  btn-sm: 36px,
+  btn-d: 40px,
+  chip: 40px,
+  chip-sm: 32px,
+  field: 52px,
+  field-sm: 40px,
+  play: 44px,
+  play-sm: 36px,
+  disc: 32px,
+  add: 32px,
+  icon: 18px,
+  icon-sm: 15px,
+  art: 64px,
+  nav-h: 44px,
+  // a nav tab, the glyph in its felt dot, the logo's cat
+  tab: 46px,
+  dot-icon: 17px,
+  mark: 28px,
+  // art on Music's grid; folder tabs: 84 wide, 40 tall (20 show), 47 when
+  // chosen (it stands 7 up), 48 on hover; the tab strip shows 28
+  art-sm: 54px,
+  folder-tab-w: 84px,
+  folder-tab: 40px,
+  folder-tab-now: 47px,
+  folder-tab-up: 48px,
+  folder-tabs: 28px,
+  // glyph sizes inside controls
+  btn-icon: 17px,
+  btn-d-icon: 16px,
+  play-icon: 18px,
+  play-icon-sm: 16px,
+  // ▶'s glyph slot (1.15em): ▶, ⏸ and the bars share it, so a state
+  // never changes the button's width
+  play-slot: 20px,
+  play-slot-sm: 18px,
+  add-icon: 16px,
+  linkdisc-icon: 16px,
+  // the equalizer bars (alone · inside ▶)
+  eq-w: 13px,
+  eq-h: 12px,
+  eq-gap: 2px,
+  eq-play-w: 14px,
+  eq-play-h: 13px,
+  // a tag, a search token, a segment, a key, the search's clear button, a
+  // popover's option row
+  tag: 28px,
+  token: 34px,
+  seg: 38px,
+  kbd: 18px,
+  clear: 36px,
+  opt: 44px,
+  // a fact's disc + glyph (i9: an 18px felt disc; i10 L3: a bare 15px
+  // glyph); WIP keeps its 18px gold disc
+  fact: 18px,
+  fact-glyph: 11px,
+  fact-wip: 18px,
+  fact-wip-glyph: 11px,
+  // a glyph on a key (↵); the width a field / a full-width line (search,
+  // a year group's header, an empty state) takes when nothing sets it
+  kbd-icon: 11px,
+  field-w: 288px,
+  line-w: 560px,
+  // Thoughts: the kicker's type disc + glyph; the bookmark; a pick's stub,
+  // eyelet and yarn loop; a note's tape; the playlist's record + label;
+  // a track's art; a tier key + item; an article's cover; the photo thumbs
+  // (big + small); the rail's type swatch, a collection's stubs
+  kick-badge: 21px,
+  kick-badge-icon: 12px,
+  ribbon-w: 20px,
+  ribbon-h: 40px,
+  stub: 34px,
+  eyelet: 12px,
+  yarn-w: 46px,
+  yarn-h: 56px,
+  tape-w: 78px,
+  tape-h: 22px,
+  record: 68px,
+  record-label: 29px,
+  track-art: 34px,
+  tier-key: 34px,
+  tier-item: 26px,
+  cover-h: 161px,
+  thumb-h: 170px,
+  thumb-sm-h: 72px,
+  type-swatch: 20px,
+  coll-mark-w: 38px,
+  coll-mark-h: 34px,
+  // a post card's width at 1440 (one of three columns in the 1046 feed)
+  post-w: 338px,
+  // the feed column (1332 − the rail − its gap); an images card's square
+  // pair and its 1 + 2 small pair
+  feed-w: 1046px,
+  thumb-sq: 148px,
+  thumb-half-h: 82px,
+  // i9's 1 + 2: the big one on the left, the two stacked on the right
+  thumb-big-w: 186px,
+  thumb-side-w: 110px,
+  // a tier item's dot
+  tier-dot: 6px,
+  // a post's kicker line (i9 / i10: its type badge, 25; i11 the 20 disc)
+  // and its foot line (the tags; i10 the 32 go-link line; i11 the tags'
+  // words, the tags hanging below)
+  kick-h: 25px,
+  // an opened article: the facts column (220, 66 to the 760 column), the
+  // contents rail (56 from it), an h2's dashed rule, a list's bullet
+  article-aside-w: 220px,
+  article-aside-gap: 66px,
+  article-toc-gap: 56px,
+  h2-rule-w: 46px,
+  // the article's kicker line and its cover
+  kick-row: 40px,
+  article-cover-h: 345px,
+  bullet: 6px,
+  post-foot-h: 28px,
+  // Projects: a card's media (212 × 146); its foot (one line, as tall as
+  // its discs: i9 44, the link discs 44 with a 19 glyph; from i10 the
+  // shared 32 disc); the opened item: its column, its top bar, a media
+  // thumb (148 × 92), the prose's measure
+  pj-thumb-w: 212px,
+  pj-thumb-h: 146px,
+  pj-foot: 44px,
+  pj-disc: 44px,
+  pj-disc-icon: 19px,
+  // a card's facts line with the room under it (layout.pj-desc-top): i9
+  // 22 (the felt discs' line); i10 20 + 4
+  pj-facts: 22px,
+  // a timeline row's thumb (96 × 64) and its write-up mark (a 30px disc in
+  // the corner; i11 T8 cuts it: 0)
+  pj-row-thumb-w: 96px,
+  pj-row-thumb-h: 64px,
+  pj-wu-mark: 30px,
+  pj-wu-mark-icon: 16px,
+  // a card's description clamp (i9: six lines of Body 15 on a text-only
+  // card; i10 four lines; i11 four lines of Body 14)
+  pj-desc-max: 135px,
+  item-w: 760px,
+  item-bar: 70px,
+  pj-media-w: 148px,
+  pj-media-h: 92px,
+  prose-w: 653px,
+  // Home: the lockup (700 × 184, the svg's 1180 × 310), a section button
+  // (60 tall, 172 wide at least, its 44 felt dot + glyph), a stack badge's
+  // logo + its phone circle (icon only), a keyword's scribble (.62em), the
+  // sound tag (42 × 34), the phone's contact circles (44, glyph 20)
+  lockup-w: 700px,
+  lockup-h: 184px,
+  secbtn: 60px,
+  secbtn-w: 172px,
+  secbtn-dot: 44px,
+  secbtn-icon: 21px,
+  stk-icon: 16px,
+  stk-sm: 28px,
+  stk-sm-icon: 17px,
+  scribble-h: 11px,
+  sound-w: 42px,
+  sound-h: 34px,
+  contact-sm: 44px,
+  contact-sm-icon: 20px,
+  lockup-w-phone: 336px,
+  lockup-h-phone: 88px,
+  // phones: the sections pill (52), its felt dot (34) + glyph, its caret
+  spool: 52px,
+  spool-dot: 34px,
+  spool-icon: 18px,
+  spool-caret: 13px,
+  // Studio: the felt section dots (a section card 44, a list row 38, an
+  // activity line 16) + their glyphs; the woven STUDIO tag; the storage
+  // meter; a section card's fan: prints (68 × 46), swatches (46), icon
+  // discs (42), its height; a card's / a row's least height; a timeline
+  // knot; the editor's toolbar buttons; a track tab + its swatch; an
+  // instrument option + its swatch; a pattern swatch; the waveform; the
+  // library card's width; the cover drop; a textarea; the editor's
+  // columns (form · preview) and the dashboard's Recently column
+  st-dot: 44px,
+  st-dot-icon: 21px,
+  st-dot-row: 38px,
+  st-dot-row-icon: 17px,
+  st-dot-act: 16px,
+  st-dot-act-icon: 9px,
+  st-woven: 26px,
+  st-meter-w: 244px,
+  st-meter-h: 10px,
+  st-print-w: 68px,
+  st-print-h: 46px,
+  st-fan-sw: 46px,
+  st-fan-ic: 42px,
+  st-fan-h: 54px,
+  st-tile-h: 196px,
+  st-row-h: 66px,
+  st-knot: 16px,
+  st-tb: 38px,
+  st-tab-h: 34px,
+  st-tab-sw: 20px,
+  st-inst-h: 58px,
+  st-inst-sw: 44px,
+  st-motif: 52px,
+  st-wave-h: 64px,
+  st-card-w: 420px,
+  st-cover-w: 168px,
+  st-cover-h: 105px,
+  st-ta-h: 120px,
+  st-form-w: 678px,
+  st-prev-w: 626px,
+  st-recent-w: 340px,
+  // ---- Music ----
+  // the player bar (1180 wide, 76 tall): its who column, the disc's slot,
+  // the round buttons (40, glyph 20), its ▶ (48, glyph 22), the waveform's
+  // height, the volume rail (84 × 4) and its pin; a track row's art (40)
+  player-w: 1180px,
+  player-h: 76px,
+  player-who: 300px,
+  player-slot: 66px,
+  player-btn: 40px,
+  player-icon: 20px,
+  player-play: 48px,
+  player-play-icon: 22px,
+  wave-h: 38px,
+  vol-w: 84px,
+  vol-h: 4px,
+  vol-pin: 6px,
+  trk-art: 40px,
+  trk-num: 20px,
+  // the folder card's description clamp: i9 3 lines of Body 15 × 1.5;
+  // from i10 2 lines (i10 15 × 1.5, i11 14 × 1.5); in two columns (the
+  // owner's 1000) 3 lines; the player's who column at that width
+  folder-desc-h: 67.5px,
+  folder-desc-h3: 67.5px,
+  folder-tab-w-wide: 117px,
+  player-who-sm: 260px,
+  // Studio · the site strip's live dot; a section card's width in the
+  // dashboard's two-column grid
+  st-live-dot: 10px,
+  st-tile-w: 472px,
+  // Studio · a line of facts (a card's counts, a row's publish state + type)
+  st-fact: 22px,
+  // a select's width (Studio's month / year pickers)
+  st-select-w: 152px,
+  // Studio · the editor: the chosen track tab (34 + its 4 rise); an
+  // instrument option's width (a third of the folder); a link's text and
+  // address inputs; the drag grip's column; the waveform's pin head
+  st-tab-up: 38px,
+  st-inst-w: 209px,
+  st-in-sm: 42px,
+  st-in-xs: 34px,
+  st-grip: 40px,
+  st-pin: 12px,
+  // Studio · a track's length column in the preview (3.2em)
+  st-len-w: 42px,
+  // ---- phones (< 960) · the floating layer ----
+  // the slot (64 tall); a knob (52, glyph 21; waiting on the up line .846
+  // of it: 44, glyph 18); the pill on the up line (44: its dot 29, glyph
+  // 15, caret 11); the sections menu (200 wide at least), its rows (48)
+  // and their felt dots (32, glyph 17); a count badge on a knob (18)
+  slot: 64px,
+  knob: 52px,
+  knob-icon: 21px,
+  knob-up: 44px,
+  knob-up-icon: 18px,
+  spool-up: 44px,
+  spool-up-dot: 29px,
+  spool-up-icon: 15px,
+  spool-up-caret: 11px,
+  spool-menu-w: 200px,
+  spool-row: 48px,
+  spool-row-dot: 32px,
+  spool-row-icon: 17px,
+  knob-badge: 18px,
+  // the phone player · the disc: a 60 record on a 76 knit rim, its
+  // progress ring 74 round it, its label 26; in the bar a 52 record (label
+  // 22) in a 60 column · the bar: 44 buttons, ▶ 44 in a 46 column, who 52
+  // tall, its thread 3
+  pdisc: 60px,
+  pdisc-rim: 76px,
+  pdisc-ring: 74px,
+  pdisc-label: 26px,
+  pdisc-bar: 52px,
+  pdisc-bar-label: 22px,
+  pbar-btn: 44px,
+  pbar-play-col: 46px,
+  pbar-disc-col: 60px,
+  pbar-who-h: 52px,
+  pbar-thread: 3px,
+  // the phone player's page: the grab handle (42 × 5), the header's
+  // buttons (44), the art (210 = min(54vw, 220, 30vh) at 390 × 844), the
+  // big waveform (52), the transport row (58: ▶ 46, glyph 24), a queue
+  // row (50 least: its grip column 30, swatch 36, ✕ column 34)
+  grab-w: 42px,
+  grab-h: 5px,
+  psheet-btn: 44px,
+  psheet-art: 210px,
+  psheet-wave: 52px,
+  ptx-h: 58px,
+  ptx-play: 46px,
+  ptx-play-icon: 24px,
+  q-row: 50px,
+  q-grip: 30px,
+  q-sw: 36px,
+  q-x: 34px,
+  // ---- phones · page frames ----
+  // the viewport (390 × 844); the folder card's art (56) and its two lines
+  // of Body (i9 / i10 15 × 1.5; i11 14 × 1.5)
+  phone-w: 390px,
+  phone-h: 844px,
+  art-phone: 56px,
+  folder-desc-h-phone: 45px,
+  // the slot's width at 390 (390 − 2 × 15); the record's label and spindle
+  // hole centred in it (the disc: (60 − 26) / 2, 60 / 2 − 2; in the bar:
+  // (52 − 22) / 2, 52 / 2 − 2)
+  slot-w: 360px,
+  page-w-phone: 348px,
+  pdisc-label-in: 17px,
+  pdisc-hole-in: 28px,
+  pdisc-bar-label-in: 15px,
+  pdisc-bar-hole-in: 24px,
+  folder-tab-w-phone: 100px,
+  // Projects on a phone: a card's thumb (72 square) and its two lines of
+  // Body (i9 / i10 15 × 1.5; i11 14 × 1.5)
+  pj-thumb-phone: 72px,
+  pj-desc-h-phone: 45px
+}

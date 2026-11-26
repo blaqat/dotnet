@@ -1,0 +1,690 @@
+import "tokens/color/roles.elyx" as col
+import "tokens/color/palette.elyx" as pal
+import "tokens/color/sections.elyx" as sec
+import "tokens/space/space.elyx" as spc
+import "components/atoms/text.elyx" as txt
+import "components/atoms/doc.elyx" as doc
+import "components/atoms/surface.elyx" as surf
+import "components/atoms/logo.elyx" as brandLogo
+import "components/molecules/nav-tab.elyx" as tab
+import "assets/icons/bold/music-notes.svg" as musicIcon
+import "assets/icons/fill/music-notes.svg" as musicIconFill
+import "assets/icons/bold/cloud.svg" as thoughtsIcon
+import "assets/icons/fill/cloud.svg" as thoughtsIconFill
+import "components/molecules/button.elyx" as btn
+import "assets/icons/bold/arrow-up-right.svg" as visitIcon
+import "components/organisms/sheet.elyx" as sht
+import "components/molecules/sound-tag.elyx" as snd
+import "assets/icons/fill/lock-simple.svg" as lockIcon
+import "assets/icons/bold/house.svg" as homeIcon
+import "assets/icons/bold/images-square.svg" as mediaIcon
+
+// Studio's chrome (studio-core.js): the kit nav with Studio's own pages,
+// the woven STUDIO tag beside the brand, the kit's sound tag hanging from
+// the sheet, and the ink cord frame (section=studio). i9 → i10 → i11 is
+// all tokens: the tabs' dots grey at rest and the rope takes the page's hue
+// from i10; the type roles change by themselves.
+// The woven STUDIO tag (.st-label): ink twill, a white dashed stitch 4px
+// in, a lock in red-hi (no accent from i10), Micro caps. It leans 2°.
+export studioTag = frame {
+  title: "STUDIO tag",
+  left: 0px,
+  top: 40px,
+  height: spc.controls.st-woven,
+  transform: [0.9994, 0.03, -0.43, -0.03, 0.9994, 1.47],
+  layout: {stack: {align-items: .center, item-gap: spc.layout.stack-tight}},
+  fill: col.roles.dark,
+  shadow: [
+    {
+      drop-shadow: {
+        color: pal.palette.shadow-lift,
+        offset: point(0px, 1px),
+        blur-radius: 0px
+      }
+    },
+    {
+      drop-shadow: {
+        color: pal.palette.shadow-pop,
+        offset: point(0px, 3px),
+        blur-radius: 6px,
+        spread: -2px
+      }
+    }
+  ],
+  corner-radius: spc.radii.st-woven,
+  padding: [0px, spc.layout.tip-x],
+  children: [tagStitch, lock, word],
+
+  tagStitch = frame : surf.stitch {
+    left: spc.steps.s1,
+    top: spc.steps.s1,
+    right: spc.steps.s1,
+    bottom: spc.steps.s1,
+    width: .nil,
+    height: .nil,
+    opacity: 0.5,
+    ignore-stack: .true,
+    corner-radius: 0px,
+    border[0].color: col.roles.dark-fg,
+    border[0].dash: [3px, 2px],
+    border[0].width: 1
+  }
+
+  lock = asset {
+    width: spc.controls.kbd-icon,
+    height: spc.controls.kbd-icon,
+    fill: col.roles.toast-ic,
+    contents: lockIcon
+  }
+
+  word = text : txt.micro {
+    contents: "STUDIO",
+    fill[0].color: col.roles.dark-fg
+  }
+}
+
+// Studio's nav: the brand + the STUDIO tag on the left; Projects · Music ·
+// Thoughts · Home · Media (each a nav tab in its section's felt) and View
+// site (a small ghost button) on the right. No tab is here on the
+// dashboard; an editor picks its section's variant (`studioNavMusic`, …).
+@variants(studioNavMusic, studioNavThoughts, studioNavPhone)
+export studioNav = frame {
+  title: "Studio nav · dashboard (no tab here)",
+  left: 0px,
+  top: 186px,
+  width: 1412px,
+  layout: {stack: {justify-content: .space-between, align-items: .center}},
+  padding: [spc.layout.nav-top, spc.layout.page-x, spc.layout.nav-bottom],
+  children: [brandRow, tabs],
+
+  brandRow = frame {
+    layout: {stack: {align-items: .center, item-gap: spc.steps.s4}},
+    children: [brand, tagHolder],
+
+    brand = frame : brandLogo.logo {}
+
+    // (a freeform holder: a stack ignores transforms, the tag leans)
+    tagHolder = frame {
+      width: 84px,
+      height: spc.controls.st-woven,
+      children: tagIn,
+
+      tagIn = frame : studioTag {
+        left: 0px,
+        top: 0px
+      }
+    }
+  }
+
+  tabs = frame {
+    layout: {stack: {align-items: .center, item-gap: spc.layout.nav-gap}},
+    children: [projectsTab, musicTab, thoughtsTab, homeTab, mediaTab, viewSite],
+
+    projectsTab = frame : tab.navTab {}
+
+    musicTab = frame : tab.navTab {
+      dot {
+        fill[0].color: sec.section.hue-music,
+
+        glyph {
+          contents: musicIcon
+        }
+      }
+
+      label {
+        contents: "Music"
+      }
+    }
+
+    thoughtsTab = frame : tab.navTab {
+      dot {
+        fill[0].color: sec.section.hue-thoughts,
+
+        glyph {
+          contents: thoughtsIcon
+        }
+      }
+
+      label {
+        contents: "Thoughts"
+      }
+    }
+
+    homeTab = frame : tab.navTab {
+      dot {
+        fill[0].color: sec.section.hue-home,
+
+        glyph {
+          contents: homeIcon
+        }
+      }
+
+      label {
+        contents: "Home"
+      }
+    }
+
+    mediaTab = frame : tab.navTab {
+      dot {
+        fill[0].color: sec.section.hue-studio,
+
+        glyph {
+          contents: mediaIcon
+        }
+      }
+
+      label {
+        contents: "Media"
+      }
+    }
+
+    viewSite = frame : btn.btnGhostSm {
+      glyph {
+        contents: visitIcon
+      }
+
+      label {
+        contents: "View site"
+      }
+    }
+  }
+}
+
+// An editor in Music: Music's tab is here (the rope: i9 red, i10 purple).
+export studioNavMusic = frame : studioNav {
+  title: "Studio nav · Music here",
+  left: 0px,
+  top: 378px,
+
+  tabs {
+    @with-variant(tab.navTabHere)
+    musicTab {
+      tab.navTabHere.tabRope {
+        border[1].color: col.roles.here-music-b,
+        border[0].color: col.roles.here-music-a
+      }
+
+      dot {
+        glyph {
+          contents: musicIconFill
+        }
+      }
+    }
+  }
+}
+
+// An editor in Thoughts: Thoughts' tab is here (i10 gold).
+export studioNavThoughts = frame : studioNav {
+  title: "Studio nav · Thoughts here",
+  left: 0px,
+  top: 570px,
+
+  tabs {
+    @with-variant(tab.navTabHere)
+    thoughtsTab {
+      tab.navTabHere.tabRope {
+        border[1].color: col.roles.here-thoughts-b,
+        border[0].color: col.roles.here-thoughts-a
+      }
+
+      dot {
+        glyph {
+          contents: thoughtsIconFill
+        }
+      }
+    }
+  }
+}
+
+// Studio's page: the kit sheet (the ink cord frame, section=studio) with
+// Studio's nav in place of the site's and the sound tag on the sheet's top
+// edge. A screen fills `paper.page` like any page:
+//   paper { page { overrides: [insert(head, after = .nil), …] } }
+@variants(studioSheetMusic, studioSheetThoughts)
+export studioSheet = frame : sht.sheet {
+  title: "Studio sheet · dashboard",
+  left: 0px,
+  top: 762px,
+
+  paper {
+    overrides: [
+      insert(stNav, after = sht.sheet.paper.sheetNav),
+      insert(stSound, after = stNav)
+    ],
+
+    page {
+      min-height: 360px
+    }
+
+    sheetNav {
+      display: .none
+    }
+  }
+
+  stNav = frame : studioNav {
+    width: 100%
+  }
+
+  stSound = frame : snd.soundTag {
+    left: 304px,
+    top: 0px,
+    ignore-stack: .true
+  }
+}
+
+export studioSheetMusic = frame : studioSheet {
+  title: "Studio sheet · Music here",
+  left: 0px,
+  top: 1358px,
+
+  paper {
+    @with-variant(studioNavMusic)
+    stNav {}
+  }
+}
+
+export studioSheetThoughts = frame : studioSheet {
+  title: "Studio sheet · Thoughts here",
+  left: 0px,
+  top: 1954px,
+
+  paper {
+    @with-variant(studioNavThoughts)
+    stNav {}
+  }
+}
+
+// Phones (< 960): the brand and the woven tag on the left, View site as a
+// round ↗ (icon-only) on the right; Studio's pages live in the floating
+// layer's sections pill (organisms/phone-nav.elyx `sectionsMenuStudio`).
+// 14 above, 4 below, 14 in; on the right it clears the sound tag (65:
+// 14 + its 42 + 9).
+export studioNavPhone = frame : studioNav {
+  title: "Studio nav · phone",
+  left: 1728px,
+  top: 186px,
+  width: spc.controls.phone-w,
+  padding-top: spc.layout.nav-top-phone,
+  padding-left: spc.layout.page-x-phone,
+  padding-bottom: spc.layout.nav-bottom-phone,
+  padding-right: spc.layout.nav-sound-room-phone,
+
+  tabs {
+    viewSite {
+      width: spc.controls.btn,
+      height: spc.controls.btn,
+
+      label {
+        display: .none
+      }
+
+      padding-left: 0px,
+      padding-right: 0px
+    }
+
+    projectsTab {
+      display: .none
+    }
+
+    musicTab {
+      display: .none
+    }
+
+    thoughtsTab {
+      display: .none
+    }
+
+    homeTab {
+      display: .none
+    }
+
+    mediaTab {
+      display: .none
+    }
+  }
+}
+
+// ==== states page (labels over the definitions, then the states boards: i9 · i10 · i11) ====
+lbl-studioTag = text : doc.specLabel {
+  left: 0px,
+  top: 0px,
+  contents: "studioTag"
+}
+
+note-studioTag = text : doc.specNote {
+  left: 0px,
+  top: 16px,
+  contents: "the Studio tag"
+}
+
+lbl-studioNav = text : doc.specLabel {
+  left: 0px,
+  top: 146px,
+  contents: "studioNav"
+}
+
+note-studioNav = text : doc.specNote {
+  left: 0px,
+  top: 162px,
+  contents: "Studio's nav · Dashboard"
+}
+
+lbl-studioNavPhone = text : doc.specLabel {
+  left: 1728px,
+  top: 146px,
+  contents: "studioNavPhone"
+}
+
+note-studioNavPhone = text : doc.specNote {
+  left: 1728px,
+  top: 162px,
+  contents: "phones"
+}
+
+lbl-studioNavMusic = text : doc.specLabel {
+  left: 0px,
+  top: 338px,
+  contents: "studioNavMusic"
+}
+
+note-studioNavMusic = text : doc.specNote {
+  left: 0px,
+  top: 354px,
+  contents: "Music here"
+}
+
+lbl-studioNavThoughts = text : doc.specLabel {
+  left: 0px,
+  top: 530px,
+  contents: "studioNavThoughts"
+}
+
+note-studioNavThoughts = text : doc.specNote {
+  left: 0px,
+  top: 546px,
+  contents: "Thoughts here"
+}
+
+lbl-studioSheet = text : doc.specLabel {
+  left: 0px,
+  top: 722px,
+  contents: "studioSheet"
+}
+
+note-studioSheet = text : doc.specNote {
+  left: 0px,
+  top: 738px,
+  contents: "Studio's sheet · Dashboard"
+}
+
+lbl-studioSheetMusic = text : doc.specLabel {
+  left: 0px,
+  top: 1318px,
+  contents: "studioSheetMusic"
+}
+
+note-studioSheetMusic = text : doc.specNote {
+  left: 0px,
+  top: 1334px,
+  contents: "Music here"
+}
+
+lbl-studioSheetThoughts = text : doc.specLabel {
+  left: 0px,
+  top: 1914px,
+  contents: "studioSheetThoughts"
+}
+
+note-studioSheetThoughts = text : doc.specNote {
+  left: 0px,
+  top: 1930px,
+  contents: "Thoughts here"
+}
+
+@variants(studioChromeStatesI10)
+studioChromeStates = frame : doc.docBoard {
+  title: "Studio chrome · states · i9",
+  left: 0px,
+  top: 2574px,
+
+  body {
+    layout.stack.item-gap: 48px,
+    overrides: [
+      insert(row-1, after = .nil),
+      insert(row-2, after = row-1),
+      insert(row-3, after = row-2),
+      insert(row-4, after = row-3),
+      insert(row-5, after = row-4),
+      insert(row-6, after = row-5),
+      insert(row-7, after = row-6),
+      insert(row-8, after = row-7)
+    ]
+  }
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i9"
+      }
+    }
+
+    boardCaption {
+      contents: "Studio chrome · every state"
+    }
+  }
+
+  row-1 = frame : doc.specRow {
+    layout.stack.item-gap: 48px,
+    overrides: [insert(st-studioTag, after = .nil)]
+  }
+
+  row-2 = frame : doc.specRow {
+    layout.stack.item-gap: 48px,
+    overrides: [insert(st-studioNav, after = .nil)]
+  }
+
+  row-3 = frame : doc.specRow {
+    layout.stack.item-gap: 48px,
+    overrides: [insert(st-studioNavMusic, after = .nil)]
+  }
+
+  row-4 = frame : doc.specRow {
+    layout.stack.item-gap: 48px,
+    overrides: [insert(st-studioNavThoughts, after = .nil)]
+  }
+
+  row-5 = frame : doc.specRow {
+    layout.stack.item-gap: 48px,
+    overrides: [insert(st-studioNavPhone, after = .nil)]
+  }
+
+  row-6 = frame : doc.specRow {
+    layout.stack.item-gap: 48px,
+    overrides: [insert(st-studioSheet, after = .nil)]
+  }
+
+  row-7 = frame : doc.specRow {
+    layout.stack.item-gap: 48px,
+    overrides: [insert(st-studioSheetMusic, after = .nil)]
+  }
+
+  row-8 = frame : doc.specRow {
+    layout.stack.item-gap: 48px,
+    overrides: [insert(st-studioSheetThoughts, after = .nil)]
+  }
+
+  st-studioTag = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "studioTag"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "the Studio tag"
+    }
+
+    it = frame : studioTag {}
+  }
+
+  st-studioNav = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "studioNav"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "Studio's nav · Dashboard"
+    }
+
+    it = frame : studioNav {}
+  }
+
+  st-studioNavMusic = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "studioNavMusic"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "Music here"
+    }
+
+    it = frame : studioNavMusic {}
+  }
+
+  st-studioNavThoughts = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "studioNavThoughts"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "Thoughts here"
+    }
+
+    it = frame : studioNavThoughts {}
+  }
+
+  st-studioNavPhone = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "studioNavPhone"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "phones"
+    }
+
+    it = frame : studioNavPhone {}
+  }
+
+  st-studioSheet = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "studioSheet"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "Studio's sheet · Dashboard"
+    }
+
+    it = frame : studioSheet {}
+  }
+
+  st-studioSheetMusic = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "studioSheetMusic"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "Music here"
+    }
+
+    it = frame : studioSheetMusic {}
+  }
+
+  st-studioSheetThoughts = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "studioSheetThoughts"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "Thoughts here"
+    }
+
+    it = frame : studioSheetThoughts {}
+  }
+}
+
+@variants(studioChromeStatesI11)
+@context(i10="on")
+studioChromeStatesI10 = frame : studioChromeStates {
+  title: "Studio chrome · states · i10",
+  left: 1808px,
+  top: 2574px,
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i10"
+      }
+    }
+  }
+}
+
+@context(i10="on", i11="on")
+studioChromeStatesI11 = frame : studioChromeStatesI10 {
+  title: "Studio chrome · states · i11",
+  left: 3616px,
+  top: 2574px,
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i11"
+      }
+    }
+  }
+}

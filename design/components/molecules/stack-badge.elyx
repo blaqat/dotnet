@@ -1,0 +1,295 @@
+import "tokens/color/roles.elyx" as col
+import "tokens/color/palette.elyx" as pal
+import "tokens/type/type.elyx" as typ
+import "tokens/space/space.elyx" as spc
+import "components/atoms/text.elyx" as txt
+import "assets/icons/stack/java.svg" as javaLogo
+import "assets/icons/stack/python.svg" as pythonLogo
+import "assets/icons/stack/rust.svg" as rustLogo
+import "components/atoms/doc.elyx" as doc
+
+// A stack badge (`.ystk`), as Home's bio wears it inline ("fluent in Java,
+// Python, Rust"): a 28px pill on white cloth (Home's ?stk=white: a hairline
+// ring + a soft shadow), the tool's colour logo (16) and its name (Label,
+// ink; i9 Nunito 750 .76rem). On phones it's the logo alone in a circle
+// (`stackBadgeSm`: i9 28, i11 T5 24 inside the bio's line).
+// Children: `logo` (untinted: the logo keeps its colours), `label`.
+// Override `logo {contents: …}` + `label {contents: …}`.
+@variants(stackBadgePython, stackBadgeRust, stackBadgeSm)
+export stackBadge = frame {
+  title: "Stack badge · Java",
+  left: 0px,
+  top: 40px,
+  height: spc.controls.tag,
+  layout: {stack: {align-items: .center, item-gap: spc.layout.stk-gap}},
+  fill: col.roles.surface,
+  shadow: [
+    {
+      drop-shadow: {
+        color: col.roles.disc-line,
+        offset: point(0px, 0px),
+        blur-radius: 0px,
+        spread: 1px
+      }
+    },
+    {
+      drop-shadow: {
+        color: pal.palette.shadow-1,
+        offset: point(0px, 1px),
+        blur-radius: 2px
+      }
+    }
+  ],
+  corner-radius: spc.radii.pill,
+  padding: [0px, spc.layout.stk-r, 0px, spc.layout.stk-l],
+  children: [logo, label],
+
+  logo = asset {
+    width: spc.controls.stk-icon,
+    height: spc.controls.stk-icon,
+    contents: javaLogo
+  }
+
+  label = text : txt.label {
+    contents: "Java",
+    font-size: typ.sizes.stk,
+    fill[0].color: col.roles.fg
+  }
+}
+
+export stackBadgePython = frame : stackBadge {
+  title: "Stack badge · Python",
+  left: 139px,
+  top: 40px,
+
+  logo {
+    contents: pythonLogo
+  }
+
+  label {
+    contents: "Python"
+  }
+}
+
+export stackBadgeRust = frame : stackBadge {
+  title: "Stack badge · Rust",
+  left: 311px,
+  top: 40px,
+
+  logo {
+    contents: rustLogo
+  }
+
+  label {
+    contents: "Rust"
+  }
+}
+
+// Phones: the logo alone in a circle; the name stays for assistive tech.
+export stackBadgeSm = frame : stackBadge {
+  title: "Stack badge · phone (icon)",
+  left: 469px,
+  top: 40px,
+  width: spc.controls.stk-sm,
+  height: spc.controls.stk-sm,
+  padding-top: 0px,
+  padding-left: 0px,
+  padding-bottom: 0px,
+  padding-right: 0px,
+  layout.stack.justify-content: .center,
+
+  logo {
+    width: spc.controls.stk-sm-icon,
+    height: spc.controls.stk-sm-icon
+  }
+
+  label {
+    display: .none
+  }
+}
+
+// ==== states page (labels over the definitions, then the states boards: i9 · i10 · i11) ====
+lbl-stackBadge = text : doc.specLabel {
+  left: 0px,
+  top: 0px,
+  contents: "stackBadge"
+}
+
+note-stackBadge = text : doc.specNote {
+  left: 0px,
+  top: 16px,
+  contents: "a stack logo"
+}
+
+lbl-stackBadgePython = text : doc.specLabel {
+  left: 139px,
+  top: 0px,
+  contents: "stackBadgePython"
+}
+
+note-stackBadgePython = text : doc.specNote {
+  left: 139px,
+  top: 16px,
+  contents: "Python"
+}
+
+lbl-stackBadgeRust = text : doc.specLabel {
+  left: 311px,
+  top: 0px,
+  contents: "stackBadgeRust"
+}
+
+note-stackBadgeRust = text : doc.specNote {
+  left: 311px,
+  top: 16px,
+  contents: "Rust"
+}
+
+lbl-stackBadgeSm = text : doc.specLabel {
+  left: 469px,
+  top: 0px,
+  contents: "stackBadgeSm"
+}
+
+note-stackBadgeSm = text : doc.specNote {
+  left: 469px,
+  top: 16px,
+  contents: "sm: the monogram tile"
+}
+
+@variants(stackBadgeStatesI10)
+stackBadgeStates = frame : doc.docBoard {
+  title: "Stack badge · states · i9",
+  left: 0px,
+  top: 228px,
+
+  body {
+    layout.stack.item-gap: 48px,
+    overrides: [insert(row-1, after = .nil)]
+  }
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i9"
+      }
+    }
+
+    boardCaption {
+      contents: "Stack badge · every state"
+    }
+  }
+
+  row-1 = frame : doc.specRow {
+    layout.stack.item-gap: 48px,
+    overrides: [
+      insert(st-stackBadge, after = .nil),
+      insert(st-stackBadgePython, after = st-stackBadge),
+      insert(st-stackBadgeRust, after = st-stackBadgePython),
+      insert(st-stackBadgeSm, after = st-stackBadgeRust)
+    ]
+  }
+
+  st-stackBadge = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "stackBadge"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "a stack logo"
+    }
+
+    it = frame : stackBadge {}
+  }
+
+  st-stackBadgePython = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "stackBadgePython"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "Python"
+    }
+
+    it = frame : stackBadgePython {}
+  }
+
+  st-stackBadgeRust = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "stackBadgeRust"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "Rust"
+    }
+
+    it = frame : stackBadgeRust {}
+  }
+
+  st-stackBadgeSm = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "stackBadgeSm"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "sm: the monogram tile"
+    }
+
+    it = frame : stackBadgeSm {}
+  }
+}
+
+@variants(stackBadgeStatesI11)
+@context(i10="on")
+stackBadgeStatesI10 = frame : stackBadgeStates {
+  title: "Stack badge · states · i10",
+  left: 746px,
+  top: 228px,
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i10"
+      }
+    }
+  }
+}
+
+@context(i10="on", i11="on")
+stackBadgeStatesI11 = frame : stackBadgeStatesI10 {
+  title: "Stack badge · states · i11",
+  left: 1492px,
+  top: 228px,
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i11"
+      }
+    }
+  }
+}

@@ -1,0 +1,345 @@
+import "tokens/color/roles.elyx" as col
+import "tokens/space/space.elyx" as spc
+import "components/atoms/text.elyx" as txt
+import "components/atoms/doc.elyx" as doc
+import "components/molecules/feedback.elyx" as fb
+import "components/organisms/studio-parts.elyx" as prt
+import "components/organisms/studio-editor.elyx" as ed
+import "components/organisms/studio-article.elyx" as sa
+import "components/organisms/studio-preview.elyx" as prv
+import "assets/icons/bold/arrow-square-in.svg" as importIcon
+
+// Studio · an article in the Thoughts editor (?view=article): the top bar
+// (← Thoughts · History · Publish, the page's primary), the head (Draft ·
+// Saved 2:20 pm, the title), then the form | the live preview. The form:
+// the lede, the cover (optional), the body (the block editor: its toolbar
+// over the sheet of blocks, its word count and keys), the tags. The
+// preview: the article as the site opens it.
+// The seed: the draft "Building the Studio".
+// i11 (`articleEditorI11`): the small caps become Titles (the form's
+// sections) and Meta words (the preview's label).
+@variants(articleEditorI11)
+export articleEditor = frame {
+  title: "Studio · article editor · body",
+  left: 0px,
+  top: 40px,
+  width: 1332px,
+  layout: {stack: {direction: .column, align-items: .stretch}},
+  children: [bar, head, grid],
+
+  bar = frame : ed.edBarPublish {
+    width: 100%
+  }
+
+  head = frame : ed.edHeadDraft {
+    width: 100%
+  }
+
+  grid = frame {
+    layout: {stack: {item-gap: spc.layout.st-ed-gap}},
+    padding-top: spc.layout.st-sec-gap,
+    children: [form, preview],
+
+    form = frame {
+      width: spc.controls.st-form-w,
+      layout: {stack: {direction: .column, align-items: .stretch}},
+      children: [lede, cover, body, tags],
+
+      lede = frame : ed.formSec {
+        width: 100%,
+        padding-top: spc.steps.s1,
+        border[0].visible: .false,
+        overrides: [insert(ledeField, after = ed.formSec.headRow)],
+
+        headRow {
+          head {
+            word {
+              contents: "LEDE"
+            }
+          }
+        }
+      }
+
+      cover = frame : ed.formSec {
+        width: 100%,
+        overrides: [
+          insert(coverDrop, after = ed.formSec.headRow),
+          insert(coverHint, after = coverDrop)
+        ],
+
+        headRow {
+          head {
+            word {
+              contents: "COVER"
+            }
+
+            meta {
+              display: .visible,
+              contents: "optional · one image"
+            }
+          }
+        }
+      }
+
+      body = frame : ed.formSec {
+        width: 100%,
+        overrides: [
+          insert(toolbar, after = ed.formSec.headRow),
+          insert(sheet, after = toolbar),
+          insert(bodyHint, after = sheet)
+        ],
+
+        headRow {
+          act {
+            glyph {
+              contents: importIcon
+            }
+
+            label {
+              contents: "Import from Notion"
+            }
+
+            display: .visible
+          }
+
+          head {
+            word {
+              contents: "BODY"
+            }
+          }
+        }
+      }
+
+      tags = frame : ed.formSec {
+        width: 100%,
+        overrides: [
+          insert(tagInput, after = ed.formSec.headRow),
+          insert(tagHint, after = tagInput)
+        ],
+
+        headRow {
+          head {
+            word {
+              contents: "TAGS"
+            }
+          }
+        }
+      }
+    }
+
+    preview = frame : prv.prevPane {
+      width: 100%,
+
+      box {
+        overrides: [insert(article, after = .nil)]
+      }
+    }
+  }
+
+  article = frame : sa.prevArticle {
+    width: 100%
+  }
+
+  ledeField = frame : ed.labeled {
+    width: 100%,
+
+    lab {
+      word {
+        contents: "One line under the title"
+      }
+    }
+
+    input {
+      value {
+        contents: "Publishing from my phone, in yarn."
+      }
+    }
+  }
+
+  coverDrop = frame {
+    layout: {stack: {}},
+    padding: spc.steps.s1,
+    children: drop,
+
+    drop = frame : sa.coverAdd {}
+  }
+
+  coverHint = frame {
+    layout: {stack: {align-items: .center, item-gap: spc.layout.fact-gap}},
+    children: [sample, sampleNote],
+
+    sample = text : txt.labelCard {
+      contents: "Add a sample file",
+      underline: .single,
+      fill[0].color: col.roles.link
+    }
+
+    sampleNote = text : txt.meta {
+      contents: "· one image · shows on the card and in link previews"
+    }
+  }
+
+  toolbar = frame : sa.mdBar {
+    width: 100%
+  }
+
+  sheet = frame : sa.docSheet {
+    width: 100%
+  }
+
+  bodyHint = frame {
+    layout: {stack: {align-items: .center, item-gap: spc.layout.fact-gap}},
+    children: [count, slashKey, slashNote, escKey, escNote],
+
+    count = text : txt.meta {
+      contents: "65 words · 1 min read ·"
+    }
+
+    slashKey = frame : fb.kbd {}
+
+    slashNote = text : txt.meta {
+      contents: "for blocks · markdown shortcuts work ·"
+    }
+
+    escKey = frame : fb.kbd {
+      key {
+        contents: "Esc"
+      }
+    }
+
+    escNote = text : txt.meta {
+      contents: "selects a block"
+    }
+  }
+
+  tagInput = frame : sa.tagField {
+    width: 100%
+  }
+
+  tagHint = text : txt.meta {
+    contents: "Tags link to the Thoughts page filtered by that tag."
+  }
+}
+
+// i11 · T1 rule 2 + T8: the form's sections are Titles, the preview's
+// label Meta words; the images block's caption a Title.
+@context(i10="on", i11="on")
+export articleEditorI11 = frame : articleEditor {
+  title: "Studio · article editor · body · i11",
+  left: 1652px,
+  top: 40px,
+
+  grid {
+    preview {
+      box {
+        article {
+          prose {
+            images {
+              @with-variant(prt.eyebrowTitle)
+              imagesHead {
+                ttl {
+                  contents: "Planning it, on paper first"
+                }
+              }
+            }
+          }
+        }
+      }
+
+      @with-variant(prt.eyebrowQuiet)
+      head {
+        meta {
+          contents: "as on blaqat.net"
+        }
+
+        quiet {
+          contents: "Preview"
+        }
+      }
+    }
+
+    form {
+      tags {
+        headRow {
+          @with-variant(prt.eyebrowTitle)
+          head {
+            ttl {
+              contents: "Tags"
+            }
+          }
+        }
+      }
+
+      body {
+        sheet {
+          doc {
+            images {
+              @with-variant(prt.eyebrowTitle)
+              imagesHead {
+                ttl {
+                  contents: "Planning it, on paper first"
+                }
+              }
+            }
+          }
+        }
+
+        headRow {
+          @with-variant(prt.eyebrowTitle)
+          head {
+            ttl {
+              contents: "Body"
+            }
+          }
+        }
+      }
+
+      cover {
+        headRow {
+          @with-variant(prt.eyebrowTitle)
+          head {
+            ttl {
+              contents: "Cover"
+            }
+          }
+        }
+      }
+
+      lede {
+        headRow {
+          @with-variant(prt.eyebrowTitle)
+          head {
+            ttl {
+              contents: "Lede"
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+// ==== states page (labels over the definitions, then the states boards: i9 · i10 · i11) ====
+lbl-articleEditor = text : doc.specLabel {
+  left: 0px,
+  top: 0px,
+  contents: "articleEditor"
+}
+
+note-articleEditor = text : doc.specNote {
+  left: 0px,
+  top: 16px,
+  contents: "i9 (i10 = tokens)"
+}
+
+lbl-articleEditorI11 = text : doc.specLabel {
+  left: 1652px,
+  top: 0px,
+  contents: "articleEditorI11"
+}
+
+note-articleEditorI11 = text : doc.specNote {
+  left: 1652px,
+  top: 16px,
+  contents: "i11"
+}

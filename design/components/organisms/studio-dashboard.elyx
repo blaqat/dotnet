@@ -1,0 +1,1478 @@
+import "tokens/color/roles.elyx" as col
+import "tokens/color/palette.elyx" as pal
+import "tokens/color/sections.elyx" as sec
+import "tokens/space/space.elyx" as spc
+import "tokens/type/type.elyx" as typ
+import "components/atoms/text.elyx" as txt
+import "components/atoms/doc.elyx" as doc
+import "components/atoms/surface.elyx" as surf
+import "components/molecules/button.elyx" as btn
+import "assets/icons/bold/music-notes.svg" as musicIcon
+import "components/molecules/fact.elyx" as fct
+import "components/molecules/year-pill.elyx" as yp
+import "components/molecules/keyword.elyx" as kw
+import "components/organisms/studio-parts.elyx" as prt
+import "assets/icons/bold/cloud.svg" as thoughtsIcon
+import "@public-assets/media/site-plan.png" as sitePlanImg
+import "@public-assets/media/sona-different.png" as sonaImg
+import "@public-assets/media/portal-student.png" as portalImg
+import "assets/art/studio/fan-couch.svg" as fanCouch
+import "assets/art/of-the-stars.svg" as fanStars
+import "assets/art/studio/fan-piano.svg" as fanPiano
+import "assets/art/farewell-my-star.svg" as fanFarewell
+import "assets/art/feline-shores.svg" as fanFeline
+import "assets/icons/bold/house.svg" as homeIcon
+import "assets/icons/bold/plus.svg" as plusIcon
+import "assets/icons/bold/scissors.svg" as scissorsIcon
+import "assets/icons/bold/caret-right.svg" as goIcon
+import "assets/icons/bold/scribble-loop.svg" as scratchIcon
+import "assets/icons/bold/article.svg" as articleIcon
+import "assets/icons/bold/tag.svg" as tagIcon
+import "assets/icons/bold/playlist.svg" as playlistIcon
+import "assets/icons/bold/images.svg" as imagesIcon
+import "assets/icons/bold/ranking.svg" as rankingIcon
+
+// Studio's dashboard (studio-screens.js "dashboard"): the site strip, the
+// four section cards, the drafts ("On the needles") and Recently.
+// i9 → i10 is tokens (the facts go bare, the strip's dot goes ink, the
+// type roles); i11 is tokens too (insets 16 all round, the card context's
+// 16 / 14 / 12) except the panes' heads (prt.eyebrowHeading, in the block).
+// ---- the site strip (.st-strip): is the site live, the last publish,
+// the storage meter, the unused files. A white patch, its stitch 6 in.
+// Children: `stripStitch`, `info` (`live` (`liveDot`, `liveWords`),
+// `last`, `store` (`storeWords`, `meter` (`meterFill`))), `orphans`.
+export siteStrip = frame {
+  title: "Site strip",
+  left: 0px,
+  top: 40px,
+  width: 1332px,
+  layout: {stack: {justify-content: .space-between, align-items: .center}},
+  fill: col.roles.surface,
+  shadow: [
+    {
+      drop-shadow: {
+        color: pal.palette.shadow-1,
+        offset: point(0px, 1px),
+        blur-radius: 0px
+      }
+    },
+    {
+      drop-shadow: {
+        color: pal.palette.shadow-1,
+        offset: point(0px, 2px),
+        blur-radius: 6px
+      }
+    }
+  ],
+  corner-radius: spc.radii.st-strip,
+  padding: [spc.layout.st-strip-y, spc.layout.st-strip-x],
+  children: [stripStitch, info, orphans],
+
+  stripStitch = frame : surf.stitch {
+    left: spc.layout.stitch-in,
+    top: spc.layout.stitch-in,
+    right: spc.layout.stitch-in,
+    bottom: spc.layout.stitch-in,
+    width: .nil,
+    height: .nil,
+    ignore-stack: .true,
+    corner-radius: spc.steps.s3
+  }
+
+  info = frame {
+    layout: {stack: {align-items: .center, item-gap: spc.layout.st-strip-gap}},
+    children: [live, last, store],
+
+    live = frame {
+      layout: {stack: {align-items: .center, item-gap: spc.steps.s2}},
+      children: [liveDot, liveWords],
+
+      // "now" that isn't music: i9 red, from i10 Studio's ink; a soft ring
+      liveDot = frame {
+        width: spc.controls.st-live-dot,
+        height: spc.controls.st-live-dot,
+        fill: col.roles.now,
+        shadow: {
+          drop-shadow: {
+            color: col.roles.now-soft,
+            offset: point(0px, 0px),
+            blur-radius: 0px,
+            spread: spc.layout.stitch-in-ctl
+          }
+        },
+        corner-radius: spc.radii.pill
+      }
+
+      liveWords = text : txt.label {
+        contents: "blaqat.net is live"
+      }
+    }
+
+    last = text : txt.meta {
+      contents: "last publish 5 h ago · no redeploys needed"
+    }
+
+    store = frame {
+      layout: {stack: {align-items: .center, item-gap: spc.layout.st-list-gap}},
+      children: [storeWords, meter],
+
+      storeWords = text : txt.meta {
+        contents: "media 270.7 MB of 10 GB"
+      }
+
+      // the storage meter: a recessed track, a dashed line along it, the
+      // used part in the now colour (270.7 MB of 10 GB: 3%)
+      meter = frame {
+        width: spc.controls.st-meter-w,
+        height: spc.controls.st-meter-h,
+        fill: col.roles.recess,
+        shadow: {
+          inner-shadow: {
+            color: pal.palette.stitch,
+            offset: point(0px, 1px),
+            blur-radius: 2px
+          }
+        },
+        corner-radius: spc.radii.pill,
+        overflow: .clip,
+        children: [meterLine, meterFill],
+
+        meterLine = frame {
+          left: spc.layout.stitch-in,
+          top: spc.steps.s1,
+          right: spc.layout.stitch-in,
+          height: 2px,
+          border: {
+            color: col.roles.stitch,
+            width: spc.layout.stitch-w-sm,
+            dash: [5px, 4px],
+            sides: .top
+          }
+        }
+
+        meterFill = frame {
+          left: 0px,
+          top: 0px,
+          bottom: 0px,
+          width: 3%,
+          fill: col.roles.now,
+          corner-radius: spc.radii.pill
+        }
+      }
+    }
+  }
+
+  orphans = frame : btn.btnSm {
+    glyph {
+      contents: scissorsIcon
+    }
+
+    label {
+      contents: "3 unused files"
+    }
+  }
+}
+
+// ---- a section card's fan: the section's latest things, fanned (each
+// leans −4° / +3° in turn, overlapping 8): a project's media (`print`,
+// 68 × 46), a release's swatch (`printSwatch`, 46), a post type's glyph
+// on a white disc (`printIcon`, 42). Each wears a white ring and a soft
+// shadow. The print is a holder (a stack ignores transforms) with the
+// leaning `card` in it (`pic`, the picture; `glyph`).
+@variants(printSwatch, printIcon)
+export print = frame {
+  title: "Fan print · a project's media",
+  left: 0px,
+  top: 220px,
+  width: spc.controls.st-print-w,
+  height: spc.controls.st-print-h,
+  children: card,
+
+  card = frame {
+    left: 0px,
+    top: 0px,
+    right: 0px,
+    bottom: 0px,
+    transform: [0.9976, 0.0698, -1.52, -0.0698, 0.9976, 2.43],
+    layout: {stack: {justify-content: .center, align-items: .center}},
+    fill: col.roles.recess,
+    border: {
+      color: col.roles.surface,
+      width: spc.layout.ring-w,
+      position: .outside
+    },
+    shadow: {
+      drop-shadow: {
+        color: pal.palette.shadow-lift,
+        offset: point(0px, 2px),
+        blur-radius: 6px
+      }
+    },
+    corner-radius: spc.radii.inner,
+    overflow: .clip,
+    children: [pic, glyph],
+
+    pic = frame {
+      left: 0px,
+      top: 0px,
+      right: 0px,
+      bottom: 0px,
+      ignore-stack: .true,
+      fill: {image: {ref: sitePlanImg}}
+    }
+
+    glyph = asset {
+      width: spc.controls.icon,
+      height: spc.controls.icon,
+      display: .none,
+      fill: col.roles.fg,
+      contents: scratchIcon
+    }
+  }
+}
+
+// A release's swatch (46, the art radius).
+export printSwatch = frame : print {
+  title: "Fan print · a swatch",
+  left: 1596px,
+  top: 220px,
+  width: spc.controls.st-fan-sw,
+  height: spc.controls.st-fan-sw,
+
+  card {
+    pic {
+      fill[0].image.ref: fanCouch
+    }
+
+    transform: [0.9976, 0.0698, -1.55, -0.0698, 0.9976, 1.66],
+    corner-radius: spc.radii.art
+  }
+}
+
+// A post type's glyph on a white disc (42).
+export printIcon = frame : print {
+  title: "Fan print · a post type",
+  left: 2164px,
+  top: 220px,
+  width: spc.controls.st-fan-ic,
+  height: spc.controls.st-fan-ic,
+
+  card {
+    fill[0].color: col.roles.surface,
+
+    pic {
+      display: .none
+    }
+
+    transform: [0.9976, 0.0698, -1.41, -0.0698, 0.9976, 1.52],
+    corner-radius: spc.radii.pill,
+
+    glyph {
+      display: .visible
+    }
+  }
+}
+
+// The fan: Projects' prints (base), Music's swatches, Thoughts' post types,
+// Home's line (its keyword scribbled). Children: `p1` … `p6`, `words`.
+@variants(fanSwatches, fanIcons, fanWords)
+export fan = frame {
+  title: "Fan · Projects (media)",
+  left: 2732px,
+  top: 220px,
+  height: spc.controls.st-fan-h,
+  layout: {stack: {align-items: .center, item-gap: spc.layout.st-fan-overlap}},
+  padding-left: spc.layout.st-fan-l,
+  children: [p1, p2, p3, p4, p5, p6, words],
+
+  p1 = frame : print {}
+
+  p2 = frame : print {
+    card {
+      pic {
+        fill[0].image.ref: sonaImg
+      }
+
+      transform: [0.9986, -0.05, 1.25, 0.05, 0.9986, -1.75]
+    }
+  }
+
+  p3 = frame : print {}
+
+  p4 = frame : print {
+    card {
+      pic {
+        fill[0].image.ref: portalImg
+      }
+
+      transform: [0.9986, -0.05, 1.25, 0.05, 0.9986, -1.75]
+    }
+  }
+
+  p5 = frame : print {
+    display: .none
+  }
+
+  p6 = frame : print {
+    display: .none
+  }
+
+  // Home's line: Title words in fg-2, the keyword scribbled
+  words = frame {
+    display: .none,
+    layout: {stack: {align-items: .center}},
+    padding: [spc.steps.s1, 0px, spc.layout.fact-gap],
+    children: [wordsA, wordsKey, wordsB],
+
+    wordsA = text : txt.label {
+      contents: "hi, i’m aiden! a ",
+      font-size: typ.sizes.st-words,
+      fill[0].color: col.roles.fg-2
+    }
+
+    wordsKey = frame : kw.keyword {
+      word {
+        fill[0].color: col.roles.fg-2,
+        font-size: typ.sizes.st-words,
+        font-family: typ.faces.label,
+        font-style: typ.faces.label-style,
+        line-height: typ.leading.label
+      }
+    }
+
+    wordsB = text : txt.label {
+      contents: "…",
+      font-size: typ.sizes.st-words,
+      fill[0].color: col.roles.fg-2
+    }
+  }
+}
+
+export fanSwatches = frame : fan {
+  title: "Fan · Music (swatches)",
+  left: 3300px,
+  top: 220px,
+
+  @with-variant(printSwatch)
+  p5 {
+    card {
+      pic {
+        fill[0].image.ref: fanFeline
+      }
+    }
+
+    display: .visible
+  }
+
+  @with-variant(printSwatch)
+  p4 {
+    card {
+      pic {
+        fill[0].image.ref: fanFarewell
+      }
+
+      transform: [0.9986, -0.05, 1.24, 0.05, 0.9986, -1.17]
+    }
+  }
+
+  @with-variant(printSwatch)
+  p3 {
+    card {
+      pic {
+        fill[0].image.ref: fanPiano
+      }
+    }
+  }
+
+  @with-variant(printSwatch)
+  p2 {
+    card {
+      pic {
+        fill[0].image.ref: fanStars
+      }
+
+      transform: [0.9986, -0.05, 1.24, 0.05, 0.9986, -1.17]
+    }
+  }
+
+  @with-variant(printSwatch)
+  p1 {}
+}
+
+// Thoughts' six post types (scratch, article, tags, playlist, images,
+// ranking), each on a white disc.
+export fanIcons = frame : fan {
+  title: "Fan · Thoughts (post types)",
+  left: 3560px,
+  top: 220px,
+
+  @with-variant(printIcon)
+  p6 {
+    card {
+      transform: [0.9986, -0.05, 1.13, 0.05, 0.9986, -1.07],
+
+      glyph {
+        contents: rankingIcon
+      }
+    }
+
+    display: .visible
+  }
+
+  @with-variant(printIcon)
+  p5 {
+    card {
+      glyph {
+        contents: imagesIcon
+      }
+    }
+
+    display: .visible
+  }
+
+  @with-variant(printIcon)
+  p4 {
+    card {
+      transform: [0.9986, -0.05, 1.13, 0.05, 0.9986, -1.07],
+
+      glyph {
+        contents: playlistIcon
+      }
+    }
+  }
+
+  @with-variant(printIcon)
+  p3 {
+    card {
+      glyph {
+        contents: tagIcon
+      }
+    }
+  }
+
+  @with-variant(printIcon)
+  p2 {
+    card {
+      transform: [0.9986, -0.05, 1.13, 0.05, 0.9986, -1.07],
+
+      glyph {
+        contents: articleIcon
+      }
+    }
+  }
+
+  @with-variant(printIcon)
+  p1 {}
+}
+
+// Home & About: its first line, the keyword scribbled.
+export fanWords = frame : fan {
+  title: "Fan · Home (its line)",
+  left: 3834px,
+  top: 220px,
+  padding-left: 0px,
+
+  p1 {
+    display: .none
+  }
+
+  p2 {
+    display: .none
+  }
+
+  p3 {
+    display: .none
+  }
+
+  p4 {
+    display: .none
+  }
+
+  words {
+    display: .visible
+  }
+}
+
+// ---- a section card (.st-seccard): a kit card (the patch) holding the
+// section's dot + its name and a + (a new item), the fan, the publish
+// counts (live · with edits · drafts) and "Last touched …".
+// Children: `top` (`lead` (`dot`, `name`), `add`), `fan`, `counts`
+// (`live`, `edits`, `drafts`), `last`. A section is a variant.
+@variants(secCardMusic, secCardThoughts, secCardHome)
+export secCard = frame : surf.patch {
+  title: "Section card · Projects",
+  left: 0px,
+  top: 394px,
+  width: spc.controls.st-tile-w,
+  min-height: spc.controls.st-tile-h,
+  padding-top: spc.layout.st-tile-x,
+  padding-left: spc.layout.st-tile-x,
+  padding-bottom: spc.layout.st-tile-b,
+  padding-right: spc.layout.st-tile-x,
+  overrides: [
+    insert(top, after = surf.patch.patchStitch),
+    insert(fanRow, after = top),
+    insert(counts, after = fanRow),
+    insert(last, after = counts)
+  ],
+
+  top = frame {
+    width: 100%,
+    layout: {stack: {justify-content: .space-between, align-items: .center}},
+    children: [lead, add],
+
+    lead = frame {
+      layout: {stack: {align-items: .center, item-gap: spc.steps.s3}},
+      children: [dot, name],
+
+      dot = frame : prt.secDot {}
+
+      name = text : txt.title {
+        contents: "Projects",
+        font-size: typ.sizes.st-tile,
+        font-style: typ.faces.st-tile-style
+      }
+    }
+
+    add = frame : btn.btnIconSm {
+      glyph {
+        contents: plusIcon
+      }
+    }
+  }
+
+  fanRow = frame : fan {}
+
+  counts = frame {
+    height: spc.controls.st-fact,
+    layout: {stack: {align-items: .center, item-gap: spc.layout.facts-gap}},
+    children: [live, edits, drafts],
+
+    live = frame : fct.factLive {
+      label {
+        contents: "11 live"
+      }
+    }
+
+    edits = frame : fct.factEdits {
+      label {
+        contents: "1 with edits"
+      }
+    }
+
+    drafts = frame : fct.factDraft {
+      label {
+        contents: "1 draft"
+      }
+    }
+  }
+
+  // "Last touched <thing> <stamp>": the thing in the strong words, the time
+  // in Meta
+  last = text : txt.body {
+    width: 100%,
+    contents: "Last touched Studio 4 min ago",
+    font-size: typ.sizes.st-note,
+    line-height: typ.leading.st-quiet,
+    fill[0].color: col.roles.fg-2,
+    subrange[0].fill[0].color: col.roles.fg,
+    subrange[0].font-style: typ.faces.st-strong-style,
+    subrange[0].range: [13, 19],
+    subrange[1].fill[0].color: col.roles.fg-3,
+    subrange[1].font-family: typ.faces.meta,
+    subrange[1].font-size: typ.sizes.meta,
+    subrange[1].font-style: typ.faces.meta-style,
+    subrange[1].range: [20, 29]
+  }
+}
+
+export secCardMusic = frame : secCard {
+  title: "Section card · Music",
+  left: 1596px,
+  top: 394px,
+
+  last {
+    subrange[1].range: [26, 36],
+    subrange[0].range: [13, 25],
+    contents: "Last touched couch demo 4 46 min ago"
+  }
+
+  counts {
+    edits {
+      label {
+        contents: "2 with edits"
+      }
+    }
+
+    live {
+      label {
+        contents: "24 live"
+      }
+    }
+  }
+
+  @with-variant(fanSwatches)
+  fanRow {}
+
+  top {
+    lead {
+      dot {
+        fill[0].color: sec.section.hue-music,
+
+        glyph {
+          contents: musicIcon
+        }
+      }
+
+      name {
+        contents: "Music"
+      }
+    }
+  }
+}
+
+export secCardThoughts = frame : secCard {
+  title: "Section card · Thoughts",
+  left: 2164px,
+  top: 394px,
+
+  last {
+    subrange[1].range: [33, 43],
+    subrange[0].range: [13, 32],
+    contents: "Last touched Building the Studio 12 min ago"
+  }
+
+  counts {
+    edits {
+      display: .none
+    }
+
+    drafts {
+      label {
+        contents: "3 drafts"
+      }
+    }
+
+    live {
+      label {
+        contents: "23 live"
+      }
+    }
+  }
+
+  @with-variant(fanIcons)
+  fanRow {}
+
+  top {
+    lead {
+      dot {
+        fill[0].color: sec.section.hue-thoughts,
+
+        glyph {
+          contents: thoughtsIcon
+        }
+      }
+
+      name {
+        contents: "Thoughts"
+      }
+    }
+  }
+}
+
+// Home & About: no +, its line instead of a fan, live.
+export secCardHome = frame : secCard {
+  title: "Section card · Home & About",
+  left: 2732px,
+  top: 394px,
+
+  last {
+    subrange[1].range: [26, 31],
+    subrange[0].range: [13, 25],
+    contents: "Last touched Home & About Nov 1"
+  }
+
+  counts {
+    drafts {
+      display: .none
+    }
+
+    edits {
+      display: .none
+    }
+
+    live {
+      label {
+        contents: "Live"
+      }
+    }
+  }
+
+  @with-variant(fanWords)
+  fanRow {}
+
+  top {
+    lead {
+      dot {
+        fill[0].color: sec.section.hue-home,
+
+        glyph {
+          contents: homeIcon
+        }
+      }
+
+      name {
+        contents: "Home & About"
+      }
+    }
+
+    add {
+      display: .none
+    }
+  }
+}
+
+// ---- a list row (.st-drow, the kit row): the section's dot, the title
+// over its facts (publish state · type · stamp), the › at the end.
+// Children: `rowStitch`, `lead` (`dot`, `main` (`name`, `sub` (`state`,
+// `kind`, `stamp`))), `go`.
+export draftRow = frame {
+  title: "List row · a draft",
+  left: 0px,
+  top: 719px,
+  width: 958px,
+  min-height: spc.controls.st-row-h,
+  layout: {stack: {justify-content: .space-between, align-items: .center}},
+  fill: col.roles.surface,
+  shadow: [
+    {
+      drop-shadow: {
+        color: pal.palette.shadow-1,
+        offset: point(0px, 1px),
+        blur-radius: 0px
+      }
+    },
+    {
+      drop-shadow: {
+        color: pal.palette.shadow-1,
+        offset: point(0px, 2px),
+        blur-radius: 6px
+      }
+    }
+  ],
+  corner-radius: spc.radii.row,
+  padding: [
+    spc.layout.st-row-y,
+    spc.layout.st-row-r,
+    spc.layout.st-row-y,
+    spc.layout.st-row-l
+  ],
+  children: [rowStitch, lead, go],
+
+  rowStitch = frame : surf.stitch {
+    left: spc.layout.stitch-in-ctl,
+    top: spc.layout.stitch-in-ctl,
+    right: spc.layout.stitch-in-ctl,
+    bottom: spc.layout.stitch-in-ctl,
+    width: .nil,
+    height: .nil,
+    ignore-stack: .true,
+    corner-radius: spc.radii.opt,
+    border[0].width: spc.layout.stitch-w-sm
+  }
+
+  lead = frame {
+    layout: {stack: {align-items: .center, item-gap: spc.steps.s3}},
+    children: [dot, main],
+
+    dot = frame : prt.secDotRow {}
+
+    main = frame {
+      layout: {stack: {direction: .column, item-gap: spc.steps.s1}},
+      children: [name, sub],
+
+      name = text : txt.titleCard {
+        contents: "Studio",
+        font-size: typ.sizes.st-row
+      }
+
+      sub = frame {
+        height: spc.controls.st-fact,
+        layout: {stack: {align-items: .center, item-gap: spc.steps.s2}},
+        children: [state, kind, stamp],
+
+        state = frame : fct.factDraft {}
+
+        kind = frame : fct.factChip {}
+
+        stamp = text : txt.meta {
+          contents: "autosaved 4 min ago"
+        }
+      }
+    }
+  }
+
+  go = asset {
+    width: spc.controls.btn-icon,
+    height: spc.controls.btn-icon,
+    fill: col.roles.fg-3,
+    contents: goIcon
+  }
+}
+
+// ---- Recently: a day (the small year pill) and its changes on the
+// timeline's thread, each a knot, the words (the thing in the strong
+// words) and the section's dot + the time.
+// `actItem` children: `knot`, `body` (`words`, `stamp` (`dot`, `time`)).
+export actItem = frame {
+  title: "Activity · a change",
+  left: 1596px,
+  top: 719px,
+  width: spc.controls.st-recent-w,
+  layout: {stack: {}},
+  padding-left: spc.layout.st-act-indent,
+  children: [knot, body],
+
+  knot = frame {
+    left: spc.layout.st-knot-x,
+    top: spc.layout.st-knot-y,
+    width: spc.controls.st-knot,
+    height: spc.controls.st-knot,
+    ignore-stack: .true,
+    fill: col.roles.sheet,
+    border: {
+      color: col.roles.fg-3,
+      width: spc.layout.stitch-w-sm,
+      dash: [3px, 3px]
+    },
+    corner-radius: spc.radii.pill
+  }
+
+  body = frame {
+    width: 100%,
+    layout: {stack: {direction: .column, item-gap: spc.steps.s1}},
+    children: [words, stamp],
+
+    words = text : txt.body {
+      width: 100%,
+      contents: "Autosaved Studio",
+      font-size: typ.sizes.st-act,
+      line-height: typ.leading.st-quiet,
+      fill[0].color: col.roles.fg,
+      subrange[0].font-style: typ.faces.st-strong-style,
+      subrange[0].range: [10, 16]
+    }
+
+    stamp = frame {
+      layout: {stack: {align-items: .center, item-gap: spc.layout.fact-gap}},
+      children: [dot, time],
+
+      dot = frame : prt.secDotAct {}
+
+      time = text : txt.meta {
+        contents: "2:28 pm"
+      }
+    }
+  }
+}
+
+// A day: its pill, then its changes on the thread. Insert the changes
+// into `changes`: `changes { overrides: [insert(c1, after = .nil), …] }`.
+export actDay = frame {
+  title: "Activity · a day",
+  left: 2164px,
+  top: 719px,
+  width: spc.controls.st-recent-w,
+  layout: {stack: {direction: .column, item-gap: spc.steps.s3}},
+  padding-bottom: spc.layout.fact-gap,
+  children: [thread, pill, changes],
+
+  // the thread: a dashed line from the pill down the day
+  thread = frame {
+    left: spc.layout.st-thread-x,
+    top: spc.steps.s5,
+    bottom: 0px,
+    width: 2px,
+    ignore-stack: .true,
+    border: {
+      color: col.roles.stitch,
+      width: spc.layout.stitch-w-sm,
+      dash: [5px, 4px],
+      sides: .left
+    }
+  }
+
+  pill = frame : yp.yearPillSm {}
+
+  changes = frame {
+    width: 100%,
+    layout: {stack: {direction: .column, item-gap: spc.layout.st-act-gap}}
+  }
+}
+
+// ==== states page (labels over the definitions, then the states boards: i9 · i10 · i11) ====
+lbl-siteStrip = text : doc.specLabel {
+  left: 0px,
+  top: 0px,
+  contents: "siteStrip"
+}
+
+note-siteStrip = text : doc.specNote {
+  left: 0px,
+  top: 16px,
+  contents: "the site strip"
+}
+
+lbl-print = text : doc.specLabel {
+  left: 0px,
+  top: 180px,
+  contents: "print"
+}
+
+note-print = text : doc.specNote {
+  left: 0px,
+  top: 196px,
+  contents: "a print · words"
+}
+
+lbl-printSwatch = text : doc.specLabel {
+  left: 1596px,
+  top: 180px,
+  contents: "printSwatch"
+}
+
+note-printSwatch = text : doc.specNote {
+  left: 1596px,
+  top: 196px,
+  contents: "a swatch"
+}
+
+lbl-printIcon = text : doc.specLabel {
+  left: 2164px,
+  top: 180px,
+  contents: "printIcon"
+}
+
+note-printIcon = text : doc.specNote {
+  left: 2164px,
+  top: 196px,
+  contents: "an icon"
+}
+
+lbl-fan = text : doc.specLabel {
+  left: 2732px,
+  top: 180px,
+  contents: "fan"
+}
+
+note-fan = text : doc.specNote {
+  left: 2732px,
+  top: 196px,
+  contents: "a fan of prints"
+}
+
+lbl-fanSwatches = text : doc.specLabel {
+  left: 3300px,
+  top: 180px,
+  contents: "fanSwatches"
+}
+
+note-fanSwatches = text : doc.specNote {
+  left: 3300px,
+  top: 196px,
+  contents: "swatches"
+}
+
+lbl-fanIcons = text : doc.specLabel {
+  left: 3560px,
+  top: 180px,
+  contents: "fanIcons"
+}
+
+note-fanIcons = text : doc.specNote {
+  left: 3560px,
+  top: 196px,
+  contents: "icons"
+}
+
+lbl-fanWords = text : doc.specLabel {
+  left: 3834px,
+  top: 180px,
+  contents: "fanWords"
+}
+
+note-fanWords = text : doc.specNote {
+  left: 3834px,
+  top: 196px,
+  contents: "words"
+}
+
+lbl-secCard = text : doc.specLabel {
+  left: 0px,
+  top: 354px,
+  contents: "secCard"
+}
+
+note-secCard = text : doc.specNote {
+  left: 0px,
+  top: 370px,
+  contents: "a section card · Projects"
+}
+
+lbl-secCardMusic = text : doc.specLabel {
+  left: 1596px,
+  top: 354px,
+  contents: "secCardMusic"
+}
+
+note-secCardMusic = text : doc.specNote {
+  left: 1596px,
+  top: 370px,
+  contents: "Music"
+}
+
+lbl-secCardThoughts = text : doc.specLabel {
+  left: 2164px,
+  top: 354px,
+  contents: "secCardThoughts"
+}
+
+note-secCardThoughts = text : doc.specNote {
+  left: 2164px,
+  top: 370px,
+  contents: "Thoughts"
+}
+
+lbl-secCardHome = text : doc.specLabel {
+  left: 2732px,
+  top: 354px,
+  contents: "secCardHome"
+}
+
+note-secCardHome = text : doc.specNote {
+  left: 2732px,
+  top: 370px,
+  contents: "Home"
+}
+
+lbl-draftRow = text : doc.specLabel {
+  left: 0px,
+  top: 679px,
+  contents: "draftRow"
+}
+
+note-draftRow = text : doc.specNote {
+  left: 0px,
+  top: 695px,
+  contents: "a draft row"
+}
+
+lbl-actItem = text : doc.specLabel {
+  left: 1596px,
+  top: 679px,
+  contents: "actItem"
+}
+
+note-actItem = text : doc.specNote {
+  left: 1596px,
+  top: 695px,
+  contents: "an activity item"
+}
+
+lbl-actDay = text : doc.specLabel {
+  left: 2164px,
+  top: 679px,
+  contents: "actDay"
+}
+
+note-actDay = text : doc.specNote {
+  left: 2164px,
+  top: 695px,
+  contents: "an activity day"
+}
+
+@variants(studioDashboardStatesI10)
+studioDashboardStates = frame : doc.docBoard {
+  title: "Studio · dashboard parts · states · i9",
+  left: 0px,
+  top: 929px,
+
+  body {
+    layout.stack.item-gap: 48px,
+    overrides: [
+      insert(row-1, after = .nil),
+      insert(row-2, after = row-1),
+      insert(row-3, after = row-2),
+      insert(row-4, after = row-3),
+      insert(row-5, after = row-4),
+      insert(row-6, after = row-5),
+      insert(row-7, after = row-6)
+    ]
+  }
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i9"
+      }
+    }
+
+    boardCaption {
+      contents: "Studio · dashboard parts · every state"
+    }
+  }
+
+  row-1 = frame : doc.specRow {
+    layout.stack.item-gap: 48px,
+    overrides: [insert(st-siteStrip, after = .nil)]
+  }
+
+  row-2 = frame : doc.specRow {
+    layout.stack.item-gap: 48px,
+    overrides: [
+      insert(st-print, after = .nil),
+      insert(st-printSwatch, after = st-print),
+      insert(st-printIcon, after = st-printSwatch)
+    ]
+  }
+
+  row-3 = frame : doc.specRow {
+    layout.stack.item-gap: 48px,
+    overrides: [
+      insert(st-fan, after = .nil),
+      insert(st-fanSwatches, after = st-fan),
+      insert(st-fanIcons, after = st-fanSwatches),
+      insert(st-fanWords, after = st-fanIcons)
+    ]
+  }
+
+  row-4 = frame : doc.specRow {
+    layout.stack.item-gap: 48px,
+    overrides: [
+      insert(st-secCard, after = .nil),
+      insert(st-secCardMusic, after = st-secCard)
+    ]
+  }
+
+  row-5 = frame : doc.specRow {
+    layout.stack.item-gap: 48px,
+    overrides: [
+      insert(st-secCardThoughts, after = .nil),
+      insert(st-secCardHome, after = st-secCardThoughts)
+    ]
+  }
+
+  row-6 = frame : doc.specRow {
+    layout.stack.item-gap: 48px,
+    overrides: [insert(st-draftRow, after = .nil)]
+  }
+
+  row-7 = frame : doc.specRow {
+    layout.stack.item-gap: 48px,
+    overrides: [
+      insert(st-actItem, after = .nil),
+      insert(st-actDay, after = st-actItem)
+    ]
+  }
+
+  st-siteStrip = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "siteStrip"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "the site strip"
+    }
+
+    it = frame : siteStrip {}
+  }
+
+  st-print = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "print"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "a print · words"
+    }
+
+    it = frame : print {}
+  }
+
+  st-printSwatch = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "printSwatch"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "a swatch"
+    }
+
+    it = frame : printSwatch {}
+  }
+
+  st-printIcon = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "printIcon"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "an icon"
+    }
+
+    it = frame : printIcon {}
+  }
+
+  st-fan = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "fan"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "a fan of prints"
+    }
+
+    it = frame : fan {}
+  }
+
+  st-fanSwatches = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "fanSwatches"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "swatches"
+    }
+
+    it = frame : fanSwatches {}
+  }
+
+  st-fanIcons = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "fanIcons"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "icons"
+    }
+
+    it = frame : fanIcons {}
+  }
+
+  st-fanWords = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "fanWords"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "words"
+    }
+
+    it = frame : fanWords {}
+  }
+
+  st-secCard = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "secCard"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "a section card · Projects"
+    }
+
+    it = frame : secCard {}
+  }
+
+  st-secCardMusic = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "secCardMusic"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "Music"
+    }
+
+    it = frame : secCardMusic {}
+  }
+
+  st-secCardThoughts = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "secCardThoughts"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "Thoughts"
+    }
+
+    it = frame : secCardThoughts {}
+  }
+
+  st-secCardHome = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "secCardHome"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "Home"
+    }
+
+    it = frame : secCardHome {}
+  }
+
+  st-draftRow = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "draftRow"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "a draft row"
+    }
+
+    it = frame : draftRow {}
+  }
+
+  st-actItem = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "actItem"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "an activity item"
+    }
+
+    it = frame : actItem {}
+  }
+
+  st-actDay = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "actDay"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "an activity day"
+    }
+
+    it = frame : actDay {}
+  }
+}
+
+@variants(studioDashboardStatesI11)
+@context(i10="on")
+studioDashboardStatesI10 = frame : studioDashboardStates {
+  title: "Studio · dashboard parts · states · i10",
+  left: 1676px,
+  top: 929px,
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i10"
+      }
+    }
+  }
+}
+
+@context(i10="on", i11="on")
+studioDashboardStatesI11 = frame : studioDashboardStatesI10 {
+  title: "Studio · dashboard parts · states · i11",
+  left: 3352px,
+  top: 929px,
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i11"
+      }
+    }
+  }
+}

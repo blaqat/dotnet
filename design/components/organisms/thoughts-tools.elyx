@@ -1,0 +1,961 @@
+import "tokens/color/roles.elyx" as col
+import "tokens/space/space.elyx" as spc
+import "tokens/type/type.elyx" as typ
+import "components/atoms/text.elyx" as txt
+import "components/atoms/doc.elyx" as doc
+import "components/atoms/surface.elyx" as surf
+import "components/molecules/chip.elyx" as chips
+import "components/molecules/search.elyx" as srch
+import "components/organisms/page-header.elyx" as head
+import "assets/icons/bold/arrow-right.svg" as goIcon
+import "assets/posts/swatch-all.svg" as allSwatch
+import "assets/posts/swatch-scratch.svg" as scratchSwatch
+import "assets/posts/swatch-article.svg" as articleSwatch
+import "assets/posts/swatch-pick.svg" as pickSwatch
+import "assets/posts/swatch-ranking.svg" as rankingSwatch
+import "assets/posts/swatch-playlist.svg" as playlistSwatch
+import "assets/posts/swatch-images.svg" as imagesSwatch
+import "assets/posts/coll-tools.svg" as toolsMark
+import "assets/posts/coll-pile.svg" as pileMark
+
+// Thoughts' rail (the stitched feed's left column, `.t-rail`): the page's
+// title + its line + its counts, the search, then the filters: the post
+// types (`railType` rows: a swatch of the thing, its name, a count; "All"
+// is on), the tags and the years (small chips), the collections
+// (`railCollection` rows). Each filter group sits under an eyebrow with a
+// dashed rule (`railEyebrow`); i11 T8 cuts the TYPE / TAGS / YEAR
+// eyebrows (the swatches and the # already say it) and keeps COLLECTIONS
+// (`thoughtsRailI11`). Everything else is tokens.
+// An eyebrow: Micro caps + a dashed rule across the rest of the rail.
+export railEyebrow = frame {
+  title: "Rail · eyebrow",
+  left: 0px,
+  top: 40px,
+  width: spc.layout.rail-w,
+  layout: {stack: {align-items: .center, item-gap: spc.layout.chip-gap}},
+  overflow: .clip,
+  children: [word, rule],
+
+  word = text : txt.micro {
+    contents: "TYPE",
+    letter-spacing: typ.tracking.caps,
+    fill[0].color: col.roles.fg-3
+  }
+
+  rule = frame : surf.stitch {
+    width: 100%,
+    height: spc.layout.stitch-w-sm,
+    corner-radius: 0px,
+    border[0].color: col.roles.line,
+    border[0].sides: .top,
+    border[0].width: spc.layout.stitch-w-sm
+  }
+}
+
+// A type row (.ychip--row): a bare row at rest, the thing's swatch, its
+// name and a count at the end; on = the chip's on (i9 the red fill, i10
+// the section's tint + ring). Children (the chip's, plus `tally` >
+// `n`): set `glyph {contents: …}`, `label {contents: …}`, `tally { n {…} }`.
+@variants(railTypeOn)
+export railType = frame : chips.chip {
+  title: "Rail · type row",
+  left: 306px,
+  top: 40px,
+  width: spc.layout.rail-w,
+  corner-radius: spc.steps.s3,
+  padding-left: spc.layout.type-row-l,
+  padding-right: spc.layout.type-row-r,
+  border[0].visible: .false,
+  fill[0].visible: .false,
+  layout.stack.item-gap: spc.steps.s3,
+  overrides: [insert(tally, after = chips.chip.chipRing)],
+  shadow[0].drop-shadow.visible: .false,
+  shadow[1].drop-shadow.visible: .false,
+
+  glyph {
+    fill[0].visible: .false,
+    width: spc.controls.type-swatch,
+    height: spc.controls.type-swatch,
+    contents: scratchSwatch
+  }
+
+  chipStitch {
+    display: .none,
+    corner-radius: spc.steps.s2
+  }
+
+  label {
+    contents: "Scratch"
+  }
+
+  chipRing {
+    corner-radius: spc.steps.s3
+  }
+
+  tally = frame {
+    left: 0px,
+    top: 0px,
+    right: 0px,
+    bottom: 0px,
+    ignore-stack: .true,
+    layout: {stack: {justify-content: .end, align-items: .center}},
+    padding-right: spc.layout.type-row-r,
+    children: n,
+
+    n = text : txt.meta {
+      contents: "4"
+    }
+  }
+}
+
+// On ("All"): the on fill, its stitch and ring.
+export railTypeOn = frame : railType {
+  title: "Rail · type row · on",
+  left: 612px,
+  top: 40px,
+  fill[0].color: col.roles.on-bg,
+  fill[0].visible: .true,
+
+  chipStitch {
+    border[0].color: col.roles.on-fg,
+    opacity: 0.3,
+    display: .visible
+  }
+
+  label {
+    fill[0].color: col.roles.on-fg,
+    contents: "All"
+  }
+
+  tally {
+    n {
+      fill[0].color: col.roles.on-fg,
+      contents: "22"
+    }
+  }
+
+  glyph {
+    contents: allSwatch
+  }
+
+  chipRing {
+    display: .visible
+  }
+}
+
+// A collection (.t-link): its stubs, its name + a Meta count, →.
+export railCollection = frame : surf.patch {
+  title: "Rail · collection",
+  left: 918px,
+  top: 40px,
+  width: spc.layout.rail-w,
+  min-height: .nil,
+  corner-radius: spc.radii.row,
+  padding-top: spc.steps.s2,
+  padding-left: spc.steps.s2,
+  padding-bottom: spc.steps.s2,
+  padding-right: spc.steps.s2,
+  layout.stack.align-items: .center,
+  layout.stack.direction: .row,
+  layout.stack.item-gap: 0,
+  layout.stack.justify-content: .space-between,
+  overrides: [
+    insert(lead, after = surf.patch.patchStitch),
+    insert(go, after = lead)
+  ],
+
+  patchStitch {
+    left: spc.steps.s1,
+    top: spc.steps.s1,
+    right: spc.steps.s1,
+    bottom: spc.steps.s1,
+    corner-radius: spc.radii.tip
+  }
+
+  lead = frame {
+    layout: {stack: {align-items: .center, item-gap: spc.steps.s3}},
+    children: [mark, words],
+
+    mark = asset {
+      width: spc.controls.coll-mark-w,
+      height: spc.controls.coll-mark-h,
+      contents: toolsMark
+    }
+
+    words = frame {
+      layout: {stack: {direction: .column, item-gap: spc.steps.s1}},
+      children: [name, n],
+
+      name = text : txt.labelCard {
+        contents: "Tools I like"
+      }
+
+      n = text : txt.metaCard {
+        contents: "5 picks"
+      }
+    }
+  }
+
+  go = asset {
+    width: spc.controls.icon-sm,
+    height: spc.controls.icon-sm,
+    fill: col.roles.fg-2,
+    contents: goIcon
+  }
+}
+
+// The rail, filled with Thoughts' real filters (22 posts).
+@variants(thoughtsRailI11)
+export thoughtsRail = frame {
+  title: "Thoughts rail",
+  left: 0px,
+  top: 210px,
+  width: spc.layout.rail-w,
+  layout: {stack: {direction: .column, item-gap: spc.layout.rail-intro}},
+  children: [intro, filters],
+
+  // the page's title + its line + its counts; the search a little lower
+  intro = frame {
+    width: 100%,
+    layout: {stack: {direction: .column, item-gap: spc.layout.stack}},
+    children: [pageHead, lines],
+
+    pageHead = frame : head.pageHeader {
+      width: .nil,
+      min-height: 0px,
+
+      actions {
+        display: .none
+      }
+
+      headText {
+        headLine {
+          titleLine {
+            title {
+              contents: "Thoughts"
+            }
+          }
+        }
+      }
+    }
+
+    lines = frame {
+      width: 100%,
+      layout: {stack: {direction: .column, item-gap: spc.steps.s1}},
+      children: [blurb, count],
+
+      blurb = text : txt.body {
+        contents: "welcome to my void"
+      }
+
+      count = text : txt.meta {
+        contents: "22 posts · since Jun 2023"
+      }
+    }
+  }
+
+  // the search, then the filter groups
+  filters = frame {
+    width: 100%,
+    layout: {stack: {direction: .column, item-gap: spc.layout.rail-section}},
+    children: [searchBox, types, tags, years, collections],
+
+    searchBox = frame : srch.search {
+      width: 100%,
+
+      lead {
+        entry {
+          query {
+            contents: "Search thoughts"
+          }
+        }
+      }
+    }
+
+    types = frame {
+      width: 100%,
+      layout: {stack: {direction: .column, item-gap: spc.layout.stack}},
+      children: [typeHead, typeRows],
+
+      typeHead = frame : railEyebrow {
+        width: 100%
+      }
+
+      typeRows = frame {
+        width: 100%,
+        layout: {stack: {direction: .column, item-gap: spc.layout.stack-tight}},
+        children: [all, scratch, articles, picks, rankings, playlists, images],
+
+        all = frame : railTypeOn {
+          width: 100%
+        }
+
+        scratch = frame : railType {
+          width: 100%
+        }
+
+        articles = frame : railType {
+          width: 100%,
+
+          glyph {
+            contents: articleSwatch
+          }
+
+          label {
+            contents: "Articles"
+          }
+
+          tally {
+            n {
+              contents: "7"
+            }
+          }
+        }
+
+        picks = frame : railType {
+          width: 100%,
+
+          glyph {
+            contents: pickSwatch
+          }
+
+          label {
+            contents: "Picks"
+          }
+
+          tally {
+            n {
+              contents: "5"
+            }
+          }
+        }
+
+        rankings = frame : railType {
+          width: 100%,
+
+          glyph {
+            contents: rankingSwatch
+          }
+
+          label {
+            contents: "Rankings"
+          }
+
+          tally {
+            n {
+              contents: "2"
+            }
+          }
+        }
+
+        playlists = frame : railType {
+          width: 100%,
+
+          glyph {
+            contents: playlistSwatch
+          }
+
+          label {
+            contents: "Playlists"
+          }
+
+          tally {
+            n {
+              contents: "1"
+            }
+          }
+        }
+
+        images = frame : railType {
+          width: 100%,
+
+          glyph {
+            contents: imagesSwatch
+          }
+
+          label {
+            contents: "Images"
+          }
+
+          tally {
+            n {
+              contents: "3"
+            }
+          }
+        }
+      }
+    }
+
+    tags = frame {
+      width: 100%,
+      layout: {stack: {direction: .column, item-gap: spc.layout.stack}},
+      children: [tagHead, tagChips],
+
+      tagHead = frame : railEyebrow {
+        width: 100%,
+
+        word {
+          contents: "TAGS"
+        }
+      }
+
+      tagChips = frame {
+        width: 100%,
+        layout: {
+          stack: {
+            item-gap: spc.layout.rail-chips-x,
+            wrap: .true,
+            line-gap: spc.layout.rail-chips-y
+          }
+        },
+        children: [
+          c1,
+          c2,
+          c3,
+          c4,
+          c5,
+          c6,
+          c7,
+          c8,
+          c9,
+          c10,
+          c11,
+          c12,
+          c13,
+          c14,
+          c15,
+          c16
+        ],
+
+        c1 = frame : chips.chipSm {
+          glyph {
+            display: .none
+          }
+
+          label {
+            contents: "#tools"
+          }
+        }
+
+        c2 = frame : chips.chipSm {
+          glyph {
+            display: .none
+          }
+
+          label {
+            contents: "#learnings"
+          }
+        }
+
+        c3 = frame : chips.chipSm {
+          glyph {
+            display: .none
+          }
+
+          label {
+            contents: "#design"
+          }
+        }
+
+        c4 = frame : chips.chipSm {
+          glyph {
+            display: .none
+          }
+
+          label {
+            contents: "#ranked"
+          }
+        }
+
+        c5 = frame : chips.chipSm {
+          glyph {
+            display: .none
+          }
+
+          label {
+            contents: "#terminal"
+          }
+        }
+
+        c6 = frame : chips.chipSm {
+          glyph {
+            display: .none
+          }
+
+          label {
+            contents: "#browser"
+          }
+        }
+
+        c7 = frame : chips.chipSm {
+          glyph {
+            display: .none
+          }
+
+          label {
+            contents: "#browsers"
+          }
+        }
+
+        c8 = frame : chips.chipSm {
+          glyph {
+            display: .none
+          }
+
+          label {
+            contents: "#projects"
+          }
+        }
+
+        c9 = frame : chips.chipSm {
+          glyph {
+            display: .none
+          }
+
+          label {
+            contents: "#shower"
+          }
+        }
+
+        c10 = frame : chips.chipSm {
+          glyph {
+            display: .none
+          }
+
+          label {
+            contents: "#dotfiles"
+          }
+        }
+
+        c11 = frame : chips.chipSm {
+          glyph {
+            display: .none
+          }
+
+          label {
+            contents: "#editor"
+          }
+        }
+
+        c12 = frame : chips.chipSm {
+          glyph {
+            display: .none
+          }
+
+          label {
+            contents: "#focus"
+          }
+        }
+
+        c13 = frame : chips.chipSm {
+          glyph {
+            display: .none
+          }
+
+          label {
+            contents: "#music"
+          }
+        }
+
+        c14 = frame : chips.chipSm {
+          glyph {
+            display: .none
+          }
+
+          label {
+            contents: "#svelte"
+          }
+        }
+
+        c15 = frame : chips.chipSm {
+          glyph {
+            display: .none
+          }
+
+          label {
+            contents: "#video"
+          }
+        }
+
+        c16 = frame : chips.chipSm {
+          glyph {
+            display: .none
+          }
+
+          label {
+            contents: "#wip"
+          }
+        }
+      }
+    }
+
+    years = frame {
+      width: 100%,
+      layout: {stack: {direction: .column, item-gap: spc.layout.stack}},
+      children: [yearHead, yearChips],
+
+      yearHead = frame : railEyebrow {
+        width: 100%,
+
+        word {
+          contents: "YEAR"
+        }
+      }
+
+      yearChips = frame {
+        width: 100%,
+        layout: {stack: {item-gap: spc.layout.rail-chips-x}},
+        children: [y1, y2, y3],
+
+        y1 = frame : chips.chipSm {
+          glyph {
+            display: .none
+          }
+
+          label {
+            contents: "2026"
+          }
+        }
+
+        y2 = frame : chips.chipSm {
+          glyph {
+            display: .none
+          }
+
+          label {
+            contents: "2024"
+          }
+        }
+
+        y3 = frame : chips.chipSm {
+          glyph {
+            display: .none
+          }
+
+          label {
+            contents: "2023"
+          }
+        }
+      }
+    }
+
+    collections = frame {
+      width: 100%,
+      layout: {stack: {direction: .column, item-gap: spc.layout.stack}},
+      children: [collHead, tools, pile],
+
+      collHead = frame : railEyebrow {
+        width: 100%,
+
+        word {
+          contents: "COLLECTIONS"
+        }
+      }
+
+      tools = frame : railCollection {
+        width: 100%
+      }
+
+      pile = frame : railCollection {
+        width: 100%,
+
+        lead {
+          mark {
+            contents: pileMark
+          }
+
+          words {
+            name {
+              contents: "Reading pile"
+            }
+
+            n {
+              contents: "nothing yet"
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+// i11 T8: the TYPE / TAGS / YEAR eyebrows are cut (kept for screen
+// readers); COLLECTIONS stays.
+@context(i10="on", i11="on")
+export thoughtsRailI11 = frame : thoughtsRail {
+  title: "Thoughts rail · i11",
+  left: 306px,
+  top: 210px,
+
+  filters {
+    types {
+      typeHead {
+        display: .none
+      }
+    }
+
+    tags {
+      tagHead {
+        display: .none
+      }
+    }
+
+    years {
+      yearHead {
+        display: .none
+      }
+    }
+  }
+}
+
+// ==== states page (labels over the definitions, then the states boards: i9 · i10 · i11) ====
+lbl-railEyebrow = text : doc.specLabel {
+  left: 0px,
+  top: 0px,
+  contents: "railEyebrow"
+}
+
+note-railEyebrow = text : doc.specNote {
+  left: 0px,
+  top: 16px,
+  contents: "a rail group's eyebrow"
+}
+
+lbl-railType = text : doc.specLabel {
+  left: 306px,
+  top: 0px,
+  contents: "railType"
+}
+
+note-railType = text : doc.specNote {
+  left: 306px,
+  top: 16px,
+  contents: "a rail chip (a post type) · rest"
+}
+
+lbl-railTypeOn = text : doc.specLabel {
+  left: 612px,
+  top: 0px,
+  contents: "railTypeOn"
+}
+
+note-railTypeOn = text : doc.specNote {
+  left: 612px,
+  top: 16px,
+  contents: "on"
+}
+
+lbl-railCollection = text : doc.specLabel {
+  left: 918px,
+  top: 0px,
+  contents: "railCollection"
+}
+
+note-railCollection = text : doc.specNote {
+  left: 918px,
+  top: 16px,
+  contents: "a collection"
+}
+
+lbl-thoughtsRail = text : doc.specLabel {
+  left: 0px,
+  top: 170px,
+  contents: "thoughtsRail"
+}
+
+note-thoughtsRail = text : doc.specNote {
+  left: 0px,
+  top: 186px,
+  contents: "the rail"
+}
+
+lbl-thoughtsRailI11 = text : doc.specLabel {
+  left: 306px,
+  top: 170px,
+  contents: "thoughtsRailI11"
+}
+
+note-thoughtsRailI11 = text : doc.specNote {
+  left: 306px,
+  top: 186px,
+  contents: "i11"
+}
+
+@variants(thoughtsRailStatesI10)
+thoughtsRailStates = frame : doc.docBoard {
+  title: "Thoughts rail · states · i9",
+  left: 0px,
+  top: 1459px,
+
+  body {
+    layout.stack.item-gap: 48px,
+    overrides: [insert(row-1, after = .nil), insert(row-2, after = row-1)]
+  }
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i9"
+      }
+    }
+
+    boardCaption {
+      contents: "Thoughts rail · every state"
+    }
+  }
+
+  row-1 = frame : doc.specRow {
+    layout.stack.item-gap: 48px,
+    overrides: [
+      insert(st-railEyebrow, after = .nil),
+      insert(st-railType, after = st-railEyebrow),
+      insert(st-railTypeOn, after = st-railType),
+      insert(st-railCollection, after = st-railTypeOn)
+    ]
+  }
+
+  row-2 = frame : doc.specRow {
+    layout.stack.item-gap: 48px,
+    overrides: [insert(st-thoughtsRail, after = .nil)]
+  }
+
+  st-railEyebrow = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "railEyebrow"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "a rail group's eyebrow"
+    }
+
+    it = frame : railEyebrow {}
+  }
+
+  st-railType = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "railType"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "a rail chip (a post type) · rest"
+    }
+
+    it = frame : railType {}
+  }
+
+  st-railTypeOn = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "railTypeOn"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "on"
+    }
+
+    it = frame : railTypeOn {}
+  }
+
+  st-railCollection = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "railCollection"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "a collection"
+    }
+
+    it = frame : railCollection {}
+  }
+
+  st-thoughtsRail = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "thoughtsRail"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "the rail"
+    }
+
+    it = frame : thoughtsRail {}
+  }
+}
+
+@variants(thoughtsRailStatesI11)
+@context(i10="on")
+thoughtsRailStatesI10 = frame : thoughtsRailStates {
+  title: "Thoughts rail · states · i10",
+  left: 1448px,
+  top: 1459px,
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i10"
+      }
+    }
+  }
+}
+
+@context(i10="on", i11="on")
+thoughtsRailStatesI11 = frame : thoughtsRailStatesI10 {
+  title: "Thoughts rail · states · i11",
+  left: 2896px,
+  top: 1459px,
+
+  body {
+    row-2 {
+      st-thoughtsRail {
+        slot {
+          @with-variant(thoughtsRailI11)
+          it {}
+        }
+
+        note {
+          contents: "i11"
+        }
+
+        label {
+          contents: "thoughtsRailI11"
+        }
+      }
+    }
+  }
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i11"
+      }
+    }
+  }
+}

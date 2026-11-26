@@ -1,0 +1,296 @@
+import "tokens/color/roles.elyx" as col
+import "tokens/color/palette.elyx" as pal
+import "tokens/color/sections.elyx" as sec
+import "tokens/space/space.elyx" as spc
+import "components/atoms/text.elyx" as txt
+import "components/atoms/surface.elyx" as surf
+import "components/molecules/nav-tab.elyx" as tab
+import "assets/icons/bold/music-notes.svg" as musicIcon
+import "assets/icons/bold/cloud.svg" as thoughtsIcon
+import "components/atoms/doc.elyx" as doc
+
+// A section button (`a.ysecbtn`, Home's nav): a 60px white pill (172 wide at
+// least) holding the section's felt dot (44, the nav tab's dot in its own
+// hue, never greyed) and two centred lines: the section's name (Title) and
+// its count (Meta). i9: the control's dashed stitch inside; i10 R9 calm: no
+// stitch (col.roles.ctl-stitch), the same soft shadow. Words: i9 Nunito
+// 850 + Maple Mono; i10 Title 800 + Meta; i11 Title 500 + Meta 400.
+// Children: `btnStitch`, `dot` (its `glyph`), `words` (`name`, `count`).
+// Set a section with a variant, or `dot {fill[0].color: … glyph {contents: …}}`.
+@variants(secBtnMusic, secBtnThoughts)
+export secBtn = frame {
+  title: "Section button · Projects",
+  left: 0px,
+  top: 40px,
+  height: spc.controls.secbtn,
+  min-width: spc.controls.secbtn-w,
+  layout: {stack: {align-items: .center, item-gap: spc.steps.s3}},
+  fill: col.roles.surface,
+  shadow: [
+    {
+      drop-shadow: {
+        color: pal.palette.shadow-1,
+        offset: point(0px, 1px),
+        blur-radius: 0px
+      }
+    },
+    {
+      drop-shadow: {
+        color: pal.palette.shadow-1,
+        offset: point(0px, 2px),
+        blur-radius: 6px
+      }
+    }
+  ],
+  corner-radius: spc.radii.pill,
+  padding: [spc.steps.s2, spc.layout.secbtn-r, spc.steps.s2, spc.steps.s2],
+  children: [btnStitch, dot, words],
+
+  btnStitch = frame : surf.stitch {
+    left: spc.layout.stitch-in,
+    top: spc.layout.stitch-in,
+    right: spc.layout.stitch-in,
+    bottom: spc.layout.stitch-in,
+    width: .nil,
+    height: .nil,
+    ignore-stack: .true,
+    corner-radius: spc.radii.pill,
+    border[0].color: col.roles.ctl-stitch
+  }
+
+  // the felt dot: always in its section's hue (no grey rest from i10)
+  dot = frame : tab.navTab.dot {
+    width: spc.controls.secbtn-dot,
+    height: spc.controls.secbtn-dot,
+
+    dotStitch {
+      border[0].color: col.roles.dot-stitch
+    }
+
+    glyph {
+      fill[0].color: col.roles.dot-fg,
+      width: spc.controls.secbtn-icon,
+      height: spc.controls.secbtn-icon
+    }
+
+    dotRest {
+      display: .none
+    }
+  }
+
+  words = frame {
+    layout: {stack: {direction: .column, align-items: .center}},
+    children: [name, count],
+
+    name = text : txt.title {
+      contents: "Projects"
+    }
+
+    count = text : txt.meta {
+      contents: "12 builds"
+    }
+  }
+}
+
+export secBtnMusic = frame : secBtn {
+  title: "Section button · Music",
+  left: 228px,
+  top: 40px,
+
+  dot {
+    fill[0].color: sec.section.hue-music,
+
+    glyph {
+      contents: musicIcon
+    }
+  }
+
+  words {
+    name {
+      contents: "Music"
+    }
+
+    count {
+      contents: "58 pieces"
+    }
+  }
+}
+
+export secBtnThoughts = frame : secBtn {
+  title: "Section button · Thoughts",
+  left: 456px,
+  top: 40px,
+
+  dot {
+    fill[0].color: sec.section.hue-thoughts,
+
+    glyph {
+      contents: thoughtsIcon
+    }
+  }
+
+  words {
+    name {
+      contents: "Thoughts"
+    }
+
+    count {
+      contents: "22 posts"
+    }
+  }
+}
+
+// ==== states page (labels over the definitions, then the states boards: i9 · i10 · i11) ====
+lbl-secBtn = text : doc.specLabel {
+  left: 0px,
+  top: 0px,
+  contents: "secBtn"
+}
+
+note-secBtn = text : doc.specNote {
+  left: 0px,
+  top: 16px,
+  contents: "Projects"
+}
+
+lbl-secBtnMusic = text : doc.specLabel {
+  left: 228px,
+  top: 0px,
+  contents: "secBtnMusic"
+}
+
+note-secBtnMusic = text : doc.specNote {
+  left: 228px,
+  top: 16px,
+  contents: "Music"
+}
+
+lbl-secBtnThoughts = text : doc.specLabel {
+  left: 456px,
+  top: 0px,
+  contents: "secBtnThoughts"
+}
+
+note-secBtnThoughts = text : doc.specNote {
+  left: 456px,
+  top: 16px,
+  contents: "Thoughts"
+}
+
+@variants(secBtnStatesI10)
+secBtnStates = frame : doc.docBoard {
+  title: "Section button · states · i9",
+  left: 0px,
+  top: 260px,
+
+  body {
+    layout.stack.item-gap: 48px,
+    overrides: [insert(row-1, after = .nil)]
+  }
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i9"
+      }
+    }
+
+    boardCaption {
+      contents: "Section button · every state"
+    }
+  }
+
+  row-1 = frame : doc.specRow {
+    layout.stack.item-gap: 48px,
+    overrides: [
+      insert(st-secBtn, after = .nil),
+      insert(st-secBtnMusic, after = st-secBtn),
+      insert(st-secBtnThoughts, after = st-secBtnMusic)
+    ]
+  }
+
+  st-secBtn = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "secBtn"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "Projects"
+    }
+
+    it = frame : secBtn {}
+  }
+
+  st-secBtnMusic = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "secBtnMusic"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "Music"
+    }
+
+    it = frame : secBtnMusic {}
+  }
+
+  st-secBtnThoughts = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "secBtnThoughts"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "Thoughts"
+    }
+
+    it = frame : secBtnThoughts {}
+  }
+}
+
+@variants(secBtnStatesI11)
+@context(i10="on")
+secBtnStatesI10 = frame : secBtnStates {
+  title: "Section button · states · i10",
+  left: 836px,
+  top: 260px,
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i10"
+      }
+    }
+  }
+}
+
+@context(i10="on", i11="on")
+secBtnStatesI11 = frame : secBtnStatesI10 {
+  title: "Section button · states · i11",
+  left: 1672px,
+  top: 260px,
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i11"
+      }
+    }
+  }
+}

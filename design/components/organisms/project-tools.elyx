@@ -1,0 +1,255 @@
+import "tokens/color/roles.elyx" as col
+import "tokens/space/space.elyx" as spc
+import "components/atoms/surface.elyx" as surf
+import "components/atoms/doc.elyx" as doc
+import "components/molecules/chip.elyx" as chips
+import "assets/icons/bold/hammer.svg" as wipIcon
+import "components/molecules/search.elyx" as srch
+import "assets/icons/bold/pause-circle.svg" as pausedIcon
+import "assets/icons/bold/faders-horizontal.svg" as browseIcon
+
+// Projects' tools line (`.pj-top.ytools--line`): the search and the filter
+// strip share one line. The search takes what the strip leaves (a grid's
+// 1fr column), 16 before the strip. The strip: All (a circle, on when
+// nothing is filtered: i9 the red fill, i10 the section's tint), a dashed
+// divider, the three types, a divider, the three statuses, then Browse.
+// Chips are 6 apart, Browse 8 after the strip. Everything is the shared
+// chip + search: i9 knit + stitches, i10 R9 calm (tokens only).
+// Children: `find` (srch.search), `filters` > `strip` (`all`, `div1`,
+// `kinds` = `personal` `work` `school`, `div2`, `states` = `wip`
+// `complete` `paused`) + `browse`.
+export projectTools = frame {
+  title: "Projects · tools line",
+  left: 0px,
+  top: 40px,
+  width: 1332px,
+  layout: {
+    grid: {
+      columns: [1fr, .auto],
+      column-gap: spc.steps.s4,
+      align-items: .center
+    }
+  },
+  children: [find, filters],
+
+  find = frame : srch.search {
+    width: 100%,
+
+    lead {
+      entry {
+        query {
+          contents: "Search projects… try “python”"
+        }
+      }
+    }
+  }
+
+  filters = frame {
+    layout: {stack: {align-items: .center, item-gap: spc.steps.s2}},
+    children: [strip, browse],
+
+    strip = frame {
+      layout: {stack: {align-items: .center, item-gap: spc.layout.filter-gap}},
+      children: [all, div1, kinds, div2, states],
+
+      all = frame : chips.chipAllOn {}
+
+      div1 = frame : filterDiv {}
+
+      kinds = frame {
+        layout: {stack: {align-items: .center, item-gap: spc.layout.filter-gap}},
+        children: [personal, work, school],
+
+        personal = frame : chips.chipPersonal {}
+
+        work = frame : chips.chipWork {}
+
+        school = frame : chips.chipSchool {}
+      }
+
+      div2 = frame : filterDiv {}
+
+      states = frame {
+        layout: {stack: {align-items: .center, item-gap: spc.layout.filter-gap}},
+        children: [wip, complete, paused],
+
+        wip = frame : chips.chip {
+          glyph {
+            contents: wipIcon
+          }
+
+          label {
+            contents: "WIP"
+          }
+        }
+
+        complete = frame : chips.chip {}
+
+        paused = frame : chips.chip {
+          glyph {
+            contents: pausedIcon
+          }
+
+          label {
+            contents: "Paused"
+          }
+        }
+      }
+    }
+
+    browse = frame : chips.chip {
+      glyph {
+        contents: browseIcon
+      }
+
+      label {
+        contents: "Browse"
+      }
+    }
+  }
+}
+
+// The dashed divider between filter groups (`.yfilter__div`): 2px dashed,
+// 24 tall, 4px of room each side.
+export filterDiv = frame {
+  title: "Filter divider",
+  left: 1596px,
+  top: 40px,
+  layout: {stack: {}},
+  padding: [0px, spc.steps.s1],
+  children: line,
+
+  line = frame : surf.stitch {
+    width: spc.layout.stitch-w,
+    height: spc.steps.s5,
+    corner-radius: 0px,
+    border[0].color: col.roles.line,
+    border[0].sides: .left
+  }
+}
+
+// ==== states page (labels over the definitions, then the states boards: i9 · i10 · i11) ====
+lbl-projectTools = text : doc.specLabel {
+  left: 0px,
+  top: 0px,
+  contents: "projectTools"
+}
+
+note-projectTools = text : doc.specNote {
+  left: 0px,
+  top: 16px,
+  contents: "search + filter chips + the view switch"
+}
+
+lbl-filterDiv = text : doc.specLabel {
+  left: 1596px,
+  top: 0px,
+  contents: "filterDiv"
+}
+
+note-filterDiv = text : doc.specNote {
+  left: 1596px,
+  top: 16px,
+  contents: "a divider between chip groups"
+}
+
+@variants(projectToolsStatesI10)
+projectToolsStates = frame : doc.docBoard {
+  title: "Project tools · states · i9",
+  left: 0px,
+  top: 236px,
+
+  body {
+    layout.stack.item-gap: 48px,
+    overrides: [insert(row-1, after = .nil), insert(row-2, after = row-1)]
+  }
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i9"
+      }
+    }
+
+    boardCaption {
+      contents: "Project tools · every state"
+    }
+  }
+
+  row-1 = frame : doc.specRow {
+    layout.stack.item-gap: 48px,
+    overrides: [insert(st-projectTools, after = .nil)]
+  }
+
+  row-2 = frame : doc.specRow {
+    layout.stack.item-gap: 48px,
+    overrides: [insert(st-filterDiv, after = .nil)]
+  }
+
+  st-projectTools = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "projectTools"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "search + filter chips + the view switch"
+    }
+
+    it = frame : projectTools {}
+  }
+
+  st-filterDiv = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "filterDiv"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "a divider between chip groups"
+    }
+
+    it = frame : filterDiv {}
+  }
+}
+
+@variants(projectToolsStatesI11)
+@context(i10="on")
+projectToolsStatesI10 = frame : projectToolsStates {
+  title: "Project tools · states · i10",
+  left: 1676px,
+  top: 236px,
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i10"
+      }
+    }
+  }
+}
+
+@context(i10="on", i11="on")
+projectToolsStatesI11 = frame : projectToolsStatesI10 {
+  title: "Project tools · states · i11",
+  left: 3352px,
+  top: 236px,
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i11"
+      }
+    }
+  }
+}

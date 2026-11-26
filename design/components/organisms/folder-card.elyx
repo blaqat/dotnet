@@ -1,0 +1,778 @@
+import "tokens/color/roles.elyx" as col
+import "tokens/color/palette.elyx" as pal
+import "tokens/space/space.elyx" as spc
+import "tokens/type/type.elyx" as typ
+import "components/atoms/text.elyx" as txt
+import "components/atoms/doc.elyx" as doc
+import "components/atoms/surface.elyx" as surf
+import "components/atoms/art.elyx" as arts
+import "components/molecules/fact.elyx" as fct
+import "components/molecules/folder-tab.elyx" as ft
+import "components/molecules/link-disc.elyx" as lnk
+import "components/molecules/add-button.elyx" as addb
+import "components/molecules/play-button.elyx" as pb
+import "assets/art/cast-adrift.svg" as castAdriftCover
+
+// Music's folder card (Yarn.folder, DESIGN-i10 §6: i8's arrangement). A
+// collection's tabs hang ABOVE the card, joined to its top edge; the art
+// top-left with the title + its facts beside it; the description in Body
+// across the full width (clamped: i9 3 lines, from i10 2); the foot: link
+// discs left, + and ▶ right (▶ 44 is the biggest button).
+// The root is the card's cell: `folder-room` above the card is the tabs'
+// room (i9 every row; from i10 only a row with a collection: a block sets
+// `padding-top: 0px` on the cards of a row without one). In a stretching
+// grid every card in a row is as tall as the tallest; the foot sits on
+// the bottom edge.
+// i9 → i10: the count "(4 tracks)" leaves the title for the facts ("· 4
+// tracks"); the link discs go duotone; the playing card gets the live tint
+// and its tab the live fill (i9: the chosen tab's white + a red thread).
+// i11: insets + radii are tokens; the face's "more" link is cut (T8).
+// Children: `card` (`cardStitch`, `top` (`head` (`art`, `tt` (`nameRow`
+// (`name`, `count`), `facts`)), `face` (`desc`, `more`)), `foot` (`links`
+// (`link1`; insert more discs after it), `acts` (`add`, `play`))), `tabs`.
+@variants(folderCardI10, folderCardCurrent, folderCardLive, folderCardSingle)
+export folderCard = frame {
+  title: "Folder card · collection",
+  left: 0px,
+  top: 40px,
+  width: 315px,
+  layout: {stack: {direction: .column, align-items: .stretch}},
+  padding-top: spc.layout.folder-room,
+  children: [card, tabs],
+
+  // the card itself (fills its cell: height 100% of a stretched row)
+  card = frame {
+    width: 100%,
+    height: 100%,
+    layout: {
+      stack: {
+        direction: .column,
+        justify-content: .space-between,
+        align-items: .stretch
+      }
+    },
+    fill: col.roles.surface,
+    shadow: [
+      {
+        drop-shadow: {
+          color: pal.palette.shadow-1,
+          offset: point(0px, 1px),
+          blur-radius: 0px
+        }
+      },
+      {
+        drop-shadow: {
+          color: pal.palette.shadow-1,
+          offset: point(0px, 2px),
+          blur-radius: 6px
+        }
+      }
+    ],
+    corner-radius: spc.radii.card,
+    padding: [spc.layout.folder-inset-y, spc.layout.folder-inset],
+    children: [cardStitch, top, foot],
+
+    cardStitch = frame : surf.stitch {
+      left: spc.layout.stitch-in,
+      top: spc.layout.stitch-in,
+      right: spc.layout.stitch-in,
+      bottom: spc.layout.stitch-in,
+      width: .nil,
+      height: .nil,
+      ignore-stack: .true,
+      corner-radius: spc.radii.card-stitch
+    }
+
+    // the head + the description
+    top = frame {
+      layout: {
+        stack: {
+          direction: .column,
+          align-items: .stretch,
+          item-gap: spc.layout.folder-gap
+        }
+      },
+      children: [head, face],
+
+      head = frame {
+        layout: {
+          grid: {columns: [54px, 1fr], column-gap: spc.layout.folder-head-gap}
+        },
+        children: [art, tt],
+
+        art = frame : arts.artSm {
+          corner-radius: spc.radii.folder-art
+        }
+
+        // the title (+ i9's count) and the facts
+        tt = frame {
+          width: 100%,
+          layout: {
+            stack: {direction: .column, item-gap: spc.layout.folder-tt-gap}
+          },
+          children: [nameRow, facts],
+
+          nameRow = frame {
+            width: 100%,
+            layout: {
+              stack: {
+                align-items: .end,
+                item-gap: spc.steps.s2,
+                wrap: .true,
+                line-gap: spc.steps.s1
+              }
+            },
+            children: [name, count],
+
+            name = text : txt.titleCard {
+              max-width: 100%,
+              contents: "Alphabet City Collection"
+            }
+
+            // i9: the count follows the title (Numeric)
+            count = text : txt.numCard {
+              contents: "(4 tracks)"
+            }
+          }
+
+          // from i10 the count is the facts' quiet second part (`sub`)
+          facts = frame : fct.fact {
+            height: .auto,
+            layout.stack.line-gap: spc.steps.s1,
+            layout.stack.wrap: .true,
+
+            sub {
+              display: .none,
+              contents: "· 4 tracks"
+            }
+          }
+        }
+      }
+
+      // the description (Body, clamped by `folder-desc-h`); on the playing
+      // card the face shows the song: its name, its notes, "more"
+      face = frame {
+        max-height: spc.controls.folder-desc-h,
+        layout: {stack: {direction: .column, align-items: .stretch}},
+        overflow: .clip,
+        children: [desc, more],
+
+        desc = text : txt.bodyCard {
+          width: 100%,
+          contents: "Joke submissions for the 7th Beepbox Tournament"
+        }
+
+        // the "more" link on the face's last line (i9 + i10; cut in i11)
+        more = frame {
+          right: 0px,
+          bottom: 0px,
+          display: .none,
+          ignore-stack: .true,
+          layout: {stack: {}},
+          fill: col.roles.surface,
+          padding-left: spc.layout.more-l,
+          children: moreWord,
+
+          moreWord = text : txt.bodyCard {
+            contents: "more",
+            font-style: typ.faces.body-bold,
+            underline: .single,
+            fill[0].color: col.roles.link
+          }
+        }
+      }
+    }
+
+    // links left; + and ▶ right
+    foot = frame {
+      layout: {stack: {justify-content: .space-between, align-items: .center}},
+      padding-top: spc.layout.folder-gap,
+      children: [links, acts],
+
+      links = frame {
+        layout: {
+          stack: {align-items: .center, item-gap: spc.layout.folder-links-gap}
+        },
+        children: link1,
+
+        link1 = frame : lnk.linkDisc {}
+      }
+
+      acts = frame {
+        layout: {stack: {align-items: .center, item-gap: spc.steps.s2}},
+        children: [add, play],
+
+        add = frame : addb.addBtn {}
+
+        play = frame : pb.playBtn {}
+      }
+    }
+  }
+
+  // the tabs hang above the card, their strip's foot on its top edge
+  tabs = frame : ft.folderTabs {
+    left: 0px,
+    top: spc.layout.folder-tabs-top,
+    right: 0px,
+    width: .nil,
+    ignore-stack: .true
+  }
+}
+
+// Current: loaded and paused. Its tab stands up in front (the live thread
+// on top); ▶ wears the live ring.
+@variants(folderCardCurrentI10)
+export folderCardCurrent = frame : folderCard {
+  title: "Folder card · current (paused)",
+  left: 379px,
+  top: 40px,
+
+  @with-variant(ft.folderTabsCurrent)
+  tabs {
+    left: 0px
+  }
+
+  card {
+    foot {
+      acts {
+        @with-variant(pb.playBtnCurrent)
+        play {}
+      }
+    }
+  }
+}
+
+// Playing: ▶ is live (the bars); the face shows the song with "more". i9:
+// the card stays white and its tab is the chosen one (white + a red
+// thread); from i10 the live tint (col.roles.live-card) + the tab's fill.
+@variants(folderCardLiveI10)
+export folderCardLive = frame : folderCard {
+  title: "Folder card · playing",
+  left: 758px,
+  top: 40px,
+
+  @with-variant(ft.folderTabsCurrent)
+  tabs {
+    left: 0px
+  }
+
+  card {
+    fill[0].color: col.roles.live-card,
+
+    foot {
+      acts {
+        @with-variant(pb.playBtnLive)
+        play {}
+      }
+    }
+
+    top {
+      face {
+        more {
+          fill[0].color: col.roles.live-card,
+          display: .visible
+        }
+
+        desc {
+          subrange[0].range: [0, 33],
+          subrange[0].fill[0].color: col.roles.fg,
+          subrange[0].font-style: typ.faces.body-bold,
+          contents: "glooming shadows of alphabet city  e starts Gurgling Gutter water as ITS Gooey Grip Grabs him from the sewers of alphabet city. IT Gets Giddy and Grins as e tries to edge away. IT garrotes e as e lets out one final eeek that echos in ITS dungeon followed by Giggles Greedy for more."
+        }
+      }
+    }
+  }
+}
+
+// A single (one song): no tabs, no count (its title takes the full
+// width). It keeps the room when its row has a collection.
+export folderCardSingle = frame : folderCard {
+  title: "Folder card · single",
+  left: 1137px,
+  top: 40px,
+
+  tabs {
+    display: .none
+  }
+
+  card {
+    foot {
+      links {
+        @with-variant(lnk.linkDiscSoundcloud)
+        link1 {}
+      }
+    }
+
+    top {
+      head {
+        art {
+          fill[1].image.ref: castAdriftCover
+        }
+
+        tt {
+          nameRow {
+            name {
+              width: 100%,
+              contents: "cast adrift"
+            }
+
+            count {
+              display: .none
+            }
+          }
+
+          facts {
+            label {
+              contents: "Completed Nov 2023"
+            }
+          }
+        }
+      }
+
+      face {
+        desc {
+          contents: "nighttime thoughts"
+        }
+      }
+    }
+  }
+}
+
+// ---- i10 · the count joins the facts; duotone link discs ----
+@context(i10="on")
+export folderCardI10 = frame : folderCard {
+  title: "Folder card · collection · i10",
+  left: 0px,
+  top: 405px,
+
+  card {
+    foot {
+      links {
+        @with-variant(lnk.linkDiscI10)
+        link1 {}
+      }
+    }
+
+    top {
+      head {
+        tt {
+          nameRow {
+            name {
+              width: 100%
+            }
+
+            count {
+              display: .none
+            }
+          }
+
+          facts {
+            sub {
+              display: .visible
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+@context(i10="on")
+export folderCardCurrentI10 = frame : folderCardCurrent {
+  title: "Folder card · current · i10",
+  left: 379px,
+  top: 405px,
+
+  card {
+    foot {
+      links {
+        @with-variant(lnk.linkDiscI10)
+        link1 {}
+      }
+    }
+
+    top {
+      head {
+        tt {
+          nameRow {
+            name {
+              width: 100%
+            }
+
+            count {
+              display: .none
+            }
+          }
+
+          facts {
+            sub {
+              display: .visible
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+// Playing from i10: the live tint, the tab's live fill, ▶ live.
+@variants(folderCardLiveI11)
+@context(i10="on")
+export folderCardLiveI10 = frame : folderCardLive {
+  title: "Folder card · playing · i10",
+  left: 758px,
+  top: 405px,
+
+  @with-variant(ft.folderTabsLive)
+  tabs {}
+
+  card {
+    foot {
+      links {
+        @with-variant(lnk.linkDiscI10)
+        link1 {}
+      }
+    }
+
+    top {
+      head {
+        tt {
+          nameRow {
+            name {
+              width: 100%
+            }
+
+            count {
+              display: .none
+            }
+          }
+
+          facts {
+            sub {
+              display: .visible
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+// ---- i11 · T8: the face's "more" is cut (the card's own link carries
+// the song) ----
+@context(i10="on", i11="on")
+export folderCardLiveI11 = frame : folderCardLiveI10 {
+  title: "Folder card · playing · i11",
+  left: 758px,
+  top: 757px,
+
+  card {
+    top {
+      face {
+        more {
+          display: .none
+        }
+      }
+    }
+  }
+}
+
+// ==== states page (labels over the definitions, then the states boards: i9 · i10 · i11) ====
+lbl-folderCard = text : doc.specLabel {
+  left: 0px,
+  top: 0px,
+  contents: "folderCard"
+}
+
+note-folderCard = text : doc.specNote {
+  left: 0px,
+  top: 16px,
+  contents: "rest · a collection (its tabs above)"
+}
+
+lbl-folderCardCurrent = text : doc.specLabel {
+  left: 379px,
+  top: 0px,
+  contents: "folderCardCurrent"
+}
+
+note-folderCardCurrent = text : doc.specNote {
+  left: 379px,
+  top: 16px,
+  contents: "current: loaded, paused"
+}
+
+lbl-folderCardLive = text : doc.specLabel {
+  left: 758px,
+  top: 0px,
+  contents: "folderCardLive"
+}
+
+note-folderCardLive = text : doc.specNote {
+  left: 758px,
+  top: 16px,
+  contents: "live: playing"
+}
+
+lbl-folderCardSingle = text : doc.specLabel {
+  left: 1137px,
+  top: 0px,
+  contents: "folderCardSingle"
+}
+
+note-folderCardSingle = text : doc.specNote {
+  left: 1137px,
+  top: 16px,
+  contents: "a single (no tabs)"
+}
+
+lbl-folderCardI10 = text : doc.specLabel {
+  left: 0px,
+  top: 365px,
+  contents: "folderCardI10"
+}
+
+note-folderCardI10 = text : doc.specNote {
+  left: 0px,
+  top: 381px,
+  contents: "i10 · the count joins the facts"
+}
+
+lbl-folderCardCurrentI10 = text : doc.specLabel {
+  left: 379px,
+  top: 365px,
+  contents: "folderCardCurrentI10"
+}
+
+note-folderCardCurrentI10 = text : doc.specNote {
+  left: 379px,
+  top: 381px,
+  contents: "i10 · current"
+}
+
+lbl-folderCardLiveI10 = text : doc.specLabel {
+  left: 758px,
+  top: 365px,
+  contents: "folderCardLiveI10"
+}
+
+note-folderCardLiveI10 = text : doc.specNote {
+  left: 758px,
+  top: 381px,
+  contents: "i10 · live tint, the tab's live fill"
+}
+
+lbl-folderCardLiveI11 = text : doc.specLabel {
+  left: 758px,
+  top: 717px,
+  contents: "folderCardLiveI11"
+}
+
+note-folderCardLiveI11 = text : doc.specNote {
+  left: 758px,
+  top: 733px,
+  contents: "i11 · the face's “more” is cut"
+}
+
+@variants(folderCardStatesI10)
+folderCardStates = frame : doc.docBoard {
+  title: "Folder card · states · i9",
+  left: 0px,
+  top: 1117px,
+
+  body {
+    overrides: [insert(row-1, after = .nil)],
+    layout.stack.item-gap: 48px
+  }
+
+  boardHead {
+    boardCaption {
+      contents: "Folder card · every state"
+    }
+  }
+
+  row-1 = frame : doc.specRow {
+    layout.stack.item-gap: 48px,
+    overrides: [
+      insert(st-folderCard, after = .nil),
+      insert(st-folderCardCurrent, after = st-folderCard),
+      insert(st-folderCardLive, after = st-folderCardCurrent),
+      insert(st-folderCardSingle, after = st-folderCardLive)
+    ]
+  }
+
+  st-folderCard = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    label {
+      contents: "folderCard"
+    }
+
+    note = text : doc.specNote {
+      contents: "rest · a collection (its tabs above)"
+    }
+
+    it = frame : folderCard {
+      left: 0px,
+      top: 0px,
+      height: 224px
+    }
+  }
+
+  st-folderCardCurrent = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "folderCardCurrent"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "current: loaded, paused"
+    }
+
+    it = frame : folderCardCurrent {}
+  }
+
+  st-folderCardLive = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "folderCardLive"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "live: playing"
+    }
+
+    it = frame : folderCardLive {}
+  }
+
+  st-folderCardSingle = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "folderCardSingle"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "a single (no tabs)"
+    }
+
+    it = frame : folderCardSingle {}
+  }
+}
+
+@variants(folderCardStatesI11)
+@context(i10="on")
+folderCardStatesI10 = frame : folderCardStates {
+  title: "Folder card · states · i10",
+  left: 1764px,
+  top: 1117px,
+
+  body {
+    row-1 {
+      st-folderCardLive {
+        slot {
+          @with-variant(folderCardLiveI10)
+          it {}
+        }
+
+        note {
+          contents: "i10 · live tint, the tab's live fill"
+        }
+
+        label {
+          contents: "folderCardLiveI10"
+        }
+      }
+
+      st-folderCardCurrent {
+        slot {
+          @with-variant(folderCardCurrentI10)
+          it {}
+        }
+
+        note {
+          contents: "i10 · current"
+        }
+
+        label {
+          contents: "folderCardCurrentI10"
+        }
+      }
+
+      st-folderCard {
+        slot {
+          @with-variant(folderCardI10)
+          it {}
+        }
+
+        note {
+          contents: "i10 · the count joins the facts"
+        }
+
+        label {
+          contents: "folderCardI10"
+        }
+      }
+    }
+  }
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i10"
+      }
+    }
+  }
+}
+
+@context(i10="on", i11="on")
+folderCardStatesI11 = frame : folderCardStatesI10 {
+  title: "Folder card · states · i11",
+  left: 3528px,
+  top: 1117px,
+
+  body {
+    row-1 {
+      st-folderCardLive {
+        slot {
+          @with-variant(folderCardLiveI11)
+          it {}
+        }
+
+        note {
+          contents: "i11 · the face's “more” is cut"
+        }
+
+        label {
+          contents: "folderCardLiveI11"
+        }
+      }
+    }
+  }
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i11"
+      }
+    }
+  }
+}

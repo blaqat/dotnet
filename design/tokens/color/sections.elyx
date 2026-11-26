@@ -1,0 +1,22 @@
+// The section hue: dyes the cord frame (i9) and, from i10, feeds the
+// section-coloured roles. Context axis `section`:
+// home | projects | music | thoughts | studio. No section = red.
+import "./palette.elyx" as p
+import "./sections-home.elyx" as home
+import "./sections-projects.elyx" as projects
+import "./sections-music.elyx" as music
+import "./sections-thoughts.elyx" as thoughts
+import "./sections-studio.elyx" as studio
+
+@variants(home.homeSection, projects.projectsSection, music.musicSection, thoughts.thoughtsSection, studio.studioSection)
+export section = tokens {
+  sec: p.palette.red,
+  sec-deep: p.palette.red-deep,
+  sec-soft: p.palette.red-soft,
+  // each section's own hue, whatever the page (the nav tabs' felt dots)
+  hue-home: p.palette.red,
+  hue-projects: p.palette.blue,
+  hue-music: p.palette.purple,
+  hue-thoughts: p.palette.gold,
+  hue-studio: p.palette.ink
+}

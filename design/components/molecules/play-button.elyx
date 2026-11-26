@@ -1,0 +1,740 @@
+import "tokens/color/roles.elyx" as col
+import "tokens/color/palette.elyx" as pal
+import "tokens/space/space.elyx" as spc
+import "components/atoms/text.elyx" as txt
+import "components/atoms/surface.elyx" as surf
+import "components/atoms/eq-bars.elyx" as eqa
+import "assets/icons/fill/play.svg" as playIcon
+import "assets/icons/fill/pause.svg" as pauseIcon
+import "components/atoms/doc.elyx" as doc
+
+@with-context()
+file {}
+
+// Yarn.playBtn: the ONE play button (i10 R7). A state changes its fill,
+// never its shape or size. Rest = the act role: i9 red with a white stitch
+// (every ▶ was solid red), i10 white with a hairline and an ink ▶.
+// Current (loaded, paused) adds the live ring; Live (playing) is the live
+// fill with white bars; LivePause shows ⏸ instead (hover, focus, eq off).
+// Children: `playStitch`, `slot` (holds `playGlyph`, `pauseGlyph`, `eq`;
+// one shows at a time) and `label` (shown only on the labelled pill).
+@variants(playBtnCurrent, playBtnLive, playBtnSm, playBtnLabel)
+export playBtn = frame {
+  title: "Play · rest (act)",
+  left: 0px,
+  top: 40px,
+  width: spc.controls.play,
+  height: spc.controls.play,
+  layout: {
+    stack: {
+      justify-content: .center,
+      align-items: .center,
+      item-gap: spc.layout.play-l-gap
+    }
+  },
+  fill: col.roles.act-bg,
+  border: [
+    {color: col.roles.act-line, position: .outside},
+    {color: col.roles.live, visible: .false, width: spc.layout.ring-w}
+  ],
+  shadow: [
+    {
+      drop-shadow: {
+        color: pal.palette.shadow-1,
+        offset: point(0px, 1px),
+        blur-radius: 0px
+      }
+    },
+    {
+      drop-shadow: {
+        color: col.roles.ctl-shadow,
+        offset: point(0px, 2px),
+        blur-radius: 6px
+      }
+    }
+  ],
+  corner-radius: spc.radii.pill,
+  children: [playStitch, slot, label],
+
+  playStitch = frame : surf.stitch {
+    left: spc.layout.stitch-in-ctl,
+    top: spc.layout.stitch-in-ctl,
+    right: spc.layout.stitch-in-ctl,
+    bottom: spc.layout.stitch-in-ctl,
+    width: .nil,
+    height: .nil,
+    ignore-stack: .true,
+    corner-radius: spc.radii.pill,
+    border[0].color: col.roles.ctl-stitch-fill
+  }
+
+  slot = frame {
+    width: spc.controls.play-slot,
+    height: spc.controls.play-slot,
+    layout: {stack: {justify-content: .center, align-items: .center}},
+    children: [playGlyph, pauseGlyph, eq]
+  }
+
+  // ▶ sits 1px right of centre (its optical centre in a round button)
+  playGlyph = asset {
+    width: spc.controls.play-icon,
+    height: spc.controls.play-icon,
+    transform: [1, 0, 1, 0, 1, 0],
+    fill: col.roles.act-fg,
+    contents: playIcon
+  }
+
+  pauseGlyph = asset {
+    width: spc.controls.play-icon,
+    height: spc.controls.play-icon,
+    display: .none,
+    fill: col.roles.live-fg,
+    contents: pauseIcon
+  }
+
+  eq = frame : eqa.eqBarsOnLive {
+    left: 0px,
+    top: 0px,
+    display: .none
+  }
+
+  label = text : txt.label {
+    display: .none,
+    contents: "Play all",
+    fill[0].color: col.roles.act-fg
+  }
+}
+
+// Current: loaded and paused. Act + the live ring; the ▶ in live-deep
+// (i9: unchanged, the ring is red on red).
+export playBtnCurrent = frame : playBtn {
+  title: "Play · current",
+  left: 192px,
+  top: 40px,
+  border[1].visible: .true,
+
+  slot {
+    playGlyph {
+      fill[0].color: col.roles.act-current
+    }
+  }
+}
+
+// Live: playing. The live fill, white bars in the glyph's slot.
+@variants(playBtnLivePause)
+export playBtnLive = frame : playBtn {
+  title: "Play · live",
+  left: 403px,
+  top: 40px,
+  border[0].visible: .false,
+  fill[0].color: col.roles.live,
+  shadow[0].drop-shadow.color: pal.palette.shadow-lift,
+  shadow[1].drop-shadow.blur-radius: 12px,
+  shadow[1].drop-shadow.color: col.roles.live-glow,
+  shadow[1].drop-shadow.offset: [0px, 4px],
+  shadow[1].drop-shadow.spread: -4px,
+
+  slot {
+    playGlyph {
+      display: .none
+    }
+
+    eq {
+      display: .visible
+    }
+  }
+}
+
+// Live, showing ⏸ (hover / focus, or eq off).
+export playBtnLivePause = frame : playBtnLive {
+  title: "Play · live ⏸",
+  left: 608px,
+  top: 40px,
+
+  slot {
+    eq {
+      display: .none
+    }
+
+    pauseGlyph {
+      display: .visible
+    }
+  }
+}
+
+// Small (36): rows and dense cards.
+@variants(playBtnSmCurrent, playBtnSmLive)
+export playBtnSm = frame : playBtn {
+  title: "Play · sm",
+  left: 0px,
+  top: 220px,
+  width: spc.controls.play-sm,
+  height: spc.controls.play-sm,
+
+  slot {
+    width: spc.controls.play-slot-sm,
+
+    playGlyph {
+      width: spc.controls.play-icon-sm,
+      height: spc.controls.play-icon-sm
+    }
+
+    pauseGlyph {
+      width: spc.controls.play-icon-sm,
+      height: spc.controls.play-icon-sm
+    }
+
+    eq {
+      width: spc.controls.eq-w,
+      height: spc.controls.eq-h
+    }
+
+    height: spc.controls.play-slot-sm
+  }
+}
+
+export playBtnSmCurrent = frame : playBtnSm {
+  title: "Play · sm current",
+  left: 192px,
+  top: 220px,
+  border[1].visible: .true,
+
+  slot {
+    playGlyph {
+      fill[0].color: col.roles.act-current
+    }
+  }
+}
+
+export playBtnSmLive = frame : playBtnSm {
+  title: "Play · sm live",
+  left: 403px,
+  top: 220px,
+  border[0].visible: .false,
+  fill[0].color: col.roles.live,
+  shadow[0].drop-shadow.color: pal.palette.shadow-lift,
+  shadow[1].drop-shadow.blur-radius: 12px,
+  shadow[1].drop-shadow.color: col.roles.live-glow,
+  shadow[1].drop-shadow.offset: [0px, 4px],
+  shadow[1].drop-shadow.spread: -4px,
+
+  slot {
+    playGlyph {
+      display: .none
+    }
+
+    eq {
+      display: .visible
+    }
+  }
+}
+
+// The labelled pill ("▶ Play all"): act at rest, like the round one.
+@variants(playBtnLabelSm, playBtnPrimary)
+export playBtnLabel = frame : playBtn {
+  title: "Play · labelled",
+  left: 0px,
+  top: 392px,
+  width: .auto,
+  padding-left: spc.layout.play-l-l,
+  padding-right: spc.layout.play-l-r,
+
+  label {
+    display: .visible
+  }
+}
+
+export playBtnLabelSm = frame : playBtnLabel {
+  title: "Play · labelled sm",
+  left: 192px,
+  top: 392px,
+  height: spc.controls.play-sm,
+  padding-left: spc.layout.play-l-sm-l,
+  padding-right: spc.layout.play-l-sm-r,
+  layout.stack.item-gap: spc.layout.play-l-sm-gap,
+
+  @with-variant(txt.labelCard)
+  label {
+    left: .nil
+  }
+
+  slot {
+    width: spc.controls.play-slot-sm,
+
+    playGlyph {
+      width: spc.controls.play-icon-sm,
+      height: spc.controls.play-icon-sm
+    }
+
+    height: spc.controls.play-slot-sm
+  }
+}
+
+// Primary: the one primary per view (a release page's Play all): ink at
+// rest from i10 (red in i9).
+@variants(playBtnPrimaryLive)
+export playBtnPrimary = frame : playBtnLabel {
+  title: "Play · primary",
+  left: 403px,
+  top: 392px,
+  border[0].visible: .false,
+  fill[0].color: col.roles.primary-bg,
+  shadow[1].drop-shadow.color: pal.palette.shadow-1,
+
+  label {
+    fill[0].color: col.roles.primary-fg
+  }
+
+  slot {
+    playGlyph {
+      fill[0].color: col.roles.primary-fg
+    }
+  }
+}
+
+// Primary while it plays ("Pause"): live, not ink.
+export playBtnPrimaryLive = frame : playBtnPrimary {
+  title: "Play · primary live",
+  left: 608px,
+  top: 392px,
+  fill[0].color: col.roles.live,
+  shadow[0].drop-shadow.color: pal.palette.shadow-lift,
+  shadow[1].drop-shadow.blur-radius: 12px,
+  shadow[1].drop-shadow.color: col.roles.live-glow,
+  shadow[1].drop-shadow.offset: [0px, 4px],
+  shadow[1].drop-shadow.spread: -4px,
+
+  label {
+    fill[0].color: col.roles.live-fg,
+    contents: "Pause"
+  }
+
+  slot {
+    playGlyph {
+      display: .none
+    }
+
+    eq {
+      display: .visible
+    }
+  }
+}
+
+// ==== states page (labels over the definitions, then the states boards: i9 · i10 · i11) ====
+lbl-playBtn = text : doc.specLabel {
+  left: 0px,
+  top: 0px,
+  contents: "playBtn"
+}
+
+note-playBtn = text : doc.specNote {
+  left: 0px,
+  top: 16px,
+  contents: "rest (act)"
+}
+
+lbl-playBtnCurrent = text : doc.specLabel {
+  left: 192px,
+  top: 0px,
+  contents: "playBtnCurrent"
+}
+
+note-playBtnCurrent = text : doc.specNote {
+  left: 192px,
+  top: 16px,
+  contents: "current: loaded, paused"
+}
+
+lbl-playBtnLive = text : doc.specLabel {
+  left: 403px,
+  top: 0px,
+  contents: "playBtnLive"
+}
+
+note-playBtnLive = text : doc.specNote {
+  left: 403px,
+  top: 16px,
+  contents: "live: playing, eq bars"
+}
+
+lbl-playBtnLivePause = text : doc.specLabel {
+  left: 608px,
+  top: 0px,
+  contents: "playBtnLivePause"
+}
+
+note-playBtnLivePause = text : doc.specNote {
+  left: 608px,
+  top: 16px,
+  contents: "live, pause glyph (hover · focus · eq off)"
+}
+
+lbl-playBtnSm = text : doc.specLabel {
+  left: 0px,
+  top: 180px,
+  contents: "playBtnSm"
+}
+
+note-playBtnSm = text : doc.specNote {
+  left: 0px,
+  top: 196px,
+  contents: "sm (36) · rest"
+}
+
+lbl-playBtnSmCurrent = text : doc.specLabel {
+  left: 192px,
+  top: 180px,
+  contents: "playBtnSmCurrent"
+}
+
+note-playBtnSmCurrent = text : doc.specNote {
+  left: 192px,
+  top: 196px,
+  contents: "sm · current"
+}
+
+lbl-playBtnSmLive = text : doc.specLabel {
+  left: 403px,
+  top: 180px,
+  contents: "playBtnSmLive"
+}
+
+note-playBtnSmLive = text : doc.specNote {
+  left: 403px,
+  top: 196px,
+  contents: "sm · live"
+}
+
+lbl-playBtnLabel = text : doc.specLabel {
+  left: 0px,
+  top: 352px,
+  contents: "playBtnLabel"
+}
+
+note-playBtnLabel = text : doc.specNote {
+  left: 0px,
+  top: 368px,
+  contents: "labelled pill · rest"
+}
+
+lbl-playBtnLabelSm = text : doc.specLabel {
+  left: 192px,
+  top: 352px,
+  contents: "playBtnLabelSm"
+}
+
+note-playBtnLabelSm = text : doc.specNote {
+  left: 192px,
+  top: 368px,
+  contents: "labelled · sm"
+}
+
+lbl-playBtnPrimary = text : doc.specLabel {
+  left: 403px,
+  top: 352px,
+  contents: "playBtnPrimary"
+}
+
+note-playBtnPrimary = text : doc.specNote {
+  left: 403px,
+  top: 368px,
+  contents: "primary (one per view)"
+}
+
+lbl-playBtnPrimaryLive = text : doc.specLabel {
+  left: 608px,
+  top: 352px,
+  contents: "playBtnPrimaryLive"
+}
+
+note-playBtnPrimaryLive = text : doc.specNote {
+  left: 608px,
+  top: 368px,
+  contents: "primary · live (Pause)"
+}
+
+@variants(playBtnStatesI10)
+playBtnStates = frame : doc.docBoard {
+  title: "Play button · states · i9",
+  left: 0px,
+  top: 596px,
+
+  body {
+    layout.stack.item-gap: 48px,
+    overrides: [
+      insert(row-1, after = .nil),
+      insert(row-2, after = row-1),
+      insert(row-3, after = row-2)
+    ]
+  }
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i9"
+      }
+    }
+
+    boardCaption {
+      contents: "Play button · every state"
+    }
+  }
+
+  row-1 = frame : doc.specRow {
+    layout.stack.item-gap: 48px,
+    overrides: [
+      insert(st-playBtn, after = .nil),
+      insert(st-playBtnCurrent, after = st-playBtn),
+      insert(st-playBtnLive, after = st-playBtnCurrent),
+      insert(st-playBtnLivePause, after = st-playBtnLive)
+    ]
+  }
+
+  row-2 = frame : doc.specRow {
+    layout.stack.item-gap: 48px,
+    overrides: [
+      insert(st-playBtnSm, after = .nil),
+      insert(st-playBtnSmCurrent, after = st-playBtnSm),
+      insert(st-playBtnSmLive, after = st-playBtnSmCurrent)
+    ]
+  }
+
+  row-3 = frame : doc.specRow {
+    layout.stack.item-gap: 48px,
+    overrides: [
+      insert(st-playBtnLabel, after = .nil),
+      insert(st-playBtnLabelSm, after = st-playBtnLabel),
+      insert(st-playBtnPrimary, after = st-playBtnLabelSm),
+      insert(st-playBtnPrimaryLive, after = st-playBtnPrimary)
+    ]
+  }
+
+  st-playBtn = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "playBtn"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "rest (act)"
+    }
+
+    it = frame : playBtn {}
+  }
+
+  st-playBtnCurrent = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "playBtnCurrent"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "current: loaded, paused"
+    }
+
+    it = frame : playBtnCurrent {}
+  }
+
+  st-playBtnLive = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "playBtnLive"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "live: playing, eq bars"
+    }
+
+    it = frame : playBtnLive {}
+  }
+
+  st-playBtnLivePause = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "playBtnLivePause"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "live, pause glyph (hover · focus · eq off)"
+    }
+
+    it = frame : playBtnLivePause {}
+  }
+
+  st-playBtnSm = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "playBtnSm"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "sm (36) · rest"
+    }
+
+    it = frame : playBtnSm {}
+  }
+
+  st-playBtnSmCurrent = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "playBtnSmCurrent"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "sm · current"
+    }
+
+    it = frame : playBtnSmCurrent {}
+  }
+
+  st-playBtnSmLive = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "playBtnSmLive"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "sm · live"
+    }
+
+    it = frame : playBtnSmLive {}
+  }
+
+  st-playBtnLabel = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "playBtnLabel"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "labelled pill · rest"
+    }
+
+    it = frame : playBtnLabel {}
+  }
+
+  st-playBtnLabelSm = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "playBtnLabelSm"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "labelled · sm"
+    }
+
+    it = frame : playBtnLabelSm {}
+  }
+
+  st-playBtnPrimary = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "playBtnPrimary"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "primary (one per view)"
+    }
+
+    it = frame : playBtnPrimary {}
+  }
+
+  st-playBtnPrimaryLive = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "playBtnPrimaryLive"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "primary · live (Pause)"
+    }
+
+    it = frame : playBtnPrimaryLive {}
+  }
+}
+
+@variants(playBtnStatesI11)
+@context(i10="on")
+playBtnStatesI10 = frame : playBtnStates {
+  title: "Play button · states · i10",
+  left: 863px,
+  top: 596px,
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i10"
+      }
+    }
+  }
+}
+
+@context(i10="on", i11="on")
+playBtnStatesI11 = frame : playBtnStatesI10 {
+  title: "Play button · states · i11",
+  left: 1726px,
+  top: 596px,
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i11"
+      }
+    }
+  }
+}

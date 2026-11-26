@@ -1,0 +1,295 @@
+import "tokens/color/roles.elyx" as col
+import "tokens/color/sections.elyx" as sec
+import "tokens/space/space.elyx" as spc
+import "components/atoms/text.elyx" as txt
+import "components/atoms/surface.elyx" as surf
+import "components/atoms/art.elyx" as artAtom
+import "components/atoms/doc.elyx" as doc
+import "assets/icons/regular/video-camera.svg" as videoIcon
+import "redesign/v3-yarn-11/media/site-plan.png" as sitePlan
+import "assets/textures/felt.png" as feltTexture
+
+// A project's media, one part wherever it shows (`.pj-thumb`, the media
+// strip's `.ycar` thumb): a screenshot with its white stitch 4px in. The
+// card's media (212 × 146, the default), the timeline row's thumb (96 × 64,
+// radius art) and the item page's strip (148 × 92, radius pj-media) are
+// this part at another size: set `width`, `height`, `corner-radius` on the
+// instance. States: `mediaThumbFelt` (a video with no still: the felt),
+// `mediaThumbMissing` (a file the page can't play: the felt, a camera, its
+// words), `mediaThumbMono` (no media at all: the initials on the section's
+// soft knit). Children: `thumbStitch` (+ `mono`; + `missingGlyph`,
+// `missingWords`). Change the picture with `fill[1].image.ref`.
+@variants(mediaThumbFelt, mediaThumbMono)
+export mediaThumb = frame : artAtom.art {
+  title: "Media thumb · image",
+  left: 0px,
+  top: 40px,
+  width: spc.controls.pj-thumb-w,
+  height: spc.controls.pj-thumb-h,
+  corner-radius: spc.radii.pj-thumb,
+  fill[1].image.ref: sitePlan,
+  overrides: [insert(thumbStitch, after = .nil)],
+
+  thumbStitch = frame : surf.stitch {
+    left: spc.steps.s1,
+    top: spc.steps.s1,
+    right: spc.steps.s1,
+    bottom: spc.steps.s1,
+    width: .nil,
+    height: .nil,
+    corner-radius: spc.radii.pj-thumb-in,
+    border[0].color: col.roles.media-stitch,
+    border[0].width: spc.layout.stitch-w-sm
+  }
+}
+
+// A video with no still: the felt (it is the thumb's picture, so a thumb
+// whose source names a picture names the felt too: `fill[1].image.ref`).
+@variants(mediaThumbMissing)
+export mediaThumbFelt = frame : mediaThumb {
+  title: "Media thumb · video (felt)",
+  left: 268px,
+  top: 40px,
+  fill[1].image.ref: feltTexture
+}
+
+// A video the page can't play: the felt, a camera, its words.
+export mediaThumbMissing = frame : mediaThumbFelt {
+  title: "Media thumb · video unavailable",
+  left: 804px,
+  top: 40px,
+  layout.stack.align-items: .center,
+  layout.stack.direction: .column,
+  layout.stack.item-gap: spc.steps.s1,
+  layout.stack.justify-content: .center,
+  overrides: [
+    insert(missingGlyph, after = mediaThumb.thumbStitch),
+    insert(missingWords, after = missingGlyph)
+  ],
+
+  thumbStitch {
+    ignore-stack: .true
+  }
+
+  missingGlyph = asset {
+    width: spc.controls.icon,
+    height: spc.controls.icon,
+    fill: col.roles.fg-2,
+    contents: videoIcon
+  }
+
+  missingWords = text : txt.numCard {
+    contents: "video unavailable",
+    fill[0].color: col.roles.fg-2
+  }
+}
+
+// No media at all (a timeline row's thumb): the initials on the section's
+// soft knit, its stitch in the deep shade (i11: a 500 heading).
+export mediaThumbMono = frame : mediaThumb {
+  title: "Media thumb · none (monogram)",
+  left: 536px,
+  top: 40px,
+  fill[0].color: sec.section.sec-soft,
+  fill[1].visible: .false,
+  layout.stack.align-items: .center,
+  layout.stack.justify-content: .center,
+  overrides: [insert(mono, after = mediaThumb.thumbStitch)],
+
+  thumbStitch {
+    border[0].color: sec.section.sec-deep,
+    opacity: 0.32,
+    ignore-stack: .true
+  }
+
+  mono = text : txt.title {
+    contents: "FA",
+    fill[0].color: sec.section.sec-deep
+  }
+}
+
+// ==== states page (labels over the definitions, then the states boards: i9 · i10 · i11) ====
+lbl-mediaThumb = text : doc.specLabel {
+  left: 0px,
+  top: 0px,
+  contents: "mediaThumb"
+}
+
+note-mediaThumb = text : doc.specNote {
+  left: 0px,
+  top: 16px,
+  contents: "an image"
+}
+
+lbl-mediaThumbFelt = text : doc.specLabel {
+  left: 268px,
+  top: 0px,
+  contents: "mediaThumbFelt"
+}
+
+note-mediaThumbFelt = text : doc.specNote {
+  left: 268px,
+  top: 16px,
+  contents: "a video with no still: the felt"
+}
+
+lbl-mediaThumbMono = text : doc.specLabel {
+  left: 536px,
+  top: 0px,
+  contents: "mediaThumbMono"
+}
+
+note-mediaThumbMono = text : doc.specNote {
+  left: 536px,
+  top: 16px,
+  contents: "no media: the monogram"
+}
+
+lbl-mediaThumbMissing = text : doc.specLabel {
+  left: 804px,
+  top: 0px,
+  contents: "mediaThumbMissing"
+}
+
+note-mediaThumbMissing = text : doc.specNote {
+  left: 804px,
+  top: 16px,
+  contents: "a file that can't play"
+}
+
+@variants(mediaThumbStatesI10)
+mediaThumbStates = frame : doc.docBoard {
+  title: "Media thumb · states · i9",
+  left: 0px,
+  top: 346px,
+
+  body {
+    layout.stack.item-gap: 48px,
+    overrides: [insert(row-1, after = .nil)]
+  }
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i9"
+      }
+    }
+
+    boardCaption {
+      contents: "Media thumb · every state"
+    }
+  }
+
+  row-1 = frame : doc.specRow {
+    layout.stack.item-gap: 48px,
+    overrides: [
+      insert(st-mediaThumb, after = .nil),
+      insert(st-mediaThumbFelt, after = st-mediaThumb),
+      insert(st-mediaThumbMono, after = st-mediaThumbFelt),
+      insert(st-mediaThumbMissing, after = st-mediaThumbMono)
+    ]
+  }
+
+  st-mediaThumb = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "mediaThumb"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "an image"
+    }
+
+    it = frame : mediaThumb {}
+  }
+
+  st-mediaThumbFelt = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "mediaThumbFelt"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "a video with no still: the felt"
+    }
+
+    it = frame : mediaThumbFelt {}
+  }
+
+  st-mediaThumbMono = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "mediaThumbMono"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "no media: the monogram"
+    }
+
+    it = frame : mediaThumbMono {}
+  }
+
+  st-mediaThumbMissing = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "mediaThumbMissing"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "a file that can't play"
+    }
+
+    it = frame : mediaThumbMissing {}
+  }
+}
+
+@variants(mediaThumbStatesI11)
+@context(i10="on")
+mediaThumbStatesI10 = frame : mediaThumbStates {
+  title: "Media thumb · states · i10",
+  left: 1264px,
+  top: 346px,
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i10"
+      }
+    }
+  }
+}
+
+@context(i10="on", i11="on")
+mediaThumbStatesI11 = frame : mediaThumbStatesI10 {
+  title: "Media thumb · states · i11",
+  left: 2528px,
+  top: 346px,
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i11"
+      }
+    }
+  }
+}

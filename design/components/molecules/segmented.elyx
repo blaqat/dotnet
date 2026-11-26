@@ -1,0 +1,438 @@
+import "tokens/color/roles.elyx" as col
+import "tokens/color/palette.elyx" as pal
+import "tokens/space/space.elyx" as spc
+import "tokens/type/type.elyx" as typ
+import "components/atoms/text.elyx" as txt
+import "components/atoms/surface.elyx" as surf
+import "assets/icons/bold/rows.svg" as timelineIcon
+import "assets/icons/bold/squares-four.svg" as gridIcon
+import "components/atoms/doc.elyx" as doc
+
+// The kit's .yseg: a single choice in a recessed track (Timeline / Grid,
+// a sort). The chosen segment is a white patch wearing the pick rope (red
+// in i9, ink from i10); the rest are bare Label words. i10 R9 calm: the
+// track's inset shadow gives way to a 1px ring (col.roles.ctl-*).
+// A segment's children: `glyph`, `label`, and `segRope` when picked.
+@variants(segBtnPicked, segBtnHover, segBtnFocus)
+export segBtn = frame {
+  title: "Segment · rest",
+  left: 0px,
+  top: 40px,
+  height: spc.controls.seg,
+  layout: {stack: {align-items: .center, item-gap: spc.layout.chip-gap}},
+  corner-radius: spc.radii.pill,
+  padding: [0px, spc.layout.seg-x],
+  children: [glyph, label],
+
+  glyph = asset {
+    width: spc.controls.icon-sm,
+    height: spc.controls.icon-sm,
+    fill: col.roles.fg-2,
+    contents: timelineIcon
+  }
+
+  label = text : txt.label {
+    contents: "Timeline",
+    font-size: typ.sizes.chip,
+    fill[0].color: col.roles.fg-2
+  }
+}
+
+// The chosen segment: a white patch + the rope on its edge.
+export segBtnPicked = frame : segBtn {
+  title: "Segment · picked",
+  left: 680px,
+  top: 40px,
+  fill[0].color: col.roles.surface,
+  overrides: [insert(segRope, after = segBtn.label)],
+  shadow[0].drop-shadow.blur-radius: 0px,
+  shadow[0].drop-shadow.color: pal.palette.shadow-1,
+  shadow[0].drop-shadow.offset: [0px, 1px],
+  shadow[1].drop-shadow.blur-radius: 3px,
+  shadow[1].drop-shadow.color: pal.palette.shadow-1,
+  shadow[1].drop-shadow.offset: [0px, 1px],
+
+  label {
+    fill[0].color: col.roles.fg,
+    contents: "Grid"
+  }
+
+  glyph {
+    fill[0].color: col.roles.fg,
+    contents: gridIcon
+  }
+
+  segRope = frame : surf.rope {
+    left: 0px,
+    top: 0px,
+    right: 0px,
+    bottom: 0px,
+    width: .nil,
+    height: .nil,
+    ignore-stack: .true
+  }
+}
+
+// Timeline / Grid (Music, Projects): the view switch.
+export seg = frame {
+  title: "Segmented · view",
+  left: 0px,
+  top: 214px,
+  layout: {stack: {align-items: .center, item-gap: spc.layout.seg-gap}},
+  fill: col.roles.recess,
+  border: col.roles.ctl-line,
+  shadow: {
+    inner-shadow: {
+      color: col.roles.ctl-shadow,
+      offset: point(0px, 1px),
+      blur-radius: 3px
+    }
+  },
+  corner-radius: spc.radii.pill,
+  padding: spc.steps.s1,
+  children: [timeline, grid],
+
+  timeline = frame : segBtn {}
+
+  grid = frame : segBtnPicked {}
+}
+
+// A sort (Studio's Music order): words only.
+export segSort = frame {
+  title: "Segmented · sort",
+  left: 245px,
+  top: 214px,
+  layout: {stack: {align-items: .center, item-gap: spc.layout.seg-gap}},
+  fill: col.roles.recess,
+  border: col.roles.ctl-line,
+  shadow: {
+    inner-shadow: {
+      color: col.roles.ctl-shadow,
+      offset: point(0px, 1px),
+      blur-radius: 3px
+    }
+  },
+  corner-radius: spc.radii.pill,
+  padding: spc.steps.s1,
+  children: [finished, started, az],
+
+  finished = frame : segBtnPicked {
+    glyph {
+      display: .none
+    }
+
+    label {
+      contents: "Finished"
+    }
+  }
+
+  started = frame : segBtn {
+    glyph {
+      display: .none
+    }
+
+    label {
+      contents: "Started"
+    }
+  }
+
+  az = frame : segBtn {
+    glyph {
+      display: .none
+    }
+
+    label {
+      contents: "A–Z"
+    }
+  }
+}
+
+// ---- interaction states (the kit's interaction rules: rest · hover ·
+// focus · picked)
+// Hover (mouse): a half-white patch, the words in ink.
+export segBtnHover = frame : segBtn {
+  title: "Segment · hover",
+  left: 245px,
+  top: 40px,
+  fill[0].color: pal.palette.white-60,
+
+  label {
+    fill[0].color: col.roles.fg
+  }
+
+  glyph {
+    fill[0].color: col.roles.fg
+  }
+}
+
+// Focus (keys only): the dark thread ring 3px outside.
+export segBtnFocus = frame : segBtn {
+  title: "Segment · focus",
+  left: 521px,
+  top: 40px,
+  overrides: [insert(segFocusRing, after = segBtn.label)],
+
+  segFocusRing = frame : surf.focusRing {
+    left: spc.layout.focus-out,
+    top: spc.layout.focus-out,
+    right: spc.layout.focus-out,
+    bottom: spc.layout.focus-out,
+    width: .nil,
+    height: .nil,
+    ignore-stack: .true
+  }
+}
+
+// ==== states page (labels over the definitions, then the states boards: i9 · i10 · i11) ====
+lbl-segBtn = text : doc.specLabel {
+  left: 0px,
+  top: 0px,
+  contents: "segBtn"
+}
+
+note-segBtn = text : doc.specNote {
+  left: 0px,
+  top: 16px,
+  contents: "a segment · rest"
+}
+
+lbl-segBtnHover = text : doc.specLabel {
+  left: 245px,
+  top: 0px,
+  contents: "segBtnHover"
+}
+
+note-segBtnHover = text : doc.specNote {
+  left: 245px,
+  top: 16px,
+  contents: "hover (on the track)"
+}
+
+lbl-segBtnFocus = text : doc.specLabel {
+  left: 521px,
+  top: 0px,
+  contents: "segBtnFocus"
+}
+
+note-segBtnFocus = text : doc.specNote {
+  left: 521px,
+  top: 16px,
+  contents: "focus (keys)"
+}
+
+lbl-segBtnPicked = text : doc.specLabel {
+  left: 680px,
+  top: 0px,
+  contents: "segBtnPicked"
+}
+
+note-segBtnPicked = text : doc.specNote {
+  left: 680px,
+  top: 16px,
+  contents: "picked: the rope"
+}
+
+lbl-seg = text : doc.specLabel {
+  left: 0px,
+  top: 174px,
+  contents: "seg"
+}
+
+note-seg = text : doc.specNote {
+  left: 0px,
+  top: 190px,
+  contents: "the view switch"
+}
+
+lbl-segSort = text : doc.specLabel {
+  left: 245px,
+  top: 174px,
+  contents: "segSort"
+}
+
+note-segSort = text : doc.specNote {
+  left: 245px,
+  top: 190px,
+  contents: "a sort (words only)"
+}
+
+@variants(segStatesI10)
+segStates = frame : doc.docBoard {
+  title: "Segmented · states · i9",
+  left: 0px,
+  top: 420px,
+
+  body {
+    layout.stack.item-gap: 48px,
+    overrides: [insert(row-1, after = .nil), insert(row-2, after = row-1)]
+  }
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i9"
+      }
+    }
+
+    boardCaption {
+      contents: "Segmented · every state"
+    }
+  }
+
+  row-1 = frame : doc.specRow {
+    layout.stack.item-gap: 48px,
+    overrides: [
+      insert(st-segBtn, after = .nil),
+      insert(st-segBtnHover, after = st-segBtn),
+      insert(st-segBtnFocus, after = st-segBtnHover),
+      insert(st-segBtnPicked, after = st-segBtnFocus)
+    ]
+  }
+
+  row-2 = frame : doc.specRow {
+    layout.stack.item-gap: 48px,
+    overrides: [
+      insert(st-seg, after = .nil),
+      insert(st-segSort, after = st-seg)
+    ]
+  }
+
+  st-segBtn = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "segBtn"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "a segment · rest"
+    }
+
+    it = frame : segBtn {}
+  }
+
+  st-segBtnHover = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "segBtnHover"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "hover (on the track)"
+    }
+
+    it = frame : segBtnHover {}
+  }
+
+  st-segBtnFocus = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "segBtnFocus"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "focus (keys)"
+    }
+
+    it = frame : segBtnFocus {}
+  }
+
+  st-segBtnPicked = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "segBtnPicked"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "picked: the rope"
+    }
+
+    it = frame : segBtnPicked {}
+  }
+
+  st-seg = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "seg"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "the view switch"
+    }
+
+    it = frame : seg {}
+  }
+
+  st-segSort = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "segSort"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "a sort (words only)"
+    }
+
+    it = frame : segSort {}
+  }
+}
+
+@variants(segStatesI11)
+@context(i10="on")
+segStatesI10 = frame : segStates {
+  title: "Segmented · states · i10",
+  left: 765px,
+  top: 420px,
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i10"
+      }
+    }
+  }
+}
+
+@context(i10="on", i11="on")
+segStatesI11 = frame : segStatesI10 {
+  title: "Segmented · states · i11",
+  left: 1530px,
+  top: 420px,
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i11"
+      }
+    }
+  }
+}

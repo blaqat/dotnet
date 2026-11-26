@@ -1,0 +1,1896 @@
+import "tokens/color/roles.elyx" as col
+import "tokens/color/palette.elyx" as pal
+import "tokens/color/sections.elyx" as sec
+import "tokens/space/space.elyx" as spc
+import "components/atoms/text.elyx" as txt
+import "components/atoms/doc.elyx" as doc
+import "components/atoms/surface.elyx" as surf
+import "components/molecules/nav-tab.elyx" as tab
+import "assets/icons/bold/folder-simple.svg" as projectsIcon
+import "assets/icons/fill/folder-simple.svg" as projectsIconFill
+import "assets/icons/bold/music-notes.svg" as musicIcon
+import "assets/icons/fill/music-notes.svg" as musicIconFill
+import "assets/icons/bold/cloud.svg" as thoughtsIcon
+import "assets/icons/fill/cloud.svg" as thoughtsIconFill
+import "components/molecules/sections-pill.elyx" as spl
+import "assets/icons/fill/house.svg" as homeIconFill
+import "assets/icons/bold/caret-down.svg" as foldIcon
+import "assets/icons/fill/squares-four.svg" as studioIconFill
+import "components/molecules/search.elyx" as srch
+import "assets/icons/bold/magnifying-glass.svg" as findIcon
+import "components/organisms/music-tools.elyx" as mt
+import "assets/icons/bold/faders-horizontal.svg" as browseIcon
+import "components/organisms/player.elyx" as pl
+import "components/organisms/player-phone.elyx" as pp
+import "assets/icons/bold/plus.svg" as newIcon
+import "assets/icons/bold/house.svg" as homeIcon
+import "assets/icons/bold/images-square.svg" as mediaIcon
+
+file {
+  draw-connections: .true
+}
+
+// The phones' navigation (< 960; kit COMPONENTS.md §16 + §21, ?mnav=spool
+// and ?msearch=fab: the decided defaults in i9, i10 and i11). There is no
+// bottom bar: the page's top keeps only the brand (organisms/nav.elyx
+// `navPhone`) and the sound tag, and everything else floats in one layer
+// over the page, measured up from the screen's bottom:
+//   the slot  a 360 × 64 strip 17 above the bottom, 15 in from each edge:
+//             whatever is open fills it (the player's bar, the search bar)
+//   the row   the slot's centre line: closed knobs rest on it (the sections
+//             pill left; the search knob, then the player's disc, right)
+//   the up    the line one slot higher: what waits while the slot is held
+//             (the pill and the knob at .846; search's chip row)
+// Parts here: the knobs (search · Browse · Studio's +), the sections menu
+// (the pill unspooled) and its rows, the search bar in the slot, the
+// floating chip row, and `phoneLayer`: the whole layer in each state.
+// ---- knobs (.yfab__btn) ----
+// One quiet white knit button (52, its stitch 6 in), the magnifier in fg-2.
+// Up: .846 (44) while the player's bar holds the slot. Open: at the search
+// bar's right end, 44, on cotton-2 (pressed in), ⌄ (it folds the bar
+// away). Count: the filters that are on, a badge on its shoulder.
+// Children: `knobStitch`, `glyph`, `badge` (`n`).
+@variants(searchKnobUp, searchKnobOpen, searchKnobCount, browseKnob, newKnob)
+export searchKnob = frame {
+  title: "Search knob · rest",
+  left: 0px,
+  top: 40px,
+  width: spc.controls.knob,
+  height: spc.controls.knob,
+  layout: {stack: {justify-content: .center, align-items: .center}},
+  fill: col.roles.surface,
+  shadow: [
+    {
+      drop-shadow: {
+        color: pal.palette.shadow-1,
+        offset: point(0px, 1px),
+        blur-radius: 0px
+      }
+    },
+    {
+      drop-shadow: {
+        color: pal.palette.shadow-pop,
+        offset: point(0px, 6px),
+        blur-radius: 16px,
+        spread: -5px
+      }
+    }
+  ],
+  corner-radius: spc.radii.pill,
+  children: [knobStitch, glyph, badge],
+
+  knobStitch = frame : surf.stitch {
+    left: spc.layout.stitch-in,
+    top: spc.layout.stitch-in,
+    right: spc.layout.stitch-in,
+    bottom: spc.layout.stitch-in,
+    width: .nil,
+    height: .nil,
+    ignore-stack: .true,
+    corner-radius: spc.radii.pill,
+    border[0].width: spc.layout.stitch-w-sm
+  }
+
+  glyph = asset {
+    width: spc.controls.knob-icon,
+    height: spc.controls.knob-icon,
+    fill: col.roles.fg-2,
+    contents: findIcon
+  }
+
+  badge = frame {
+    top: -2px,
+    right: -2px,
+    width: spc.controls.knob-badge,
+    height: spc.controls.knob-badge,
+    display: .none,
+    ignore-stack: .true,
+    layout: {stack: {justify-content: .center, align-items: .center}},
+    fill: col.roles.primary-bg,
+    corner-radius: spc.radii.pill,
+    children: n,
+
+    n = text : txt.micro {
+      contents: "2",
+      fill[0].color: col.roles.primary-fg
+    }
+  }
+}
+
+export searchKnobUp = frame : searchKnob {
+  title: "Search knob · up (the player has the slot)",
+  left: 470px,
+  top: 40px,
+  width: spc.controls.knob-up,
+  height: spc.controls.knob-up,
+
+  glyph {
+    width: spc.controls.knob-up-icon,
+    height: spc.controls.knob-up-icon
+  }
+}
+
+export searchKnobOpen = frame : searchKnob {
+  title: "Search knob · open (folds the bar)",
+  left: 940px,
+  top: 40px,
+  width: spc.controls.knob-up,
+  height: spc.controls.knob-up,
+  fill[0].color: col.roles.recess,
+  shadow[0].inner-shadow.blur-radius: 2px,
+  shadow[1]: .nil,
+
+  glyph {
+    fill[0].color: col.roles.fg,
+    width: spc.controls.knob-up-icon,
+    height: spc.controls.knob-up-icon,
+    contents: foldIcon
+  }
+
+  knobStitch {
+    display: .none
+  }
+}
+
+export searchKnobCount = frame : searchKnob {
+  title: "Search knob · 2 filters on",
+  left: 1410px,
+  top: 40px,
+
+  badge {
+    display: .visible
+  }
+}
+
+// Browse (the floating chip row's end): the same knob, 44, the faders.
+export browseKnob = frame : searchKnob {
+  title: "Browse knob (the chip row's end)",
+  left: 1880px,
+  top: 40px,
+  width: spc.controls.knob-up,
+  height: spc.controls.knob-up,
+
+  glyph {
+    fill[0].color: col.roles.fg,
+    width: spc.controls.knob-up-icon,
+    height: spc.controls.knob-up-icon,
+    contents: browseIcon
+  }
+}
+
+// Studio's + (new): the ink knob (the view's primary), a white stitch.
+export newKnob = frame : searchKnob {
+  title: "New knob (Studio's +)",
+  left: 2350px,
+  top: 40px,
+  fill[0].color: col.roles.dark,
+
+  knobStitch {
+    border[0].color: pal.palette.on-dark-stitch
+  }
+
+  glyph {
+    fill[0].color: col.roles.dark-fg,
+    contents: newIcon
+  }
+}
+
+// ---- the sections menu (.yspool__menu) ----
+// A row: the section's felt dot (32: its hue in i9; from i10 grey until
+// it's here) and its name. Here (aria-current): cotton-2, the HERE rope on
+// its edge (i9 red; from i10 the page's hue), the filled glyph.
+// Children: `dot` (`glyph`), `label`.
+@variants(spoolRowHere)
+export spoolRow = frame {
+  title: "Sections menu · row",
+  left: 0px,
+  top: 212px,
+  width: spc.controls.spool-menu-w,
+  height: spc.controls.spool-row,
+  layout: {stack: {align-items: .center, item-gap: spc.layout.spool-row-gap}},
+  corner-radius: spc.radii.spool-row,
+  padding: [0px, spc.layout.spool-row-r, 0px, spc.layout.spool-row-l],
+  children: [dot, label],
+
+  dot = frame : tab.navTab.dot {
+    width: spc.controls.spool-row-dot,
+    height: spc.controls.spool-row-dot,
+    fill[0].color: sec.section.hue-home,
+
+    glyph {
+      width: spc.controls.spool-row-icon,
+      height: spc.controls.spool-row-icon,
+      contents: homeIcon
+    }
+  }
+
+  label = text : txt.label {
+    contents: "Home",
+    fill[0].color: col.roles.fg-2
+  }
+}
+
+export spoolRowHere = frame : spoolRow {
+  title: "Sections menu · row · here",
+  left: 470px,
+  top: 212px,
+  fill[0].color: col.roles.recess,
+  overrides: [insert(rowRope, after = spoolRow.label)],
+
+  label {
+    fill[0].color: col.roles.fg
+  }
+
+  dot {
+    glyph {
+      fill[0].color: col.roles.dot-fg,
+      contents: homeIconFill
+    }
+
+    dotStitch {
+      border[0].color: col.roles.dot-stitch
+    }
+
+    dotRest {
+      display: .none
+    }
+  }
+
+  rowRope = frame : surf.ropeHere {
+    left: 0px,
+    top: 0px,
+    right: 0px,
+    bottom: 0px,
+    width: .nil,
+    height: .nil,
+    ignore-stack: .true,
+    corner-radius: spc.radii.spool-row
+  }
+}
+
+// The menu: white knit (22, a stitch 5 in), 200 wide at least, the site's
+// four sections in a column (9 in, 4 apart), the page's own roped. It
+// rises 8 above the pill (see `phoneLayerMenu`). One variant per section
+// (`section=…`); Studio lists its own pages.
+// Children: `menuStitch`, `rows` (`home`, `projects`, `music`, `thoughts`).
+@variants(
+  sectionsMenuProjects,
+  sectionsMenuMusic,
+  sectionsMenuThoughts,
+  sectionsMenuStudio
+)
+export sectionsMenu = frame {
+  title: "Sections menu · Home here",
+  left: 0px,
+  top: 380px,
+  min-width: spc.controls.spool-menu-w,
+  layout: {stack: {direction: .column, align-items: .stretch}},
+  fill: col.roles.surface,
+  shadow: [
+    {
+      drop-shadow: {
+        color: pal.palette.shadow-1,
+        offset: point(0px, 1px),
+        blur-radius: 0px
+      }
+    },
+    {
+      drop-shadow: {
+        color: pal.palette.shadow-pop,
+        offset: point(0px, 18px),
+        blur-radius: 40px,
+        spread: -12px
+      }
+    },
+    {
+      drop-shadow: {
+        color: pal.palette.shadow-1,
+        offset: point(0px, 2px),
+        blur-radius: 6px
+      }
+    }
+  ],
+  corner-radius: spc.radii.spool-menu,
+  children: [menuStitch, rows],
+
+  menuStitch = frame : surf.stitch {
+    left: spc.steps.s1,
+    top: spc.steps.s1,
+    right: spc.steps.s1,
+    bottom: spc.steps.s1,
+    width: .nil,
+    height: .nil,
+    ignore-stack: .true,
+    corner-radius: spc.radii.spool-menu-stitch,
+    border[0].width: spc.layout.stitch-w-sm
+  }
+
+  rows = frame {
+    layout: {
+      stack: {
+        direction: .column,
+        align-items: .stretch,
+        item-gap: spc.layout.spool-rows-gap
+      }
+    },
+    padding: spc.layout.spool-menu-in,
+    children: [home, projects, music, thoughts],
+
+    home = frame : spoolRowHere {
+      width: 100%
+    }
+
+    projects = frame : spoolRow {
+      width: 100%,
+
+      dot {
+        fill[0].color: sec.section.hue-projects,
+
+        glyph {
+          contents: projectsIcon
+        }
+      }
+
+      label {
+        contents: "Projects"
+      }
+    }
+
+    music = frame : spoolRow {
+      width: 100%,
+
+      dot {
+        fill[0].color: sec.section.hue-music,
+
+        glyph {
+          contents: musicIcon
+        }
+      }
+
+      label {
+        contents: "Music"
+      }
+    }
+
+    thoughts = frame : spoolRow {
+      width: 100%,
+
+      dot {
+        fill[0].color: sec.section.hue-thoughts,
+
+        glyph {
+          contents: thoughtsIcon
+        }
+      }
+
+      label {
+        contents: "Thoughts"
+      }
+    }
+  }
+}
+
+@context(section="projects")
+export sectionsMenuProjects = frame : sectionsMenu {
+  title: "Sections menu · Projects here",
+  left: 470px,
+  top: 380px,
+
+  rows {
+    @with-variant(spoolRowHere)
+    projects {
+      dot {
+        glyph {
+          contents: projectsIconFill
+        }
+      }
+    }
+
+    @with-variant(spoolRow)
+    home {}
+  }
+}
+
+@context(section="music")
+export sectionsMenuMusic = frame : sectionsMenu {
+  title: "Sections menu · Music here",
+  left: 940px,
+  top: 380px,
+
+  rows {
+    @with-variant(spoolRowHere)
+    music {
+      dot {
+        glyph {
+          contents: musicIconFill
+        }
+      }
+    }
+
+    @with-variant(spoolRow)
+    home {}
+  }
+}
+
+@context(section="thoughts")
+export sectionsMenuThoughts = frame : sectionsMenu {
+  title: "Sections menu · Thoughts here",
+  left: 1410px,
+  top: 380px,
+
+  rows {
+    @with-variant(spoolRowHere)
+    thoughts {
+      dot {
+        glyph {
+          contents: thoughtsIconFill
+        }
+      }
+    }
+
+    @with-variant(spoolRow)
+    home {}
+  }
+}
+
+// Studio's own pages: Studio (here) · Projects · Music · Thoughts · Media.
+@context(section="studio")
+export sectionsMenuStudio = frame : sectionsMenu {
+  title: "Sections menu · Studio here",
+  left: 1880px,
+  top: 380px,
+
+  rows {
+    overrides: [insert(media, after = sectionsMenu.rows.thoughts)],
+
+    home {
+      dot {
+        fill[0].color: sec.section.hue-studio,
+
+        glyph {
+          contents: studioIconFill
+        }
+      }
+
+      label {
+        contents: "Studio"
+      }
+    }
+  }
+
+  media = frame : spoolRow {
+    width: 100%,
+
+    dot {
+      fill[0].color: sec.section.hue-studio,
+
+      glyph {
+        contents: mediaIcon
+      }
+    }
+
+    label {
+      contents: "Media"
+    }
+  }
+}
+
+// ---- search (?msearch=fab) ----
+// The search bar in the slot (.yfab__panel): the knob unrolled into a 360 ×
+// 64 white knit bar (20; its stitch 6 in, solid ink while it has focus),
+// the field's own chrome stepped back (just the magnifier and the words),
+// the open knob (⌄) at its right end. Children: `barStitch`, `field`,
+// `fold`.
+@variants(searchSlotTyped)
+export searchSlot = frame {
+  title: "Search bar in the slot · focused",
+  left: 0px,
+  top: 774px,
+  width: spc.controls.slot-w,
+  height: spc.controls.slot,
+  layout: {stack: {align-items: .center, item-gap: spc.layout.fab-knob-gap}},
+  fill: col.roles.surface,
+  shadow: [
+    {
+      drop-shadow: {
+        color: pal.palette.shadow-1,
+        offset: point(0px, 1px),
+        blur-radius: 1px
+      }
+    },
+    {
+      drop-shadow: {
+        color: pal.palette.shadow-lift,
+        offset: point(0px, 10px),
+        blur-radius: 22px
+      }
+    }
+  ],
+  corner-radius: spc.radii.slot,
+  padding: [0px, spc.layout.fab-knob-r, 0px, spc.layout.fab-l],
+  children: [barStitch, field, fold],
+
+  barStitch = frame : surf.stitch {
+    left: spc.layout.stitch-in,
+    top: spc.layout.stitch-in,
+    right: spc.layout.stitch-in,
+    bottom: spc.layout.stitch-in,
+    width: .nil,
+    height: .nil,
+    ignore-stack: .true,
+    corner-radius: spc.radii.slot-stitch,
+    border[0].color: col.roles.focus,
+    border[0].dash: .nil
+  }
+
+  field = frame : srch.search {
+    width: 100%,
+    border[0].visible: .false,
+    fill[0].visible: .false,
+    shadow[0].inner-shadow.visible: .false,
+
+    searchStitch {
+      display: .none
+    }
+
+    key {
+      display: .none
+    }
+
+    lead {
+      entry {
+        query {
+          contents: "Search music"
+        }
+      }
+    }
+  }
+
+  fold = frame : searchKnobOpen {}
+}
+
+// Typed: the words in ink.
+export searchSlotTyped = frame : searchSlot {
+  title: "Search bar in the slot · typed",
+  left: 470px,
+  top: 774px,
+
+  field {
+    lead {
+      entry {
+        query {
+          fill[0].color: col.roles.fg,
+          contents: "shadow"
+        }
+      }
+    }
+  }
+}
+
+// The floating chip row (.yfab__float) on the up line while search is
+// open: Music's filter strip (All · instruments · statuses), cut at the
+// row's end by Browse's knob. Children: `strip` (the tools' `scroll`),
+// `browse`.
+export filterFloat = frame {
+  title: "Floating chip row (search open)",
+  left: 940px,
+  top: 774px,
+  width: spc.controls.slot-w,
+  layout: {stack: {align-items: .center}},
+  children: [strip, browse],
+
+  strip = frame {
+    left: 0px,
+    top: 662.5px,
+    width: 316px,
+    height: 45px,
+    layout: {stack: {align-items: .center}},
+    overflow: .clip,
+    children: chips,
+
+    chips = frame : mt.musicTools.filters.scroll {}
+  }
+
+  browse = frame : browseKnob {}
+}
+
+// ---- the floating layer (.ylayer), the whole bottom chrome ----
+// A transparent 390 × 844 layer to lay over a phone frame (left 0, top 0).
+// Its `dock` stacks the up line over the slot's row, 17 above the bottom.
+// Rest: the sections pill (Home; pick the page's with `@with-variant` on
+// `dock.row.spool.pill`) and the search knob. States: Disc (a song is
+// loaded: the knob steps left of the player's disc), Bar (the player's bar
+// holds the slot: the pill and the knob wait on the up line; paused too),
+// Search (the search bar holds the slot, its chip row on the up line, the
+// pill steps away), Menu (the pill unspooled into the sections), New
+// (Studio: the + instead of search).
+// Children: `dock` (`up` (`upPill`, `upKnob`, `float`), `row` (`spool`
+// (`pill`, `menu`), `knobs` (`knob`, `disc`), `bar`, `search`)).
+@variants(
+  phoneLayerDisc,
+  phoneLayerBar,
+  phoneLayerSearch,
+  phoneLayerMenu,
+  phoneLayerNew
+)
+export phoneLayer = frame {
+  title: "Floating layer · rest (pill · search knob)",
+  left: 0px,
+  top: 958px,
+  width: spc.controls.phone-w,
+  height: spc.controls.phone-h,
+  children: dock,
+
+  dock = frame {
+    left: 0px,
+    right: 0px,
+    bottom: 0px,
+    layout: {stack: {direction: .column, align-items: .stretch}},
+    padding: [0px, spc.layout.slot-side, spc.layout.slot-bottom],
+    children: [up, row],
+
+    // the up line: what waits while the slot is held
+    up = frame {
+      height: spc.controls.slot,
+      display: .none,
+      layout: {stack: {justify-content: .space-between, align-items: .center}},
+      padding-right: spc.layout.knob-up-r,
+      children: [upPill, upKnob, float],
+
+      upPill = frame : spl.sectionsPillUp {}
+
+      upKnob = frame : searchKnobUp {}
+
+      float = frame : filterFloat {
+        width: 100%,
+        display: .none
+      }
+    }
+
+    // the slot's row: the closed knobs, or what fills the slot
+    row = frame {
+      height: spc.controls.slot,
+      layout: {stack: {justify-content: .space-between, align-items: .center}},
+      children: [spool, knobs, bar, search],
+
+      // the pill; its menu rises 8 above it
+      spool = frame {
+        layout: {stack: {align-items: .center}},
+        children: [pill, menu],
+
+        pill = frame : spl.sectionsPill {}
+
+        menu = frame : sectionsMenu {
+          left: 0px,
+          bottom: spc.layout.spool-menu-b,
+          display: .none,
+          ignore-stack: .true
+        }
+      }
+
+      knobs = frame {
+        layout: {stack: {align-items: .center, item-gap: spc.layout.knob-gap}},
+        padding-right: spc.layout.knob-r,
+        children: [knob, disc],
+
+        knob = frame : searchKnob {}
+
+        disc = frame : pp.playerDisc {
+          display: .none
+        }
+      }
+
+      bar = frame : pl.playerPhone {
+        width: 100%,
+        display: .none
+      }
+
+      search = frame : searchSlot {
+        width: 100%,
+        display: .none
+      }
+    }
+  }
+}
+
+// A song is loaded (closed): the disc rests at the row's right end, the
+// knob steps left of it.
+export phoneLayerDisc = frame : phoneLayer {
+  title: "Floating layer · disc (a song loaded)",
+  left: 470px,
+  top: 958px,
+
+  dock {
+    row {
+      knobs {
+        padding-right: 0px,
+
+        disc {
+          display: .visible
+        }
+      }
+    }
+  }
+}
+
+// The player's bar holds the slot; the pill and the knob wait on the up
+// line.
+@variants(phoneLayerBarPaused)
+export phoneLayerBar = frame : phoneLayer {
+  title: "Floating layer · the player's bar (playing)",
+  left: 940px,
+  top: 958px,
+
+  dock {
+    row {
+      spool {
+        display: .none
+      }
+
+      knobs {
+        display: .none
+      }
+
+      bar {
+        display: .visible
+      }
+    }
+
+    up {
+      display: .visible
+    }
+  }
+}
+
+export phoneLayerBarPaused = frame : phoneLayerBar {
+  title: "Floating layer · the player's bar (paused)",
+  left: 1410px,
+  top: 958px,
+
+  dock {
+    row {
+      @with-variant(pl.playerPhonePaused)
+      bar {}
+    }
+  }
+}
+
+// Search open: the bar in the slot, the chip row on the up line; the pill
+// steps away.
+export phoneLayerSearch = frame : phoneLayer {
+  title: "Floating layer · search open",
+  left: 1880px,
+  top: 958px,
+
+  dock {
+    up {
+      upPill {
+        display: .none
+      }
+
+      upKnob {
+        display: .none
+      }
+
+      display: .visible,
+      layout.stack.align-items: .end,
+      padding-bottom: spc.layout.slot-gap,
+      padding-right: 0px,
+
+      float {
+        display: .visible
+      }
+    }
+
+    row {
+      spool {
+        display: .none
+      }
+
+      knobs {
+        display: .none
+      }
+
+      search {
+        display: .visible
+      }
+    }
+  }
+}
+
+// The pill unspooled: the sections menu 8 above it, the caret down.
+export phoneLayerMenu = frame : phoneLayer {
+  title: "Floating layer · sections menu open",
+  left: 2350px,
+  top: 958px,
+
+  dock {
+    row {
+      spool {
+        menu {
+          display: .visible
+        }
+
+        @with-variant(spl.sectionsPillOpen)
+        pill {}
+      }
+    }
+  }
+}
+
+// Studio: the + (new) where the search knob rests.
+export phoneLayerNew = frame : phoneLayer {
+  title: "Floating layer · Studio (+ new)",
+  left: 2820px,
+  top: 958px,
+
+  dock {
+    row {
+      knobs {
+        @with-variant(newKnob)
+        knob {}
+      }
+
+      spool {
+        @with-variant(spl.sectionsPillStudio)
+        pill {}
+      }
+    }
+  }
+}
+
+note-searchKnob = text : doc.specNote {
+  left: 0px,
+  top: 16px,
+  contents: "the search knob · rest"
+}
+
+lbl-searchKnobUp = text : doc.specLabel {
+  left: 470px,
+  top: 0px,
+  contents: "searchKnobUp"
+}
+
+note-searchKnobUp = text : doc.specNote {
+  left: 470px,
+  top: 16px,
+  contents: "up: on the line"
+}
+
+lbl-searchKnobOpen = text : doc.specLabel {
+  left: 940px,
+  top: 0px,
+  contents: "searchKnobOpen"
+}
+
+note-searchKnobOpen = text : doc.specNote {
+  left: 940px,
+  top: 16px,
+  contents: "open: unrolled"
+}
+
+lbl-searchKnobCount = text : doc.specLabel {
+  left: 1410px,
+  top: 0px,
+  contents: "searchKnobCount"
+}
+
+note-searchKnobCount = text : doc.specNote {
+  left: 1410px,
+  top: 16px,
+  contents: "with a filter count"
+}
+
+lbl-browseKnob = text : doc.specLabel {
+  left: 1880px,
+  top: 0px,
+  contents: "browseKnob"
+}
+
+note-browseKnob = text : doc.specNote {
+  left: 1880px,
+  top: 16px,
+  contents: "browse (filters)"
+}
+
+lbl-newKnob = text : doc.specLabel {
+  left: 2350px,
+  top: 0px,
+  contents: "newKnob"
+}
+
+note-newKnob = text : doc.specNote {
+  left: 2350px,
+  top: 16px,
+  contents: "Studio's new"
+}
+
+lbl-spoolRow = text : doc.specLabel {
+  left: 0px,
+  top: 172px,
+  contents: "spoolRow"
+}
+
+note-spoolRow = text : doc.specNote {
+  left: 0px,
+  top: 188px,
+  contents: "a sections row"
+}
+
+lbl-spoolRowHere = text : doc.specLabel {
+  left: 470px,
+  top: 172px,
+  contents: "spoolRowHere"
+}
+
+note-spoolRowHere = text : doc.specNote {
+  left: 470px,
+  top: 188px,
+  contents: "here"
+}
+
+lbl-sectionsMenu = text : doc.specLabel {
+  left: 0px,
+  top: 340px,
+  contents: "sectionsMenu"
+}
+
+note-sectionsMenu = text : doc.specNote {
+  left: 0px,
+  top: 356px,
+  contents: "the sections menu · Home"
+}
+
+lbl-sectionsMenuProjects = text : doc.specLabel {
+  left: 470px,
+  top: 340px,
+  contents: "sectionsMenuProjects"
+}
+
+note-sectionsMenuProjects = text : doc.specNote {
+  left: 470px,
+  top: 356px,
+  contents: "section = projects"
+}
+
+lbl-sectionsMenuMusic = text : doc.specLabel {
+  left: 940px,
+  top: 340px,
+  contents: "sectionsMenuMusic"
+}
+
+note-sectionsMenuMusic = text : doc.specNote {
+  left: 940px,
+  top: 356px,
+  contents: "section = music"
+}
+
+lbl-sectionsMenuThoughts = text : doc.specLabel {
+  left: 1410px,
+  top: 340px,
+  contents: "sectionsMenuThoughts"
+}
+
+note-sectionsMenuThoughts = text : doc.specNote {
+  left: 1410px,
+  top: 356px,
+  contents: "section = thoughts"
+}
+
+lbl-sectionsMenuStudio = text : doc.specLabel {
+  left: 1880px,
+  top: 340px,
+  contents: "sectionsMenuStudio"
+}
+
+note-sectionsMenuStudio = text : doc.specNote {
+  left: 1880px,
+  top: 356px,
+  contents: "section = studio"
+}
+
+lbl-searchSlot = text : doc.specLabel {
+  left: 0px,
+  top: 734px,
+  contents: "searchSlot"
+}
+
+note-searchSlot = text : doc.specNote {
+  left: 0px,
+  top: 750px,
+  contents: "search in the slot · focused"
+}
+
+lbl-searchSlotTyped = text : doc.specLabel {
+  left: 470px,
+  top: 734px,
+  contents: "searchSlotTyped"
+}
+
+note-searchSlotTyped = text : doc.specNote {
+  left: 470px,
+  top: 750px,
+  contents: "typed"
+}
+
+lbl-filterFloat = text : doc.specLabel {
+  left: 940px,
+  top: 734px,
+  contents: "filterFloat"
+}
+
+note-filterFloat = text : doc.specNote {
+  left: 940px,
+  top: 750px,
+  contents: "the chip row on the up line"
+}
+
+lbl-phoneLayer = text : doc.specLabel {
+  left: 0px,
+  top: 918px,
+  contents: "phoneLayer"
+}
+
+note-phoneLayer = text : doc.specNote {
+  left: 0px,
+  top: 934px,
+  contents: "the floating layer · rest"
+}
+
+lbl-phoneLayerDisc = text : doc.specLabel {
+  left: 470px,
+  top: 918px,
+  contents: "phoneLayerDisc"
+}
+
+note-phoneLayerDisc = text : doc.specNote {
+  left: 470px,
+  top: 934px,
+  contents: "a song loaded"
+}
+
+lbl-phoneLayerBar = text : doc.specLabel {
+  left: 940px,
+  top: 918px,
+  contents: "phoneLayerBar"
+}
+
+note-phoneLayerBar = text : doc.specNote {
+  left: 940px,
+  top: 934px,
+  contents: "the bar · playing"
+}
+
+lbl-phoneLayerBarPaused = text : doc.specLabel {
+  left: 1410px,
+  top: 918px,
+  contents: "phoneLayerBarPaused"
+}
+
+note-phoneLayerBarPaused = text : doc.specNote {
+  left: 1410px,
+  top: 934px,
+  contents: "the bar · paused"
+}
+
+lbl-phoneLayerSearch = text : doc.specLabel {
+  left: 1880px,
+  top: 918px,
+  contents: "phoneLayerSearch"
+}
+
+note-phoneLayerSearch = text : doc.specNote {
+  left: 1880px,
+  top: 934px,
+  contents: "search open"
+}
+
+lbl-phoneLayerMenu = text : doc.specLabel {
+  left: 2350px,
+  top: 918px,
+  contents: "phoneLayerMenu"
+}
+
+note-phoneLayerMenu = text : doc.specNote {
+  left: 2350px,
+  top: 934px,
+  contents: "sections open"
+}
+
+lbl-phoneLayerNew = text : doc.specLabel {
+  left: 2820px,
+  top: 918px,
+  contents: "phoneLayerNew"
+}
+
+note-phoneLayerNew = text : doc.specNote {
+  left: 2820px,
+  top: 934px,
+  contents: "Studio"
+}
+
+@variants(phoneNavStatesI10)
+phoneNavStates = frame : doc.docBoard {
+  title: "Phone nav · states · i9",
+  left: 0px,
+  top: 2034px,
+
+  body {
+    layout.stack.item-gap: 48px,
+    overrides: [
+      insert(row-1, after = .nil),
+      insert(row-2, after = row-1),
+      insert(row-3, after = row-2),
+      insert(row-4, after = row-3)
+    ]
+  }
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i9"
+      }
+    }
+
+    boardCaption {
+      contents: "Phone nav · every state"
+    }
+  }
+
+  row-1 = frame : doc.specRow {
+    layout.stack.item-gap: 48px,
+    overrides: [
+      insert(st-searchKnob, after = .nil),
+      insert(st-searchKnobUp, after = st-searchKnob),
+      insert(st-searchKnobOpen, after = st-searchKnobUp),
+      insert(st-searchKnobCount, after = st-searchKnobOpen),
+      insert(st-browseKnob, after = st-searchKnobCount),
+      insert(st-newKnob, after = st-browseKnob)
+    ]
+  }
+
+  row-2 = frame : doc.specRow {
+    layout.stack.item-gap: 48px,
+    overrides: [
+      insert(st-spoolRow, after = .nil),
+      insert(st-spoolRowHere, after = st-spoolRow)
+    ]
+  }
+
+  row-3 = frame : doc.specRow {
+    layout.stack.item-gap: 48px,
+    overrides: [
+      insert(st-searchSlot, after = .nil),
+      insert(st-searchSlotTyped, after = st-searchSlot),
+      insert(st-filterFloat, after = st-searchSlotTyped)
+    ]
+  }
+
+  row-4 = frame : doc.specRow {
+    layout.stack.item-gap: 48px,
+    overrides: [
+      insert(st-phoneLayer, after = .nil),
+      insert(st-phoneLayerDisc, after = st-phoneLayer),
+      insert(st-phoneLayerBar, after = st-phoneLayerDisc),
+      insert(st-phoneLayerBarPaused, after = st-phoneLayerBar),
+      insert(st-phoneLayerSearch, after = st-phoneLayerBarPaused),
+      insert(st-phoneLayerMenu, after = st-phoneLayerSearch),
+      insert(st-phoneLayerNew, after = st-phoneLayerMenu)
+    ]
+  }
+
+  st-searchKnob = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "searchKnob"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "the search knob · rest"
+    }
+
+    it = frame : searchKnob {}
+  }
+
+  st-searchKnobUp = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "searchKnobUp"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "up: on the line"
+    }
+
+    it = frame : searchKnobUp {}
+  }
+
+  st-searchKnobOpen = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "searchKnobOpen"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "open: unrolled"
+    }
+
+    it = frame : searchKnobOpen {}
+  }
+
+  st-searchKnobCount = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "searchKnobCount"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "with a filter count"
+    }
+
+    it = frame : searchKnobCount {}
+  }
+
+  st-browseKnob = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "browseKnob"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "browse (filters)"
+    }
+
+    it = frame : browseKnob {}
+  }
+
+  st-newKnob = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "newKnob"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "Studio's new"
+    }
+
+    it = frame : newKnob {}
+  }
+
+  st-spoolRow = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "spoolRow"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "a sections row"
+    }
+
+    it = frame : spoolRow {}
+  }
+
+  st-spoolRowHere = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "spoolRowHere"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "here"
+    }
+
+    it = frame : spoolRowHere {}
+  }
+
+  st-searchSlot = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "searchSlot"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "search in the slot · focused"
+    }
+
+    it = frame : searchSlot {}
+  }
+
+  st-searchSlotTyped = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "searchSlotTyped"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "typed"
+    }
+
+    it = frame : searchSlotTyped {}
+  }
+
+  st-filterFloat = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "filterFloat"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "the chip row on the up line"
+    }
+
+    it = frame : filterFloat {}
+  }
+
+  st-phoneLayer = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "phoneLayer"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "the floating layer · rest"
+    }
+
+    it = frame : phoneLayer {}
+  }
+
+  st-phoneLayerDisc = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "phoneLayerDisc"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "a song loaded"
+    }
+
+    it = frame : phoneLayerDisc {}
+  }
+
+  st-phoneLayerBar = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "phoneLayerBar"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "the bar · playing"
+    }
+
+    it = frame : phoneLayerBar {}
+  }
+
+  st-phoneLayerBarPaused = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "phoneLayerBarPaused"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "the bar · paused"
+    }
+
+    it = frame : phoneLayerBarPaused {}
+  }
+
+  st-phoneLayerSearch = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "phoneLayerSearch"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "search open"
+    }
+
+    it = frame : phoneLayerSearch {}
+  }
+
+  st-phoneLayerMenu = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "phoneLayerMenu"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "sections open"
+    }
+
+    it = frame : phoneLayerMenu {}
+  }
+
+  st-phoneLayerNew = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "phoneLayerNew"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "Studio"
+    }
+
+    it = frame : phoneLayerNew {}
+  }
+}
+
+@variants(phoneNavStatesI11)
+@context(i10="on")
+phoneNavStatesI10 = frame : phoneNavStates {
+  title: "Phone nav · states · i10",
+  left: 3698px,
+  top: 2034px,
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i10"
+      }
+    }
+  }
+}
+
+@context(i10="on", i11="on")
+phoneNavStatesI11 = frame : phoneNavStatesI10 {
+  title: "Phone nav · states · i11",
+  left: 7396px,
+  top: 2034px,
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i11"
+      }
+    }
+  }
+}
+
+@variants(
+  sectionsMenuStatesI10,
+  sectionsMenuStatesProjects,
+  sectionsMenuStatesMusic,
+  sectionsMenuStatesThoughts,
+  sectionsMenuStatesStudio
+)
+sectionsMenuStates = frame : doc.docBoard {
+  title: "Sections menu · states · i9",
+  left: 0px,
+  top: 3780px,
+
+  body {
+    layout.stack.item-gap: 48px,
+    overrides: [insert(row-1, after = .nil)]
+  }
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i9"
+      }
+    }
+
+    boardCaption {
+      contents: "Sections menu · every state"
+    }
+  }
+
+  row-1 = frame : doc.specRow {
+    layout.stack.item-gap: 48px,
+    overrides: [insert(st-sectionsMenu, after = .nil)]
+  }
+
+  st-sectionsMenu = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "sectionsMenu"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "the sections menu · Home"
+    }
+
+    it = frame : sectionsMenu {}
+  }
+}
+
+@variants(sectionsMenuStatesI11)
+@context(i10="on")
+sectionsMenuStatesI10 = frame : sectionsMenuStates {
+  title: "Sections menu · states · i10",
+  left: 491px,
+  top: 3780px,
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i10"
+      }
+    }
+  }
+}
+
+@context(i10="on", i11="on")
+sectionsMenuStatesI11 = frame : sectionsMenuStatesI10 {
+  title: "Sections menu · states · i11",
+  left: 989px,
+  top: 3780px,
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i11"
+      }
+    }
+  }
+}
+
+@variants(sectionsMenuStatesProjectsI10)
+@context(section="projects")
+sectionsMenuStatesProjects = frame : sectionsMenuStates {
+  title: "Sections menu · projects · states · i9",
+  left: 0px,
+  top: 4324px,
+
+  body {
+    row-1 {
+      st-sectionsMenu {
+        slot {
+          @with-variant(sectionsMenuProjects)
+          it {}
+        }
+
+        note {
+          contents: "section = projects"
+        }
+
+        label {
+          contents: "sectionsMenuProjects"
+        }
+      }
+    }
+  }
+
+  boardHead {
+    boardCaption {
+      contents: "Sections menu · section = projects"
+    }
+  }
+}
+
+@variants(sectionsMenuStatesProjectsI11)
+@context(i10="on", section="projects")
+sectionsMenuStatesProjectsI10 = frame : sectionsMenuStatesProjects {
+  title: "Sections menu · projects · states · i10",
+  left: 491px,
+  top: 4324px,
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i10"
+      }
+    }
+  }
+}
+
+@context(i10="on", i11="on", section="projects")
+sectionsMenuStatesProjectsI11 = frame : sectionsMenuStatesProjectsI10 {
+  title: "Sections menu · projects · states · i11",
+  left: 989px,
+  top: 4324px,
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i11"
+      }
+    }
+  }
+}
+
+@variants(sectionsMenuStatesMusicI10)
+@context(section="music")
+sectionsMenuStatesMusic = frame : sectionsMenuStates {
+  title: "Sections menu · music · states · i9",
+  left: 0px,
+  top: 4828px,
+
+  body {
+    row-1 {
+      st-sectionsMenu {
+        slot {
+          @with-variant(sectionsMenuMusic)
+          it {}
+        }
+
+        note {
+          contents: "section = music"
+        }
+
+        label {
+          contents: "sectionsMenuMusic"
+        }
+      }
+    }
+  }
+
+  boardHead {
+    boardCaption {
+      contents: "Sections menu · section = music"
+    }
+  }
+}
+
+@variants(sectionsMenuStatesMusicI11)
+@context(i10="on", section="music")
+sectionsMenuStatesMusicI10 = frame : sectionsMenuStatesMusic {
+  title: "Sections menu · music · states · i10",
+  left: 491px,
+  top: 4828px,
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i10"
+      }
+    }
+  }
+}
+
+@context(i10="on", i11="on", section="music")
+sectionsMenuStatesMusicI11 = frame : sectionsMenuStatesMusicI10 {
+  title: "Sections menu · music · states · i11",
+  left: 989px,
+  top: 4828px,
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i11"
+      }
+    }
+  }
+}
+
+@variants(sectionsMenuStatesThoughtsI10)
+@context(section="thoughts")
+sectionsMenuStatesThoughts = frame : sectionsMenuStates {
+  title: "Sections menu · thoughts · states · i9",
+  left: 0px,
+  top: 5332px,
+
+  body {
+    row-1 {
+      st-sectionsMenu {
+        slot {
+          @with-variant(sectionsMenuThoughts)
+          it {}
+        }
+
+        note {
+          contents: "section = thoughts"
+        }
+
+        label {
+          contents: "sectionsMenuThoughts"
+        }
+      }
+    }
+  }
+
+  boardHead {
+    boardCaption {
+      contents: "Sections menu · section = thoughts"
+    }
+  }
+}
+
+@variants(sectionsMenuStatesThoughtsI11)
+@context(i10="on", section="thoughts")
+sectionsMenuStatesThoughtsI10 = frame : sectionsMenuStatesThoughts {
+  title: "Sections menu · thoughts · states · i10",
+  left: 491px,
+  top: 5332px,
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i10"
+      }
+    }
+  }
+}
+
+@context(i10="on", i11="on", section="thoughts")
+sectionsMenuStatesThoughtsI11 = frame : sectionsMenuStatesThoughtsI10 {
+  title: "Sections menu · thoughts · states · i11",
+  left: 989px,
+  top: 5332px,
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i11"
+      }
+    }
+  }
+}
+
+@variants(sectionsMenuStatesStudioI10)
+@context(section="studio")
+sectionsMenuStatesStudio = frame : sectionsMenuStates {
+  title: "Sections menu · studio · states · i9",
+  left: 0px,
+  top: 5836px,
+
+  body {
+    row-1 {
+      st-sectionsMenu {
+        slot {
+          @with-variant(sectionsMenuStudio)
+          it {}
+        }
+
+        note {
+          contents: "section = studio"
+        }
+
+        label {
+          contents: "sectionsMenuStudio"
+        }
+      }
+    }
+  }
+
+  boardHead {
+    boardCaption {
+      contents: "Sections menu · section = studio"
+    }
+  }
+}
+
+@variants(sectionsMenuStatesStudioI11)
+@context(i10="on", section="studio")
+sectionsMenuStatesStudioI10 = frame : sectionsMenuStatesStudio {
+  title: "Sections menu · studio · states · i10",
+  left: 491px,
+  top: 5836px,
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i10"
+      }
+    }
+  }
+}
+
+@context(i10="on", i11="on", section="studio")
+sectionsMenuStatesStudioI11 = frame : sectionsMenuStatesStudioI10 {
+  title: "Sections menu · studio · states · i11",
+  left: 989px,
+  top: 5836px,
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i11"
+      }
+    }
+  }
+}

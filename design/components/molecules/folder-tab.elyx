@@ -1,0 +1,651 @@
+import "tokens/color/roles.elyx" as col
+import "tokens/color/palette.elyx" as pal
+import "tokens/space/space.elyx" as spc
+import "components/atoms/text.elyx" as txt
+import "components/atoms/surface.elyx" as surf
+import "components/atoms/doc.elyx" as doc
+
+// A folder tab (`.yfolder__tab`): one of a collection's songs, hanging above
+// its card. 84 × 40 with 11px top corners; only its top 20 shows above the
+// card's edge (the strip below clips the rest). Number (Num) + name (Micro),
+// both ink-3, on cotton-2 knit; i9 adds the control stitch (clear from i10).
+// Set it with `number {contents: "02"}` and `name {contents: "glooming…"}`.
+@variants(folderTabHover, folderTabCurrent, folderTabLive)
+export folderTab = frame {
+  title: "Folder tab · rest",
+  left: 0px,
+  top: 40px,
+  width: spc.controls.folder-tab-w,
+  height: spc.controls.folder-tab,
+  layout: {stack: {item-gap: spc.steps.s1}},
+  fill: col.roles.recess,
+  shadow: [
+    {
+      drop-shadow: {
+        color: pal.palette.hairline,
+        offset: point(0px, -1px),
+        blur-radius: 0px
+      }
+    },
+    {
+      drop-shadow: {
+        color: pal.palette.shadow-1,
+        offset: point(0px, -2px),
+        blur-radius: 6px
+      }
+    }
+  ],
+  corner-radius: [spc.radii.folder-tab, spc.radii.folder-tab, 0px, 0px],
+  overflow: .clip,
+  padding: [spc.steps.s1, spc.layout.folder-tab-x, 0px],
+  children: [tabStitch, number, name],
+
+  // the control stitch (i9); clear from i10 (stitch=calm)
+  tabStitch = frame : surf.stitch {
+    left: spc.steps.s1,
+    top: spc.steps.s1,
+    right: spc.steps.s1,
+    bottom: spc.steps.s1,
+    width: .nil,
+    height: .nil,
+    ignore-stack: .true,
+    corner-radius: [spc.steps.s2, spc.steps.s2, 0px, 0px],
+    border[0].color: col.roles.ctl-stitch,
+    border[0].width: spc.layout.stitch-w-sm
+  }
+
+  number = text : txt.numCard {
+    contents: "01"
+  }
+
+  name = text : txt.micro {
+    contents: "stalking lowercase letters",
+    fill[0].color: col.roles.fg-3
+  }
+}
+
+// Hover: it rises 8 (taller from the bottom: the strip clips it there) and
+// turns white, the text ink.
+export folderTabHover = frame : folderTab {
+  title: "Folder tab · hover",
+  left: 379px,
+  top: 40px,
+  height: spc.controls.folder-tab-up,
+  fill[0].color: col.roles.surface,
+
+  name {
+    fill[0].color: col.roles.fg
+  }
+
+  number {
+    fill[0].color: col.roles.fg
+  }
+}
+
+// Chosen (the current song, loaded and paused): it stands 7 up in front of
+// its neighbours, in the card's own white, so it merges into the card's top
+// edge; a live thread on its top (i9: red, the text red-deep; i10: the live
+// purple, the text stays ink-3).
+export folderTabCurrent = frame : folderTab {
+  title: "Folder tab · current",
+  left: 758px,
+  top: 40px,
+  height: spc.controls.folder-tab-now,
+  fill[0].color: col.roles.surface,
+  shadow[0].drop-shadow.color: col.roles.live,
+  shadow[0].drop-shadow.offset: [0px, spc.layout.ring-w],
+  shadow[0].inner-shadow.color: col.roles.live,
+  shadow[0].inner-shadow.offset: [0px, spc.layout.ring-w],
+  shadow[1].drop-shadow.blur-radius: 8px,
+  shadow[1].drop-shadow.color: pal.palette.hairline,
+
+  name {
+    fill[0].color: col.roles.current-fg
+  }
+
+  number {
+    fill[0].color: col.roles.current-fg
+  }
+}
+
+// Playing: the live fill (i9 red, i10 purple), white text.
+export folderTabLive = frame : folderTab {
+  title: "Folder tab · live (playing)",
+  left: 1137px,
+  top: 40px,
+  height: spc.controls.folder-tab-now,
+  fill[0].color: col.roles.live,
+  shadow[1].drop-shadow.blur-radius: 8px,
+  shadow[1].drop-shadow.color: pal.palette.stitch-soft,
+
+  name {
+    fill[0].color: col.roles.live-fg
+  }
+
+  number {
+    fill[0].color: col.roles.live-fg,
+    opacity: 0.82
+  }
+
+  tabStitch {
+    border[0].color: col.roles.ctl-stitch-fill
+  }
+}
+
+// A collection's strip (`.yfolder__tabs` + the back cover): everything that
+// hangs above the card. Place it right above the card (its bottom on the
+// card's top edge) and as wide as the card. 28 tall: the tabs' top 20 + 8 for
+// one to stand up; the rest is clipped at the card's edge. The tabs start one
+// card inset in and overlap 22 (later ones in front). The chosen tab stands in
+// front of both neighbours: its group draws first-on-top (`reverse-overlap`).
+// Nesting: strip > tab1 + after1 > tab2 + after2 > tab3 + tab4.
+@variants(folderTabsCurrent, folderTabsLive)
+export folderTabs = frame {
+  title: "Folder tabs · rest",
+  left: 0px,
+  top: 224px,
+  width: 315px,
+  height: spc.controls.folder-tabs,
+  overflow: .clip,
+  children: [fold, strip],
+
+  // the back cover, a step darker, peeking 7 above the card behind the tabs
+  fold = frame {
+    left: spc.layout.fold-in,
+    right: spc.layout.fold-in,
+    bottom: 0px,
+    height: spc.layout.fold-peek,
+    fill: col.roles.fold,
+    shadow: {
+      drop-shadow: {
+        color: pal.palette.hairline,
+        offset: point(0px, -1px),
+        blur-radius: 2px
+      }
+    },
+    corner-radius: [spc.radii.fold, spc.radii.fold, 0px, 0px]
+  }
+
+  strip = frame {
+    left: spc.layout.folder-inset,
+    top: 0px,
+    right: spc.layout.folder-inset,
+    height: spc.controls.folder-tab-up,
+    layout: {
+      stack: {align-items: .end, item-gap: spc.layout.folder-tab-overlap}
+    },
+    children: [tab1, after1],
+
+    tab1 = frame : folderTab {}
+
+    after1 = frame {
+      layout: {
+        stack: {align-items: .end, item-gap: spc.layout.folder-tab-overlap}
+      },
+      children: [tab2, after2],
+
+      tab2 = frame : folderTab {
+        number {
+          contents: "02"
+        }
+
+        name {
+          contents: "glooming shadows of alphabet city"
+        }
+      }
+
+      after2 = frame {
+        layout: {
+          stack: {align-items: .end, item-gap: spc.layout.folder-tab-overlap}
+        },
+        children: [tab3, tab4],
+
+        tab3 = frame : folderTab {
+          number {
+            contents: "03"
+          }
+
+          name {
+            contents: "uncovering the truth"
+          }
+        }
+
+        tab4 = frame : folderTab {
+          number {
+            contents: "04"
+          }
+
+          name {
+            contents: "escaping"
+          }
+        }
+      }
+    }
+  }
+}
+
+// Song 02 chosen (loaded, paused): it stands up in front.
+export folderTabsCurrent = frame : folderTabs {
+  title: "Folder tabs · 02 current",
+  left: 379px,
+  top: 224px,
+
+  strip {
+    after1 {
+      layout.stack.reverse-overlap: .true,
+
+      @with-variant(folderTabCurrent)
+      tab2 {}
+    }
+  }
+}
+
+// Song 02 playing: the live fill.
+export folderTabsLive = frame : folderTabs {
+  title: "Folder tabs · 02 playing",
+  left: 758px,
+  top: 224px,
+
+  strip {
+    after1 {
+      layout.stack.reverse-overlap: .true,
+
+      @with-variant(folderTabLive)
+      tab2 {}
+    }
+  }
+}
+
+// On a card: the strip sits on the card's top edge; the chosen tab merges
+// into it.
+onCard = frame {
+  title: "Folder tabs on a card (example)",
+  left: 0px,
+  top: 388px,
+  width: 315px,
+  layout: {stack: {direction: .column, align-items: .stretch}},
+  children: [onCardTabs, onCardCard],
+
+  onCardTabs = frame : folderTabsCurrent {
+    width: .nil
+  }
+
+  onCardCard = frame : surf.patch {
+    width: .nil
+  }
+}
+
+onCardLive = frame {
+  title: "… playing (example)",
+  left: 379px,
+  top: 388px,
+  width: 315px,
+  layout: {stack: {direction: .column, align-items: .stretch}},
+  children: [onCardLiveTabs, onCardLiveCard],
+
+  onCardLiveTabs = frame : folderTabsLive {
+    width: .nil
+  }
+
+  onCardLiveCard = frame : surf.patch {
+    width: .nil,
+    fill[0].color: col.roles.live-soft
+  }
+}
+
+// ==== states page (labels over the definitions, then the states boards: i9 · i10 · i11) ====
+lbl-folderTab = text : doc.specLabel {
+  left: 0px,
+  top: 0px,
+  contents: "folderTab"
+}
+
+note-folderTab = text : doc.specNote {
+  left: 0px,
+  top: 16px,
+  contents: "a song's tab · rest"
+}
+
+lbl-folderTabHover = text : doc.specLabel {
+  left: 379px,
+  top: 0px,
+  contents: "folderTabHover"
+}
+
+note-folderTabHover = text : doc.specNote {
+  left: 379px,
+  top: 16px,
+  contents: "hover: stands up"
+}
+
+lbl-folderTabCurrent = text : doc.specLabel {
+  left: 758px,
+  top: 0px,
+  contents: "folderTabCurrent"
+}
+
+note-folderTabCurrent = text : doc.specNote {
+  left: 758px,
+  top: 16px,
+  contents: "current: loaded, paused"
+}
+
+lbl-folderTabLive = text : doc.specLabel {
+  left: 1137px,
+  top: 0px,
+  contents: "folderTabLive"
+}
+
+note-folderTabLive = text : doc.specNote {
+  left: 1137px,
+  top: 16px,
+  contents: "live: playing"
+}
+
+lbl-folderTabs = text : doc.specLabel {
+  left: 0px,
+  top: 184px,
+  contents: "folderTabs"
+}
+
+note-folderTabs = text : doc.specNote {
+  left: 0px,
+  top: 200px,
+  contents: "a collection's tabs · rest"
+}
+
+lbl-folderTabsCurrent = text : doc.specLabel {
+  left: 379px,
+  top: 184px,
+  contents: "folderTabsCurrent"
+}
+
+note-folderTabsCurrent = text : doc.specNote {
+  left: 379px,
+  top: 200px,
+  contents: "one current"
+}
+
+lbl-folderTabsLive = text : doc.specLabel {
+  left: 758px,
+  top: 184px,
+  contents: "folderTabsLive"
+}
+
+note-folderTabsLive = text : doc.specNote {
+  left: 758px,
+  top: 200px,
+  contents: "one live"
+}
+
+lbl-onCard = text : doc.specLabel {
+  left: 0px,
+  top: 348px,
+  contents: "onCard"
+}
+
+note-onCard = text : doc.specNote {
+  left: 0px,
+  top: 364px,
+  contents: "in place on a card"
+}
+
+lbl-onCardLive = text : doc.specLabel {
+  left: 379px,
+  top: 348px,
+  contents: "onCardLive"
+}
+
+note-onCardLive = text : doc.specNote {
+  left: 379px,
+  top: 364px,
+  contents: "on a card · live"
+}
+
+@variants(folderTabStatesI10)
+folderTabStates = frame : doc.docBoard {
+  title: "Folder tab · states · i9",
+  left: 0px,
+  top: 672px,
+
+  body {
+    layout.stack.item-gap: 48px,
+    overrides: [
+      insert(row-1, after = .nil),
+      insert(row-2, after = row-1),
+      insert(row-3, after = row-2)
+    ]
+  }
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i9"
+      }
+    }
+
+    boardCaption {
+      contents: "Folder tab · every state"
+    }
+  }
+
+  row-1 = frame : doc.specRow {
+    layout.stack.item-gap: 48px,
+    overrides: [
+      insert(st-folderTab, after = .nil),
+      insert(st-folderTabHover, after = st-folderTab),
+      insert(st-folderTabCurrent, after = st-folderTabHover),
+      insert(st-folderTabLive, after = st-folderTabCurrent)
+    ]
+  }
+
+  row-2 = frame : doc.specRow {
+    layout.stack.item-gap: 48px,
+    overrides: [
+      insert(st-folderTabs, after = .nil),
+      insert(st-folderTabsCurrent, after = st-folderTabs),
+      insert(st-folderTabsLive, after = st-folderTabsCurrent)
+    ]
+  }
+
+  row-3 = frame : doc.specRow {
+    layout.stack.item-gap: 48px,
+    overrides: [
+      insert(st-onCard, after = .nil),
+      insert(st-onCardLive, after = st-onCard)
+    ]
+  }
+
+  st-folderTab = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "folderTab"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "a song's tab · rest"
+    }
+
+    it = frame : folderTab {}
+  }
+
+  st-folderTabHover = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "folderTabHover"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "hover: stands up"
+    }
+
+    it = frame : folderTabHover {}
+  }
+
+  st-folderTabCurrent = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "folderTabCurrent"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "current: loaded, paused"
+    }
+
+    it = frame : folderTabCurrent {}
+  }
+
+  st-folderTabLive = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "folderTabLive"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "live: playing"
+    }
+
+    it = frame : folderTabLive {}
+  }
+
+  st-folderTabs = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "folderTabs"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "a collection's tabs · rest"
+    }
+
+    it = frame : folderTabs {}
+  }
+
+  st-folderTabsCurrent = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "folderTabsCurrent"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "one current"
+    }
+
+    it = frame : folderTabsCurrent {}
+  }
+
+  st-folderTabsLive = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "folderTabsLive"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "one live"
+    }
+
+    it = frame : folderTabsLive {}
+  }
+
+  st-onCard = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "onCard"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "in place on a card"
+    }
+
+    it = frame : onCard {}
+  }
+
+  st-onCardLive = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "onCardLive"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "on a card · live"
+    }
+
+    it = frame : onCardLive {}
+  }
+}
+
+@variants(folderTabStatesI11)
+@context(i10="on")
+folderTabStatesI10 = frame : folderTabStates {
+  title: "Folder tab · states · i10",
+  left: 1329px,
+  top: 672px,
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i10"
+      }
+    }
+  }
+}
+
+@context(i10="on", i11="on")
+folderTabStatesI11 = frame : folderTabStatesI10 {
+  title: "Folder tab · states · i11",
+  left: 2658px,
+  top: 672px,
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i11"
+      }
+    }
+  }
+}

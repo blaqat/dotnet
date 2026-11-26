@@ -1,0 +1,339 @@
+import "tokens/space/space.elyx" as spc
+import "components/atoms/doc.elyx" as doc
+import "components/molecules/sections-pill.elyx" as spl
+import "components/organisms/sheet.elyx" as sh
+import "components/organisms/page-header.elyx" as head
+import "components/organisms/phone-nav.elyx" as nv
+import "blocks/thoughts-feed.elyx" as feed
+
+@with-context(section="thoughts")
+file {}
+
+// Thoughts on a phone (390 × 844): no rail (its title becomes the page
+// header: "Thoughts." with the count beside it; its search and filters are
+// the floating knob), then the posts newest first in one column under each
+// month's ruled pill. November's first three: the cat scratch note,
+// Ghostty, Helium (the month's cards, `blocks/thoughts-feed.elyx`, one
+// column, the feed's gutter between them). The floating row: Thoughts'
+// pill and the search knob.
+// i10 / i11 pick the month's iteration variants (the kicker's caps, the
+// pick button, i11's cut "Read →"); the rest is tokens.
+// Children: `sheet` (`header`, `stream`), `layer`.
+@variants(thoughtsPhoneI10)
+export thoughtsPhone = frame {
+  title: "Thoughts · phone (i9)",
+  left: 0px,
+  top: 40px,
+  width: spc.controls.phone-w,
+  height: spc.controls.phone-h,
+  overflow: .clip,
+  children: [sheet, layer],
+
+  sheet = frame : sh.sheetPhone {
+    left: 0px,
+    top: 0px,
+    width: 100%,
+
+    paper {
+      page {
+        overrides: [
+          insert(header, after = .nil),
+          insert(stream, after = header)
+        ]
+      }
+    }
+
+    header = frame : head.pageHeaderMetaPhone {
+      width: spc.controls.page-w-phone,
+
+      headText {
+        headLine {
+          titleLine {
+            title {
+              contents: "Thoughts"
+            }
+          }
+
+          meta {
+            contents: "22 posts · since Jun 2023"
+          }
+        }
+      }
+    }
+
+    // November, newest first: one column
+    stream = frame : feed.monthNov {
+      width: 100%,
+
+      grid {
+        c1 {
+          movingSite {
+            display: .none
+          }
+
+          scratchFeedback {
+            display: .none
+          }
+        }
+
+        c2 {
+          tenBrowsers {
+            display: .none
+          }
+
+          browsersRanked {
+            display: .none
+          }
+        }
+
+        c3 {
+          zedPick {
+            display: .none
+          }
+
+          ghosttyPick {
+            display: .none
+          }
+        }
+
+        layout.grid.columns: 1fr,
+        layout.grid.row-gap: spc.layout.post-gutter
+      }
+    }
+  }
+
+  // the floating row: Thoughts' pill, the search knob
+  layer = frame : nv.phoneLayer {
+    left: 0px,
+    top: 0px,
+
+    dock {
+      row {
+        spool {
+          @with-variant(spl.sectionsPillThoughts)
+          pill {}
+        }
+      }
+    }
+  }
+}
+
+@variants(thoughtsPhoneI11)
+@context(i10="on")
+export thoughtsPhoneI10 = frame : thoughtsPhone {
+  title: "Thoughts · phone (i10)",
+  left: 470px,
+  top: 40px,
+
+  sheet {
+    fill[1].image.sizing.scale: 3.48,
+
+    paper {
+      page {
+        @with-variant(feed.monthNovI10)
+        stream {
+          grid {
+            c3 {
+              feed.monthNovI10.browsersRankedI10 {
+                display: .none
+              }
+            }
+
+            c2 {
+              feed.monthNovI10.ghosttyPickI10 {
+                display: .none
+              }
+            }
+
+            layout.grid.row-gap: spc.i10.layoutI10.post-gutter
+          }
+        }
+      }
+    }
+  }
+}
+
+@context(i10="on", i11="on")
+export thoughtsPhoneI11 = frame : thoughtsPhoneI10 {
+  title: "Thoughts · phone (i11)",
+  left: 940px,
+  top: 40px,
+
+  sheet {
+    fill[1].image.sizing.scale: 3.1,
+
+    paper {
+      page {
+        @with-variant(feed.monthNovI11)
+        stream {
+          grid {
+            c3 {
+              feed.monthNovI11.ghosttyPickI11 {
+                display: .none
+              }
+            }
+
+            c2 {
+              feed.monthNovI11.browsersRankedI11 {
+                display: .none
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+// ==== states page (labels over the definitions, then the states boards: i9 · i10 · i11) ====
+lbl-thoughtsPhone = text : doc.specLabel {
+  left: 0px,
+  top: 0px,
+  contents: "thoughtsPhone"
+}
+
+note-thoughtsPhone = text : doc.specNote {
+  left: 0px,
+  top: 16px,
+  contents: "i9"
+}
+
+lbl-thoughtsPhoneI10 = text : doc.specLabel {
+  left: 470px,
+  top: 0px,
+  contents: "thoughtsPhoneI10"
+}
+
+note-thoughtsPhoneI10 = text : doc.specNote {
+  left: 470px,
+  top: 16px,
+  contents: "i10"
+}
+
+lbl-thoughtsPhoneI11 = text : doc.specLabel {
+  left: 940px,
+  top: 0px,
+  contents: "thoughtsPhoneI11"
+}
+
+note-thoughtsPhoneI11 = text : doc.specNote {
+  left: 940px,
+  top: 16px,
+  contents: "i11"
+}
+
+@variants(thoughtsPhoneStatesI10)
+thoughtsPhoneStates = frame : doc.docBoard {
+  title: "Thoughts · phone · states · i9",
+  left: 0px,
+  top: 1116px,
+
+  body {
+    layout.stack.item-gap: 48px,
+    overrides: [insert(row-1, after = .nil)]
+  }
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i9"
+      }
+    }
+
+    boardCaption {
+      contents: "Thoughts · phone · every state"
+    }
+  }
+
+  row-1 = frame : doc.specRow {
+    layout.stack.item-gap: 48px,
+    overrides: [insert(st-thoughtsPhone, after = .nil)]
+  }
+
+  st-thoughtsPhone = frame : doc.spec {
+    overrides: [insert(note, after = doc.spec.label)],
+
+    label {
+      contents: "thoughtsPhone"
+    }
+
+    slot {
+      overrides: [insert(it, after = .nil)]
+    }
+
+    note = text : doc.specNote {
+      contents: "i9"
+    }
+
+    it = frame : thoughtsPhone {}
+  }
+}
+
+@variants(thoughtsPhoneStatesI11)
+@context(i10="on")
+thoughtsPhoneStatesI10 = frame : thoughtsPhoneStates {
+  title: "Thoughts · phone · states · i10",
+  left: 614px,
+  top: 1116px,
+
+  body {
+    row-1 {
+      st-thoughtsPhone {
+        slot {
+          @with-variant(thoughtsPhoneI10)
+          it {}
+        }
+
+        note {
+          contents: "i10"
+        }
+
+        label {
+          contents: "thoughtsPhoneI10"
+        }
+      }
+    }
+  }
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i10"
+      }
+    }
+  }
+}
+
+@context(i10="on", i11="on")
+thoughtsPhoneStatesI11 = frame : thoughtsPhoneStatesI10 {
+  title: "Thoughts · phone · states · i11",
+  left: 1228px,
+  top: 1116px,
+
+  body {
+    row-1 {
+      st-thoughtsPhone {
+        slot {
+          @with-variant(thoughtsPhoneI11)
+          it {}
+        }
+
+        note {
+          contents: "i11"
+        }
+
+        label {
+          contents: "thoughtsPhoneI11"
+        }
+      }
+    }
+  }
+
+  boardHead {
+    boardTag {
+      iterName {
+        contents: "i11"
+      }
+    }
+  }
+}
